@@ -21,8 +21,10 @@
     "lucide-react": "^0.424.0",
     "next": "14.2.5",
     "node-cron": "^3.0.3",
+    "node-loader": "^2.0.0",
     "react": "^18",
     "react-dom": "^18",
+    "save": "^2.9.0",
     "tailwind-merge": "^2.4.0",
     "tailwindcss-animate": "^1.0.7",
     "zlib-sync": "^0.1.9"

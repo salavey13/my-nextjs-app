@@ -10,17 +10,12 @@ import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Badge, Button } from "@/components/ui/badge";
-import { Client, GatewayIntentBits } from 'discord.js';
-import cron from 'node-cron';
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { supabase } from "../../lib/supabaseClient.ts"
 
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_KEY;
-const supabase = createClient(supabaseUrl, supabaseKey);
 
-const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages] });
-
-export function MemberDashboard() {
+export default function MemberDashboard() {
   const [members, setMembers] = useState([]);
 
   useEffect(() => {
@@ -56,54 +51,6 @@ export function MemberDashboard() {
       );
     }
   };
-
-  useEffect(() => {
-    // Discord Bot Logic
-    client.on('messageCreate', async message => {
-      if (message.author.bot) return;
-
-      const { data, error } = await supabase
-        .from('user_requests')
-        .select('*')
-        .eq('discord_id', message.author.id)
-        .single();
-
-      if (error && error.code === 'PGRST116') {
-        await supabase
-          .from('user_requests')
-          .insert([{ discord_id: message.author.id, request_count: 1, is_vip: false }]);
-        message.reply('Request received! You have 9 free requests left today.');
-      } else {
-        if (data.is_vip || data.request_count < 10) {
-          await supabase
-            .from('user_requests')
-            .update({ request_count: data.request_count + 1 })
-            .eq('discord_id', message.author.id);
-
-          // Simulate Automa interaction
-          navigator.clipboard.writeText(message.content);
-          setTimeout(async () => {
-            const replyMessage = await navigator.clipboard.readText();
-            message.reply(replyMessage);
-          }, 10000);
-        } else {
-          message.reply('You have exceeded your daily request limit. Upgrade to VIP for unlimited access!');
-        }
-      }
-    });
-
-    client.login(process.env.DISCORD_BOT_TOKEN);
-  }, []);
-
-  useEffect(() => {
-    // Daily reset of request counts
-    cron.schedule('0 0 * * *', async () => {
-      await supabase
-        .from('user_requests')
-        .update({ request_count: 0 });
-      console.log('Daily request counts reset');
-    });
-  }, []);
 
   return (
     <div className="w-full min-h-screen bg-muted/40 flex flex-col">
