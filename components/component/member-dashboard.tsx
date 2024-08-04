@@ -11,7 +11,6 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Badge, Button } from "@/components/ui/badge";
 import { Client, GatewayIntentBits } from 'discord.js';
 import cron from 'node-cron';
-import Link from "next/link";
 
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_KEY;
