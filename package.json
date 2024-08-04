@@ -24,7 +24,8 @@
     "react": "^18",
     "react-dom": "^18",
     "tailwind-merge": "^2.4.0",
-    "tailwindcss-animate": "^1.0.7"
+    "tailwindcss-animate": "^1.0.7",
+    "zlib-sync": "^0.1.9"
   },
   "devDependencies": {
     "@types/node": "^20",
