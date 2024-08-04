@@ -1,8 +1,7 @@
 import { Client, GatewayIntentBits } from 'discord.js';
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '@supabase/supabase-js';
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent] });
-const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
 
 client.on('messageCreate', async message => {
   if (message.author.bot) return;
