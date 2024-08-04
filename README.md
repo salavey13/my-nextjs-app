@@ -34,3 +34,18 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+
+# My Discord Bot with Vercel UI
+
+This project integrates a Discord bot with a web UI component deployed on Vercel. The bot listens for requests and triggers workflows based on VIP status and request count.
+
+## Setup
+
+1. Install dependencies: `npm install`
+2. Start the development server: `npm run dev`
+3. Build the project: `npm run build`
+4. Export the project: `npm run export`
+
+## Deployment
+
+Deploy to Vercel by connecting your GitHub repository or manually uploading the project.

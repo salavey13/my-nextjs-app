@@ -1,0 +1,19 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/bot",
+      "dest": "/pages/api/bot.js"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/pages/index.js"
+    }
+  ]
+}
