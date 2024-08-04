@@ -12,7 +12,7 @@ import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { supabase } from "../../lib/supabaseClient.ts"
+import { supabase } from "../../lib/supabaseClient"
 
 
 export default function MemberDashboard() {
