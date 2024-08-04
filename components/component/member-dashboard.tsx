@@ -14,9 +14,16 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { supabase } from "../../lib/supabaseClient"
 
+interface UserRequest {
+  id: number;
+  created_at: string;
+  discord_id: string;
+  request_count: number;
+  is_vip: boolean;
+}
 
 export default function MemberDashboard() {
-  const [members, setMembers] = useState([]);
+  const [members, setMembers] = useState<UserRequest[]>([]);
 
   useEffect(() => {
     // Fetch members from Supabase
