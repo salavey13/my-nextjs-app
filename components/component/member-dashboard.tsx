@@ -29,20 +29,21 @@ export default function MemberDashboard() {
     // Fetch members from Supabase
     const fetchMembers = async () => {
       const { data, error } = await supabase
-        .from('user_requests')
+        .from<UserRequest>('user_requests')
         .select('*');
 
       if (error) {
         console.error("Error fetching members:", error);
       } else {
-        setMembers(data);
+        setMembers(data || []); // Ensure data is not undefined
       }
     };
+
 
     fetchMembers();
   }, []);
 
-  const makeVip = async (discordId) => {
+  const makeVip = async (discordId: string) => {
     const { data, error } = await supabase
       .from('user_requests')
       .update({ is_vip: true })
