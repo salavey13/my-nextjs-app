@@ -29,16 +29,15 @@ export default function MemberDashboard() {
     // Fetch members from Supabase
     const fetchMembers = async () => {
       const { data, error } = await supabase
-        .from<UserRequest>('user_requests')
+        .from('user_requests')
         .select('*');
 
       if (error) {
         console.error("Error fetching members:", error);
       } else {
-        setMembers(data || []); // Ensure data is not undefined
+        setMembers(data as UserRequest[] || []); // Cast data to UserRequest[]
       }
     };
-
 
     fetchMembers();
   }, []);
