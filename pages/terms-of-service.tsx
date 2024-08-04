@@ -8,7 +8,7 @@ const TermsOfService = () => {
 
       <h2 className="text-2xl font-semibold mt-6">Introduction</h2>
       <p>
-        By using JuniperScriptBot ("the Bot"), you agree to these Terms of Service ("Terms"). If you do not agree with these Terms, you may not use the Bot.
+        By using JuniperScriptBot (&quot;the Bot&quot;), you agree to these Terms of Service (&quot;Terms&quot;). If you do not agree with these Terms, you may not use the Bot.
       </p>
 
       <h2 className="text-2xl font-semibold mt-6">Usage</h2>
