@@ -1,7 +1,8 @@
-// next.config.js
-module.exports = {
-  reactStrictMode: true,
+/** @type {import('next').NextConfig} */
+const nextConfig = {
   experimental: {
-    appDir: true,
+    // remove 'appDir' if it's causing issues or make sure it's correctly configured
   },
 };
+
+module.exports = nextConfig;
