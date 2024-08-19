@@ -1,5 +1,6 @@
-import MemberDashboard from "@/components/component/member-dashboard";
+// src/app/page.tsx
+import Dashboard from "@/components/Dashboard";
 
 export default function Home() {
-  return <MemberDashboard />;
+  return <Dashboard />;
 }
