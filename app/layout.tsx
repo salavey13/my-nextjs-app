@@ -7,7 +7,7 @@ import { AppProvider } from "../context/AppContext";
 import Referral from "@/components/Referral";
 import { ReactNode } from "react";
 import { TranslationProvider } from '../utils/TranslationUtils'; // Adjust the import path as needed
-
+import Link from "next/link";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -33,6 +33,13 @@ export default function RootLayout({
           </AppProvider>
         </UserProvider>
       </body>
+      
+      <footer className="p-4">
+        <div className="flex justify-center space-x-4">
+          <Link href="/terms-of-service">Terms of Service</Link>
+          <Link href="/privacy-policy">Privacy Policy</Link>
+        </div>
+      </footer>
     </html>
   );
 }
