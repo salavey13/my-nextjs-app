@@ -37,7 +37,7 @@ export default function Dashboard() {
       const { data, error } = await supabase
         .from('bets')
         .select('*')
-        .eq('user', store.tg_id); // Ensure only bets for the current user
+        .eq('user_id', store.tg_id); // Ensure only bets for the current user
 
       if (error) {
         console.error("Error fetching bets:", error);
