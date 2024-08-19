@@ -1,11 +1,8 @@
-// src/context/AppContext.tsx
-import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
-import { languageDictionary } from '../utils/TranslationUtils';
+"use client";
 
-const supabaseUrl = 'https://your-supabase-url.supabase.co';
-const supabaseKey = 'your-supabase-key';
-const supabase: SupabaseClient = createClient(supabaseUrl, supabaseKey);
+import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
+import { supabase } from '../lib/supabaseClient'; // Import from lib/supabaseClient.ts
+import { languageDictionary } from '../utils/TranslationUtils';
 
 const defaultStore = {
   tg_id: '',
@@ -22,12 +19,10 @@ interface AppContextType {
   store: typeof defaultStore;
   setStore: React.Dispatch<React.SetStateAction<typeof defaultStore>>;
   fetchPlayer: (tg_id: string, username: string) => void;
-  logDebugInfo: (message: string) => void;
   t: (key: string) => string;
   user: any;
   setUser: React.Dispatch<React.SetStateAction<any>>;
   changeLanguage: (langCode: string) => void;
-  supabase: SupabaseClient;
   updateUserReferral: (referrerId: string, gameId: string) => void;
   increaseReferrerX: (referrerId: string) => void;
 }
@@ -86,7 +81,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   };
 
   return (
-    <AppContext.Provider value={{ store, setStore, fetchPlayer, t, user, setUser, changeLanguage, supabase, updateUserReferral, increaseReferrerX }}>
+    <AppContext.Provider value={{ store, setStore, fetchPlayer, t, user, setUser, changeLanguage, updateUserReferral, increaseReferrerX }}>
       {children}
     </AppContext.Provider>
   );

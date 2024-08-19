@@ -1,41 +1,65 @@
 // src/components/Referral.tsx
-import React, { useState, useEffect } from 'react';
-import { useGame } from '../context/AppContext';
+"use client";
+
+import React, { useState } from 'react';
+import { supabase } from '../lib/supabaseClient'; // Updated import path
+import { useUser } from '../context/UserContext';
 
 const Referral: React.FC = () => {
-  const { user, store, supabase, fetchPlayer } = useGame();
-  const [referralLink, setReferralLink] = useState<string | null>(null);
+  const { user } = useUser();
+  const [refereeUsername, setRefereeUsername] = useState('');
+  const [referralLevel, setReferralLevel] = useState(1); // Default to level 1
 
-  useEffect(() => {
-    if (!store.tg_id && user) {
-      fetchPlayer(user.telegram_id, user.telegram_username);
-    }
-    if (!store.coins) {
-      alert('Please add your TON wallet address to your profile to receive payments.');
-    }
-  }, [store.tg_id, user, store.coins, fetchPlayer]);
+  const handleReferUser = async () => {
+    if (!user) return; // Ensure user is defined
 
-  const generateReferralLink = async () => {
-    const { data, error } = await supabase.from('referrals').insert([{ referrer_id: store.tg_id }]).select().single();
-    if (error) {
-      console.error('Error generating referral link:', error);
-    } else {
-      setReferralLink(`${window.location.origin}/signup?referral_id=${data.id}`);
+    // Check if the referee exists
+    const { data: refereeData, error: refereeError } = await supabase
+      .from('users')
+      .select('id')
+      .eq('telegram_username', refereeUsername)
+      .single();
+
+    if (refereeError || !refereeData) {
+      console.error('Error fetching referee data:', refereeError);
+      return;
     }
+
+    // Insert referral data with level
+    const { error: referralError } = await supabase.from('referrals').insert([
+      { referrer_id: user.id, referee_id: refereeData.id, level: referralLevel },
+    ]);
+
+    if (referralError) {
+      console.error('Error referring user:', referralError);
+      return;
+    }
+
+    // Update referrer's total referrals
+    const { error: updateError } = await supabase.from('users').update({ total_referrals: user.total_referrals + 1 }).eq('id', user.id);
+
+    if (updateError) {
+      console.error('Error updating referrer referrals:', updateError);
+      return;
+    }
+
+    setRefereeUsername('');
+    setReferralLevel(referralLevel + 1); // Increase level for next referral
   };
 
   return (
     <div className="p-4">
-      <h2 className="text-xl font-bold mb-4">Invite Friends</h2>
-      <button onClick={generateReferralLink} className="btn btn-primary mb-4">
-        Generate Referral Link
+      <h2 className="text-xl font-bold mb-4">Refer a Friend</h2>
+      <input
+        type="text"
+        placeholder="Friend's Username"
+        value={refereeUsername}
+        onChange={(e) => setRefereeUsername(e.target.value)}
+        className="input input-bordered w-full mb-2"
+      />
+      <button onClick={handleReferUser} className="btn btn-primary">
+        Refer User
       </button>
-      {referralLink && (
-        <div className="mb-4">
-          <p>Share this link with friends:</p>
-          <a href={referralLink} className="text-blue-500">{referralLink}</a>
-        </div>
-      )}
     </div>
   );
 };

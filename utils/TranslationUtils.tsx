@@ -1,6 +1,7 @@
 // src/utils/TranslationUtils.tsx
-import React, { createContext, useContext, FC } from "react";
-import { useGame } from "../context/AppContext.tsx";
+"use client";
+import React, { createContext, useContext, ReactNode, FC } from "react";
+import { useGame } from "../context/AppContext";
 
 type LanguageDictionary = {
   [key: string]: { [key: string]: string };
@@ -10,7 +11,11 @@ const TranslationContext = createContext<
   { t: (key: string) => string } | undefined
 >(undefined);
 
-export const TranslationProvider: FC = ({ children }) => {
+interface TranslationProviderProps {
+  children: ReactNode;
+}
+
+export const TranslationProvider: FC<TranslationProviderProps> = ({ children }) => {
   const { store } = useGame();
   const currentLanguage = store.lang || "en";
 
@@ -28,7 +33,7 @@ export const TranslationProvider: FC = ({ children }) => {
 export const useTranslation = () => {
   const context = useContext(TranslationContext);
   if (!context) {
-    throw new Error("useTranslation must be used within a TranslationProvider");
+    throw new Error('useTranslation must be used within a TranslationProvider');
   }
   return context;
 };
