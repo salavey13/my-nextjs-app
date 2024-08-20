@@ -22,7 +22,7 @@ const Referral: React.FC = () => {
 
       if (error || !data) {
         // Handle case where referral code doesn't exist (create a new one)
-        const newRefCode = `${user.id}-${Date.now()}`;
+        const newRefCode = `${user?.telegram_id}-${Date.now()}`;
         const { error: insertError } = await supabase
           .from('referrals')
           .insert([{ user_id: user?.telegram_id, ref_code: newRefCode }]);
@@ -45,10 +45,17 @@ const Referral: React.FC = () => {
 
     const telegramMessage = `${friendName}! ${t("inviteMessage")} t.me/oneSitePlsBot/vip?ref=${referralCode}`;
 
-    const telegramUrl = `https://t.me/share/url?url=${encodeURIComponent(telegramMessage)}`;
+    const telegramUrl = `https://telegram.me/share/url?url=${encodeURIComponent(telegramMessage)}`;
 
     window.open(telegramUrl, '_blank');
   };
+
+  
+
+  const inviteFriend = () => {
+    const url = `t.me/oneSitePlsBot/vip?ref=${referralCode}`
+    window.open(`https://telegram.me/share/url?url=${url}`, "_blank")
+  }
 
   return (
     <div className="p-4">
