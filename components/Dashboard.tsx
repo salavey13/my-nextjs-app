@@ -32,6 +32,7 @@ interface Event {
 export default function Dashboard() {
   const [bets, setBets] = useState<Bet[]>([]);
   const [events, setEvents] = useState<Event[]>([]);
+  const [allEvents, setAllEvents] = useState<Event[]>([]);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [betAmount, setBetAmount] = useState<string>('');
   const { user, t } = useAppContext();
@@ -65,8 +66,22 @@ export default function Dashboard() {
       }
     };
 
+    // Fetch events from Supabase
+    const fetchAllEvents = async () => {
+      const { data, error } = await supabase
+        .from('events')
+        .select('*')
+        
+      if (error) {
+        console.error("Error fetching all events:", error);
+      } else {
+        setAllEvents(data || []);
+      }
+    };
+
     fetchBets();
     fetchEvents();
+    fetchAllEvents();
   }, [user?.telegram_id, bets]);
 
   // Handler for placing a bet
@@ -87,7 +102,7 @@ export default function Dashboard() {
             user_id: user?.telegram_id,
             event_id: selectedEvent.id,
             amount: betAmount,
-            outcome: 'pending',
+            outcome: 'Pending',
             status: 'active',
           },
         ]);
@@ -108,6 +123,12 @@ export default function Dashboard() {
     }
   };
 
+  // Function to get the event title by event ID
+  const getEventTitleById = (eventId: number) => {
+    const event = allEvents.find(e => e.id === eventId);
+    return event ? event.title : 'Unknown Event';
+  };
+
   return (
     <div className="w-full min-h-screen bg-muted/40 flex flex-col p-4 overflow-auto">
       <div className="flex justify-between items-center mb-4">
@@ -122,6 +143,7 @@ export default function Dashboard() {
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead>{t("title")}</TableHead>
                 <TableHead>{t("amount")}</TableHead>
                 <TableHead>{t("outcome")}</TableHead>
                 <TableHead>{t("status")}</TableHead>
@@ -130,7 +152,8 @@ export default function Dashboard() {
             <TableBody>
               {bets.map(bet => (
                 <TableRow key={bet.id}>
-                  <TableCell>{bet.amount} TON</TableCell>
+                  <TableCell>{getEventTitleById(bet.event_id)}</TableCell>
+                  <TableCell>{bet.amount}</TableCell>
                   <TableCell>{bet.outcome}</TableCell>
                   <TableCell>
                     {bet.status === 'active' ? (
