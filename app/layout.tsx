@@ -36,8 +36,6 @@ export default function RootLayout({
                 <div className="flex space-x-4">
                   <Link href="/terms-of-service" className="text-sm">Terms of Service</Link>
                   <Link href="/privacy-policy" className="text-sm">Privacy Policy</Link>
-                </div>
-                <div className="flex space-x-4">
                   <Link href="/page1" className="text-sm">Page 1</Link>
                   <Link href="/page2" className="text-sm">Page 2</Link>
                   {/* Add more links as needed */}
