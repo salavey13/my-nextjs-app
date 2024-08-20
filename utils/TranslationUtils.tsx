@@ -151,6 +151,8 @@ export const languageDictionary: LanguageDictionary = {
     skip: "Skip",
     continue: "Continue",
     exit: "Exit",
+    active: "Active",
+    activeBets: "Active Bets and Events",
   },
   ru: {
     name: "Русский",
@@ -160,6 +162,8 @@ export const languageDictionary: LanguageDictionary = {
     addTask: "Добавить задачу",
     complete: "Завершить",
     delete: "Удалить",
+    active: "Активный",
+    activeBets: "Активные ставки и события",
     // Add more translations...
   },
   ukr: {
@@ -170,6 +174,8 @@ export const languageDictionary: LanguageDictionary = {
     addTask: "Додати завдання",
     complete: "Завершити",
     delete: "Видалити",
+    active: "Активний",
+    activeBets: "Активні ставки та події",
     // Add more translations...
   },
 };

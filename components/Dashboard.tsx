@@ -10,7 +10,8 @@ import { useAppContext } from "../context/AppContext";
 // Define the shape of the bet data
 interface Bet {
   id: number;
-  user: string;
+  user_id: number;
+  event_id: number;
   amount: number;
   outcome: string;
   status: string;
@@ -29,7 +30,7 @@ interface Event {
 export default function Dashboard() {
   const [bets, setBets] = useState<Bet[]>([]);
   const [events, setEvents] = useState<Event[]>([]);
-  const { user } = useAppContext();
+  const { user , t} = useAppContext();
 
   useEffect(() => {
     // Fetch bets from Supabase
@@ -51,7 +52,7 @@ export default function Dashboard() {
       const { data, error } = await supabase
         .from('events')
         .select('*')
-        .not('id', 'in', `(${bets.map(bet => bet.id).join(',')})`); // Exclude events already bet on
+        .not('id', 'in', `(${bets.map(bet => bet.event_id).join(',')})`); // Exclude events already bet on
 
       if (error) {
         console.error("Error fetching events:", error);
@@ -73,7 +74,7 @@ export default function Dashboard() {
   return (
     <div className="w-full min-h-screen bg-muted/40 flex flex-col p-4 overflow-auto">
       <div className="flex justify-between items-center mb-4">
-        <h1 className="text-3xl font-bold">Active Bets and Events</h1>
+        <h1 className="text-3xl font-bold">{t("activeBets")}</h1>
         <span className="text-lg">{user?.telegram_username}</span>
       </div>
       <Card>

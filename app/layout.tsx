@@ -27,24 +27,23 @@ export default function RootLayout({
           <TranslationProvider>
             <div className="flex flex-col flex-grow container mx-auto p-4">
               <div className="flex justify-between items-center mb-4">
-                <h1 className="text-3xl font-bold">IQ/Social Score Calculator</h1>
+                <h1 className="text-3xl font-bold">Калькулятор IQ/социальных показателей</h1>
               </div>
               {children}
             </div>
-            <footer className="bg-gray-800 text-gray-400 p-4">
-              <div className="flex justify-between">
-                <div className="flex space-x-4">
-                  <Link href="/terms-of-service" className="text-sm">Terms of Service</Link>
-                  <Link href="/privacy-policy" className="text-sm">Privacy Policy</Link>
-                  <Link href="/page1" className="text-sm">Page 1</Link>
-                  <Link href="/page2" className="text-sm">Page 2</Link>
-                  {/* Add more links as needed */}
-                </div>
-              </div>
-            </footer>
           </TranslationProvider>
         </AppProvider>
       </body>
+      <footer className="bg-gray-800 text-gray-400 p-4">
+        <div className="flex justify-between">
+          <Link href="/" className="text-sm">✨</Link>
+          <Link href="/privacy-policy" className="text-sm">Политика конфиденциальности</Link>
+          <Link href="/terms-of-service" className="text-sm">Условия использования</Link>
+          <Link href="/page1" className="text-sm">Privacy Policy</Link>
+          <Link href="/page2" className="text-sm">Terms of Service</Link>
+          {/* Add more links as needed */}
+        </div>
+      </footer>
     </html>
   );
 }
