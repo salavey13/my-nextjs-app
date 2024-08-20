@@ -5,7 +5,7 @@ const PrivacyPolicy = () => {
   return (
     <div className="container mx-auto p-6 bg-gray-200 text-white rounded-lg shadow-lg">
       <h1 className="text-4xl font-extrabold mb-6 text-teal-400">Политика конфиденциальности</h1>
-      <p className="text-sm text-gray-400"><strong>Дата вступления в силу:</strong> 4 августа 2024 г.</p>
+      <p className="text-sm text-gray-400"><strong>Дата вступления в силу: </strong>4 августа 2024 г.</p>
 
       <h2 className="text-3xl font-semibold mt-8 text-teal-300">Информация, которую мы собираем</h2>
       <p className="mt-4 text-lg text-gray-300">
