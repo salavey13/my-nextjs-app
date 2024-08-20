@@ -27,7 +27,7 @@ export const DialogTrigger = DialogPrimitive.Trigger;
 export const DialogContent = ({ children, className, ...props }: { children: ReactNode; className?: string }) => {
   return (
     <DialogPrimitive.Portal>
-      <DialogPrimitive.Overlay className="fixed inset-0 bg-black bg-opacity-50 transition-opacity" />
+      <DialogPrimitive.Overlay className="fixed inset-0 bg-black bg-opacity-50 bg-opacity-50 backdrop-blur-sm transition-opacity" />
       <DialogPrimitive.Content
         className={cn(
           "fixed top-1/2 left-1/2 w-full max-w-lg transform -translate-x-1/2 -translate-y-1/2",

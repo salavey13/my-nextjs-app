@@ -5,10 +5,11 @@ import { supabase } from "../lib/supabaseClient";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { useAppContext } from "../context/AppContext";
+import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input"; // Assuming you have an Input component
+import { useAppContext } from "../context/AppContext";
 
+// Define the shape of the bet data
 interface Bet {
   id: number;
   user_id: number;
@@ -18,6 +19,7 @@ interface Bet {
   status: string;
 }
 
+// Define the shape of the event data
 interface Event {
   id: number;
   title: string;
@@ -31,15 +33,16 @@ export default function Dashboard() {
   const [bets, setBets] = useState<Bet[]>([]);
   const [events, setEvents] = useState<Event[]>([]);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
-  const [betAmount, setBetAmount] = useState<string>("");
+  const [betAmount, setBetAmount] = useState<string>('');
   const { user, t } = useAppContext();
 
   useEffect(() => {
+    // Fetch bets from Supabase
     const fetchBets = async () => {
       const { data, error } = await supabase
-        .from("bets")
-        .select("*")
-        .eq("user_id", user?.telegram_id);
+        .from('bets')
+        .select('*')
+        .eq('user_id', user?.telegram_id); // Ensure only bets for the current user
 
       if (error) {
         console.error("Error fetching bets:", error);
@@ -48,11 +51,12 @@ export default function Dashboard() {
       }
     };
 
+    // Fetch events from Supabase
     const fetchEvents = async () => {
       const { data, error } = await supabase
-        .from("events")
-        .select("*")
-        .not("id", "in", `(${bets.map((bet) => bet.event_id).join(",")})`);
+        .from('events')
+        .select('*')
+        .not('id', 'in', `(${bets.map(bet => bet.event_id).join(',')})`); // Exclude events already bet on
 
       if (error) {
         console.error("Error fetching events:", error);
@@ -65,29 +69,42 @@ export default function Dashboard() {
     fetchEvents();
   }, [user?.telegram_id, bets]);
 
-  const handlePlaceBet = (event: Event) => {
-    setSelectedEvent(event);
+  // Handler for placing a bet
+  const handlePlaceBet = async (eventId: number) => {
+    const event = events.find(e => e.id === eventId);
+    if (event) {
+      setSelectedEvent(event);
+    }
   };
 
+  // Confirm Bet Handler
   const confirmBet = async () => {
-    if (!selectedEvent || !betAmount) return;
+    if (selectedEvent && betAmount) {
+      const { error } = await supabase
+        .from('bets')
+        .insert([
+          {
+            user_id: user?.telegram_id,
+            event_id: selectedEvent.id,
+            amount: betAmount,
+            outcome: 'pending',
+            status: 'active',
+          },
+        ]);
 
-    const { data, error } = await supabase
-      .from("bets")
-      .insert({
-        user_id: user?.telegram_id,
-        event_id: selectedEvent.id,
-        amount: parseFloat(betAmount),
-        outcome: "pending",
-        status: "active",
-      });
+      if (error) {
+        console.error("Error placing bet:", error);
+      } else {
+        setSelectedEvent(null);
+        setBetAmount('');
+        // Refresh bets after placing a bet
+        const { data } = await supabase
+          .from('bets')
+          .select('*')
+          .eq('user_id', user?.telegram_id);
 
-    if (error) {
-      console.error("Error placing bet:", error);
-    } else if (data) {
-      setBets([...bets, data[0]]);
-      setSelectedEvent(null);
-      setBetAmount("");
+        setBets(data || []);
+      }
     }
   };
 
@@ -111,12 +128,12 @@ export default function Dashboard() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {bets.map((bet) => (
+              {bets.map(bet => (
                 <TableRow key={bet.id}>
                   <TableCell>{bet.amount} ETH</TableCell>
                   <TableCell>{bet.outcome}</TableCell>
                   <TableCell>
-                    {bet.status === "active" ? (
+                    {bet.status === 'active' ? (
                       <Button variant="outline" size="sm">
                         {t("active")}
                       </Button>
@@ -144,13 +161,13 @@ export default function Dashboard() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {events.map((event) => (
+              {events.map(event => (
                 <TableRow key={event.id}>
                   <TableCell>{event.title}</TableCell>
                   <TableCell>{event.description}</TableCell>
                   <TableCell>
                     <Button
-                      onClick={() => handlePlaceBet(event)}
+                      onClick={() => handlePlaceBet(event.id)}
                       variant="outline"
                       size="sm"
                       disabled={event.expired}
@@ -173,16 +190,18 @@ export default function Dashboard() {
               <DialogTitle>{t("placeBet")}</DialogTitle>
               <DialogDescription>{selectedEvent.title}</DialogDescription>
             </DialogHeader>
-            <div className="my-4">
-              <iframe
-                width="100%"
-                height="315"
-                src={selectedEvent.educational_video_url}
-                title="Educational Video"
-                frameBorder="0"
-                allowFullScreen
-              ></iframe>
-            </div>
+            {selectedEvent.educational_video_url && (
+              <div className="my-4">
+                <iframe
+                  width="100%"
+                  height="315"
+                  src={selectedEvent.educational_video_url}
+                  title="Educational Video"
+                  frameBorder="0"
+                  allowFullScreen
+                ></iframe>
+              </div>
+            )}
             <Input
               type="number"
               placeholder={t("enterBetAmount")}
