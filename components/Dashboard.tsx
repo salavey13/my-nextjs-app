@@ -130,7 +130,7 @@ export default function Dashboard() {
             <TableBody>
               {bets.map(bet => (
                 <TableRow key={bet.id}>
-                  <TableCell>{bet.amount} ETH</TableCell>
+                  <TableCell>{bet.amount} TON</TableCell>
                   <TableCell>{bet.outcome}</TableCell>
                   <TableCell>
                     {bet.status === 'active' ? (
