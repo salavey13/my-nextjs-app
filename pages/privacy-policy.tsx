@@ -2,49 +2,48 @@ import React from "react";
 
 const PrivacyPolicy = () => {
   return (
-    <div className="container mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-4">Privacy Policy</h1>
-      <p><strong>Effective Date:</strong> 4 August 2024</p>
+    <div className="container mx-auto p-6 bg-gray-900 text-white rounded-lg shadow-lg">
+      <h1 className="text-4xl font-extrabold mb-6 text-teal-400">Политика конфиденциальности</h1>
+      <p className="text-sm text-gray-400"><strong>Дата вступления в силу:</strong> 4 августа 2024 г.</p>
 
-      <h2 className="text-2xl font-semibold mt-6">Information We Collect</h2>
-      <p>
-        We collect the following information when you use the Bot:
-        <ul className="list-disc ml-6 mt-2">
-          <li>Discord Username</li>
-          <li>Any content you submit via the Bot (e.g., requests)</li>
+      <h2 className="text-3xl font-semibold mt-8 text-teal-300">Информация, которую мы собираем</h2>
+      <p className="mt-4 text-lg text-gray-300">
+        При использовании Бота oneSitePlsBot мы собираем следующую информацию:
+        <ul className="list-disc ml-8 mt-2 text-gray-300">
+          <li>Ваше имя пользователя в Discord</li>
+          <li>Любой контент, отправленный через Бот (например, запросы или ставки)</li>
         </ul>
-        We do not collect any other personal information.
+        Мы не собираем никакой другой личной информации.
       </p>
 
-      <h2 className="text-2xl font-semibold mt-6">How We Use Your Information</h2>
-      <p>
-        Your Discord username is used to manage your VIP status and track your request limits.
-        Requests submitted through the Bot may be stored and used by us for further development, analysis, or other purposes.
+      <h2 className="text-3xl font-semibold mt-8 text-teal-300">Как мы используем вашу информацию</h2>
+      <p className="mt-4 text-lg text-gray-300">
+        Ваше имя пользователя в Discord используется для управления вашей активностью в ставках и отслеживания вашего участия. Контент, отправленный через Бот, может храниться и использоваться для дальнейшей разработки, анализа и других целей.
       </p>
 
-      <h2 className="text-2xl font-semibold mt-6">Data Security</h2>
-      <p>
-        We implement appropriate technical and organizational measures to protect your data from unauthorized access, loss, or misuse.
+      <h2 className="text-3xl font-semibold mt-8 text-teal-300">Безопасность данных</h2>
+      <p className="mt-4 text-lg text-gray-300">
+        Мы применяем соответствующие технические и организационные меры для защиты ваших данных от несанкционированного доступа, потерь или злоупотреблений.
       </p>
 
-      <h2 className="text-2xl font-semibold mt-6">Data Sharing</h2>
-      <p>
-        We do not share your data with third parties except as necessary to operate the Bot or as required by law.
+      <h2 className="text-3xl font-semibold mt-8 text-teal-300">Обмен данными</h2>
+      <p className="mt-4 text-lg text-gray-300">
+        Мы не передаем ваши данные третьим лицам, за исключением случаев, когда это необходимо для работы Бота или в соответствии с требованиями закона.
       </p>
 
-      <h2 className="text-2xl font-semibold mt-6">Your Rights</h2>
-      <p>
-        You may request the deletion of your data or the termination of your VIP status at any time by contacting us @salavey13.
+      <h2 className="text-3xl font-semibold mt-8 text-teal-300">Ваши права</h2>
+      <p className="mt-4 text-lg text-gray-300">
+        Вы можете запросить удаление ваших данных или прекращение использования Бота в любое время, связавшись с нами по адресу <span className="text-teal-400">@salavey13</span>.
       </p>
 
-      <h2 className="text-2xl font-semibold mt-6">Changes to This Policy</h2>
-      <p>
-        We may update this Privacy Policy from time to time. You are encouraged to review this Policy periodically for any changes.
+      <h2 className="text-3xl font-semibold mt-8 text-teal-300">Изменения в Политике конфиденциальности</h2>
+      <p className="mt-4 text-lg text-gray-300">
+        Мы можем периодически обновлять эту Политику конфиденциальности. Пожалуйста, просматривайте ее регулярно, чтобы быть в курсе изменений.
       </p>
 
-      <h2 className="text-2xl font-semibold mt-6">Contact Us</h2>
-      <p>
-        If you have any questions about this Privacy Policy, please contact us at @salavey13.
+      <h2 className="text-3xl font-semibold mt-8 text-teal-300">Свяжитесь с нами</h2>
+      <p className="mt-4 text-lg text-gray-300">
+        Если у вас есть вопросы по поводу этой Политики конфиденциальности, свяжитесь с нами по адресу <span className="text-teal-400">@salavey13</span>.
       </p>
     </div>
   );

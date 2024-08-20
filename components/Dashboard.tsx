@@ -5,7 +5,7 @@ import { supabase } from "../lib/supabaseClient";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { useGame } from "../context/AppContext";
+import { useAppContext } from "../context/AppContext";
 
 // Define the shape of the bet data
 interface Bet {
@@ -29,7 +29,7 @@ interface Event {
 export default function Dashboard() {
   const [bets, setBets] = useState<Bet[]>([]);
   const [events, setEvents] = useState<Event[]>([]);
-  const { store } = useGame();
+  const { store } = useAppContext();
 
   useEffect(() => {
     // Fetch bets from Supabase

@@ -1,7 +1,7 @@
 // src/utils/TranslationUtils.tsx
 "use client";
 import React, { createContext, useContext, ReactNode, FC } from "react";
-import { useGame } from "../context/AppContext";
+import { useAppContext } from "../context/AppContext";
 
 type LanguageDictionary = {
   [key: string]: { [key: string]: string };
@@ -16,7 +16,7 @@ interface TranslationProviderProps {
 }
 
 export const TranslationProvider: FC<TranslationProviderProps> = ({ children }) => {
-  const { store } = useGame();
+  const { store } = useAppContext();
   const currentLanguage = store.lang || "en";
 
   const t = (key: string): string => {

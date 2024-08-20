@@ -3,10 +3,10 @@
 
 import React, { useState } from 'react';
 import { supabase } from '../lib/supabaseClient'; // Updated import path
-import { useUser } from '../context/UserContext';
+import { useAppContext } from '../context/AppContext';
 
 const Referral: React.FC = () => {
-  const { user } = useUser();
+  const { user } = useAppContext();
   const [refereeUsername, setRefereeUsername] = useState('');
   const [referralLevel, setReferralLevel] = useState(1); // Default to level 1
 

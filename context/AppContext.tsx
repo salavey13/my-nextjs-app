@@ -1,10 +1,10 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
-import { supabase } from '../lib/supabaseClient'; // Import from lib/supabaseClient.ts
+import { supabase } from '../lib/supabaseClient';
 import { languageDictionary } from '../utils/TranslationUtils';
 
-// Define the default store state
+// Default store state
 const defaultStore = {
   tg_id: '',
   username: '',
@@ -16,30 +16,32 @@ const defaultStore = {
   currentGameId: '',
 };
 
+// User type definition
 interface UserData {
+  id: number;
   telegram_id: number;
   telegram_username: string;
-  coins: string;
-  xp: string;
-  lang: string;
-  X: string;
-  // Add other fields as needed
+  iq: number | null;
+  social_credit: number;
+  role: number;
+  total_referrals: number;
+  referral_bonus: number;
 }
 
-// Define the AppContext type
+// Combined context type
 interface AppContextType {
   store: typeof defaultStore;
   setStore: React.Dispatch<React.SetStateAction<typeof defaultStore>>;
+  user: UserData | null;
+  setUser: React.Dispatch<React.SetStateAction<UserData | null>>;
   fetchPlayer: (tg_id: string, username: string, lang: string) => void;
   t: (key: string) => string;
-  user: any;
-  setUser: React.Dispatch<React.SetStateAction<any>>;
   changeLanguage: (langCode: string) => void;
   updateUserReferral: (referrerId: string, gameId: string) => void;
   increaseReferrerX: (referrerId: string) => void;
 }
 
-// Create the AppContext
+// Create the combined AppContext
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
@@ -81,7 +83,6 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
       if (error) throw error;
 
-      // Ensure `newUser` is properly typed
       const userData: UserData = newUser as UserData;
 
       setStore((prev) => ({ ...prev, ...userData }));
@@ -104,7 +105,6 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const updateUserReferral = async (referrerId: string, gameId: string) => {
     try {
       await supabase.from('users').update({ referer: referrerId }).eq('telegram_id', store.tg_id);
-      await supabase.from('game_participants').insert([{ game_id: gameId, user_id: store.tg_id }]);
     } catch (error) {
       console.error('Update referral error:', error);
     }
@@ -124,16 +124,59 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     }
   };
 
+  useEffect(() => {
+    const initTelegramWebApp = () => {
+      const script = document.createElement("script");
+      script.src = "https://telegram.org/js/telegram-web-app.js";
+      script.async = true;
+      document.head.appendChild(script);
+
+      script.onload = () => {
+        if (window.Telegram?.WebApp) {
+          const initData = window.Telegram.WebApp.initData;
+
+          if (initData) {
+            const urlParams = new URLSearchParams(initData);
+            const userParam = urlParams.get("user");
+
+            if (userParam) {
+              const user = JSON.parse(decodeURIComponent(userParam));
+              if (!user.id) return;
+
+              fetchPlayer(user.id.toString(), user.username, store.lang);
+            }
+
+            setupTelegramBackButton();
+          }
+        }
+      };
+
+      return () => {
+        document.head.removeChild(script);
+      };
+    };
+
+    initTelegramWebApp();
+  }, [fetchPlayer, store.lang]);
+
+  const setupTelegramBackButton = () => {
+    const backButton = window.Telegram?.WebApp?.BackButton;
+    if (backButton) {
+      backButton.show();
+      backButton.onClick(() => window.history.back());
+    }
+  };
+
   return (
-    <AppContext.Provider value={{ store, setStore, fetchPlayer, t, user, setUser, changeLanguage, updateUserReferral, increaseReferrerX }}>
+    <AppContext.Provider value={{ store, setStore, user, setUser, fetchPlayer, t, changeLanguage, updateUserReferral, increaseReferrerX }}>
       {children}
     </AppContext.Provider>
   );
 };
 
 // Custom hook to use AppContext
-export const useGame = () => {
+export const useAppContext = () => {
   const context = useContext(AppContext);
-  if (!context) throw new Error('useGame must be used within an AppProvider');
+  if (!context) throw new Error('useAppContext must be used within an AppProvider');
   return context;
 };
