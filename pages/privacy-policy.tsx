@@ -2,7 +2,7 @@ import React from "react";
 
 const PrivacyPolicy = () => {
   return (
-    <div className="container mx-auto p-6 bg-gray-900 text-white rounded-lg shadow-lg">
+    <div className="container mx-auto p-6 bg-gray-200 text-white rounded-lg shadow-lg">
       <h1 className="text-4xl font-extrabold mb-6 text-teal-400">Политика конфиденциальности</h1>
       <p className="text-sm text-gray-400"><strong>Дата вступления в силу:</strong> 4 августа 2024 г.</p>
 
@@ -18,7 +18,7 @@ const PrivacyPolicy = () => {
 
       <h2 className="text-3xl font-semibold mt-8 text-teal-300">Как мы используем вашу информацию</h2>
       <p className="mt-4 text-lg text-gray-300">
-        Ваше имя пользователя в Discord используется для управления вашей активностью в ставках и отслеживания вашего участия. Контент, отправленный через Бот, может храниться и использоваться для дальнейшей разработки, анализа и других целей.
+        Ваше имя пользователя в Telegram используется для управления вашей активностью в ставках и отслеживания вашего участия. Контент, отправленный через Бот, может храниться и использоваться для дальнейшей разработки, анализа и других целей.
       </p>
 
       <h2 className="text-3xl font-semibold mt-8 text-teal-300">Безопасность данных</h2>

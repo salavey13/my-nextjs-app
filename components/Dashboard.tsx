@@ -29,7 +29,7 @@ interface Event {
 export default function Dashboard() {
   const [bets, setBets] = useState<Bet[]>([]);
   const [events, setEvents] = useState<Event[]>([]);
-  const { store } = useAppContext();
+  const { user } = useAppContext();
 
   useEffect(() => {
     // Fetch bets from Supabase
@@ -37,7 +37,7 @@ export default function Dashboard() {
       const { data, error } = await supabase
         .from('bets')
         .select('*')
-        .eq('user_id', store.tg_id); // Ensure only bets for the current user
+        .eq('user_id', user?.telegram_id); // Ensure only bets for the current user
 
       if (error) {
         console.error("Error fetching bets:", error);
@@ -62,7 +62,7 @@ export default function Dashboard() {
 
     fetchBets();
     fetchEvents();
-  }, [store.tg_id, bets]);
+  }, [user?.telegram_id, bets]);
 
   // Handler for placing a bet
   const handlePlaceBet = async (eventId: number) => {
@@ -74,7 +74,7 @@ export default function Dashboard() {
     <div className="w-full min-h-screen bg-muted/40 flex flex-col p-4 overflow-auto">
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-3xl font-bold">Active Bets and Events</h1>
-        <span className="text-lg">User: {store.username}</span>
+        <span className="text-lg">{user?.telegram_username}</span>
       </div>
       <Card>
         <CardHeader>
