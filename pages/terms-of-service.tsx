@@ -1,5 +1,6 @@
 import React from "react";
 import Footer from "../components/ui/footer";
+import "../app/globals.css";
 const TermsOfService = () => {
   return (
     <div className="container mx-auto p-6 bg-gray-200 text-white rounded-lg shadow-lg">
