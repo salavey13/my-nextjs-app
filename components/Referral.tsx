@@ -17,7 +17,7 @@ const Referral: React.FC = () => {
       const { data, error } = await supabase
         .from('referrals')
         .select('ref_code')
-        .eq('user_id', user.id)
+        .eq('user_id', user?.telegram_id)
         .single();
 
       if (error || !data) {
@@ -25,7 +25,7 @@ const Referral: React.FC = () => {
         const newRefCode = `${user.id}-${Date.now()}`;
         const { error: insertError } = await supabase
           .from('referrals')
-          .insert([{ user_id: user.id, ref_code: newRefCode }]);
+          .insert([{ user_id: user?.telegram_id, ref_code: newRefCode }]);
 
         if (insertError) {
           console.error('Error generating referral code:', insertError);
