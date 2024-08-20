@@ -151,6 +151,7 @@ export const languageDictionary: LanguageDictionary = {
     skip: "Skip",
     continue: "Continue",
     exit: "Exit",
+    calcTitle: "IQ/social indicators calculator",
     active: "Active",
     activeBets: "Active Bets and Events",
     amount: "Amount",
@@ -163,6 +164,10 @@ export const languageDictionary: LanguageDictionary = {
     bet: "Bet",
     placeBet: "Place Bet",
     enterBetAmount: "Enter Bet Amount",
+    referFriend: "Refer a Friend",
+    friendNamePlaceholder: "Friend's Name",
+    inviteFriendButton: "Invite Friend",
+    inviteMessage: "Hey {name}, join me on this amazing platform! Click the link below to get started:"
   },
   ru: {
     name: "Русский",
@@ -185,6 +190,14 @@ export const languageDictionary: LanguageDictionary = {
     placeBet: "Сделать Ставку",
     enterBetAmount: "Введите Сумму Ставки",
     confirm: "Подтвердить",
+    calcTitle: "Калькулятор IQ/социальных показателей",
+    friendNamePlaceholder: "Friend's Name",
+    inviteFriendButton: "Invite Friend",
+    inviteMessage: "Hey {name}, join me on this amazing platform! Click the link below to get started:",
+    referFriend: "Пригласи друга",
+    friendsNamePlaceholder: "Имя друга",
+    InviteFriendButton: "Пригласить друга",
+    InviteMessage: "Эй, {name}, присоединяйся ко мне на этой удивительной платформе! Нажмите на ссылку ниже, чтобы начать:"
     // Add more translations...
   },
   ukr: {
@@ -206,6 +219,11 @@ export const languageDictionary: LanguageDictionary = {
     bet: "Ставка",
     placeBet: "Зробити ставку",
     enterBetAmount: "Введіть суму ставки",
+    calcTitle: "Калькулятор IQ/соціальних показників",
+    referFriend: "Запропонуйте другу",
+    friendNamePlaceholder: "Ім'я друга",
+    inviteFriendButton: "Запросити друга",
+    inviteMessage: "Привіт, {name}, приєднуйся до мене на цій дивовижній платформі! Натисніть посилання нижче, щоб почати:"
     // Add more translations...
   },
 };

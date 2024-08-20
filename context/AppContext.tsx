@@ -39,6 +39,8 @@ interface AppContextType {
   changeLanguage: (langCode: string) => void;
   updateUserReferral: (referrerId: string, gameId: string) => void;
   increaseReferrerX: (referrerId: string) => void;
+  debugLogs: string[];
+  addDebugLog: (log: string) => void;
 }
 
 // Create the combined AppContext
@@ -47,6 +49,11 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [store, setStore] = useState(defaultStore);
   const [user, setUser] = useState<UserData | null>(null);
+  const [debugLogs, setDebugLogs] = useState<string[]>([]);
+
+  const addDebugLog = (log: string) => {
+    setDebugLogs((prevLogs) => [...prevLogs, log]);
+  };
 
   // Function to fetch or insert player data
   const fetchPlayer = useCallback(async (tg_id: string, username: string, lang: string) => {
@@ -59,6 +66,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
       if (error && error.code !== 'PGRST116') {
         console.error('Fetch error:', error);
+        addDebugLog(`Fetch error: ${error}`)
         return;
       }
 
@@ -70,6 +78,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       }
     } catch (error) {
       console.error('Fetch/Insert error:', error);
+      addDebugLog(`Fetch/Insert error: ${error}`)
     }
   }, []);
 
@@ -81,7 +90,10 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         .insert([{ telegram_id: tg_id, telegram_username: username, coins: '420', xp: '1000', lang, X: '0' }])
         .single();
 
-      if (error) throw error;
+      if (error) {
+        addDebugLog(`Insert error: ${error}`)
+        throw error;
+      }
 
       const userData: UserData = newUser as UserData;
 
@@ -89,6 +101,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       setUser(userData);
     } catch (error) {
       console.error('Insert error:', error);
+      addDebugLog(`caught Insert error: ${error}`)
     }
   };
 
@@ -168,7 +181,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   };
 
   return (
-    <AppContext.Provider value={{ store, setStore, user, setUser, fetchPlayer, t, changeLanguage, updateUserReferral, increaseReferrerX }}>
+    <AppContext.Provider value={{ store, setStore, user, setUser, fetchPlayer, t, changeLanguage, updateUserReferral, increaseReferrerX, debugLogs, addDebugLog  }}>
       {children}
     </AppContext.Provider>
   );

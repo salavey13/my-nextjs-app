@@ -1,64 +1,67 @@
-// src/components/Referral.tsx
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient'; // Updated import path
 import { useAppContext } from '../context/AppContext';
 
 const Referral: React.FC = () => {
-  const { user } = useAppContext();
-  const [refereeUsername, setRefereeUsername] = useState('');
-  const [referralLevel, setReferralLevel] = useState(1); // Default to level 1
+  const { user, t } = useAppContext();
+  const [friendName, setFriendName] = useState('');
+  const [referralCode, setReferralCode] = useState('');
 
-  const handleReferUser = async () => {
-    if (!user) return; // Ensure user is defined
+  useEffect(() => {
+    if (!user) return;
 
-    // Check if the referee exists
-    const { data: refereeData, error: refereeError } = await supabase
-      .from('users')
-      .select('id')
-      .eq('telegram_username', refereeUsername)
-      .single();
+    // Fetch or generate a referral code for the user
+    const fetchReferralCode = async () => {
+      const { data, error } = await supabase
+        .from('referrals')
+        .select('ref_code')
+        .eq('user_id', user.id)
+        .single();
 
-    if (refereeError || !refereeData) {
-      console.error('Error fetching referee data:', refereeError);
-      return;
-    }
+      if (error || !data) {
+        // Handle case where referral code doesn't exist (create a new one)
+        const newRefCode = `${user.id}-${Date.now()}`;
+        const { error: insertError } = await supabase
+          .from('referrals')
+          .insert([{ user_id: user.id, ref_code: newRefCode }]);
 
-    // Insert referral data with level
-    const { error: referralError } = await supabase.from('referrals').insert([
-      { referrer_id: user.id, referee_id: refereeData.id, level: referralLevel },
-    ]);
+        if (insertError) {
+          console.error('Error generating referral code:', insertError);
+        } else {
+          setReferralCode(newRefCode);
+        }
+      } else {
+        setReferralCode(data.ref_code);
+      }
+    };
 
-    if (referralError) {
-      console.error('Error referring user:', referralError);
-      return;
-    }
+    fetchReferralCode();
+  }, [user]);
 
-    // Update referrer's total referrals
-    const { error: updateError } = await supabase.from('users').update({ total_referrals: user.total_referrals + 1 }).eq('id', user.id);
+  const handleInviteFriend = () => {
+    if (!user || !referralCode) return;
 
-    if (updateError) {
-      console.error('Error updating referrer referrals:', updateError);
-      return;
-    }
+    const telegramMessage = `${friendName}! ${t("inviteMessage")} t.me/oneSitePlsBot/vip?ref=${referralCode}`;
 
-    setRefereeUsername('');
-    setReferralLevel(referralLevel + 1); // Increase level for next referral
+    const telegramUrl = `https://t.me/share/url?url=${encodeURIComponent(telegramMessage)}`;
+
+    window.open(telegramUrl, '_blank');
   };
 
   return (
     <div className="p-4">
-      <h2 className="text-xl font-bold mb-4">Refer a Friend</h2>
+      <h2 className="text-xl font-bold mb-4">{t("referFriend")}</h2>
       <input
         type="text"
-        placeholder="Friend's Username"
-        value={refereeUsername}
-        onChange={(e) => setRefereeUsername(e.target.value)}
-        className="input input-bordered w-full mb-2"
+        placeholder={t("friendNamePlaceholder")}
+        value={friendName}
+        onChange={(e) => setFriendName(e.target.value)}
+        className="input input-bordered w-full sm:w-3/4 md:w-2/3 lg:w-1/2 mb-2"
       />
-      <button onClick={handleReferUser} className="btn btn-primary">
-        Refer User
+      <button onClick={handleInviteFriend} className="btn btn-primary">
+        {t("inviteFriendButton")}
       </button>
     </div>
   );

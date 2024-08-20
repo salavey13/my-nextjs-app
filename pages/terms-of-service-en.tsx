@@ -1,5 +1,5 @@
 import React from "react";
-import Link from "next/link";
+import Footer from "../components/ui/footer";
 const TermsOfServiceEn = () => {
   return (
     <div className="container mx-auto p-6 bg-gray-200 text-white rounded-lg shadow-lg">
@@ -38,16 +38,7 @@ supporting truth and freedom.
       <p className="mt-4 text-lg text-gray-300">
         If you have any questions about these Terms, please contact us at <span className="text-teal-400">@salavey13</span>.
       </p>
-      <footer className="bg-gray-800 text-gray-400 p-4">
-        <div className="flex justify-between">
-        <Link href="/" className="text-sm">✨</Link>
-          <Link href="/privacy-policy" className="text-sm">Политика конфиденциальности</Link>
-          <Link href="/terms-of-service" className="text-sm">Условия использования</Link>
-          <Link href="/page1" className="text-sm">Privacy Policy</Link>
-          <Link href="/page2" className="text-sm">Terms of Service</Link>
-          {/* Add more links as needed */}
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 };
