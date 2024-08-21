@@ -224,7 +224,7 @@ export default function Dashboard() {
           <DialogContent>
             <DialogHeader>
               <DialogTitle>{t("placeBet")}</DialogTitle>
-              <DialogDescription>{selectedEvent.title}</DialogDescription>
+              <DialogDescription>{store.lang === 'ru' ? selectedEvent.title_ru : store.lang === 'ukr' ? selectedEvent.title_ukr : selectedEvent.title}</DialogDescription>
             </DialogHeader>
             {selectedEvent.educational_video_url && (
               <div className="my-4">
