@@ -135,7 +135,7 @@ const Referral: React.FC = () => {
     const botToken = process.env.NEXT_PUBLIC_BOT_TOKEN;
     const inviteLink = `https://t.me/oneSitePlsBot/vip?ref=${referralCode}`;
     const memeUrl = "https://th.bing.com/th/id/OIG2.fwYLXgRzLnnm2DMcdfl1"//await getRandomMeme();
-    const message = `${t("playWithUs")}  ${user?.telegram_username }! 🎮✨`;
+    const message = `${t("playWithUs")} ${user?.telegram_username }! 🎮✨`;
 
     const url = new URL(`https://api.telegram.org/bot${botToken}/sendPhoto`);
     url.searchParams.append("chat_id", user.telegram_id.toFixed());

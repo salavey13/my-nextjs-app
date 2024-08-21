@@ -107,7 +107,7 @@ export default function Dashboard() {
   };
 
   const confirmBet = async () => {
-    if (selectedEvent && betAmount && user && user.id) {
+    if (selectedEvent && betAmount && user) {
       const { error } = await supabase
         .from('bets')
         .insert([
