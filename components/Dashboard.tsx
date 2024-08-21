@@ -50,7 +50,7 @@ export default function Dashboard() {
       const { data, error } = await supabase
         .from('bets')
         .select('*')
-        .eq('user_id', user.id);
+        .eq('user_id', user.telegram_id);
 
       if (error) {
         console.error("Error fetching bets:", error);
@@ -112,9 +112,9 @@ export default function Dashboard() {
         .from('bets')
         .insert([
           {
-            user_id: Number(user.id),
+            user_id: user?.telegram_id,
             event_id: selectedEvent.id,
-            amount: Number(betAmount),
+            amount: betAmount,
             outcome: 'Pending',
             status: 'active',
           },
@@ -128,7 +128,7 @@ export default function Dashboard() {
         const { data } = await supabase
           .from('bets')
           .select('*')
-          .eq('user_id', user.id);
+          .eq('user_id', user.telegram_id);
 
         setBets(data || []);
       }

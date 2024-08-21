@@ -93,7 +93,7 @@ const Referral: React.FC = () => {
 
     setIsUpdating(true);
 
-    const newReferralCode = `${newName}_13`;
+    const newReferralCode = `${newName}`;
 
     try {
       const { error } = await supabase
