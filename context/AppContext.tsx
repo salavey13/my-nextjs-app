@@ -239,7 +239,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
               const user = JSON.parse(decodeURIComponent(userParam));
               if (!user.id) return;
   
-              fetchPlayer(user.id, user.username, user.lang);
+              fetchPlayer(user.id, user.username, user.language_code);
             }
   
             setupTelegramBackButton();
