@@ -41,7 +41,7 @@ interface AppContextType {
   setStore: React.Dispatch<React.SetStateAction<typeof defaultStore>>;
   user: UserData | null;
   setUser: React.Dispatch<React.SetStateAction<UserData | null>>;
-  fetchPlayer: (tg_id: string, username: string, lang: string) => void;
+  fetchPlayer: (tg_id: number, username: string, lang: string) => void;
   t: (key: string) => string;
   changeLanguage: (langCode: string) => void;
   updateUserReferral: (referrerId: string, gameId: string) => void;
