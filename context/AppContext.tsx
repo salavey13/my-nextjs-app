@@ -2,17 +2,16 @@
 
 import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode, Suspense } from 'react';
 import { supabase } from '../lib/supabaseClient';
-import {languageDictionary} from "../utils/TranslationUtils";
-import { useTranslation } from 'react-i18next';
+import { languageDictionary } from "../utils/TranslationUtils";
+import { usePathname, useSearchParams } from 'next/navigation';
 
-import { usePathname, useSearchParams } from 'next/navigation'
 // Default store state
 const defaultStore = {
   tg_id: '',
   username: '',
   coins: '0',
   xp: '0',
-  lang: 'en',
+  lang: 'ru' || 'en' || 'ukr',
   X: '0',
   tasksTodo: [],
   currentGameId: '',
@@ -28,7 +27,10 @@ interface UserData {
   role: number;
   total_referrals: number;
   referral_bonus: number;
-  lang: 'ru',
+  lang: 'ru' | 'en';
+  coins: '0',
+  xp: '0',
+  X: '0',
   ref_code: string;
   rank: string;
 }
@@ -56,44 +58,43 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const [store, setStore] = useState(defaultStore);
   const [user, setUser] = useState<UserData | null>(null);
   const [debugLogs, setDebugLogs] = useState<string[]>([]);
-  const pathname = usePathname()
-  const searchParams = useSearchParams()
- 
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
   useEffect(() => {
-    const url = `${pathname}?${searchParams}`
-    console.log(url)
+    const url = `${pathname}?${searchParams}`;
+    console.log(url);
     // You can now use the current URL
-    // ...
-  }, [pathname, searchParams])
-  
-  //const { t } = useTranslation();
+  }, [pathname, searchParams]);
 
   useEffect(() => {
     const handleRef = async () => {
       if (pathname && searchParams && user) {
-        const refCode = searchParams.get('ref')
+        const refCode = searchParams.get('ref');
 
-        // Check if the user is already referred by this ref_code
-        const { data: existingReferral, error: checkReferralError } = await supabase
-          .from('referrals')
-          .select('*')
-          .eq('ref_code', refCode)
-          .eq('referred_user_id', user.id)
-          .single();
+        if (refCode) {
+          // Check if the user is already referred by this ref_code
+          const { data: existingReferral, error: checkReferralError } = await supabase
+            .from('referrals')
+            .select('*')
+            .eq('ref_code', refCode)
+            .eq('referred_user_id', user.id)
+            .single();
 
-        if (checkReferralError && checkReferralError.code !== 'PGRST116') {
-          console.error(checkReferralError);
-          return;
-        }
+          if (checkReferralError && checkReferralError.code !== 'PGRST116') {
+            console.error(checkReferralError);
+            return;
+          }
 
-        if (!existingReferral) {
-          // Add the referral
-          const { error: referralError } = await supabase.from('referrals').insert([
-            { ref_code: refCode, referred_user_id: user.id },
-          ]);
+          if (!existingReferral) {
+            // Add the referral
+            const { error: referralError } = await supabase.from('referrals').insert([
+              { ref_code: refCode, referred_user_id: user.id },
+            ]);
 
-          if (referralError) {
-            console.error('Error adding referral:', referralError);
+            if (referralError) {
+              console.error('Error adding referral:', referralError);
+            }
           }
         }
       }
@@ -105,7 +106,6 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const updateUserReferrals = (newReferralCode: string) => {
     setUser((prevUser: any) => ({ ...prevUser, ref_code: newReferralCode }));
   };
-
 
   const addDebugLog = (log: string) => {
     setDebugLogs((prevLogs) => [...prevLogs, log]);
@@ -122,7 +122,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
       if (error && error.code !== 'PGRST116') {
         console.error('Fetch error:', error);
-        addDebugLog(`Fetch error: ${error}`)
+        addDebugLog(`Fetch error: ${error}`);
         return;
       }
 
@@ -134,7 +134,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       }
     } catch (error) {
       console.error('Fetch/Insert error:', error);
-      addDebugLog(`Fetch/Insert error: ${error}`)
+      addDebugLog(`Fetch/Insert error: ${error}`);
     }
   }, []);
 
@@ -147,7 +147,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         .single();
 
       if (error) {
-        addDebugLog(`Insert error: ${error}`)
+        addDebugLog(`Insert error: ${error}`);
         throw error;
       }
 
@@ -157,7 +157,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       setUser(userData);
     } catch (error) {
       console.error('Insert error:', error);
-      addDebugLog(`caught Insert error: ${error}`)
+      addDebugLog(`Insert error: ${error}`);
     }
   };
 
@@ -238,11 +238,9 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
   return (
     <Suspense fallback={<div>Loading...</div>}>
-      <AppContext.Provider value={{ store, setStore, user, setUser, fetchPlayer, t, changeLanguage, updateUserReferral, increaseReferrerX, debugLogs, addDebugLog, updateUserReferrals  }}>
-      
+      <AppContext.Provider value={{ store, setStore, user, setUser, fetchPlayer, t, changeLanguage, updateUserReferral, increaseReferrerX, debugLogs, addDebugLog, updateUserReferrals }}>
         {children}
-      
-    </AppContext.Provider>
+      </AppContext.Provider>
     </Suspense>
   );
 };
