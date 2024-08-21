@@ -65,6 +65,14 @@
     height: 100%;
   }
 
+  h1{
+    background: linear-gradient(45deg, #8e2de2, #4a00e0, #9c27b0); /* Define the gradient colors */
+    -webkit-background-clip: text; /* Clip the background to the text */
+    -webkit-text-fill-color: transparent; /* Make the text color transparent */
+    background-clip: text; /* For non-webkit browsers */
+    text-fill-color: transparent; /* For non-webkit browsers */
+  }
+
   .main-content {
     min-height: calc(100vh - 128px); /* Adjust based on header and footer height */
     padding-top: 64px; /* Header height */

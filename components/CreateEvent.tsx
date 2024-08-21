@@ -12,18 +12,22 @@ export default function CreateEvent() {
   const { t, addDebugLog } = useAppContext();
   const [title, setTitle] = useState<string>('');
   const [description, setDescription] = useState<string>('');
+  const [titleRu, setTitleRu] = useState<string>('');
+  const [descriptionRu, setDescriptionRu] = useState<string>('');
   const [educationalVideoUrl, setEducationalVideoUrl] = useState<string>('');
   const [expirationDate, setExpirationDate] = useState<string | null>(null);
   const [showConfirmation, setShowConfirmation] = useState<boolean>(false);
 
   const handleCreateEvent = async () => {
-    if (title && description) {
+    if (title && description && titleRu && descriptionRu) {
       const { error } = await supabase
         .from('events')
         .insert([
           {
             title,
             description,
+            title_ru: titleRu,
+            description_ru: descriptionRu,
             educational_video_url: educationalVideoUrl,
             expired: false,
             expiration_date: expirationDate,
@@ -44,6 +48,8 @@ export default function CreateEvent() {
   const resetForm = () => {
     setTitle('');
     setDescription('');
+    setTitleRu('');
+    setDescriptionRu('');
     setEducationalVideoUrl('');
     setExpirationDate(null);
   };
@@ -67,6 +73,20 @@ export default function CreateEvent() {
             placeholder={t("eventDescription")}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
+            className="mb-4"
+          />
+          <Input
+            type="text"
+            placeholder={t("eventTitleRu")}
+            value={titleRu}
+            onChange={(e) => setTitleRu(e.target.value)}
+            className="mb-4"
+          />
+          <Input
+            type="text"
+            placeholder={t("eventDescriptionRu")}
+            value={descriptionRu}
+            onChange={(e) => setDescriptionRu(e.target.value)}
             className="mb-4"
           />
           <Input

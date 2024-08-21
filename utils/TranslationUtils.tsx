@@ -179,6 +179,8 @@ export const languageDictionary: LanguageDictionary = {
     createEvent: "Create Event",
     eventTitle: "Event Title",
     eventDescription: "Event Description",
+    eventTitleRu: "Event Title In Russian",
+    eventDescriptionRu: "Event Description In Russian",
     educationalVideoUrl: "Educational Video URL",
     expirationDate: "Expiration Date",
     eventCreated: "Event Created",
@@ -244,7 +246,9 @@ export const languageDictionary: LanguageDictionary = {
     referralName: "Название Приглоса",
     successfulInvites: "Успешные приглашения",
     rank: "Лвл",
-    username: "Псевдоним"
+    username: "Псевдоним",
+    eventTitleRu: "Название мероприятия на русском языке",
+    eventDescriptionRu: "Описание события на русском языке",
     // Add more translations...
   },
   ukr: {
@@ -294,7 +298,9 @@ export const languageDictionary: LanguageDictionary = {
     referralName: "Ім'я Пріглоса",
     successfulInvites: "Успішні запрошення",
     rank: "Лвл",
-    username: "Псевдонім"
+    username: "Псевдонім",
+    eventTitleRu: "Назва події російською",
+    eventDescriptionRu: "Опис події російською мовою"
     // Add more translations...
   },
 };

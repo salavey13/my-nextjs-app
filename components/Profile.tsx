@@ -17,7 +17,7 @@ const Profile: React.FC = () => {
           className="rounded-full"
         />
         <div className="ml-4">
-          <h2 className="text-2xl font-semibold">{t('profile')}</h2>
+          <h1 className="text-2xl font-semibold">{t('profile')}</h1>
           <p className="text-gray-600">{user?.telegram_username}</p>
         </div>
       </div>

@@ -148,10 +148,10 @@ const Referral: React.FC = () => {
   return (
     <Suspense fallback={<LoadingSpinner />}>
       <div className="p-6 bg-gray-800 rounded-lg shadow-lg">
-        <h2 className="text-2xl font-bold text-white mb-4">
+        <h1 className="text-2xl font-bold text-white mb-4">
           <FontAwesomeIcon icon={faUserPlus} className="mr-2" />
           {t('inviteFriend')}
-        </h2>
+        </h1>
         <div className="mb-4">
           <label className="block text-gray-400 text-sm mb-1">
             {t('referralName')}
