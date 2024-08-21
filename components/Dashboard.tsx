@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { useAppContext } from "../context/AppContext";
-
+import DebugInfo from "../components/DebugInfo";
 // Define the shape of the bet data
 interface Bet {
   id: number;
@@ -35,7 +35,12 @@ export default function Dashboard() {
   const [allEvents, setAllEvents] = useState<Event[]>([]);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [betAmount, setBetAmount] = useState<string>('');
-  const { user, t } = useAppContext();
+  const { user, t, addDebugLog  } = useAppContext();
+
+  useEffect(() => {
+    addDebugLog("Page loaded");
+    // Add other logs as necessary
+  }, [addDebugLog]);
 
   useEffect(() => {
     // Fetch bets from Supabase
@@ -128,12 +133,12 @@ export default function Dashboard() {
     const event = allEvents.find(e => e.id === eventId);
     return event ? event.title : 'Unknown Event';
   };
-
+//<span className="text-lg font-thin">{user?.telegram_username}</span>
   return (
     <div className="w-full min-h-screen bg-muted/40 flex flex-col p-4 overflow-auto">
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-3xl font-bold">{t("activeBets")}</h1>
-        <span className="text-lg font-thin">{user?.telegram_username}</span>
+        
       </div>
       <Card>
         <CardHeader>

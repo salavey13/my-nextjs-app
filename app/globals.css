@@ -57,19 +57,16 @@
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
   }
-}
 
-@layer base {
-  * {
-    @apply border-border bg-background text-foreground;
-  }
   body {
+    @apply bg-background text-foreground;
     margin: 0;
     padding: 0;
     font-family: 'Inter', sans-serif;
-    background-color: #000;
-    color: #fff;
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
     text-rendering: optimizeLegibility;
+    transition: background-color 0.3s ease, color 0.3s ease;
   }
   
   html {
@@ -81,11 +78,23 @@
     padding-top: 64px; /* Header height */
     padding-bottom: 64px; /* Footer height */
     backdrop-filter: blur(10px);
-    background: linear-gradient(180deg, rgba(0,0,0,0.9) 0%, rgba(24,24,24,0.8) 100%);
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.9) 0%, rgba(24, 24, 24, 0.8) 100%);
   }
-  
-  /* Add glow effect to header and footer */
+
   header, footer {
     box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+    background-color: hsl(var(--background) / 0.8); /* Slightly transparent background */
+    backdrop-filter: blur(10px);
+  }
+
+  * {
+    @apply border-border bg-background text-foreground;
+  }
+
+  /* Custom Neon Glow Effect */
+  .neon-glow {
+    text-shadow: 0 0 8px rgba(0, 255, 255, 0.7),
+                 0 0 16px rgba(0, 255, 255, 0.5),
+                 0 0 24px rgba(0, 255, 255, 0.3);
   }
 }

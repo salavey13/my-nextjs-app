@@ -175,7 +175,14 @@ export const languageDictionary: LanguageDictionary = {
     inviteSent: "Invite Sent Successfully!",
     alreadyReferred: "This user has already been referred.",
     error: "An error occurred. Please try again.",
-    profile: "Profile",
+    createEvent: "Create Event",
+    eventTitle: "Event Title",
+    eventDescription: "Event Description",
+    educationalVideoUrl: "Educational Video URL",
+    expirationDate: "Expiration Date",
+    eventCreated: "Event Created",
+    eventCreationSuccessMessage: "The event has been successfully created",
+    close: "Close"
   },
   ru: {
     name: "Русский",
@@ -214,6 +221,14 @@ export const languageDictionary: LanguageDictionary = {
     alreadyReferred: "Этот пользователь уже был приглашен.",
     error: "Произошла ошибка. Попробуйте еще раз.",
     profile: "Профиль",
+    createEvent: "Создать Событие",
+    eventTitle: "Название События",
+    eventDescription: "Описание События",
+    educationalVideoUrl: "Ссылка На Обучающее Видео",
+    expirationDate: "Дата Истечения",
+    eventCreated: "Событие Создано",
+    eventCreationSuccessMessage: "Событие успешно создано",
+    close: "Закрыть"
     // Add more translations...
   },
   ukr: {
@@ -247,7 +262,15 @@ export const languageDictionary: LanguageDictionary = {
     inviteSent: "Запрошення надіслано успішно!",
     alreadyReferred: "Цього користувача вже було направлено.",
     error: "Сталася помилка. Повторіть спробу.",
-    profile: "Профіль"
+    profile: "Профіль",
+    createEvent: "Створити Подію",
+    eventTitle: "Назва Події",
+    eventDescription: "Опис Події",
+    educationalVideoUrl: "URL Освітнього Відео",
+    expirationDate: "Дата Закінчення",
+    eventCreated: "Подію Створено",
+    eventCreationSuccessMessage: "Подію успішно створено",
+    close: "Закрити"
     // Add more translations...
   },
 };

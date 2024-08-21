@@ -72,7 +72,7 @@ const Referral: React.FC = () => {
       // Open Telegram link
       window.open(telegramUrl, '_blank');
       
-      toast.success(t('inviteSent'));
+      //toast.success(t('inviteSent'));
     } catch (error) {
       console.error('Error sending invite:', error);
       toast.error(t('error'));

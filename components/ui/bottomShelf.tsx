@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHome, faList, faPlus, faBell, faUser } from '@fortawesome/free-solid-svg-icons';
+import { faHome, faList, faPlus, faBell, faUser, faCalendarPlus } from '@fortawesome/free-solid-svg-icons';
 import { useAppContext } from "@/context/AppContext";
 
 interface NavigationLink {
@@ -37,11 +37,13 @@ const BottomShelf: React.FC = () => {
           <span className="text-xs">{link.label}</span>
         </Link>
       ))}
-      <div className="fixed bottom-[132px] left-1/2 transform -translate-x-1/2 w-14 h-14 bg-blue-500 rounded-full flex items-center justify-center shadow-lg">
-        <Link href="/create">
-          <FontAwesomeIcon icon={faPlus} size="lg" className="text-white" />
-        </Link>
-      </div>
+      <div className="fixed bottom-[125px] left-1/2 transform -translate-x-1/2 w-16 h-16 rounded-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center shadow-xl neon-glow">
+      <Link href="/createEvent">
+        <div className="w-full h-full flex items-center justify-center rounded-full">
+          <FontAwesomeIcon icon={faCalendarPlus} size="2x" className="text-white" />
+        </div>
+      </Link>
+    </div>
     </footer>
   );
 };
