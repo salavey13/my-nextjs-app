@@ -1,4 +1,4 @@
-"use client"; 
+"use client";
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -37,7 +37,7 @@ const BottomShelf: React.FC = () => {
           <span className="text-xs">{link.label}</span>
         </Link>
       ))}
-      <div className="absolute left-1/2 transform -translate-x-1/2 w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center">
+      <div className="fixed bottom-[132px] left-1/2 transform -translate-x-1/2 w-14 h-14 bg-blue-500 rounded-full flex items-center justify-center shadow-lg">
         <Link href="/create">
           <FontAwesomeIcon icon={faPlus} size="lg" className="text-white" />
         </Link>

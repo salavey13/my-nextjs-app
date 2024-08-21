@@ -174,7 +174,8 @@ export const languageDictionary: LanguageDictionary = {
     sendInvite: "Send Invite",
     inviteSent: "Invite Sent Successfully!",
     alreadyReferred: "This user has already been referred.",
-    error: "An error occurred. Please try again."
+    error: "An error occurred. Please try again.",
+    profile: "Profile",
   },
   ru: {
     name: "Русский",
@@ -211,7 +212,8 @@ export const languageDictionary: LanguageDictionary = {
     sendInvite: "Отправить приглашение",
     inviteSent: "Приглашение успешно отправлено!",
     alreadyReferred: "Этот пользователь уже был приглашен.",
-    error: "Произошла ошибка. Попробуйте еще раз."
+    error: "Произошла ошибка. Попробуйте еще раз.",
+    profile: "Профиль",
     // Add more translations...
   },
   ukr: {
@@ -244,7 +246,8 @@ export const languageDictionary: LanguageDictionary = {
     sendInvite: "Надіслати запрошення",
     inviteSent: "Запрошення надіслано успішно!",
     alreadyReferred: "Цього користувача вже було направлено.",
-    error: "Сталася помилка. Повторіть спробу."
+    error: "Сталася помилка. Повторіть спробу.",
+    profile: "Профіль"
     // Add more translations...
   },
 };
