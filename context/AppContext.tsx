@@ -139,12 +139,12 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   }, []);
 
   // Function to insert a new user
-  const insertNewUser = async (tg_id: string, username: string, lang: string) => {
+  const insertNewUser = async (tg_id: number, username: string, lang: string) => {
     addDebugLog("INSIDE INSERT");
     try {
       const { data: newUser, error } = await supabase
         .from('users')
-        .insert([{ telegram_id: tg_id, telegram_username: username, coins: '420', xp: '1000', lang, X: '0' }])
+        .insert([{ telegram_id: tg_id, telegram_username: username, lamg: lang }])
         .single();
 
       if (error) {
