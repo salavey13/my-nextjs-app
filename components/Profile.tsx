@@ -8,6 +8,7 @@ const Profile: React.FC = () => {
 
   return (
     <div className="p-6 shadow-md rounded-lg max-w-md mx-auto mt-8">
+      <h1 className="text-2xl font-semibold neon-glow">{t('profile')}</h1>
       <div className="flex items-center mb-4">
         <Image 
           src="/placeholder-user.jpg" 
@@ -17,7 +18,7 @@ const Profile: React.FC = () => {
           className="rounded-full"
         />
         <div className="ml-4">
-          <h1 className="text-2xl font-thin">{t('profile')}</h1>
+          
           <p className="text-gray-600">{user?.telegram_username}</p>
         </div>
       </div>

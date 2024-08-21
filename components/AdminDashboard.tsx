@@ -21,7 +21,7 @@ const AdminDashboard: React.FC = () => {
 
   return (
     <div className="p-4">
-      <h1 className="text-2xl font-bold mb-4"><FontAwesomeIcon icon={faUserShield} className="gradient-icon mr-2" />{t('adminDashboard')}</h1>
+      <h1 className="text-2xl font-bold mb-4 neon-glow"><FontAwesomeIcon icon={faUserShield} className="gradient-icon mr-2" />{t('adminDashboard')}</h1>
       <table className="table-auto w-full border">
         <thead>
           <tr>

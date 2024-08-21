@@ -141,7 +141,7 @@ export default function Dashboard() {
   return (
     <div className="w-full min-h-screen bg-muted/40 flex flex-col p-4 overflow-auto">
       <div className="flex justify-between items-center mb-4">
-        <h1 className="text-3xl font-bold"><FontAwesomeIcon icon={faTachometerAlt} className="gradient-icon mr-2" />{t("calcTitle")}</h1>
+        <h1 className="text-3xl font-bold neon-glow"><FontAwesomeIcon icon={faTachometerAlt} className="gradient-icon mr-2" />{t("calcTitle")}</h1>
         
       </div>
       <Card>
