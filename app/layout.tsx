@@ -8,7 +8,8 @@ import { ReactNode, useEffect } from "react";
 import React, { Suspense } from "react";
 import TopShelf from "../components/ui/topShelf";
 import BottomShelf from "../components/ui/bottomShelf";
-import LoadingSpinner from "../components/ui/LoadingSpinner";  // Import the new component
+import LoadingSpinner from "../components/ui/LoadingSpinner"; 
+import ThemeHandler from "../components/ThemeHandler";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -50,6 +51,7 @@ export default function RootLayout({
       <body
         className={`${inter.className} bg-black text-white flex flex-col min-h-screen`}
       >
+        <ThemeHandler />
         <Suspense fallback={<LoadingSpinner />}>  {/* Use the custom loading component */}
           <AppProvider>
             <TopShelf />

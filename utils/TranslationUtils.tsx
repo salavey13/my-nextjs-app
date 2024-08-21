@@ -186,7 +186,11 @@ export const languageDictionary: LanguageDictionary = {
     close: "Close",
     home: "Home",
     admin: "Admin",
-    referral: "Referral"
+    referral: "Referral",
+    referralName: "Priglos Name",
+    successfulInvites: "Successful Invites",
+    rank: "Lvl",
+    username: "Nickname"
   },
   ru: {
     name: "Русский",
@@ -235,10 +239,16 @@ export const languageDictionary: LanguageDictionary = {
     close: "Закрыть",
     home: "Главная",
     admin: "Админ",
-    referral: "Реферал"
+    referral: "Реферал",
+    notifications: "Уведомления",
+    referralName: "Название Приглоса",
+    successfulInvites: "Успешные приглашения",
+    rank: "Лвл",
+    username: "Псевдоним"
     // Add more translations...
   },
   ukr: {
+    notifications: "Сповіщення",
     name: "Українська",
     welcome: "Ласкаво просимо",
     task: "Завдання",
@@ -280,7 +290,11 @@ export const languageDictionary: LanguageDictionary = {
     close: "Закрити",
     home: "Головна",
     admin: "Адмін",
-    referral: "Реферал"
+    referral: "Реферал",
+    referralName: "Ім'я Пріглоса",
+    successfulInvites: "Успішні запрошення",
+    rank: "Лвл",
+    username: "Псевдонім"
     // Add more translations...
   },
 };
