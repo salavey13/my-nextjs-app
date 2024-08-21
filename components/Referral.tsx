@@ -89,7 +89,7 @@ const Referral: React.FC = () => {
     if (newName.trim() === '') return;
 
     // Prevent excessive updates
-    if (isUpdating) return;
+    if (isUpdating  || !user) return;
 
     setIsUpdating(true);
 
@@ -99,7 +99,7 @@ const Referral: React.FC = () => {
       const { error } = await supabase
         .from('users')
         .update({ ref_code: newReferralCode })
-        .eq('id', user?.id);
+        .eq('telegram_id', user.telegram_id);
 
       if (error) {
         toast.error(t('error'));

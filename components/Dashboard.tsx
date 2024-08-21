@@ -106,14 +106,14 @@ export default function Dashboard() {
   };
 
   const confirmBet = async () => {
-    if (selectedEvent && betAmount && user) {
+    if (selectedEvent && betAmount && user && user.id) {
       const { error } = await supabase
         .from('bets')
         .insert([
           {
-            user_id: user?.id,
+            user_id: Number(user.id),
             event_id: selectedEvent.id,
-            amount: betAmount,
+            amount: Number(betAmount),
             outcome: 'Pending',
             status: 'active',
           },
@@ -127,7 +127,7 @@ export default function Dashboard() {
         const { data } = await supabase
           .from('bets')
           .select('*')
-          .eq('user_id', user?.id);
+          .eq('user_id', user.id);
 
         setBets(data || []);
       }
