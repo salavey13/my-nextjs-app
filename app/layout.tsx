@@ -22,36 +22,36 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: ReactNode }>) {
   
-  // useEffect(() => {
-  //   const prefersDarkScheme = window.matchMedia("(prefers-color-scheme: dark)").matches;
+  useEffect(() => {
+    const prefersDarkScheme = window.matchMedia("(prefers-color-scheme: dark)").matches;
 
-  //   if (prefersDarkScheme) {
-  //     document.documentElement.classList.add("dark");
-  //   } else {
-  //     document.documentElement.classList.remove("dark");
-  //   }
+    if (prefersDarkScheme) {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
 
-  //   const themeChangeListener = (e: MediaQueryListEvent) => {
-  //     if (e.matches) {
-  //       document.documentElement.classList.add("dark");
-  //     } else {
-  //       document.documentElement.classList.remove("dark");
-  //     }
-  //   };
+    const themeChangeListener = (e: MediaQueryListEvent) => {
+      if (e.matches) {
+        document.documentElement.classList.add("dark");
+      } else {
+        document.documentElement.classList.remove("dark");
+      }
+    };
 
-  //   window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", themeChangeListener);
+    window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", themeChangeListener);
 
-  //   return () => {
-  //     window.matchMedia("(prefers-color-scheme: dark)").removeEventListener("change", themeChangeListener);
-  //   };
-  // }, []);
-
+    return () => {
+      window.matchMedia("(prefers-color-scheme: dark)").removeEventListener("change", themeChangeListener);
+    };
+  }, []);
+//<ThemeHandler />
   return (
     <html lang="en">
       <body
         className={`${inter.className} bg-black text-white flex flex-col min-h-screen`}
       >
-        <ThemeHandler />
+        
         <Suspense fallback={<LoadingSpinner />}>  {/* Use the custom loading component */}
           <AppProvider>
             <TopShelf />
