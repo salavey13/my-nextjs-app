@@ -32,22 +32,23 @@ const BottomShelf: React.FC = () => {
   return (
     <div className="fixed bottom-0 w-full h-16 bg-gray-900 flex justify-around items-center text-gray-400">
       {navigationLinks.map((link, index) => (
-        <Link key={index} href={link.href}>
-          <a
-            className={`flex flex-col items-center justify-center w-12 h-12 ${
-              pathname === link.href ? 'text-blue-500' : 'text-gray-400'
-            }`}
-          >
-            <FontAwesomeIcon icon={link.icon} size="lg" />
-            <span className="text-xs">{link.label}</span>
-          </a>
-        </Link>
+        (<Link
+          key={index}
+          href={link.href}
+          className={`flex flex-col items-center justify-center w-12 h-12 ${
+            pathname === link.href ? 'text-blue-500' : 'text-gray-400'
+          }`}>
+
+          <FontAwesomeIcon icon={link.icon} size="lg" />
+          <span className="text-xs">{link.label}</span>
+
+        </Link>)
       ))}
       <div className="absolute left-1/2 transform -translate-x-1/2 w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center">
         <Link href="/create">
-          <a>
-            <FontAwesomeIcon icon={faPlus} size="lg" className="text-white" />
-          </a>
+
+          <FontAwesomeIcon icon={faPlus} size="lg" className="text-white" />
+
         </Link>
       </div>
     </div>
