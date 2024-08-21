@@ -1,3 +1,4 @@
+//components\Dashboard.tsx
 "use client";
 
 import { useEffect, useState } from "react";
@@ -9,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { useAppContext } from "../context/AppContext";
 import DebugInfo from "../components/DebugInfo";
+
 // Define the shape of the bet data
 interface Bet {
   id: number;
@@ -40,7 +42,7 @@ export default function Dashboard() {
   useEffect(() => {
     addDebugLog("Page loaded");
     // Add other logs as necessary
-  }, [addDebugLog]);
+  }, []); // Empty array means this runs only once on component mount
 
   useEffect(() => {
     // Fetch bets from Supabase
@@ -137,7 +139,7 @@ export default function Dashboard() {
   return (
     <div className="w-full min-h-screen bg-muted/40 flex flex-col p-4 overflow-auto">
       <div className="flex justify-between items-center mb-4">
-        <h1 className="text-3xl font-bold">{t("activeBets")}</h1>
+        <h1 className="text-3xl font-bold">{t("calcTitle")}</h1>
         
       </div>
       <Card>
@@ -209,7 +211,7 @@ export default function Dashboard() {
           </Table>
         </CardContent>
       </Card>
-
+      <DebugInfo />
       {/* Modal for placing a bet */}
       {selectedEvent && (
         <Dialog open={true} onOpenChange={() => setSelectedEvent(null)}>

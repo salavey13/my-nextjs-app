@@ -37,7 +37,7 @@ const BottomShelf: React.FC = () => {
           <span className="text-xs">{link.label}</span>
         </Link>
       ))}
-      <div className="fixed bottom-[125px] left-1/2 transform -translate-x-1/2 w-16 h-16 rounded-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center shadow-xl neon-glow">
+      <div className="fixed bottom-[100px] left-1/2 transform -translate-x-1/2 w-16 h-16 rounded-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center">
       <Link href="/createEvent">
         <div className="w-full h-full flex items-center justify-center rounded-full">
           <FontAwesomeIcon icon={faCalendarPlus} size="2x" className="text-white" />

@@ -61,24 +61,22 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  useEffect(() => {
-    const url = `${pathname}?${searchParams}`;
-    console.log(url);
-    // You can now use the current URL
-  }, [pathname, searchParams]);
+  // useEffect(() => {
+  //   console.log(`URL Updated: ${pathname}?${searchParams}`);
+  // }, [pathname, searchParams]);
 
   useEffect(() => {
     const handleRef = async () => {
       if (pathname && searchParams && user) {
         const refCode = searchParams.get('ref');
 
-        if (refCode) {
+        if (refCode && user.ref_code !== refCode) {
           // Check if the user is already referred by this ref_code
           const { data: existingReferral, error: checkReferralError } = await supabase
             .from('referrals')
             .select('*')
             .eq('ref_code', refCode)
-            .eq('referred_user_id', user.id)
+            .eq('referred_user_id', user.telegram_id)
             .single();
 
           if (checkReferralError && checkReferralError.code !== 'PGRST116') {
@@ -89,7 +87,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
           if (!existingReferral) {
             // Add the referral
             const { error: referralError } = await supabase.from('referrals').insert([
-              { ref_code: refCode, referred_user_id: user.id },
+              { ref_code: refCode, referred_user_id: user.telegram_id },
             ]);
 
             if (referralError) {
@@ -100,7 +98,9 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       }
     };
 
-    handleRef();
+    if (user) {
+      handleRef();
+    }
   }, [pathname, searchParams, user]);
 
   const updateUserReferrals = (newReferralCode: string) => {
@@ -140,6 +140,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
   // Function to insert a new user
   const insertNewUser = async (tg_id: string, username: string, lang: string) => {
+    addDebugLog("INSIDE INSERT");
     try {
       const { data: newUser, error } = await supabase
         .from('users')
@@ -199,34 +200,37 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       script.src = "https://telegram.org/js/telegram-web-app.js";
       script.async = true;
       document.head.appendChild(script);
-
+  
       script.onload = () => {
         if (window.Telegram?.WebApp) {
           const initData = window.Telegram.WebApp.initData;
-
+  
           if (initData) {
             const urlParams = new URLSearchParams(initData);
             const userParam = urlParams.get("user");
-
+  
             if (userParam) {
               const user = JSON.parse(decodeURIComponent(userParam));
               if (!user.id) return;
-
-              fetchPlayer(user.id.toString(), user.username, user.lang);
+  
+              if (!store.tg_id) {
+                fetchPlayer(user.id.toString(), user.username, user.lang);
+              }
             }
-
+  
             setupTelegramBackButton();
+            applyTelegramTheme();
           }
         }
       };
-
+  
       return () => {
         document.head.removeChild(script);
       };
     };
-
+  
     initTelegramWebApp();
-  }, [fetchPlayer, store.lang]);
+  }, []);
 
   const setupTelegramBackButton = () => {
     const backButton = window.Telegram?.WebApp?.BackButton;
@@ -235,6 +239,18 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       backButton.onClick(() => window.history.back());
     }
   };
+
+  const applyTelegramTheme = () => {
+    const themeParams = window.Telegram?.WebApp?.themeParams
+    if (themeParams) {
+        Object.entries(themeParams).forEach(([key, value]) => {
+            document.documentElement.style.setProperty(
+                `--tg-theme-${key.replace(/_/g, "-")}`,
+                String(value)
+            )
+        })
+    }
+  }
 
   return (
     <Suspense fallback={<div>Loading...</div>}>
