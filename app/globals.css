@@ -65,12 +65,26 @@
     height: 100%;
   }
 
-  h1{
+  /* Apply a 3-point purple gradient to all h1 headers */
+  h1 {
     background: linear-gradient(45deg, #8e2de2, #4a00e0, #9c27b0); /* Define the gradient colors */
     -webkit-background-clip: text; /* Clip the background to the text */
     -webkit-text-fill-color: transparent; /* Make the text color transparent */
     background-clip: text; /* For non-webkit browsers */
     text-fill-color: transparent; /* For non-webkit browsers */
+    animation: slide-in-left 1s ease-out; /* Apply the slide-in animation */
+  }
+
+  /* Define the slide-in animation */
+  @keyframes slide-in-left {
+    from {
+      transform: translateX(-69%);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
   }
 
   .main-content {

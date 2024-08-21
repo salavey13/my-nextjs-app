@@ -124,7 +124,6 @@ export const languageDictionary: LanguageDictionary = {
     change_language: "Change Language",
     music: "Music",
     sound_effects: "Sound Effects",
-    notifications: "Notifications",
     privacy_policy: "Privacy Policy",
     terms_of_service: "Terms of Service",
     // Quests and Rewards
@@ -197,7 +196,9 @@ export const languageDictionary: LanguageDictionary = {
     referrer: "Referrer",
     referee: "Referee",
     level: "Level",
-    date: "Date"
+    date: "Date",
+    notifications: "Notifications",
+    nonewnotifications: "You have no new notifications."
   },
   ru: {
     name: "Русский",
@@ -248,6 +249,7 @@ export const languageDictionary: LanguageDictionary = {
     admin: "Админ",
     referral: "Реферал",
     notifications: "Уведомления",
+    nonewnotifications: "У вас нет новых уведомлений.",
     referralName: "Название Приглоса",
     successfulInvites: "Успешные приглашения",
     rank: "Лвл",
@@ -315,7 +317,8 @@ export const languageDictionary: LanguageDictionary = {
     referrer: "Реферер",
     referee: "Рефері",
     level: "Рівень",
-    date: "Дата"
+    date: "Дата",
+    nonewnotifications: "У вас немає нових повідомлень."
     // Add more translations...
   },
 };

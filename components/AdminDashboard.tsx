@@ -1,12 +1,12 @@
-// src/components/AdminDashboard.tsx
 "use client";
 
 import React, { useEffect, useState } from 'react';
 import { supabase } from "../lib/supabaseClient";
 import { useAppContext } from '../context/AppContext';
-
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faUserShield } from '@fortawesome/free-solid-svg-icons';
 const AdminDashboard: React.FC = () => {
-  const { user } = useAppContext();
+  const { user, t } = useAppContext();
   const [referrals, setReferrals] = useState<any[]>([]);
   
   useEffect(() => {
@@ -21,14 +21,14 @@ const AdminDashboard: React.FC = () => {
 
   return (
     <div className="p-4">
-      <h1 className="text-xl font-bold mb-4">Admin Dashboard</h1>
+      <h1 className="text-2xl font-bold mb-4"><FontAwesomeIcon icon={faUserShield} className="gradient-icon mr-2" />{t('adminDashboard')}</h1>
       <table className="table-auto w-full border">
         <thead>
           <tr>
-            <th className="border p-2">Referrer</th>
-            <th className="border p-2">Referee</th>
-            <th className="border p-2">Level</th>
-            <th className="border p-2">Date</th>
+            <th className="border p-2">{t('referrer')}</th>
+            <th className="border p-2">{t('referee')}</th>
+            <th className="border p-2">{t('level')}</th>
+            <th className="border p-2">{t('date')}</th>
           </tr>
         </thead>
         <tbody>

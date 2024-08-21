@@ -149,7 +149,7 @@ const Referral: React.FC = () => {
     <Suspense fallback={<LoadingSpinner />}>
       <div className="p-6 bg-gray-800 rounded-lg shadow-lg">
         <h1 className="text-2xl font-bold text-white mb-4">
-          <FontAwesomeIcon icon={faUserPlus} className="mr-2" />
+          <FontAwesomeIcon icon={faUserPlus} className="gradient-icon mr-2" />
           {t('inviteFriend')}
         </h1>
         <div className="mb-4">

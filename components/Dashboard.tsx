@@ -10,6 +10,8 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { useAppContext } from "../context/AppContext";
 import DebugInfo from "../components/DebugInfo";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTachometerAlt } from '@fortawesome/free-solid-svg-icons';
 
 // Define the shape of the bet data
 interface Bet {
@@ -139,7 +141,7 @@ export default function Dashboard() {
   return (
     <div className="w-full min-h-screen bg-muted/40 flex flex-col p-4 overflow-auto">
       <div className="flex justify-between items-center mb-4">
-        <h1 className="text-3xl font-bold">{t("calcTitle")}</h1>
+        <h1 className="text-3xl font-bold"><FontAwesomeIcon icon={faTachometerAlt} className="gradient-icon mr-2" />{t("calcTitle")}</h1>
         
       </div>
       <Card>
