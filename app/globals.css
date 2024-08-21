@@ -87,7 +87,9 @@
     backdrop-filter: blur(10px);
   }
 
-
+  * {
+    @apply border-border;
+  }
 
   /* Custom Neon Glow Effect */
   .neon-glow {
