@@ -21,7 +21,7 @@ const AdminDashboard: React.FC = () => {
 
   return (
     <div className="p-4">
-      <h2 className="text-xl font-bold mb-4">Admin Dashboard</h2>
+      <h1 className="text-xl font-bold mb-4">Admin Dashboard</h1>
       <table className="table-auto w-full border">
         <thead>
           <tr>

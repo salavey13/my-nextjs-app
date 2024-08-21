@@ -192,7 +192,12 @@ export const languageDictionary: LanguageDictionary = {
     referralName: "Priglos Name",
     successfulInvites: "Successful Invites",
     rank: "Lvl",
-    username: "Nickname"
+    username: "Nickname",
+    adminDashboard: "Admin Dashboard",
+    referrer: "Referrer",
+    referee: "Referee",
+    level: "Level",
+    date: "Date"
   },
   ru: {
     name: "Русский",
@@ -249,6 +254,11 @@ export const languageDictionary: LanguageDictionary = {
     username: "Псевдоним",
     eventTitleRu: "Название мероприятия на русском языке",
     eventDescriptionRu: "Описание события на русском языке",
+    adminDashboard: "Панель администратора",
+    referrer: "Реферер",
+    referee: "Рефери",
+    level: "Уровень",
+    date: "Дата"
     // Add more translations...
   },
   ukr: {
@@ -300,7 +310,12 @@ export const languageDictionary: LanguageDictionary = {
     rank: "Лвл",
     username: "Псевдонім",
     eventTitleRu: "Назва події російською",
-    eventDescriptionRu: "Опис події російською мовою"
+    eventDescriptionRu: "Опис події російською мовою",
+    adminDashboard: "Панель адміністратора",
+    referrer: "Реферер",
+    referee: "Рефері",
+    level: "Рівень",
+    date: "Дата"
     // Add more translations...
   },
 };
