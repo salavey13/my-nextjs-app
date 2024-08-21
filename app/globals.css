@@ -29,7 +29,7 @@
   @media (prefers-color-scheme: dark) {
     :root {
       --background: var(--tg-theme-bg-color, 224 71.4% 4.1%);
-      --foreground: var(--tg-theme-text-color, 210 20% 98%);
+      --foreground: var(--tg-theme-text-color, 224 71.4% 4.1%);
       --card: var(--tg-theme-bg-color, 224 71.4% 4.1%);
       --card-foreground: var(--tg-theme-text-color, 210 20% 98%);
       --popover: var(--tg-theme-secondary-bg-color, 224 71.4% 4.1%);

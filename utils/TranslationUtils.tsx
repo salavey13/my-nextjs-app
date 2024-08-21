@@ -311,7 +311,7 @@ export const languageDictionary: LanguageDictionary = {
     upcomingEvents: "Майбутні події",
     title: "Назва",
     actions: "Дії",
-    expired: "Термін дії минув",
+    expired: "Минув",
     bet: "Натиск",
     placeBet: "Зробити ставку",
     enterBetAmount: "Введіть суму ставки",
