@@ -115,29 +115,43 @@ const Referral: React.FC = () => {
     }
   };
 
+  const getRandomMeme = async () => {
+    // Placeholder URL; replace with actual API if available
+    const response = await fetch('https://api.example.com/random-meme?topic=russo-ukrainian-war');
+    if (!response.ok) {
+      console.error('Failed to fetch meme');
+      return "https://th.bing.com/th/id/OIG2.fwYLXgRzLnnm2DMcdfl1"; // Fallback image URL
+    }
+    const data = await response.json();
+    return data?.memeUrl || "https://th.bing.com/th/id/OIG2.fwYLXgRzLnnm2DMcdfl1"; // Fallback image URL
+  };
+  
   const sendTelegramInvite = async (referralCode: string) => {
+    const { user, t } = useAppContext();
+  
     if (!process.env.NEXT_PUBLIC_BOT_TOKEN || !user) {
       console.error('Bot token is missing');
       return;
     }
-
+  
     const botToken = process.env.NEXT_PUBLIC_BOT_TOKEN;
-    const message = `Play with ${user?.telegram_username}! 🎮✨`;
     const inviteLink = `https://t.me/oneSitePlsBot/vip?ref=${referralCode}`;
-
+    const memeUrl = await getRandomMeme();
+    const message = `${t("playWithUs")}  ${user?.telegram_username }! 🎮✨`;
+  
     const url = new URL(`https://api.telegram.org/bot${botToken}/sendPhoto`);
     url.searchParams.append("chat_id", user.telegram_id.toFixed());
     url.searchParams.append("caption", message);
-    url.searchParams.append("photo", "https://th.bing.com/th/id/OIG2.fwYLXgRzLnnm2DMcdfl1");
+    url.searchParams.append("photo", memeUrl);
     url.searchParams.append("reply_markup", JSON.stringify({
       inline_keyboard: [
-        [{ text: t("play"), url: inviteLink }],
-        [{ text: "Site", url: "https://oneSitePls.framer.ai" }],
-        [{ text: "Join us", url: "https://t.me/aibotsites" }],
-        [{ text: "Subscribe to YouTube", url: "https://youtube.com/@salavey13" }],
+        [{ text: t("startPlaying"), url: inviteLink }],
+        [{ text: t("visitSite"), url: "https://oneSitePls.framer.ai" }],
+        [{ text: t("joinCommunity"), url: "https://t.me/aibotsites" }],
+        [{ text: t("youtubeChannel"), url: "https://youtube.com/@salavey13" }],
       ],
     }));
-
+  
     try {
       await fetch(url.toString());
     } catch (error) {

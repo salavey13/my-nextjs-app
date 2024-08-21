@@ -50,7 +50,6 @@ export const languageDictionary: LanguageDictionary = {
     complete: "Complete",
     delete: "Delete",
     // UI
-    play: "Play",
     settings: "Settings",
     referrals: "Referrals",
     top13: "Leaderboard",
@@ -198,7 +197,13 @@ export const languageDictionary: LanguageDictionary = {
     level: "Level",
     date: "Date",
     notifications: "Notifications",
-    nonewnotifications: "You have no new notifications."
+    nonewnotifications: "You have no new notifications.",
+    play: "Play",
+    playWithUs: "Play with",
+    startPlaying: "Start Playing",
+    visitSite: "Visit Our Site",
+    joinCommunity: "Join Our Community",
+    youtubeChannel: "Subscribe to Our YouTube"
   },
   ru: {
     name: "Русский",
@@ -217,7 +222,7 @@ export const languageDictionary: LanguageDictionary = {
     title: "Название",
     actions: "Действия",
     expired: "Истек",
-    bet: "Сделать Ставку",
+    bet: "Наспор",
     placeBet: "Сделать Ставку",
     enterBetAmount: "Введите Сумму Ставки",
     confirm: "Подтвердить",
@@ -260,7 +265,13 @@ export const languageDictionary: LanguageDictionary = {
     referrer: "Реферер",
     referee: "Рефери",
     level: "Уровень",
-    date: "Дата"
+    date: "Дата",
+    play: "Играть",
+    playWithUs: "Играйте с",
+    startPlaying: "Начать игру",
+    visitSite: "Посетить наш сайт",
+    joinCommunity: "Присоединиться к сообществу",
+    youtubeChannel: "Подписаться на наш YouTube"
     // Add more translations...
   },
   ukr: {
@@ -280,7 +291,7 @@ export const languageDictionary: LanguageDictionary = {
     title: "Назва",
     actions: "Дії",
     expired: "Термін дії минув",
-    bet: "Ставка",
+    bet: "Натиск",
     placeBet: "Зробити ставку",
     enterBetAmount: "Введіть суму ставки",
     calcTitle: "Калькулятор IQ/соціальних показників",
@@ -318,7 +329,13 @@ export const languageDictionary: LanguageDictionary = {
     referee: "Рефері",
     level: "Рівень",
     date: "Дата",
-    nonewnotifications: "У вас немає нових повідомлень."
+    nonewnotifications: "У вас немає нових повідомлень.",
+    play: "Грати",
+    playWithUs: "Грай з",
+    startPlaying: "Почати гру",
+    visitSite: "Відвідати наш сайт",
+    joinCommunity: "Приєднатися до спільноти",
+    youtubeChannel: "Підписатися на наш YouTube"
     // Add more translations...
   },
 };
