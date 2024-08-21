@@ -69,20 +69,16 @@ const Referral: React.FC = () => {
         // Prepare Telegram link with referral code
         const telegramUrl = `https://t.me/oneSitePlsBot/vip?ref=${referralCode}`;
 
-        // Use Telegram's openLink method to open the link
-        if (window.Telegram?.WebApp) {
-            window.Telegram.WebApp.openLink(telegramUrl);
-        } else {
-            // Fallback in case Telegram's method is not available
-            window.open(telegramUrl, '_blank');
-        }
+        // Open the Telegram link
+        window.open(telegramUrl, '_blank');
 
+        // Optionally show a success message
         // toast.success(t('inviteSent'));
     } catch (error) {
         console.error('Error sending invite:', error);
-        toast.error(t('error'));
+        //toast.error(t('error'));
     }
-};
+}
 
   const handleReferralNameChange = async (newName: string) => {
     if (newName.trim() === '') return;
