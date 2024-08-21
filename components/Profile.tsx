@@ -7,7 +7,7 @@ const Profile: React.FC = () => {
   const { user, t } = useAppContext();
 
   return (
-    <div className="p-6 bg-white shadow-md rounded-lg max-w-md mx-auto mt-8">
+    <div className="p-6 shadow-md rounded-lg max-w-md mx-auto mt-8">
       <div className="flex items-center mb-4">
         <Image 
           src="/placeholder-user.jpg" 
