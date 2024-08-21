@@ -11,28 +11,33 @@ const defaultStore = {
   username: '',
   coins: '0',
   xp: '0',
-  lang: 'ru' || 'en' || 'ukr',
+  lang: 'ru',
   X: '0',
   tasksTodo: [],
   currentGameId: '',
 };
 
-// User type definition
+                       
 interface UserData {
   id: number;
   telegram_id: number;
   telegram_username: string;
-  iq: number | null;
-  social_credit: number;
-  role: number;
-  total_referrals: number;
-  referral_bonus: number;
-  lang: 'ru' | 'en';
-  coins: '0',
-  xp: '0',
-  X: '0',
+  lang: 'ru' | 'en' | 'ukr';
+  coins: number;
+  rp: number;
+  X: number;
   ref_code: string;
   rank: string;
+  social_credit: number;
+  role: number;
+  cheers_count: number;
+  referer?: number | null;
+  tasksTodo?: string | null;
+  currentgameId?: string | null;
+  game_state?: string | null;
+  ton_wallet?: string | null;
+  initial_readings?: Record<string, any> | null;
+  monthly_prices?: Record<string, any> | null;
 }
 
 // Combined context type
@@ -127,7 +132,18 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       }
 
       if (data) {
-        setStore((prev) => ({ ...prev, ...data }));
+        // Ensure only the fields that exist in defaultStore are updated
+        setStore((prev) => ({
+          ...prev,
+          tg_id: data.telegram_id.toString(),
+          username: data.telegram_username || '',
+          coins: data.coins.toString(),
+          xp: data.rp.toString(),
+          lang: data.lang,
+          X: data.X.toString(),
+          tasksTodo: data.tasksTodo ? JSON.parse(data.tasksTodo) : [],
+          currentGameId: data.currentgameId || '',
+        }));
         setUser(data);
       } else {
         await insertNewUser(tg_id, username, lang);
@@ -138,13 +154,12 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     }
   }, []);
 
-  // Function to insert a new user
   const insertNewUser = async (tg_id: number, username: string, lang: string) => {
     addDebugLog("INSIDE INSERT");
     try {
       const { data: newUser, error } = await supabase
         .from('users')
-        .insert([{ telegram_id: tg_id, telegram_username: username, lamg: lang }])
+        .insert([{ telegram_id: tg_id, telegram_username: username, lang: lang }])
         .single();
 
       if (error) {
@@ -154,7 +169,18 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
       const userData: UserData = newUser as UserData;
 
-      setStore((prev) => ({ ...prev, ...userData }));
+      // Ensure only the fields that exist in defaultStore are updated
+      setStore((prev) => ({
+        ...prev,
+        tg_id: userData.telegram_id.toString(),
+        username: userData.telegram_username || '',
+        coins: userData.coins.toString(),
+        xp: userData.rp.toString(),
+        lang: userData.lang,
+        X: userData.X.toString(),
+        tasksTodo: userData.tasksTodo ? JSON.parse(userData.tasksTodo) : [],
+        currentGameId: userData.currentgameId || '',
+      }));
       setUser(userData);
     } catch (error) {
       console.error('Insert error:', error);
