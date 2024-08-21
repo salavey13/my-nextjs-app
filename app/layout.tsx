@@ -45,13 +45,13 @@ export default function RootLayout({
   //     window.matchMedia("(prefers-color-scheme: dark)").removeEventListener("change", themeChangeListener);
   //   };
   // }, []);
-//<ThemeHandler />
+
   return (
     <html lang="en">
       <body
         className={`${inter.className} bg-black text-white flex flex-col min-h-screen`}
       >
-        
+        <ThemeHandler />
         <Suspense fallback={<LoadingSpinner />}>  {/* Use the custom loading component */}
           <AppProvider>
             <TopShelf />

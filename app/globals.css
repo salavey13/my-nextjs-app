@@ -26,7 +26,7 @@
     --radius: 0.5rem;
   }
 
-  /* @media (prefers-color-scheme: dark) {
+  @media (prefers-color-scheme: dark) {
     :root {
       --background: var(--tg-theme-bg-color, 224 71.4% 4.1%);
       --foreground: var(--tg-theme-text-color, 210 20% 98%);
@@ -48,7 +48,7 @@
       --input: var(--tg-theme-input-bg-color, 215 27.9% 16.9%);
       --ring: var(--tg-theme-bg-color, 216 12.2% 83.9%);
     }
-  } */
+  } 
 
   body {
     @apply bg-background text-foreground;

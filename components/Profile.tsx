@@ -50,7 +50,6 @@ const Profile: React.FC = () => {
       </div>
       <div className="mt-8 text-center">
         <p className="text-sm text-gray-400">{t('ref_code')}: {user?.ref_code || t('none')}</p>
-        <p className="text-sm text-gray-400">{t('currentGameId')}: {user?.currentgameId || t('none')}</p>
       </div>
     </div>
   );

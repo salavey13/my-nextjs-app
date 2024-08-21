@@ -243,7 +243,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
             }
   
             setupTelegramBackButton();
-            applyTelegramTheme();
+            //applyTelegramTheme();
           }
         }
       };
