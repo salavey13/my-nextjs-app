@@ -1,76 +1,139 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import { supabase } from '../lib/supabaseClient'; // Updated import path
+import React, { useState, useEffect, Suspense } from 'react';
+import { supabase } from '../lib/supabaseClient';
 import { useAppContext } from '../context/AppContext';
+import { useTranslation } from 'react-i18next';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faUserPlus, faPaperPlane, faTrophy } from '@fortawesome/free-solid-svg-icons';
+import toast from 'react-hot-toast';
 
 const Referral: React.FC = () => {
-  const { user, t } = useAppContext();
-  const [friendName, setFriendName] = useState('');
-  const [referralCode, setReferralCode] = useState('');
+  const { user, updateUserReferrals, t  } = useAppContext();
+  //const { t } = useTranslation();
+  const [referralName, setReferralName] = useState('');
+  const [referralCode, setReferralCode] = useState<string | null>(null);
+  const [inviteCount, setInviteCount] = useState(0);
 
   useEffect(() => {
-    if (!user) return;
+    const fetchReferralData = async () => {
+      if (user) {
+        // Set the default referral name to the user's username or existing referral code
+        const defaultReferralName = user.ref_code ? user.ref_code.replace('_13', '') : user.telegram_username;
+        setReferralName(defaultReferralName || '');
 
-    // Fetch or generate a referral code for the user
-    const fetchReferralCode = async () => {
-      const { data, error } = await supabase
-        .from('referrals')
-        .select('ref_code')
-        .eq('user_id', user?.telegram_id)
-        .single();
-
-      if (error || !data) {
-        // Handle case where referral code doesn't exist (create a new one)
-        const newRefCode = `${user?.telegram_id}-${Date.now()}`;
-        const { error: insertError } = await supabase
-          .from('referrals')
-          .insert([{ user_id: user?.telegram_id, ref_code: newRefCode }]);
-
-        if (insertError) {
-          console.error('Error generating referral code:', insertError);
+        // Generate or fetch referral code
+        if (!user.ref_code) {
+          // Generate a new referral code
+          const newReferralCode = `${defaultReferralName}_13`;
+          
+          // Save the referral code to the user's profile
+          const { error } = await supabase
+            .from('users')
+            .update({ ref_code: newReferralCode })
+            .eq('id', user.id);
+          
+          if (error) {
+            toast.error(t('error'));
+            console.error(error);
+            return;
+          }
+          
+          setReferralCode(newReferralCode);
         } else {
-          setReferralCode(newRefCode);
+          // Use existing referral code
+          setReferralCode(user.ref_code);
         }
-      } else {
-        setReferralCode(data.ref_code);
+
+        // Fetch the number of successful invites
+        const { count, error: inviteError } = await supabase
+          .from('referrals')
+          .select('*', { count: 'exact' })
+          .eq('ref_code', referralCode);
+
+        if (inviteError) {
+          console.error(inviteError);
+        } else {
+          setInviteCount(count || 0);
+        }
       }
     };
 
-    fetchReferralCode();
-  }, [user]);
+    fetchReferralData();
+  }, [user, t, referralCode]);
 
-  const handleInviteFriend = () => {
-    if (!user || !referralCode) return;
+  const handleSendInvite = async () => {
+    if (!referralCode) return;
 
-    const telegramMessage = `${friendName}! ${t("inviteMessage")} t.me/oneSitePlsBot/vip?ref=${referralCode}`;
-
-    const telegramUrl = `https://telegram.me/share/url?url=${encodeURIComponent(telegramMessage)}`;
-
-    window.open(telegramUrl, '_blank');
+    try {
+      // Prepare Telegram link with referral code
+      const telegramUrl = `https://t.me/oneSitePlsBot/vip?ref=${referralCode}`;
+      
+      // Open Telegram link
+      window.open(telegramUrl, '_blank');
+      
+      toast.success(t('inviteSent'));
+    } catch (error) {
+      console.error('Error sending invite:', error);
+      toast.error(t('error'));
+    }
   };
 
-  
+  const handleReferralNameChange = async (newName: string) => {
+    if (newName.trim() === '') return;
 
-  const inviteFriend = () => {
-    const url = `t.me/oneSitePlsBot/vip?ref=${referralCode}`
-    window.open(`https://telegram.me/share/url?url=${url}`, "_blank")
-  }
+    const newReferralCode = `${newName}_13`;
+
+    // Save the new referral code to the user's profile
+    const { error } = await supabase
+      .from('users')
+      .update({ ref_code: newReferralCode })
+      .eq('id', user?.id);
+
+    if (error) {
+      toast.error(t('error'));
+      console.error(error);
+      return;
+    }
+
+    setReferralCode(newReferralCode);
+    setReferralName(newName);
+    updateUserReferrals(newReferralCode);
+  };
 
   return (
-    <div className="p-4">
-      <h2 className="text-xl font-bold mb-4">{t("referFriend")}</h2>
-      <input
-        type="text"
-        placeholder={t("friendNamePlaceholder")}
-        value={friendName}
-        onChange={(e) => setFriendName(e.target.value)}
-        className="input input-bordered w-full sm:w-3/4 md:w-2/3 lg:w-1/2 mb-2"
-      />
-      <button onClick={handleInviteFriend} className="btn btn-primary">
-        {t("inviteFriendButton")}
-      </button>
-    </div>
+    <Suspense fallback={<div>Loading...</div>}>
+        <div className="p-6 bg-gray-800 rounded-lg shadow-lg">
+        <h2 className="text-2xl font-bold text-white mb-4">
+            <FontAwesomeIcon icon={faUserPlus} className="mr-2" />
+            {t('inviteFriend')}
+        </h2>
+        <div className="mb-4">
+            <label className="block text-gray-400 text-sm mb-1">
+            {t('referralName')}
+            </label>
+            <input
+            type="text"
+            value={referralName}
+            onChange={(e) => handleReferralNameChange(e.target.value)}
+            className="input input-bordered w-full bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+        </div>
+        <button
+            onClick={handleSendInvite}
+            className="btn btn-primary flex items-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition w-full"
+        >
+            <FontAwesomeIcon icon={faPaperPlane} className="mr-2" />
+            {t('sendInvite')}
+        </button>
+        <div className="mt-6 text-center">
+            <FontAwesomeIcon icon={faTrophy} className="text-yellow-400 mb-2" />
+            <p className="text-gray-400">
+            {t('successfulInvites')}: {inviteCount}
+            </p>
+        </div>
+        </div>
+    </Suspense>
   );
 };
 

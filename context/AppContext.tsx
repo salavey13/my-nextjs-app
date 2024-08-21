@@ -1,9 +1,11 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode, Suspense } from 'react';
 import { supabase } from '../lib/supabaseClient';
-import { languageDictionary } from '../utils/TranslationUtils';
+import {languageDictionary} from "../utils/TranslationUtils";
+import { useTranslation } from 'react-i18next';
 
+import { usePathname, useSearchParams } from 'next/navigation'
 // Default store state
 const defaultStore = {
   tg_id: '',
@@ -26,6 +28,9 @@ interface UserData {
   role: number;
   total_referrals: number;
   referral_bonus: number;
+  lang: 'ru',
+  ref_code: string;
+  rank: string;
 }
 
 // Combined context type
@@ -41,6 +46,7 @@ interface AppContextType {
   increaseReferrerX: (referrerId: string) => void;
   debugLogs: string[];
   addDebugLog: (log: string) => void;
+  updateUserReferrals: (newReferralCode: string) => void;
 }
 
 // Create the combined AppContext
@@ -50,6 +56,56 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const [store, setStore] = useState(defaultStore);
   const [user, setUser] = useState<UserData | null>(null);
   const [debugLogs, setDebugLogs] = useState<string[]>([]);
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+ 
+  useEffect(() => {
+    const url = `${pathname}?${searchParams}`
+    console.log(url)
+    // You can now use the current URL
+    // ...
+  }, [pathname, searchParams])
+  
+  //const { t } = useTranslation();
+
+  useEffect(() => {
+    const handleRef = async () => {
+      if (pathname && searchParams && user) {
+        const refCode = searchParams.get('ref')
+
+        // Check if the user is already referred by this ref_code
+        const { data: existingReferral, error: checkReferralError } = await supabase
+          .from('referrals')
+          .select('*')
+          .eq('ref_code', refCode)
+          .eq('referred_user_id', user.id)
+          .single();
+
+        if (checkReferralError && checkReferralError.code !== 'PGRST116') {
+          console.error(checkReferralError);
+          return;
+        }
+
+        if (!existingReferral) {
+          // Add the referral
+          const { error: referralError } = await supabase.from('referrals').insert([
+            { ref_code: refCode, referred_user_id: user.id },
+          ]);
+
+          if (referralError) {
+            console.error('Error adding referral:', referralError);
+          }
+        }
+      }
+    };
+
+    handleRef();
+  }, [pathname, searchParams, user]);
+
+  const updateUserReferrals = (newReferralCode: string) => {
+    setUser((prevUser: any) => ({ ...prevUser, ref_code: newReferralCode }));
+  };
+
 
   const addDebugLog = (log: string) => {
     setDebugLogs((prevLogs) => [...prevLogs, log]);
@@ -111,7 +167,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     sessionStorage.setItem('lang', langCode);
   };
 
-  // Translation function
+  // deprecated Translation function
   const t = (key: string) => languageDictionary[store.lang]?.[key] || key;
 
   // Update user referral
@@ -156,7 +212,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
               const user = JSON.parse(decodeURIComponent(userParam));
               if (!user.id) return;
 
-              fetchPlayer(user.id.toString(), user.username, store.lang);
+              fetchPlayer(user.id.toString(), user.username, user.lang);
             }
 
             setupTelegramBackButton();
@@ -181,9 +237,13 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   };
 
   return (
-    <AppContext.Provider value={{ store, setStore, user, setUser, fetchPlayer, t, changeLanguage, updateUserReferral, increaseReferrerX, debugLogs, addDebugLog  }}>
-      {children}
+    <Suspense fallback={<div>Loading...</div>}>
+      <AppContext.Provider value={{ store, setStore, user, setUser, fetchPlayer, t, changeLanguage, updateUserReferral, increaseReferrerX, debugLogs, addDebugLog, updateUserReferrals  }}>
+      
+        {children}
+      
     </AppContext.Provider>
+    </Suspense>
   );
 };
 

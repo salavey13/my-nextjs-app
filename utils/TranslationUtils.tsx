@@ -167,7 +167,14 @@ export const languageDictionary: LanguageDictionary = {
     referFriend: "Refer a Friend",
     friendNamePlaceholder: "Friend's Name",
     inviteFriendButton: "Invite Friend",
-    inviteMessage: "Hey {name}, join me on this amazing platform! Click the link below to get started:"
+    inviteMessage: "Hey {name}, join me on this amazing platform! Click the link below to get started:",
+    referAFriend: "Refer a Friend",
+    inviteFriend: "Invite a Friend via Telegram",
+    friendName: "Friend's Name",
+    sendInvite: "Send Invite",
+    inviteSent: "Invite Sent Successfully!",
+    alreadyReferred: "This user has already been referred.",
+    error: "An error occurred. Please try again."
   },
   ru: {
     name: "Русский",
@@ -197,7 +204,14 @@ export const languageDictionary: LanguageDictionary = {
     referFriend: "Пригласи друга",
     friendsNamePlaceholder: "Имя друга",
     InviteFriendButton: "Пригласить друга",
-    InviteMessage: "Эй, {name}, присоединяйся ко мне на этой удивительной платформе! Нажмите на ссылку ниже, чтобы начать:"
+    InviteMessage: "Эй, {name}, присоединяйся ко мне на этой удивительной платформе! Нажмите на ссылку ниже, чтобы начать:",
+    referAFriend: "Пригласить друга",
+    inviteFriend: "Пригласить друга через Telegram",
+    friendName: "Имя друга",
+    sendInvite: "Отправить приглашение",
+    inviteSent: "Приглашение успешно отправлено!",
+    alreadyReferred: "Этот пользователь уже был приглашен.",
+    error: "Произошла ошибка. Попробуйте еще раз."
     // Add more translations...
   },
   ukr: {
@@ -223,7 +237,14 @@ export const languageDictionary: LanguageDictionary = {
     referFriend: "Запропонуйте другу",
     friendNamePlaceholder: "Ім'я друга",
     inviteFriendButton: "Запросити друга",
-    inviteMessage: "Привіт, {name}, приєднуйся до мене на цій дивовижній платформі! Натисніть посилання нижче, щоб почати:"
+    inviteMessage: "Привіт, {name}, приєднуйся до мене на цій дивовижній платформі! Натисніть посилання нижче, щоб почати:",
+    referAFriend: "Запропонуйте другу",
+    inviteFriend: "Запросити друга через Telegram",
+    friendName: "Ім'я друга",
+    sendInvite: "Надіслати запрошення",
+    inviteSent: "Запрошення надіслано успішно!",
+    alreadyReferred: "Цього користувача вже було направлено.",
+    error: "Сталася помилка. Повторіть спробу."
     // Add more translations...
   },
 };
