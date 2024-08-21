@@ -37,12 +37,12 @@ export default function Dashboard() {
   const [allEvents, setAllEvents] = useState<Event[]>([]);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [betAmount, setBetAmount] = useState<string>('');
-  const { user, t, addDebugLog  } = useAppContext();
+  const { user, t  } = useAppContext();
 
-  useEffect(() => {
-    addDebugLog("Page loaded");
-    // Add other logs as necessary
-  }, []); // Empty array means this runs only once on component mount
+  //, addDebugLog useEffect(() => {
+  //   addDebugLog("Page loaded");
+  //   // Add other logs as necessary
+  // }, []); // Empty array means this runs only once on component mount
 
   useEffect(() => {
     // Fetch bets from Supabase

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, Suspense } from 'react';
+import React, { useState, useEffect, Suspense, useCallback } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { useAppContext } from '../context/AppContext';
 import { useTranslation } from 'react-i18next';
@@ -14,6 +14,7 @@ const Referral: React.FC = () => {
   const [referralName, setReferralName] = useState('');
   const [referralCode, setReferralCode] = useState<string | null>(null);
   const [inviteCount, setInviteCount] = useState(0);
+  const [isUpdating, setIsUpdating] = useState(false);
 
   useEffect(() => {
     const fetchReferralData = async () => {
@@ -22,31 +23,41 @@ const Referral: React.FC = () => {
         setReferralName(defaultReferralName || '');
 
         if (!user.ref_code) {
+          // Only generate a new referral code if one does not exist
           const newReferralCode = `${defaultReferralName}_13`;
-          const { error } = await supabase
-            .from('users')
-            .update({ ref_code: newReferralCode })
-            .eq('id', user.id);
+          try {
+            const { error } = await supabase
+              .from('users')
+              .update({ ref_code: newReferralCode })
+              .eq('id', user.id);
 
-          if (error) {
-            toast.error(t('error'));
+            if (error) {
+              toast.error(t('error'));
+              console.error(error);
+              return;
+            }
+            setReferralCode(newReferralCode);
+          } catch (error) {
             console.error(error);
-            return;
+            toast.error(t('error'));
           }
-          setReferralCode(newReferralCode);
         } else {
           setReferralCode(user.ref_code);
         }
 
-        const { count, error: inviteError } = await supabase
-          .from('referrals')
-          .select('*', { count: 'exact' })
-          .eq('ref_code', referralCode);
+        try {
+          const { count, error: inviteError } = await supabase
+            .from('referrals')
+            .select('*', { count: 'exact' })
+            .eq('ref_code', referralCode);
 
-        if (inviteError) {
-          console.error(inviteError);
-        } else {
-          setInviteCount(count || 0);
+          if (inviteError) {
+            console.error(inviteError);
+          } else {
+            setInviteCount(count || 0);
+          }
+        } catch (error) {
+          console.error(error);
         }
       }
     };
@@ -54,15 +65,15 @@ const Referral: React.FC = () => {
     fetchReferralData();
   }, [user, t, referralCode]);
 
-  const handleSendInvite = async () => {
+  const handleSendInvite = useCallback(async () => {
     if (!referralCode) return;
 
     try {
       const inviteLink = `https://t.me/oneSitePlsBot/vip?ref=${referralCode}`;
-      
+
       // Copy the link to the clipboard
       await navigator.clipboard.writeText(inviteLink);
-      
+
       // Show a success message
       toast.success(t('inviteCopied'));
 
@@ -72,30 +83,38 @@ const Referral: React.FC = () => {
       console.error('Error sending invite:', error);
       toast.error(t('error'));
     }
-  };
+  }, [referralCode, t]);
 
   const handleReferralNameChange = async (newName: string) => {
     if (newName.trim() === '') return;
 
+    // Prevent excessive updates
+    if (isUpdating) return;
+
+    setIsUpdating(true);
+
     const newReferralCode = `${newName}_13`;
 
-    const { error } = await supabase
-      .from('users')
-      .update({ ref_code: newReferralCode })
-      .eq('id', user?.id);
+    try {
+      const { error } = await supabase
+        .from('users')
+        .update({ ref_code: newReferralCode })
+        .eq('id', user?.id);
 
-    if (error) {
-      toast.error(t('error'));
-      console.error(error);
-      return;
+      if (error) {
+        toast.error(t('error'));
+        console.error(error);
+        return;
+      }
+
+      setReferralCode(newReferralCode);
+      setReferralName(newName);
+      updateUserReferrals(newReferralCode);
+    } finally {
+      setIsUpdating(false);
     }
-
-    setReferralCode(newReferralCode);
-    setReferralName(newName);
-    updateUserReferrals(newReferralCode);
   };
 
-  // Function to send a Telegram message
   const sendTelegramInvite = async (referralCode: string) => {
     if (!process.env.NEXT_PUBLIC_BOT_TOKEN || !user) {
       console.error('Bot token is missing');
