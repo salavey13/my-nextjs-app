@@ -175,6 +175,7 @@ export const languageDictionary: LanguageDictionary = {
     inviteSent: "Invite Sent Successfully!",
     alreadyReferred: "This user has already been referred.",
     error: "An error occurred. Please try again.",
+    profile: "Profile",
     createEvent: "Create Event",
     eventTitle: "Event Title",
     eventDescription: "Event Description",
@@ -182,7 +183,10 @@ export const languageDictionary: LanguageDictionary = {
     expirationDate: "Expiration Date",
     eventCreated: "Event Created",
     eventCreationSuccessMessage: "The event has been successfully created",
-    close: "Close"
+    close: "Close",
+    home: "Home",
+    admin: "Admin",
+    referral: "Referral"
   },
   ru: {
     name: "Русский",
@@ -228,7 +232,10 @@ export const languageDictionary: LanguageDictionary = {
     expirationDate: "Дата Истечения",
     eventCreated: "Событие Создано",
     eventCreationSuccessMessage: "Событие успешно создано",
-    close: "Закрыть"
+    close: "Закрыть",
+    home: "Главная",
+    admin: "Админ",
+    referral: "Реферал"
     // Add more translations...
   },
   ukr: {
@@ -270,7 +277,10 @@ export const languageDictionary: LanguageDictionary = {
     expirationDate: "Дата Закінчення",
     eventCreated: "Подію Створено",
     eventCreationSuccessMessage: "Подію успішно створено",
-    close: "Закрити"
+    close: "Закрити",
+    home: "Головна",
+    admin: "Адмін",
+    referral: "Реферал"
     // Add more translations...
   },
 };
