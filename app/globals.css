@@ -61,9 +61,31 @@
 
 @layer base {
   * {
-    @apply border-border;
+    @apply border-border bg-background text-foreground;
   }
   body {
-    @apply bg-background text-foreground;
+    margin: 0;
+    padding: 0;
+    font-family: 'Inter', sans-serif;
+    background-color: #000;
+    color: #fff;
+    text-rendering: optimizeLegibility;
+  }
+  
+  html {
+    height: 100%;
+  }
+  
+  .main-content {
+    min-height: calc(100vh - 128px); /* Adjust based on header and footer height */
+    padding-top: 64px; /* Header height */
+    padding-bottom: 64px; /* Footer height */
+    backdrop-filter: blur(10px);
+    background: linear-gradient(180deg, rgba(0,0,0,0.9) 0%, rgba(24,24,24,0.8) 100%);
+  }
+  
+  /* Add glow effect to header and footer */
+  header, footer {
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
   }
 }
