@@ -112,7 +112,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   };
 
   // Function to fetch or insert player data
-  const fetchPlayer = useCallback(async (tg_id: string, username: string, lang: string) => {
+  const fetchPlayer = useCallback(async (tg_id: number, username: string, lang: string) => {
     try {
       const { data, error } = await supabase
         .from('users')
@@ -213,7 +213,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
               const user = JSON.parse(decodeURIComponent(userParam));
               if (!user.id) return;
   
-              fetchPlayer(user.id.toString(), user.username, user.lang);
+              fetchPlayer(user.id, user.username, user.lang);
             }
   
             setupTelegramBackButton();
