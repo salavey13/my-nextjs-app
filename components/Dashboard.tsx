@@ -45,11 +45,12 @@ export default function Dashboard() {
   const { user, t, store } = useAppContext(); // Assuming `language` provides current language
 
   useEffect(() => {
+    if (!user) return
     const fetchBets = async () => {
       const { data, error } = await supabase
         .from('bets')
         .select('*')
-        .eq('user_id', user?.id);
+        .eq('user_id', user.id);
 
       if (error) {
         console.error("Error fetching bets:", error);
@@ -86,7 +87,7 @@ export default function Dashboard() {
     fetchBets();
     fetchEvents();
     fetchAllEvents();
-  }, [user?.telegram_id, bets]);
+  }, [user, bets]);
 
   const getEventDetailsById = useCallback((eventId: number) => {
     const event = allEvents.find(e => e.id === eventId);

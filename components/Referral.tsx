@@ -134,7 +134,7 @@ const Referral: React.FC = () => {
 
     const botToken = process.env.NEXT_PUBLIC_BOT_TOKEN;
     const inviteLink = `https://t.me/oneSitePlsBot/vip?ref=${referralCode}`;
-    const memeUrl = await getRandomMeme();
+    const memeUrl = "https://th.bing.com/th/id/OIG2.fwYLXgRzLnnm2DMcdfl1"//await getRandomMeme();
     const message = `${t("playWithUs")}  ${user?.telegram_username }! 🎮✨`;
 
     const url = new URL(`https://api.telegram.org/bot${botToken}/sendPhoto`);
@@ -155,7 +155,7 @@ const Referral: React.FC = () => {
     } catch (error) {
       console.error('Error sending Telegram message:', error);
     }
-  }, [user, t]); // Include all dependencies in the dependency array
+  }, [user]); // Include all dependencies in the dependency array
 
   return (
     <Suspense fallback={<LoadingSpinner />}>
