@@ -42,7 +42,7 @@ export default function Dashboard() {
   const [allEvents, setAllEvents] = useState<Event[]>([]);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [betAmount, setBetAmount] = useState<string>('');
-  const { user, t, store } = useAppContext(); // Assuming `language` provides current language
+  const { user, setUser, t, store } = useAppContext(); // Assuming `language` provides current language
 
   useEffect(() => {
     if (!user) return
@@ -108,32 +108,61 @@ export default function Dashboard() {
 
   const confirmBet = async () => {
     if (selectedEvent && betAmount && user) {
-      const { error } = await supabase
-        .from('bets')
-        .insert([
-          {
-            user_id: user?.telegram_id,
-            event_id: selectedEvent.id,
-            amount: betAmount,
-            outcome: 'Pending',
-            status: 'active',
-          },
-        ]);
-
-      if (error) {
-        console.error("Error placing bet:", error);
-      } else {
+      try {
+        // Step 1: Insert the new bet into the 'bets' table
+        const { error: betError } = await supabase
+          .from('bets')
+          .insert([
+            {
+              user_id: user.telegram_id,
+              event_id: selectedEvent.id,
+              amount: betAmount,
+              outcome: 'Pending',
+              status: 'active',
+            },
+          ]);
+  
+        if (betError) {
+          console.error("Error placing bet:", betError);
+          return;
+        }
+  
+        // Step 2: Clear the selected event and bet amount
         setSelectedEvent(null);
         setBetAmount('');
-        const { data } = await supabase
+  
+        // Step 3: Fetch the user's updated bets
+        const { data: betsData, error: fetchError } = await supabase
           .from('bets')
           .select('*')
           .eq('user_id', user.telegram_id);
-
-        setBets(data || []);
+  
+        if (fetchError) {
+          console.error("Error fetching bets:", fetchError);
+        } else {
+          setBets(betsData || []);
+        }
+  
+        // Step 4: Increment the user's rank
+        const updatedRank = (parseInt(user.rank, 10) || 0) + 1;
+        const { error: rankError } = await supabase
+          .from('users')
+          .update({ rank: updatedRank.toString() })
+          .eq('telegram_id', user.telegram_id);
+  
+        if (rankError) {
+          console.error("Error updating user rank:", rankError);
+        } else {
+          // Optionally, update the user in context with the new rank
+          setUser((prevUser) => prevUser ? { ...prevUser, rank: updatedRank.toString() } : null);
+        }
+  
+      } catch (error) {
+        console.error("An unexpected error occurred:", error);
       }
     }
   };
+  
 
   return (
     <div className="w-full min-h-screen bg-muted/40 flex flex-col p-4 overflow-auto">

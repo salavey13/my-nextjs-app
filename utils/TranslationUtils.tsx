@@ -296,6 +296,7 @@ export const languageDictionary: LanguageDictionary = {
   },
   ukr: {
     notifications: "Сповіщення",
+    confirm: "Підтвердити",
     name: "Українська",
     welcome: "Ласкаво просимо",
     task: "Завдання",
