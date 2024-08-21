@@ -126,19 +126,17 @@ const Referral: React.FC = () => {
     return data?.memeUrl || "https://th.bing.com/th/id/OIG2.fwYLXgRzLnnm2DMcdfl1"; // Fallback image URL
   };
   
-  const sendTelegramInvite = async (referralCode: string) => {
-    const { user, t } = useAppContext();
-  
+  const sendTelegramInvite = useCallback(async (referralCode: string) => {
     if (!process.env.NEXT_PUBLIC_BOT_TOKEN || !user) {
       console.error('Bot token is missing');
       return;
     }
-  
+
     const botToken = process.env.NEXT_PUBLIC_BOT_TOKEN;
     const inviteLink = `https://t.me/oneSitePlsBot/vip?ref=${referralCode}`;
     const memeUrl = await getRandomMeme();
     const message = `${t("playWithUs")}  ${user?.telegram_username }! 🎮✨`;
-  
+
     const url = new URL(`https://api.telegram.org/bot${botToken}/sendPhoto`);
     url.searchParams.append("chat_id", user.telegram_id.toFixed());
     url.searchParams.append("caption", message);
@@ -151,13 +149,13 @@ const Referral: React.FC = () => {
         [{ text: t("youtubeChannel"), url: "https://youtube.com/@salavey13" }],
       ],
     }));
-  
+
     try {
       await fetch(url.toString());
     } catch (error) {
       console.error('Error sending Telegram message:', error);
     }
-  };
+  }, [user, t]); // Include all dependencies in the dependency array
 
   return (
     <Suspense fallback={<LoadingSpinner />}>
