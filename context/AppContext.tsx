@@ -101,7 +101,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     if (user) {
       handleRef();
     }
-  }, [pathname, searchParams, user]);
+  }, [pathname, searchParams, user?.id]);
 
   const updateUserReferrals = (newReferralCode: string) => {
     setUser((prevUser: any) => ({ ...prevUser, ref_code: newReferralCode }));
@@ -213,9 +213,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
               const user = JSON.parse(decodeURIComponent(userParam));
               if (!user.id) return;
   
-              if (!store.tg_id) {
-                fetchPlayer(user.id.toString(), user.username, user.lang);
-              }
+              fetchPlayer(user.id.toString(), user.username, user.lang);
             }
   
             setupTelegramBackButton();
@@ -230,7 +228,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     };
   
     initTelegramWebApp();
-  }, []);
+  }, [user?.id]);
 
   const setupTelegramBackButton = () => {
     const backButton = window.Telegram?.WebApp?.BackButton;

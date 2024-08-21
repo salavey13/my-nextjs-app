@@ -124,8 +124,8 @@
   }
 
   .neon-glow {
-    text-shadow: 0 0 8px rgba(157, 255, 0, 0.13),
-                0 0 16px rgba(0, 153, 255, 0.11),
+    text-shadow: 0 0 8px rgba(0, 0, 0, 0.13),
+                0 0 16px rgba(0, 217, 255, 0.322),
                 0 0 24px rgba(21, 255, 0, 0.068);
   }
 }

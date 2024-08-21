@@ -83,7 +83,7 @@ const Referral: React.FC = () => {
       console.error('Error sending invite:', error);
       toast.error(t('error'));
     }
-  }, [referralCode, t]);
+  }, [referralCode]);
 
   const handleReferralNameChange = async (newName: string) => {
     if (newName.trim() === '') return;
