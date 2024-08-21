@@ -37,8 +37,8 @@ const Profile: React.FC = () => {
           <p className="text-gray-700">{user?.coins}</p>
         </div>
         <div>
-          <p className="font-medium">{t('xp')}:</p>
-          <p className="text-gray-700">{user?.xp}</p>
+          <p className="font-medium">{t('rp')}:</p>
+          <p className="text-gray-700">{user?.rp}</p>
         </div>
       </div>
     </div>
