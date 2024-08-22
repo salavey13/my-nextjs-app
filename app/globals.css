@@ -5,15 +5,15 @@
 @layer base {
   :root {
     --background: var(--tg-theme-bg-color, 0 0% 100%);
-    --foreground: /*var(--tg-theme-text-color, 224 71.4% 4.1%)*/white;
+    --foreground: var(--tg-theme-text-color, 224 71.4% 4.1%);
     --card: var(--tg-theme-bg-color, 0 0% 100%);
-    --card-foreground: /*var(--tg-theme-text-color, 224 71.4% 4.1%)*/white;
+    --card-foreground: var(--tg-theme-text-color, 224 71.4% 4.1%);
     --popover: var(--tg-theme-secondary-bg-color, 0 0% 100%);
-    --popover-foreground: /*var(--tg-theme-text-color, 224 71.4% 4.1%)*/white;
+    --popover-foreground: var(--tg-theme-text-color, 224 71.4% 4.1%);
     --primary: var(--tg-theme-button-color, 220.9 39.3% 11%);
     --primary-foreground: var(--tg-theme-button-text-color, 210 20% 98%);
     --secondary: var(--tg-theme-secondary-bg-color, 220 14.3% 95.9%);
-    --secondary-foreground: /*var(--tg-theme-text-color, 224 71.4% 4.1%)*/white;
+    --secondary-foreground: var(--tg-theme-text-color, 224 71.4% 4.1%);
     --muted: var(--tg-theme-hint-color, 220 14.3% 95.9%);
     --muted-foreground: var(--tg-theme-hint-color, 220 8.9% 46.1%);
     --accent: var(--tg-theme-link-color, 220 14.3% 95.9%);
@@ -26,7 +26,9 @@
     --radius: 0.5rem;
   }
 
-  /* @media (prefers-color-scheme: dark) {
+  /* Uncomment this block to re-enable dark theme support */
+  /*
+  @media (prefers-color-scheme: dark) {
     :root {
       --background: var(--tg-theme-bg-color, 224 71.4% 4.1%);
       --foreground: var(--tg-theme-text-color, 210 20% 98%);
@@ -48,7 +50,8 @@
       --input: var(--tg-theme-input-bg-color, 215 27.9% 16.9%);
       --ring: var(--tg-theme-bg-color, 216 12.2% 83.9%);
     }
-  }    */
+  }
+  */
 
   body {
     @apply bg-background text-foreground;
@@ -67,12 +70,12 @@
 
   /* Apply a 3-point purple gradient to all h1 headers */
   h1 {
-    background: linear-gradient(45deg, #8e2de2, #4a00e0, #9c27b0); /* Define the gradient colors */
-    -webkit-background-clip: text; /* Clip the background to the text */
-    -webkit-text-fill-color: transparent; /* Make the text color transparent */
-    background-clip: text; /* For non-webkit browsers */
-    text-fill-color: transparent; /* For non-webkit browsers */
-    animation: slide-in-left 1s ease-out; /* Apply the slide-in animation */
+    background: linear-gradient(45deg, #8e2de2, #4a00e0, #9c27b0);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-fill-color: transparent;
+    animation: slide-in-left 1s ease-out;
   }
 
   /* Define the slide-in animation */
@@ -99,18 +102,17 @@
     -webkit-text-fill-color: transparent;
   }
 
-  
   .main-content {
-    min-height: calc(100vh - 128px); /* Adjust based on header and footer height */
-    padding-top: 64px; /* Header height */
-    padding-bottom: 64px; /* Footer height */
+    min-height: calc(100vh - 128px);
+    padding-top: 64px;
+    padding-bottom: 64px;
     backdrop-filter: blur(10px);
     background: linear-gradient(180deg, rgba(0, 0, 0, 0.9) 0%, rgba(24, 24, 24, 0.8) 100%);
   }
 
   header, footer {
     box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
-    background-color: hsl(var(--background) / 0.8); /* Slightly transparent background */
+    background-color: hsl(var(--background) / 0.8);
     backdrop-filter: blur(10px);
   }
 
@@ -120,7 +122,7 @@
 
   /* Loading spinner */
   .loader {
-    border-top-color: hsl(var(--primary)); /* Spinner's color */
+    border-top-color: hsl(var(--primary));
   }
 
   .neon-glow {
