@@ -3,55 +3,29 @@
 @tailwind utilities;
 
 @layer base {
-  /* :root {
-    --background: var(--tg-theme-bg-color, 0 0% 100%);
-    --foreground: var(--tg-theme-text-color, 224 71.4% 4.1%);
-    --card: var(--tg-theme-bg-color, 0 0% 100%);
-    --card-foreground: var(--tg-theme-text-color, 224 71.4% 4.1%);
-    --popover: var(--tg-theme-secondary-bg-color, 0 0% 100%);
-    --popover-foreground: var(--tg-theme-text-color, 224 71.4% 4.1%);
-    --primary: var(--tg-theme-button-color, 220.9 39.3% 11%);
-    --primary-foreground: var(--tg-theme-button-text-color, 210 20% 98%);
-    --secondary: var(--tg-theme-secondary-bg-color, 220 14.3% 95.9%);
-    --secondary-foreground: var(--tg-theme-text-color, 224 71.4% 4.1%);
-    --muted: var(--tg-theme-hint-color, 220 14.3% 95.9%);
-    --muted-foreground: var(--tg-theme-hint-color, 220 8.9% 46.1%);
-    --accent: var(--tg-theme-link-color, 220 14.3% 95.9%);
-    --accent-foreground: var(--tg-theme-button-text-color, 220.9 39.3% 11%);
-    --destructive: var(--tg-theme-destructive-color, 0 84.2% 60.2%);
-    --destructive-foreground: var(--tg-theme-button-text-color, 210 20% 98%);
-    --border: var(--tg-theme-border-color, 220 13% 91%);
-    --input: var(--tg-theme-input-bg-color, 220 13% 91%);
-    --ring: var(--tg-theme-bg-color, 224 71.4% 4.1%);
-    --radius: 0.5rem;
-  } */
-
-  /* Uncomment this block to re-enable dark theme support */
-  /*
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --background: var(--tg-theme-bg-color, 224 71.4% 4.1%);
-      --foreground: var(--tg-theme-text-color, 210 20% 98%);
-      --card: var(--tg-theme-bg-color, 224 71.4% 4.1%);
-      --card-foreground: var(--tg-theme-text-color, 210 20% 98%);
-      --popover: var(--tg-theme-secondary-bg-color, 224 71.4% 4.1%);
-      --popover-foreground: var(--tg-theme-text-color, 210 20% 98%);
-      --primary: var(--tg-theme-button-color, 210 20% 98%);
-      --primary-foreground: var(--tg-theme-button-text-color, 220.9 39.3% 11%);
-      --secondary: var(--tg-theme-secondary-bg-color, 215 27.9% 16.9%);
-      --secondary-foreground: var(--tg-theme-text-color, 210 20% 98%);
-      --muted: var(--tg-theme-hint-color, 215 27.9% 16.9%);
-      --muted-foreground: var(--tg-theme-hint-color, 217.9 10.6% 64.9%);
-      --accent: var(--tg-theme-link-color, 215 27.9% 16.9%);
-      --accent-foreground: var(--tg-theme-button-text-color, 210 20% 98%);
-      --destructive: var(--tg-theme-destructive-color, 0 62.8% 30.6%);
-      --destructive-foreground: var(--tg-theme-button-text-color, 210 20% 98%);
-      --border: var(--tg-theme-border-color, 215 27.9% 16.9%);
-      --input: var(--tg-theme-input-bg-color, 215 27.9% 16.9%);
-      --ring: var(--tg-theme-bg-color, 216 12.2% 83.9%);
-    }
+  /* Hardcode light theme colors */
+  :root {
+    --background: 0 0% 100%; /* White background */
+    --foreground: 0 0% 0%; /* Black text */
+    --card: 0 0% 100%; /* White card background */
+    --card-foreground: 0 0% 0%; /* Black card text */
+    --popover: 0 0% 100%; /* White popover background */
+    --popover-foreground: 0 0% 0%; /* Black popover text */
+    --primary: 220.9 39.3% 11%; /* Dark blue primary color */
+    --primary-foreground: 210 20% 98%; /* Light text on primary */
+    --secondary: 220 14.3% 95.9%; /* Light secondary background */
+    --secondary-foreground: 0 0% 0%; /* Black secondary text */
+    --muted: 220 14.3% 95.9%; /* Light muted background */
+    --muted-foreground: 220 8.9% 46.1%; /* Muted foreground */
+    --accent: 220 14.3% 95.9%; /* Light accent background */
+    --accent-foreground: 220.9 39.3% 11%; /* Dark accent text */
+    --destructive: 0 84.2% 60.2%; /* Red destructive color */
+    --destructive-foreground: 210 20% 98%; /* Light text on destructive */
+    --border: 220 13% 91%; /* Light border color */
+    --input: 220 13% 91%; /* Light input background */
+    --ring: 224 71.4% 4.1%; /* Dark ring color */
+    --radius: 0.5rem; /* Border radius */
   }
-  */
 
   body {
     @apply bg-background text-foreground;
@@ -78,7 +52,6 @@
     animation: slide-in-left 1s ease-out;
   }
 
-  /* Define the slide-in animation */
   @keyframes slide-in-left {
     from {
       transform: translateX(-69%);
@@ -107,12 +80,12 @@
     padding-top: 64px;
     padding-bottom: 64px;
     backdrop-filter: blur(10px);
-    background: linear-gradient(180deg, rgba(0, 0, 0, 0.9) 0%, rgba(24, 24, 24, 0.8) 100%);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.9) 0%, rgba(240, 240, 240, 0.8) 100%); /* Light gradient */
   }
 
   header, footer {
-    box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
-    /*background-color: hsl(var(--background) / 0.8);*/
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1); /* Light shadow */
+    background-color: hsl(var(--background) / 0.8); /* Light background */
     backdrop-filter: blur(10px);
   }
 
