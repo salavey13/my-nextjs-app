@@ -5,7 +5,7 @@
 @layer base {
   :root {
     --background: var(--tg-theme-bg-color, 0 0% 100%);
-    --foreground: var(--tg-theme-text-color, 224 71.4% 4.1%);
+    --foreground: /*var(--tg-theme-text-color, 224 71.4% 4.1%)*/white;
     --card: var(--tg-theme-bg-color, 0 0% 100%);
     --card-foreground: var(--tg-theme-text-color, 224 71.4% 4.1%);
     --popover: var(--tg-theme-secondary-bg-color, 0 0% 100%);
@@ -48,15 +48,15 @@
       --input: var(--tg-theme-input-bg-color, 215 27.9% 16.9%);
       --ring: var(--tg-theme-bg-color, 216 12.2% 83.9%);
     }
-  }  */
+  }   */
 
   body {
     @apply bg-background text-foreground;
     margin: 0;
     padding: 0;
     font-family: 'Inter', sans-serif;
-    /* background-color: hsl(var(--background));
-    color: hsl(var(--foreground)); */
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground)); 
     text-rendering: optimizeLegibility;
     transition: background-color 0.3s ease, color 0.3s ease;
   }
