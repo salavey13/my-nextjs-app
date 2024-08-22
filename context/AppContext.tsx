@@ -168,20 +168,21 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       }
 
       const userData: UserData = newUser as UserData;
-
+      if (userData) {
       // Ensure only the fields that exist in defaultStore are updated
       setStore((prev) => ({
-        ...prev,
-        tg_id: userData.telegram_id?.toString(),
-        username: userData.telegram_username || '',
-        coins: userData.coins.toString(),
-        xp: userData.rp.toString(),
-        lang: userData.lang,
-        X: userData.X.toString(),
-        tasksTodo: userData.tasksTodo ? JSON.parse(userData.tasksTodo) : [],
-        currentGameId: userData.currentgameId || '',
-      }));
-      setUser(userData);
+          ...prev,
+          tg_id: userData.telegram_id.toString(),
+          username: userData.telegram_username || '',
+          coins: userData.coins.toString(),
+          xp: userData.rp.toString(),
+          lang: userData.lang,
+          X: userData.X.toString(),
+          tasksTodo: userData.tasksTodo ? JSON.parse(userData.tasksTodo) : [],
+          currentGameId: userData.currentgameId || '',
+        }));
+        setUser(userData);
+      }
     } catch (error) {
       console.error('Insert error:', error);
       addDebugLog(`Insert error: ${error}`);
