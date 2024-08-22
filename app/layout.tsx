@@ -44,12 +44,12 @@ export default function RootLayout({
   //   return () => {
   //     window.matchMedia("(prefers-color-scheme: dark)").removeEventListener("change", themeChangeListener);
   //   };
-  // }, []);
+  // }, []);bg-black text-white 
 
   return (
     <html lang="en">
       <body
-        className={`${inter.className} bg-black text-white flex flex-col min-h-screen`}
+        className={`${inter.className} flex flex-col min-h-screen`}
       >
         <ThemeHandler />
         <Suspense fallback={<LoadingSpinner />}>  {/* Use the custom loading component */}
