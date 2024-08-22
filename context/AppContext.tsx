@@ -172,7 +172,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       // Ensure only the fields that exist in defaultStore are updated
       setStore((prev) => ({
         ...prev,
-        tg_id: userData.telegram_id.toString(),
+        tg_id: userData.telegram_id?.toString(),
         username: userData.telegram_username || '',
         coins: userData.coins.toString(),
         xp: userData.rp.toString(),
