@@ -152,7 +152,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       console.error('Fetch/Insert error:', error);
       addDebugLog(`Fetch/Insert error: ${error}`);
     }
-  }, []);
+  }, [user]);
 
   const insertNewUser = async (tg_id: number, username: string, lang: string) => {
     addDebugLog("INSIDE INSERT");
