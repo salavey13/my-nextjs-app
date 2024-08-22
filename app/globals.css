@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 @layer base {
-  :root {
+  /* :root {
     --background: var(--tg-theme-bg-color, 0 0% 100%);
     --foreground: var(--tg-theme-text-color, 224 71.4% 4.1%);
     --card: var(--tg-theme-bg-color, 0 0% 100%);
@@ -24,7 +24,7 @@
     --input: var(--tg-theme-input-bg-color, 220 13% 91%);
     --ring: var(--tg-theme-bg-color, 224 71.4% 4.1%);
     --radius: 0.5rem;
-  }
+  } */
 
   /* Uncomment this block to re-enable dark theme support */
   /*
@@ -112,7 +112,7 @@
 
   header, footer {
     box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
-    background-color: hsl(var(--background) / 0.8);
+    /*background-color: hsl(var(--background) / 0.8);*/
     backdrop-filter: blur(10px);
   }
 
