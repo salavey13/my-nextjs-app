@@ -8,7 +8,7 @@ const Profile: React.FC = () => {
 
   return (
     <div className="p-8 shadow-lg rounded-lg max-w-lg mx-auto mt-10 bg-gradient-to-r from-gray-800 to-gray-900 text-white">
-      <h1 className="text-3xl font-bold neon-glow mb-6">{t('profile')}</h1>
+      <h1 className="text-3xl font-bold mb-6">{t('profile')}</h1>
       <div className="flex items-center mb-6">
         <Image 
           src="/placeholder-user.jpg" 

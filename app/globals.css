@@ -7,13 +7,13 @@
     --background: var(--tg-theme-bg-color, 0 0% 100%);
     --foreground: /*var(--tg-theme-text-color, 224 71.4% 4.1%)*/white;
     --card: var(--tg-theme-bg-color, 0 0% 100%);
-    --card-foreground: var(--tg-theme-text-color, 224 71.4% 4.1%);
+    --card-foreground: /*var(--tg-theme-text-color, 224 71.4% 4.1%)*/white;
     --popover: var(--tg-theme-secondary-bg-color, 0 0% 100%);
-    --popover-foreground: var(--tg-theme-text-color, 224 71.4% 4.1%);
+    --popover-foreground: /*var(--tg-theme-text-color, 224 71.4% 4.1%)*/white;
     --primary: var(--tg-theme-button-color, 220.9 39.3% 11%);
     --primary-foreground: var(--tg-theme-button-text-color, 210 20% 98%);
     --secondary: var(--tg-theme-secondary-bg-color, 220 14.3% 95.9%);
-    --secondary-foreground: var(--tg-theme-text-color, 220.9 39.3% 11%);
+    --secondary-foreground: /*var(--tg-theme-text-color, 224 71.4% 4.1%)*/white;
     --muted: var(--tg-theme-hint-color, 220 14.3% 95.9%);
     --muted-foreground: var(--tg-theme-hint-color, 220 8.9% 46.1%);
     --accent: var(--tg-theme-link-color, 220 14.3% 95.9%);
@@ -48,7 +48,7 @@
       --input: var(--tg-theme-input-bg-color, 215 27.9% 16.9%);
       --ring: var(--tg-theme-bg-color, 216 12.2% 83.9%);
     }
-  }   */
+  }    */
 
   body {
     @apply bg-background text-foreground;
