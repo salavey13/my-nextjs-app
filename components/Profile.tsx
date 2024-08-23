@@ -22,7 +22,7 @@ const Profile: React.FC = () => {
           <p className="text-sm text-gray-400">{t('userId')}: {user?.telegram_id}</p>
         </div>
       </div>
-      <div className="space-y-5">
+      <div className="space-y-1">
         <div className="bg-gray-700 p-4 rounded-lg">
           <p className="text-sm font-medium text-gray-300">{t('rank')}:</p>
           <p className="text-lg font-semibold">{user?.rank}</p>

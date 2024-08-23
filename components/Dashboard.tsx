@@ -45,49 +45,69 @@ export default function Dashboard() {
   const { user, setUser, t, store } = useAppContext(); // Assuming `language` provides current language
 
   useEffect(() => {
-    if (!user) return
+    if (!user) return;
+  
     const fetchBets = async () => {
       const { data, error } = await supabase
         .from('bets')
         .select('*')
         .eq('user_id', user.telegram_id);
-
+  
       if (error) {
         console.error("Error fetching bets:", error);
       } else {
         setBets(data || []);
       }
     };
-
+  
     const fetchEvents = async () => {
       const { data, error } = await supabase
         .from('events')
         .select('*')
         .not('id', 'in', `(${bets.map(bet => bet.event_id).join(',')})`);
-
+  
       if (error) {
         console.error("Error fetching events:", error);
       } else {
         setEvents(data || []);
       }
     };
-
+  
     const fetchAllEvents = async () => {
       const { data, error } = await supabase
         .from('events')
         .select('*');
-
+  
       if (error) {
         console.error("Error fetching all events:", error);
       } else {
         setAllEvents(data || []);
       }
     };
-
-    fetchBets();
+  
+    fetchBets();  // Fetch bets only on mount or when the user changes
+    fetchAllEvents();  // Fetch all events only once or when the user changes
+  }, [user]);  // Remove `bets` from dependencies to avoid multiple triggers
+  
+  // Separate useEffect for fetching events whenever bets change
+  useEffect(() => {
+    if (!user) return;
+  
+    const fetchEvents = async () => {
+      const { data, error } = await supabase
+        .from('events')
+        .select('*')
+        .not('id', 'in', `(${bets.map(bet => bet.event_id).join(',')})`);
+  
+      if (error) {
+        console.error("Error fetching events:", error);
+      } else {
+        setEvents(data || []);
+      }
+    };
+  
     fetchEvents();
-    fetchAllEvents();
-  }, [user, bets]);
+  }, [bets]);  // Only refetch events when bets change
 
   const getEventDetailsById = useCallback((eventId: number) => {
     const event = allEvents.find(e => e.id === eventId);
@@ -105,11 +125,10 @@ export default function Dashboard() {
       setSelectedEvent(event);
     }
   };
-
+  
   const confirmBet = async () => {
     if (selectedEvent && betAmount && user) {
       try {
-        // Step 1: Insert the new bet into the 'bets' table
         const { error: betError } = await supabase
           .from('bets')
           .insert([
@@ -117,7 +136,7 @@ export default function Dashboard() {
               user_id: user.telegram_id,
               event_id: selectedEvent.id,
               amount: betAmount,
-              outcome: 'Pending',
+              outcome: 'pending',
               status: 'active',
             },
           ]);
@@ -127,11 +146,10 @@ export default function Dashboard() {
           return;
         }
   
-        // Step 2: Clear the selected event and bet amount
         setSelectedEvent(null);
         setBetAmount('');
   
-        // Step 3: Fetch the user's updated bets
+        // Manually update bets after placing a bet
         const { data: betsData, error: fetchError } = await supabase
           .from('bets')
           .select('*')
@@ -143,7 +161,7 @@ export default function Dashboard() {
           setBets(betsData || []);
         }
   
-        // Step 4: Increment the user's rank
+        // Update the user's rank
         const updatedRank = (parseInt(user.rank, 10) || 0) + 1;
         const { error: rankError } = await supabase
           .from('users')
@@ -153,7 +171,6 @@ export default function Dashboard() {
         if (rankError) {
           console.error("Error updating user rank:", rankError);
         } else {
-          // Optionally, update the user in context with the new rank
           setUser((prevUser) => prevUser ? { ...prevUser, rank: updatedRank.toString() } : null);
         }
   
@@ -183,7 +200,7 @@ export default function Dashboard() {
                 <TableHead>{t("title")}</TableHead>
                 <TableHead>{t("amount")}</TableHead>
                 <TableHead>{t("outcome")}</TableHead>
-                <TableHead>{t("status")}</TableHead>
+                {/*<TableHead>{t("status")}</TableHead>*/}
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -193,16 +210,19 @@ export default function Dashboard() {
                   <TableRow key={bet.id}>
                     <TableCell>{title}</TableCell>
                     <TableCell>{bet.amount}</TableCell>
-                    <TableCell>{bet.outcome}</TableCell>
-                    <TableCell>
+                    <TableCell>{t(bet.outcome)}</TableCell>
+                    {/* <TableCell>
                       {bet.status === 'active' ? (
-                        <Button variant="outline" size="sm">
+                        <Button variant="ghost" size="sm">
                           {t("active")}
                         </Button>
                       ) : (
-                        <span>{bet.status}</span>
+                        <Button variant="destructive" size="sm" 
+                        disabled={true}>
+                          {bet.status}
+                        </Button>
                       )}
-                    </TableCell>
+                    </TableCell> */}
                   </TableRow>
                 );
               })}
@@ -233,7 +253,7 @@ export default function Dashboard() {
                     <TableCell>
                       <Button
                         onClick={() => handlePlaceBet(event.id)}
-                        variant="outline"
+                        variant="default"
                         size="sm"
                         disabled={event.expired}
                       >
