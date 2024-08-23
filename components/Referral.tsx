@@ -42,7 +42,7 @@ const Referral: React.FC = () => {
   };
 
   const generateReferralCode = async (defaultReferralName: string) => {
-    const newReferralCode = `${defaultReferralName}_13`;
+    const newReferralCode = `${defaultReferralName}`;
     try {
       const { error } = await supabase
         .from('users')
