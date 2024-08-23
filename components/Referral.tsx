@@ -161,7 +161,7 @@ const Referral: React.FC = () => {
         </div>
         <button
           onClick={handleSendInvite}
-          className="btn btn-primary flex items-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition w-full"
+          className="btn btn-primary flex items-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition justify-center w-full"
           aria-label="Send Invite"
         >
           <FontAwesomeIcon icon={faPaperPlane} className="mr-2" />
