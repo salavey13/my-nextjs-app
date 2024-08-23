@@ -5,7 +5,7 @@ import { supabase } from "../lib/supabaseClient";
 import { useAppContext } from '../context/AppContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUserShield } from '@fortawesome/free-solid-svg-icons';
-
+import LoadingSpinner from "../components/ui/LoadingSpinner"
 // Define types for summary data
 interface SummaryData {
   total: number;
@@ -82,7 +82,7 @@ const AdminDashboard: React.FC = () => {
     fetchReferrals();
   }, [user]);
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <LoadingSpinner />;
   if (error) return <div>Error: {error}</div>;
 
   return (

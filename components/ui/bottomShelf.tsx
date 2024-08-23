@@ -19,8 +19,9 @@ const BottomShelf: React.FC = () => {
   const navigationLinks: NavigationLink[] = [
     { href: '/', icon: faHome, label: t('home') },
     { href: '/admin', icon: faList, label: t('admin') },
+    { href: '/createEvent', icon: faCalendarPlus, label: '' },
     { href: '/referral', icon: faPlus, label: t('referral') },
-    { href: '/notifications', icon: faBell, label: t('notifications') },
+    //{ href: '/notifications', icon: faBell, label: t('notifications') },
     { href: '/profile', icon: faUser, label: t('profile') },
   ];
 
@@ -33,17 +34,17 @@ const BottomShelf: React.FC = () => {
           className={`flex flex-col items-center justify-center w-12 h-12 ${
             pathname === link.href ? 'text-blue-500' : 'text-gray-400'
           }`}>
-          <FontAwesomeIcon icon={link.icon} size="lg" />
+          <FontAwesomeIcon icon={link.icon} size={link.label ===''?"2x":"lg"} />
           <span className="text-xs">{link.label}</span>
         </Link>
       ))}
-      <div className="fixed bottom-[100px] left-1/2 transform -translate-x-1/2 w-16 h-16 rounded-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center">
+      {/* <div className="fixed bottom-[100px] left-1/2 transform -translate-x-1/2 w-16 h-16 rounded-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center">
         <Link href="/createEvent">
             <div className="w-full h-full flex items-center justify-center rounded-full">
             <FontAwesomeIcon icon={faCalendarPlus} size="2x" className="text-white" />
             </div>
         </Link>
-      </div>
+      </div> */}
     </footer>
   );
 };
