@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode, Suspense } from 'react';
 import { supabase } from '../lib/supabaseClient';
-import { languageDictionary } from "../utils/TranslationUtils";
+import { LanguageDictionary, translations } from "../utils/TranslationUtils";
 import { usePathname, useSearchParams } from 'next/navigation';
 import { updateUserReferral, increaseReferrerX, addReferralEntry } from '../services/ReferralService';
 
@@ -226,7 +226,28 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     sessionStorage.setItem('lang', langCode);
   };
 
-  const t = (key: string) => languageDictionary[store.lang]?.[key] || key;
+  const t = (key: string, variables?: Record<string, string>): string => {
+    const keys = key.split('.');
+    let translation: string | LanguageDictionary = translations[store.lang];
+
+    for (const k of keys) {
+      if (typeof translation === 'string') {
+        return key; // Return the key if translation is not found
+      }
+      translation = translation[k];
+      if (translation === undefined) {
+        return key; // Return the key if translation is not found
+      }
+    }
+
+    if (typeof translation === 'string' && variables) {
+      return Object.keys(variables).reduce((str, variable) => {
+        return str.replace(`{${variable}}`, variables[variable]);
+      }, translation);
+    }
+
+    return typeof translation === 'string' ? translation : key;
+  };
 
   useEffect(() => {
     const initTelegramWebApp = () => {

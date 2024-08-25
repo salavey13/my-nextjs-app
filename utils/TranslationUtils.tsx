@@ -3,12 +3,13 @@
 import React, { createContext, useContext, ReactNode, FC } from "react";
 import { useAppContext } from "../context/AppContext";
 
-type LanguageDictionary = {
-  [key: string]: { [key: string]: string };
-};
-
-const TranslationContext = createContext<
-  { t: (key: string) => string } | undefined
+export type LanguageDictionary = {
+    [key: string]: string | LanguageDictionary;
+  };
+  
+  
+  const TranslationContext = createContext<
+  { t: (key: string, variables?: Record<string, string>) => string } | undefined
 >(undefined);
 
 interface TranslationProviderProps {
@@ -16,11 +17,30 @@ interface TranslationProviderProps {
 }
 
 export const TranslationProvider: FC<TranslationProviderProps> = ({ children }) => {
-  const { store } = useAppContext();
+  const { store } = useAppContext(); // Assuming useAppContext() provides current language
   const currentLanguage = store.lang || "en";
 
-  const t = (key: string): string => {
-    return languageDictionary[currentLanguage][key] || key;
+  const t = (key: string, variables?: Record<string, string>): string => {
+    const keys = key.split('.');
+    let translation: string | LanguageDictionary = translations[currentLanguage];
+
+    for (const k of keys) {
+      if (typeof translation === 'string') {
+        return key; // Return the key if translation is not found
+      }
+      translation = translation[k];
+      if (translation === undefined) {
+        return key; // Return the key if translation is not found
+      }
+    }
+
+    if (typeof translation === 'string' && variables) {
+      return Object.keys(variables).reduce((str, variable) => {
+        return str.replace(`{${variable}}`, variables[variable]);
+      }, translation);
+    }
+
+    return typeof translation === 'string' ? translation : key;
   };
 
   return (
@@ -37,11 +57,11 @@ export const useTranslation = () => {
   }
   return context;
 };
-
-export const supportedLanguages = ["en", "ru", "ukr"];
-
-export const languageDictionary: LanguageDictionary = {
-  en: {
+  
+  export const supportedLanguages = ["en", "ru", "ukr"];
+  
+  export const translations: LanguageDictionary = {
+    en: {
     name: "English",
     welcome: "Welcome",
     task: "Task",
@@ -229,7 +249,32 @@ export const languageDictionary: LanguageDictionary = {
     referral_accepted: "Referral Accepted",
     quest_started: "Quest Started",
     quest_completed: "Quest Completed",
-  },
+    subtitle: {
+      githubManager: "GitHub Manager",
+    },
+    button: {
+      createBranch: "Create Branch",
+      pushFiles: "Push Files to Branch",
+      mergeBranch: "Merge Branch to Main",
+    },
+    log: {
+      filePushed: "File {fileName} pushed to branch {branchName} with commit SHA {newCommitSha}.",
+      branchMerged: "Branch {branchName} merged into main.",
+      rollback: "Branch {branchName} rolled back to commit SHA {sha}.",
+    },
+    suberror: {
+      createBranch: "Failed to create branch",
+      pushFiles: "Failed to push files to branch",
+      mergeBranch: "Failed to merge branch into main",
+      rollback: "Failed to rollback to commit",
+      branchRequired: "Branch name is required",
+      translationFieldsRequired: "Please specify a language and provide translations.",
+      updateTranslations: "Failed to update translations",
+    },
+    success: {
+      translationsUpdated: "Translations updated successfully.",
+    },
+    },
   ru: {
     adminDashboard: "Панель администратора",
     totalReferrals: "Всего рефералов",
@@ -322,7 +367,32 @@ export const languageDictionary: LanguageDictionary = {
     referral_sent: "Реферал отправлен",
     referral_accepted: "Реферал принят",
     quest_started: "Задание начато",
-    quest_completed: "Задание завершено"
+    quest_completed: "Задание завершено",
+    subtitle: {
+      githubManager: "Менеджер GitHub",
+    },
+    button: {
+      createBranch: "Создать ветку",
+      pushFiles: "Отправить файлы в ветку",
+      mergeBranch: "Слить ветку с основной",
+    },
+    log: {
+      filePushed: "Файл {fileName} отправлен в ветку {branchName} с хэшем коммита {newCommitSha}.",
+      branchMerged: "Ветка {branchName} слита с основной.",
+      rollback: "Ветка {branchName} откатана к коммиту с хэшем {sha}.",
+    },
+    suberror: {
+      createBranch: "Не удалось создать ветку",
+      pushFiles: "Не удалось отправить файлы в ветку",
+      mergeBranch: "Не удалось слить ветку с основной",
+      rollback: "Не удалось откатить к коммиту",
+      branchRequired: "Требуется название ветки",
+      translationFieldsRequired: "Пожалуйста, укажите язык и предоставьте переводы.",
+      updateTranslations: "Не удалось обновить переводы",
+    },
+    success: {
+      translationsUpdated: "Переводы успешно обновлены.",
+    },
     // Add more translations...
   },
   ukr: {
@@ -414,6 +484,31 @@ export const languageDictionary: LanguageDictionary = {
     refCode: "Код реферала",
     referralsByCode: "Реферали за кодом",
     referrals: "Реферали",
+    subtitle: {
+        githubManager: "Менеджер GitHub",
+    },
+    button: {
+        createBranch: "Створити гілку",
+        pushFiles: "Надіслати файли до гілки",
+        mergeBranch: "Об'єднати гілку з головною",
+    },
+    журнал: {
+        filePushed: "Файл {fileName} направлено до гілки {branchName} із SHA комітом {newCommitSha}.",
+        branchMerged: "Гілку {branchName} об’єднано з основною.",
+        rollback: "Гілку {branchName} повернуто до фіксації SHA {sha}.",
+    },
+    suberror: {
+        createBranch: "Не вдалося створити гілку",
+        pushFiles: "Не вдалося відправити файли до гілки",
+        mergeBranch: "Не вдалося об'єднати гілку в основну",
+        rollback: "Не вдалося відкотити для фіксації",
+        branchRequired: "Потрібна назва гілки",
+        translationFieldsRequired: "Будь ласка, вкажіть мову та надайте переклади.",
+        updateTranslations: "Не вдалося оновити переклади",
+    },
+    success: {
+        translationsUpdated: "Переклади успішно оновлено.",
+    },
     // Add more translations...
   },
 };

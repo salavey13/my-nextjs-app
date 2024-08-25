@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHome, faList, faPlus, faBell, faUser, faCalendarPlus } from '@fortawesome/free-solid-svg-icons';
+import { faHome, faList, faPlus, faBell, faUser, faCalendarPlus, faLightbulb } from '@fortawesome/free-solid-svg-icons';
 import { useAppContext } from "@/context/AppContext";
 
 interface NavigationLink {
@@ -22,7 +22,8 @@ const BottomShelf: React.FC = () => {
     { href: '/createEvent', icon: faCalendarPlus, label: '' },
     { href: '/referral', icon: faPlus, label: t('referral') },
     //{ href: '/notifications', icon: faBell, label: t('notifications') },
-    { href: '/profile', icon: faUser, label: t('profile') },
+    //{ href: '/profile', icon: faUser, label: t('profile') },
+    { href: '/dev', icon: faLightbulb, label: t('dev') }
   ];
 
   return (
