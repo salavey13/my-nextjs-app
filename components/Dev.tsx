@@ -15,7 +15,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import NavigationLink from "./ui/bottomShelf"
 
-import { updateReadme, fetchBottomShelfCode, saveUpdatedBottomShelf } from '../utils/githubUtils'; // Import the utility function
+import { updateReadme, fetchBottomShelfCode } from '../utils/githubUtils'; // Import the utility function
+//import { saveUpdatedBottomShelf } from '../utils/githubUtils';
 type ParsedResponse = {
     branchName: string | null;
     files: ParsedFile[];
@@ -361,19 +362,19 @@ File: components/NewComponent.tsx
       // Fetch the current BottomShelf.tsx code from GitHub
       let bottomShelfCode = await fetchBottomShelfCode();
   
-      // Modify the BottomShelf code to add the new link
-      const newLink = {
-        href: `/app/${parsedData.branchName}`,
-        icon: 'faLightbulb',  // Replace with appropriate icon
-        label: parsedData.branchName,
-      };
-      const updatedBottomShelfCode = bottomShelfCode.replace(
-        /(const navigationLinks: NavigationLink\[] = \[)/,
-        `$1\n    { href: '${newLink.href}', icon: ${newLink.icon}, label: '${newLink.label}' },`
-      );
+    //   // Modify the BottomShelf code to add the new link
+    //   const newLink = {
+    //     href: `/app/${parsedData.branchName}`,
+    //     icon: 'faLightbulb',  // Replace with appropriate icon
+    //     label: parsedData.branchName,
+    //   };
+    //   const updatedBottomShelfCode = bottomShelfCode.replace(
+    //     /(const navigationLinks: NavigationLink\[] = \[)/,
+    //     `$1\n    { href: '${newLink.href}', icon: ${newLink.icon}, label: '${newLink.label}' },`
+    //   );
   
-      // Save the updated BottomShelf.tsx code back to GitHub
-      await saveUpdatedBottomShelf(updatedBottomShelfCode);
+    //   // Save the updated BottomShelf.tsx code back to GitHub
+    //   await saveUpdatedBottomShelf(updatedBottomShelfCode);
   
       // Create the new page.tsx file for the new component
       const pagePath = `app/${parsedData.branchName}/page.tsx`;

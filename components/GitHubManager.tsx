@@ -235,17 +235,35 @@ const GitHubManager: React.FC = () => {
 
   const updateReadme = async (newContent: string) => {
     if (!octokit || !branchName) return;
-
-    const { data } = await octokit.repos.getContent({
-      owner: REPO_OWNER,
-      repo: REPO_NAME,
-      path: "README.md",
-    });
   
-    const readmeContent = Buffer.from(data.content, "base64").toString("utf-8");
-    const updatedReadmeContent = `${readmeContent}\n\n${newContent}`;
+    try {
+      const { data } = await octokit.repos.getContent({
+        owner: REPO_OWNER,
+        repo: REPO_NAME,
+        path: "README.md",
+      });
   
-    await pushFilesToBranch("README.md", updatedReadmeContent, t("commitMessages.updateReadme"));
+      // Check if data is an array (indicating a directory), or an object (indicating a file)
+      if (Array.isArray(data)) {
+        console.error(t('error.readmeIsDirectory'));
+        throw new Error(t('error.readmeIsDirectory'));
+      }
+  
+      // If it's not an array, it's an object representing a file
+      const fileData = data as { content: string | undefined; sha: string };
+      if (!fileData || !fileData.content) {
+        console.error(t('error.noReadmeContent'));
+        throw new Error(t('error.noReadmeContent'));
+      }
+  
+      const readmeContent = Buffer.from(fileData.content, "base64").toString("utf-8");
+      const updatedReadmeContent = `${readmeContent}\n\n${newContent}`;
+  
+      await pushFilesToBranch("README.md", updatedReadmeContent, t("commitMessages.updateReadme"));
+    } catch (err) {
+      console.error(t('error.failedToUpdateReadme'), err);
+      throw err; // Re-throw the error to be handled by the caller
+    }
   };
 
   const mergeBranchToMain = async () => {

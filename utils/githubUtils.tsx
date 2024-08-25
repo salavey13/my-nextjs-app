@@ -85,3 +85,55 @@ export const fetchBottomShelfCode = async () => {
       throw error;
     }
   };
+
+  // export const saveUpdatedBottomShelf = async (updatedContent: string) => {
+  //   try {
+  //     // Fetch the current ref (branch)
+  //     const branchName = `your-branch-name`; // Make sure this is dynamically passed if needed
+  //     const { data: refData } = await octokit.git.getRef({
+  //       owner: REPO_OWNER,
+  //       repo: REPO_NAME,
+  //       ref: `heads/${branchName}`,
+  //     });
+  
+  //     const baseTreeSha = refData.object.sha;
+  
+  //     // Create a blob for the new content
+  //     const { data: blobData } = await octokit.git.createBlob({
+  //       owner: REPO_OWNER,
+  //       repo: REPO_NAME,
+  //       content: Buffer.from(updatedContent).toString("base64"),
+  //       encoding: "base64",
+  //     });
+  
+  //     // Create a new tree with the updated file
+  //     const { data: treeData } = await octokit.git.createTree({
+  //       owner: REPO_OWNER,
+  //       repo: REPO_NAME,
+  //       tree: [{ path: "components/ui/bottomShelf.tsx", mode: "100644", type: "blob", sha: blobData.sha }],
+  //       base_tree: baseTreeSha,
+  //     });
+  
+  //     // Create a new commit with the updated tree
+  //     const { data: commitData } = await octokit.git.createCommit({
+  //       owner: REPO_OWNER,
+  //       repo: REPO_NAME,
+  //       message: "Update bottomShelf.tsx",
+  //       tree: treeData.sha,
+  //       parents: [refData.object.sha],
+  //     });
+  
+  //     // Update the reference (branch) to point to the new commit
+  //     await octokit.git.updateRef({
+  //       owner: REPO_OWNER,
+  //       repo: REPO_NAME,
+  //       ref: `heads/${branchName}`,
+  //       sha: commitData.sha,
+  //     });
+  
+  //     console.log("bottomShelf.tsx updated successfully in the repository");
+  //   } catch (error) {
+  //     console.error("Error saving bottomShelf.tsx code:", error);
+  //     throw error;
+  //   }
+  // };
