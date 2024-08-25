@@ -23,6 +23,7 @@ const ClipboardManager: React.FC<ClipboardManagerProps> = ({ requestText }) => {
 
       <Button 
         onClick={() => writeToClipboard(requestText)}
+        variant="outline"
         className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 mb-2"
       >
         Copy Request to Clipboard

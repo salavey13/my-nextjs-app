@@ -19,10 +19,11 @@ import { updateReadme, fetchBottomShelfCode, saveUpdatedBottomShelf } from '../u
 type ParsedResponse = {
     branchName: string | null;
     files: ParsedFile[];
-    tableDescription: string | null;
+    sqlTables: string[] | null;
     translations: Record<string, any> | null;
     readmeUpdate: string | null;
   };
+
 interface ParsedFile {
     path: string;
     content: string;
@@ -32,8 +33,8 @@ const Dev: React.FC = () => {
   const { user, t, fetchPlayer } = useAppContext();
   const [ideaText, setIdeaText] = useState<string>("");  // Idea input state
   const [ideas, setIdeas] = useState([
-    { id: 1, title: "Idea 1", description: "Description of idea 1", contributors: ["Alice", "Bob"] },
-    { id: 2, title: "Idea 2", description: "Description of idea 2", contributors: ["Charlie", "Dave"] },
+    { id: 1, title: "Idea 1", description: "Description of idea 1", contributors: ["SALAVEY13"] },
+    { id: 2, title: "Idea 2", description: "Description of idea 2", contributors: ["the_4uka"] },
     // Add more ideas as needed
   ]);
   const [requestText, setRequestText] = useState<string>("");  // Zero stage request text
@@ -203,47 +204,61 @@ File: components/NewComponent.tsx
   };
 
   // Enhanced parser to extract branch name
-  async function parseResponse(response: string): Promise<ParsedResponse> {
-    const branchNameRegex = /Branch Name:\n- (.+)\n/;
-    const fileRegex = /File: `([^`]+)`\n```(?:typescript|js|tsx|json|sql|[^`]+)?\n([\s\S]+?)```/g;
-    const tableRegex = /### Supabase Tables:\n```sql\n([\s\S]+?)```/;
-    const translationRegex = /### Translation Keys:\n```tsx\n([\s\S]+?)```/;
-    const readmeRegex = /### README.md Update:\n```md\n([\s\S]+?)```/;
+  const parseResponse = (response: string): ParsedResponse => {
+    const branchNameRegex = /### 0\. \*\*Branch Name\*\*:\s*```bash\s*([^`]+)\s*```/;
+    const fileRegex = /### \d+\. \*\*Component Implementation\*\*:\s*\*\*File:\*\* `([^`]+)`\n```tsx([\s\S]*?)```/g;
+    const translationKeysRegex = /### \d+\. \*\*Translation Keys\*\*:\n```tsx([\s\S]*?)```/;
+    const sqlTablesRegex = /### \d+\. \*\*Supabase Tables\*\*:\n```sql([\s\S]*?)```/;
+    const readmeUpdateRegex = /### \d+\. \*\*README\.md Update\*\*:\n```md([\s\S]*?)```/;
 
-    const files: { path: string; content: string }[] = [];
-    let match;
+    const parsedData: ParsedResponse = {
+        branchName: '',
+        files: [],
+        translations: {},
+        sqlTables: [],
+        readmeUpdate: ''
+    };
 
-    // Extract branch name
-    const branchNameMatch = branchNameRegex.exec(response);
-    const branchName = branchNameMatch ? branchNameMatch[1].trim() : null;
-
-    // Extract files
-    while ((match = fileRegex.exec(response)) !== null) {
-      const [, path, content] = match;
-      files.push({ path, content });
+    // Extract the branch name
+    const branchNameMatch = response.match(branchNameRegex);
+    if (branchNameMatch) {
+        parsedData.branchName = branchNameMatch[1].trim();
     }
 
-    // Extract table description
-    const tableMatch = tableRegex.exec(response);
-    const tableDescription = tableMatch ? tableMatch[1].trim() : null;
-
-    // Extract translations
-    const translationMatch = translationRegex.exec(response);
-    let translations: Record<string, any> | null = null;
-    if (translationMatch) {
-      try {
-        translations = JSON.parse(translationMatch[1].trim());
-      } catch (error) {
-        console.error('Failed to parse translations:', error);
-      }
+    // Extract file implementations
+    let fileMatch;
+    while ((fileMatch = fileRegex.exec(response)) !== null) {
+        parsedData.files.push({
+            path: fileMatch[1].trim(),
+            content: fileMatch[2].trim(),
+        });
     }
 
-    // Extract README update
-    const readmeMatch = readmeRegex.exec(response);
-    const readmeUpdate = readmeMatch ? readmeMatch[1].trim() : null;
+    // Extract translation keys
+    const translationKeysMatch = response.match(translationKeysRegex);
+    if (translationKeysMatch) {
+        parsedData.translations = eval(`(${translationKeysMatch[1].trim()})`);
+    }
 
-    return { branchName, files, tableDescription, translations, readmeUpdate };
-  }
+    // Extract SQL table creation commands
+    const sqlTablesMatch = response.match(sqlTablesRegex);
+    if (sqlTablesMatch) {
+        parsedData.sqlTables = sqlTablesMatch[1].trim().split(/\n{2,}/);
+    }
+
+    // Extract README.md update
+    const readmeUpdateMatch = response.match(readmeUpdateRegex);
+    if (readmeUpdateMatch) {
+        parsedData.readmeUpdate = readmeUpdateMatch[1].trim();
+    }
+    console.log(parsedData.branchName);
+    console.log(parsedData.files);
+    console.log(parsedData.translations);
+    console.log(parsedData.sqlTables);
+    console.log(parsedData.readmeUpdate);
+
+    return parsedData;
+};
 
   // Function to save extracted files to the local system
   async function saveFiles(files: ParsedFile[]) {
@@ -443,6 +458,7 @@ return (
         <div className="mt-4">
           <Button 
             onClick={handleGetResponse} 
+            variant="outline"
             className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
           >
             Get Response from Clipboard
@@ -452,34 +468,40 @@ return (
   
       {/* Display Parsed Response */}
       {step >= 2 && parsedData && (
-        <div className="mt-8">
-          <h2 className="text-xl font-semibold">Parsed Response</h2>
-          <div className="parsed-files">
-            <h3 className="text-lg font-bold">Components</h3>
-            {parsedData.files.map((file: ParsedFile, index: number) => (
-              <div key={index} className="file-item">
-                <a 
-                  href="#" 
-                  onClick={() => saveFiles([file])} 
-                  className="text-blue-500 underline"
-                >
-                  {file.path}
-                </a>
-              </div>
-            ))}
-          </div>
-          <div className="parsed-translations">
-            <h3 className="text-lg font-bold">Translations</h3>
-            <pre className="bg-gray-800 text-white p-2 rounded">{JSON.stringify(parsedData.translations, null, 2)}</pre>
-          </div>
-          <div className="parsed-readme">
-            <h3 className="text-lg font-bold">README.md Update</h3>
-            <pre className="bg-gray-800 text-white p-2 rounded">{parsedData.readmeUpdate}</pre>
-          </div>
-          <div className="parsed-tables">
-            <h3 className="text-lg font-bold">Supabase Tables</h3>
-            <pre className="bg-gray-800 text-white p-2 rounded">{parsedData.tableDescription}</pre>
-          </div>
+        <div className="parsed-data">
+            <h1 className="text-2xl font-bold mb-4">Parsed Response Data</h1>
+            
+            <section className="branch-name mb-6">
+                <h2 className="text-xl font-semibold">Branch Name</h2>
+                <p className="bg-gray-100 p-2 rounded">{parsedData.branchName}</p>
+            </section>
+            
+            <section className="component-implementation mb-6">
+                <h2 className="text-xl font-semibold">Component Implementations</h2>
+                {parsedData.files.map((file:ParsedFile, index:number) => (
+                    <div key={index} className="file-item mb-4">
+                        <h3 className="font-bold">{file.path}</h3>
+                        <pre className="bg-gray-100 p-2 rounded overflow-x-auto">{file.content}</pre>
+                    </div>
+                ))}
+            </section>
+
+            <section className="translations mb-6">
+                <h2 className="text-xl font-semibold">Translation Keys</h2>
+                <pre className="bg-gray-100 p-2 rounded overflow-x-auto">{JSON.stringify(parsedData.translations, null, 2)}</pre>
+            </section>
+
+            <section className="sql-tables mb-6">
+                <h2 className="text-xl font-semibold">Supabase Tables</h2>
+                {parsedData.sqlTables.map((sql:string[], index: number) => (
+                    <pre key={index} className="bg-gray-100 p-2 rounded overflow-x-auto">{sql}</pre>
+                ))}
+            </section>
+
+            <section className="readme-update mb-6">
+                <h2 className="text-xl font-semibold">README.md Update</h2>
+                <pre className="bg-gray-100 p-2 rounded overflow-x-auto">{parsedData.readmeUpdate}</pre>
+            </section>
         </div>
       )}
   
