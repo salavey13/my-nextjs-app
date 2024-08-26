@@ -549,7 +549,7 @@ File: components/NewComponent.tsx
     const fileRegex = /###\s*\d*\.*\s*\**\s*Component Implementation\s*\**\s*:*\s*\**\n*\**File:\s*`([^`]+)`\s*\**\n```tsx\n([\s\S]*?)```/gm;
     const translationKeysRegex = /###\s*\d*\.?\s*\**\s*Translation Keys\s*\**\s*:*\s*\**\n```tsx([\s\S]*?)```/;
     const sqlTablesRegex = /###\s*\d*\.?\s*\**\s*Supabase Tables\s*\**\s*:*\s*\**\n```sql([\s\S]*?)```/;
-    const readmeUpdateRegex = /###\s*\d*\.?\s*\**\s*README\.md Update\s*\**\s*:*\s*\**\n```md([\s\S]*?)```/;
+    const readmeUpdateRegex = /###\s*\d*\.?\s*\**\s*README\.md Update\s*\**\s*:*\s*\**\n```m\.*([\s\S]*?)### S/;
 
     const parsedData: ParsedResponse = {
         branchName: '',
