@@ -1,3 +1,4 @@
+//components/ui/bottomShelf.tsx
 "use client";
 
 import Link from "next/link";
@@ -6,7 +7,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHome, faList, faPlus, faBell, faUser, faCalendarPlus, faLightbulb } from '@fortawesome/free-solid-svg-icons';
 import { useAppContext } from "@/context/AppContext";
 
-interface NavigationLink {
+export interface NavigationLink {
   href: string;
   icon: any;
   label: string;
@@ -39,13 +40,6 @@ const BottomShelf: React.FC = () => {
           <span className="text-xs">{link.label}</span>
         </Link>
       ))}
-      {/* <div className="fixed bottom-[100px] left-1/2 transform -translate-x-1/2 w-16 h-16 rounded-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center">
-        <Link href="/createEvent">
-            <div className="w-full h-full flex items-center justify-center rounded-full">
-            <FontAwesomeIcon icon={faCalendarPlus} size="2x" className="text-white" />
-            </div>
-        </Link>
-      </div> */}
     </footer>
   );
 };

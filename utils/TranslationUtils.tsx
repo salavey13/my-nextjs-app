@@ -1,4 +1,4 @@
-// src/utils/TranslationUtils.tsx
+// utils/TranslationUtils.tsx
 "use client";
 import React, { createContext, useContext, ReactNode, FC } from "react";
 import { useAppContext } from "../context/AppContext";
@@ -62,6 +62,7 @@ export const useTranslation = () => {
   
   export const translations: LanguageDictionary = {
     en: {
+    copy: "Copy Request to Clipboard",
     name: "English",
     welcome: "Welcome",
     task: "Task",
@@ -276,6 +277,7 @@ export const useTranslation = () => {
     },
     },
   ru: {
+    copy: "Скопировать в буфер мессадж боту",
     adminDashboard: "Панель администратора",
     totalReferrals: "Всего рефералов",
     referralsLastMonth: "Рефералы за последний месяц",
@@ -396,6 +398,7 @@ export const useTranslation = () => {
     // Add more translations...
   },
   ukr: {
+    copy: "Копіювати запит до буфера обміну",
     notifications: "Сповіщення",
     confirm: "Підтвердити",
     name: "Українська",

@@ -1,3 +1,4 @@
+//components/Referral.tsx
 "use client";
 
 import React, { useState, useEffect, Suspense, useCallback } from 'react';
@@ -7,6 +8,7 @@ import { useTranslation } from 'react-i18next';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUserPlus, faPaperPlane, faTrophy } from '@fortawesome/free-solid-svg-icons';
 import LoadingSpinner from "../components/ui/LoadingSpinner";
+import { Button } from "@/components/ui/button";
 
 const Referral: React.FC = () => {
   const { user, updateUserReferrals, t  } = useAppContext();
@@ -159,14 +161,15 @@ const Referral: React.FC = () => {
             aria-label="Referral Name"
           />
         </div>
-        <button
+        <Button
           onClick={handleSendInvite}
           className="btn btn-primary flex items-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition justify-center w-full"
           aria-label="Send Invite"
+          variant="outline"
         >
           <FontAwesomeIcon icon={faPaperPlane} className="mr-2" />
           {t('sendInvite')}
-        </button>
+        </Button>
         <div className="mt-6 text-center">
           <FontAwesomeIcon icon={faTrophy} className="text-yellow-400 mb-2" />
           <p className="text-gray-400">

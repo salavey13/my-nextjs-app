@@ -1,12 +1,13 @@
 import React from 'react';
 import { Button } from "@/components/ui/button";
-
+import { useAppContext } from '../context/AppContext';
+import Link from "next/link";
 interface ClipboardManagerProps {
   requestText: string;
 }
 
 const ClipboardManager: React.FC<ClipboardManagerProps> = ({ requestText }) => {
-
+    const { t } = useAppContext();
   // Function to write to clipboard
   const writeToClipboard = async (text: string) => {
     try {
@@ -26,8 +27,13 @@ const ClipboardManager: React.FC<ClipboardManagerProps> = ({ requestText }) => {
         variant="outline"
         className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 mb-2"
       >
-        Copy Request to Clipboard
+        {t("copy")} 
       </Button>
+      <Link
+          href="https://chatgpt.com/?temporary-chat=true"
+          className={`flex flex-col items-center justify-center text-gray-400 w-12 h-12`}>
+          <span className="text-s">ChatGPT</span>
+        </Link>
     </div>
   ); 
 };

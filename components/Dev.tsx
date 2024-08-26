@@ -56,9 +56,9 @@ const Dev: React.FC = () => {
     You are provided with the attached codebase which contains the current state of the project. Your task is to:
 0. **Create a branch name for implementation of the component**
 
-1. **Create a new React component** : ${ideaText} The component should be placed in the \`/components\` directory and should utilize existing components and styles from the project, particularly from \`/components/ui\`. Use Tailwind CSS for styling, and ensure that the component integrates smoothly with the AppContext.
+1. **Create a new React component** : ${ideaText} The component should be placed in the \`/components\` directory and should utilize existing components  and styles from the project, particularly from \`/components/ui\` like Button, Input, card, LoadingSpinner, Table. Use Tailwind CSS for styling, and ensure that the component integrates smoothly with the AppContext.
 
-2. **Extract all UI strings** used in the ${ideaText} component for translation. Implement the \`t()\` translation function correctly in the component and provide the translation keys for \`en\`, \`ru\`, and \`ukr\` languages in a TypeScript format, ready to be patched into \`TranslationUtils.tsx\`.
+2. **Extract all UI strings** used in the new component for translation. Implement the \`t()\` translation function correctly in the component and provide the translation keys for \`en\`, \`ru\`, and \`ukr\` languages in a TypeScript format, ready to be patched into \`TranslationUtils.tsx\`.
 
 3. **Describe any new Supabase tables** required to support this feature. Provide the SQL commands to create these tables, formatted for direct integration into Supabase.
 
@@ -71,7 +71,7 @@ The codebase is provided as a single file (\`MegaFile.txt\`). Each component in 
    - Branch Name
 1. **Component Implementation**:
    - The entire React component code should be provided, with the file path included as a comment at the top.
-   
+   - 
 2. **Translation Keys**:
    - The keys should be in a TypeScript format, matching the format used in \TranslationUtils.tsx\`.
 
@@ -81,62 +81,256 @@ The codebase is provided as a single file (\`MegaFile.txt\`). Each component in 
 4. **README.md Update**:
    - A markdown text ready to be appended to the existing \`README.md\` file, formatted with appropriate headers and code blocks.
 
+5. **bottomShelf.tsx**
+   - Please include implementation of adding new item to list "navigationLinks" and outputting new version of bottomShelf.tsx as a file (it can be extracted from megaFile - it is marked with "# components/ui/bottomShelf.tsx" and can be found by comment in the beginning of the file contents itself: "//componentsui/bottomShelf.tsx") and respective File: app/pageName/page.tsx. Include link to new page.ts in respective folder with the name of component like following:
+   //app/profile/page.tsx
+import Profile from "@/components/Profile";
+
+export default function ProfilePage() {
+  return <Profile />;
+}
+bottomShelf.tsx for reference:
+// components/ui/bottomShelf.tsx
+"use client";
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faHome, faList, faPlus, faBell, faUser, faCalendarPlus, faLightbulb } from '@fortawesome/free-solid-svg-icons';
+import { useAppContext } from "@/context/AppContext";
+
+export interface NavigationLink {
+  href: string;
+  icon: any;
+  label: string;
+}
+
+const BottomShelf: React.FC = () => {
+  const pathname = usePathname();
+  const { t } = useAppContext();
+
+  const navigationLinks: NavigationLink[] = [
+    { href: '/', icon: faHome, label: t('home') },
+    { href: '/admin', icon: faList, label: t('admin') },
+    { href: '/createEvent', icon: faCalendarPlus, label: '' },
+    { href: '/referral', icon: faPlus, label: t('referral') },
+    //{ href: '/notifications', icon: faBell, label: t('notifications') },
+    //{ href: '/profile', icon: faUser, label: t('profile') },
+    { href: '/dev', icon: faLightbulb, label: t('dev') }
+  ];
+
+  return (
+    <footer className="fixed bottom-0 left-0 w-full h-16 bg-gray-900 text-white flex justify-around items-center z-20 backdrop-blur-lg shadow-lg">
+      {navigationLinks.map((link, index) => (
+        <Link
+          key={index}
+          href={link.href}
+          className="flex flex-col items-center justify-center w-12 h-12 text-blue-500">
+          <FontAwesomeIcon icon={link.icon} size={link.label ===''?"2x":"lg"} />
+          <span className="text-xs">{link.label}</span>
+        </Link>
+      ))}
+    </footer>
+  );
+};
+
+export default BottomShelf;
+
 Make sure to follow this format strictly to help automate the integration process.
 ---
 
 ### **Expected Response (Example)**
 Branch Name:
-userinfo
+referrals_feature
 
 Component Implementation:
-File: components/UserInfo.tsx
+File: components/Referral.tsx
 """tsx
-// components/UserInfo.tsx
+//components/Referral.tsx
 "use client";
 
-import React, { useEffect, useState } from 'react';
-import { supabase } from "../lib/supabaseClient";
+import React, { useState, useEffect, Suspense, useCallback } from 'react';
+import { supabase } from '../lib/supabaseClient';
 import { useAppContext } from '../context/AppContext';
+import { useTranslation } from 'react-i18next';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faUserPlus, faPaperPlane, faTrophy } from '@fortawesome/free-solid-svg-icons';
 import LoadingSpinner from "../components/ui/LoadingSpinner";
+import { Button } from "@/components/ui/button";
 
-const UserInfo: React.FC = () => {
-    const { user, t } = useAppContext();
-    const [userData, setUserData] = useState<any>(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
+const Referral: React.FC = () => {
+  const { user, updateUserReferrals, t  } = useAppContext();
+  const [referralName, setReferralName] = useState('');
+  const [referralCode, setReferralCode] = useState<string | null>(null);
+  const [inviteCount, setInviteCount] = useState(0);
+  const [isUpdating, setIsUpdating] = useState(false);
 
-    useEffect(() => {
-        const fetchUserData = async () => {
-            try {
-                const { data, error } = await supabase
-                    .from('users')
-                    .select('*')
-                    .eq('id', user?.id);
+  useEffect(() => {
+    fetchReferralData();
+  }, [user]);
 
-                if (error) throw error;
-                setUserData(data?.[0]);
-                setLoading(false);
-            } catch (error: any) {
-                setError(error.message);
-                setLoading(false);
-            }
-        };
-        fetchUserData();
-    }, [user]);
+  const fetchReferralData = async () => {
+    if (!user) return;
 
-    if (loading) return <LoadingSpinner />;
-    if (error) return <div>{t('error')}: {error}</div>;
+    try {
+      const defaultReferralName = user.ref_code ? user.ref_code: user.telegram_username;
+      setReferralName(defaultReferralName || '');
 
-    return (
-        <div className="p-4 bg-white shadow-md rounded-md">
-            <h2 className="text-xl font-bold">{t('userInfo')}</h2>
-            <p>{t('email')}: {userData?.email}</p>
-            <p>{t('joined')}: {new Date(userData?.created_at).toLocaleDateString()}</p>
+      if (!user.ref_code) {
+        const newReferralCode = await generateReferralCode(defaultReferralName);
+        setReferralCode(newReferralCode);
+      } else {
+        setReferralCode(user.ref_code);
+      }
+
+      const count = await getInviteCount(user.ref_code);
+      setInviteCount(count);
+
+    } catch (error) {
+      console.error('Error fetching referral data:', error);
+    }
+  };
+
+  const generateReferralCode = async (defaultReferralName: string) => {
+    const newReferralCode = salavey13;
+    try {
+      const { error } = await supabase
+        .from('users')
+        .update({ ref_code: newReferralCode })
+        .eq('id', user?.id);
+
+      if (error) throw error;
+      return newReferralCode;
+
+    } catch (error) {
+      console.error('Error generating referral code:', error);
+      throw error;
+    }
+  };
+
+  const getInviteCount = async (referralCode: string | null) => {
+    if (!referralCode) return 0;
+
+    try {
+      const { count, error } = await supabase
+        .from('referrals')
+        .select('*', { count: 'exact' })
+        .eq('ref_code', referralCode);
+
+      if (error) throw error;
+      return count || 0;
+
+    } catch (error) {
+      console.error('Error fetching invite count:', error);
+      return 0;
+    }
+  };
+
+  const handleSendInvite = useCallback(async () => {
+    if (!referralCode) return;
+
+    try {
+      const inviteLink = https://t.me/oneSitePlsBot/vip?ref=referralCode;
+      await navigator.clipboard.writeText(inviteLink);
+
+      await sendTelegramInvite(referralCode);
+
+    } catch (error) {
+      console.error('Error sending invite:', error);
+    }
+  }, [referralCode]);
+
+  const handleReferralNameChange = async (newName: string) => {
+    if (newName.trim() === '' || isUpdating) return;
+
+    setIsUpdating(true);
+
+    try {
+      const newReferralCode = await generateReferralCode(newName);
+      setReferralCode(newReferralCode);
+      setReferralName(newName);
+      updateUserReferrals(newReferralCode);
+
+    } catch (error) {
+      console.error('Error updating referral name:', error);
+
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const sendTelegramInvite = useCallback(async (referralCode: string) => {
+    if (!process.env.NEXT_PUBLIC_BOT_TOKEN || !user) {
+      console.error('Bot token is missing');
+      return;
+    }
+
+    const botToken = process.env.NEXT_PUBLIC_BOT_TOKEN;
+    const inviteLink = https://t.me/oneSitePlsBot/vip?ref=referralCode;
+    const url = new URL(\`https://api.telegram.org/botbotToken/sendPhoto);
+    const message = "playWithUs" user.telegram_username ! 🎮✨;
+    url.searchParams.append("chat_id", user.telegram_id.toFixed());
+    url.searchParams.append("caption", message);
+    url.searchParams.append("photo", "https://th.bing.com/th/id/OIG2.fwYLXgRzLnnm2DMcdfl1");
+    url.searchParams.append("reply_markup", JSON.stringify({
+      inline_keyboard: [
+        [{ text: t("startPlaying"), url: inviteLink }],
+        [{ text: t("visitSite"), url: "https://oneSitePls.framer.ai" }],
+        [{ text: t("joinCommunity"), url: "https://t.me/aibotsites" }],
+        [{ text:  t("youtubeChannel"), url: "https://youtube.com/@salavey13" }],
+      ],
+    }));
+
+    try {
+      const response = await fetch(url.toString());
+      if (!response.ok) throw new Error('Failed to send Telegram message');
+
+    } catch (error) {
+      console.error('Error sending Telegram message:', error);
+    }
+  }, [user]); // Include all dependencies in the dependency array
+
+  return (
+    <Suspense fallback={<LoadingSpinner />}>
+      <div className="p-6 bg-gray-800 rounded-lg shadow-lg">
+        <h1 className="text-2xl font-bold text-white mb-4">
+          <FontAwesomeIcon icon={faUserPlus} className="mr-2" />
+          {t('inviteFriend')}
+        </h1>
+        <div className="mb-4">
+          <label className="block text-gray-400 text-sm mb-1">
+            {t('referralName')}
+          </label>
+          <input
+            type="text"
+            value={referralName}
+            onChange={(e) => handleReferralNameChange(e.target.value)}
+            className="input input-bordered w-full bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            aria-label="Referral Name"
+          />
         </div>
-    );
+        <Button
+          onClick={handleSendInvite}
+          className="btn btn-primary flex items-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition justify-center w-full"
+          aria-label="Send Invite"
+          variant="outline"
+        >
+          <FontAwesomeIcon icon={faPaperPlane} className="mr-2" />
+          {t('sendInvite')}
+        </Button>
+        <div className="mt-6 text-center">
+          <FontAwesomeIcon icon={faTrophy} className="text-yellow-400 mb-2" />
+          <p className="text-gray-400">
+            {t('successfulInvites')}: {inviteCount}
+          </p>
+        </div>
+      </div>
+    </Suspense>
+  );
 };
 
-export default UserInfo;
+export default Referral;
+
 """
 Translation Keys:
 export const languageDictionary: LanguageDictionary = {
