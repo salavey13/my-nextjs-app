@@ -1,4 +1,4 @@
-//components/ui/bottomShelf.tsx
+// components/ui/bottomShelf.tsx
 "use client";
 
 import Link from "next/link";
@@ -17,14 +17,17 @@ const BottomShelf: React.FC = () => {
   const pathname = usePathname();
   const { t } = useAppContext();
 
-  const navigationLinks: NavigationLink[] = [
+  const navigationLinks: NavigationLink[] = [    
+
     { href: '/', icon: faHome, label: t('home') },
     { href: '/admin', icon: faList, label: t('admin') },
     { href: '/createEvent', icon: faCalendarPlus, label: '' },
     { href: '/referral', icon: faPlus, label: t('referral') },
     //{ href: '/notifications', icon: faBell, label: t('notifications') },
     //{ href: '/profile', icon: faUser, label: t('profile') },
-    { href: '/dev', icon: faLightbulb, label: t('dev') }
+    { href: '/dev', icon: faLightbulb, label: t('dev') },
+    { href: '/questsforcoins', icon: faLightbulb, label: t('questsforcoins') },
+    { href: '/hackbutton', icon: faLightbulb, label: t('hackbutton') }
   ];
 
   return (
@@ -33,9 +36,7 @@ const BottomShelf: React.FC = () => {
         <Link
           key={index}
           href={link.href}
-          className={`flex flex-col items-center justify-center w-12 h-12 ${
-            pathname === link.href ? 'text-blue-500' : 'text-gray-400'
-          }`}>
+          className="flex flex-col items-center justify-center w-12 h-12 text-blue-500">
           <FontAwesomeIcon icon={link.icon} size={link.label ===''?"2x":"lg"} />
           <span className="text-xs">{link.label}</span>
         </Link>

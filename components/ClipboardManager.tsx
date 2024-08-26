@@ -30,9 +30,24 @@ const ClipboardManager: React.FC<ClipboardManagerProps> = ({ requestText }) => {
         {t("copy")} 
       </Button>
       <Link
-          href="https://chatgpt.com/?temporary-chat=true"
-          className={`flex flex-col items-center justify-center text-gray-400 w-12 h-12`}>
-          <span className="text-s">ChatGPT</span>
+        href="https://chatgpt.com/?temporary-chat=true"
+        className="group flex flex-col items-center justify-center text-gray-400 w-12 h-12 hover:text-blue-500 transition-all duration-300 transform hover:scale-110"
+        target="_blank"
+        rel="noopener noreferrer"
+        >
+        <span className="text-sm w-full mb-1 transition-all duration-300 group-hover:text-blue-500">
+            ChatGPT
+        </span>
+        <svg
+            className="w-12 h-12 text-gray-400 group-hover:text-blue-500 transition-all duration-300"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+        >
+            <path strokeLinecap="round" strokeLinejoin="round" d="M8 17l4-4m0 0l4 4m-4-4v6"></path>
+        </svg>
         </Link>
     </div>
   ); 

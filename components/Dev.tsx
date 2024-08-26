@@ -34,8 +34,8 @@ const Dev: React.FC = () => {
   const { user, t, fetchPlayer } = useAppContext();
   const [ideaText, setIdeaText] = useState<string>("");  // Idea input state
   const [ideas, setIdeas] = useState([
-    { id: 1, title: "Idea 1", description: "Description of idea 1", contributors: ["SALAVEY13"] },
-    { id: 2, title: "Idea 2", description: "Description of idea 2", contributors: ["the_4uka"] },
+    { id: 1, title: "HackButton", description: "a big button in the middle of the screen that upon clicking adds me 13k coins to the balance with flying congratulations message \"You hacked the system!\"", contributors: ["SALAVEY13"] },
+    { id: 2, title: "quest4coins", description: "quests for earning coins with different type of tasks, from inviting 3 friends through referrals to creating first feature in dev mode. quests should be loaded from quests table from supabase - states for quests for particular user should be saved to quests_ststes table: new/in_progress/finished/reward_claimed - at first no state means new, after first click state is updated to in progress and current rank of user is checked (users table id(int4), telegram_id(int8), telegram_username, rank(int4), coins(int4)) if quest is about reaching 1st rank - if rank is ≥=1 then state is changed to finished and lable \"get reward is shown\", to get reward user clicks on thisfinished wuest and his coins are incremented by 13k, then state of quest is saved as reward_claimed and grays out. create similar flows for all types of quests. quest should contain url field on db what to open upon clicking if needed for sharing or something", contributors: ["SALAVEY13"] },
     // Add more ideas as needed
   ]);
   const [requestText, setRequestText] = useState<string>("");  // Zero stage request text
@@ -52,15 +52,111 @@ const Dev: React.FC = () => {
     //const zeroStageRequest = `Please rephrase the following idea for use in future development stages: "${ideaText}". Format it as a unified request, using best practices for clarity and completeness.`;
     
     const zeroStageRequest = 
-    `
-    You are provided with the attached codebase which contains the current state of the project. Your task is to:
+    `You are provided with the attached codebase which contains the current state of the project. Your task is to:
 0. **Create a branch name for implementation of the component**
 
 1. **Create a new React component** : ${ideaText} The component should be placed in the \`/components\` directory and should utilize existing components  and styles from the project, particularly from \`/components/ui\` like Button, Input, card, LoadingSpinner, Table. Use Tailwind CSS for styling, and ensure that the component integrates smoothly with the AppContext.
 
 2. **Extract all UI strings** used in the new component for translation. Implement the \`t()\` translation function correctly in the component and provide the translation keys for \`en\`, \`ru\`, and \`ukr\` languages in a TypeScript format, ready to be patched into \`TranslationUtils.tsx\`.
 
-3. **Describe any new Supabase tables** required to support this feature. Provide the SQL commands to create these tables, formatted for direct integration into Supabase. You cn use existing tables as you wish:
+3. **Describe any new Supabase tables** required to support this feature. Provide the SQL commands to create these tables, formatted for direct integration into Supabase. 
+
+4. **Update the \'README.md\' file** to include a new section that documents the \`UserInfo\` component. This should include a feature description and usage instructions.
+
+The codebase is provided as a single file (\'MegaFile.txt\'). Each component in the \`/components\` and \`/components/ui\` folders can be used as examples for implementation. The \`adminDashboard.tsx\` file should serve as a reference for how to structure and format your response. Please ensure that the response is formatted for easy parsing and direct integration into the project.
+
+### Expected Output:
+0. **Branch Name**:
+   - Branch Name
+1. **Component Implementation**
+   - The entire React component code should be provided, with the file path included as a comment at the top.
+   - 
+2. **Translation Keys**
+   - The keys should be in a TypeScript format, matching the format used in \TranslationUtils.tsx\`.
+    Translation Keys:
+    export const languageDictionary: LanguageDictionary = {
+    en: {
+        userInfo: "User Information",
+        email: "Email",
+        joined: "Joined",
+        error: "Error"
+    },
+    ru: {
+        userInfo: "Информация о пользователе",
+        email: "Электронная почта",
+        joined: "Присоединился",
+        error: "Ошибка"
+    },
+    ukr: {
+        userInfo: "Інформація про користувача",
+        email: "Електронна пошта",
+        joined: "Приєднався",
+        error: "Помилка"
+    }
+    };
+3. **Supabase Tables**
+   - SQL commands required to create any new Supabase tables should be provided, formatted for direct integration.
+
+4. **README.md Update**
+   - A markdown text ready to be appended to the existing \`README.md\` file, formatted with appropriate headers and code blocks.
+
+5. **bottomShelf.tsx**
+   - Please include implementation of adding new item to list "navigationLinks" and outputting new version of bottomShelf.tsx as a file (it can be extracted from megaFile - it is marked with "# components/ui/bottomShelf.tsx" and can be found by comment in the beginning of the file contents itself: "//componentsui/bottomShelf.tsx") and respective File: app/pageName/page.tsx. Include link to new page.ts in respective folder with the name of component like following:
+   //app/profile/page.tsx
+import Profile from "@/components/Profile";
+
+export default function ProfilePage() {
+  return <Profile />;
+}
+
+bottomShelf.tsx for reference:
+// components/ui/bottomShelf.tsx
+"use client";
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faHome, faList, faPlus, faBell, faUser, faCalendarPlus, faLightbulb } from '@fortawesome/free-solid-svg-icons';
+import { useAppContext } from "@/context/AppContext";
+
+export interface NavigationLink {
+  href: string;
+  icon: any;
+  label: string;
+}
+
+const BottomShelf: React.FC = () => {
+  const pathname = usePathname();
+  const { t } = useAppContext();
+
+  const navigationLinks: NavigationLink[] = [
+    { href: '/', icon: faHome, label: t('home') },
+    { href: '/admin', icon: faList, label: t('admin') },
+    { href: '/createEvent', icon: faCalendarPlus, label: '' },
+    { href: '/referral', icon: faPlus, label: t('referral') },
+    //{ href: '/notifications', icon: faBell, label: t('notifications') },
+    //{ href: '/profile', icon: faUser, label: t('profile') },
+    { href: '/dev', icon: faLightbulb, label: t('dev') }
+  ];
+
+  return (
+    <footer className="fixed bottom-0 left-0 w-full h-16 bg-gray-900 text-white flex justify-around items-center z-20 backdrop-blur-lg shadow-lg">
+      {navigationLinks.map((link, index) => (
+        <Link
+          key={index}
+          href={link.href}
+          className="flex flex-col items-center justify-center w-12 h-12 text-blue-500">
+          <FontAwesomeIcon icon={link.icon} size={link.label ===''?"2x":"lg"} />
+          <span className="text-xs">{link.label}</span>
+        </Link>
+      ))}
+    </footer>
+  );
+};
+
+export default BottomShelf;
+
+You can use existing tables as you wish:
   public.users (
     telegram_username text not null default ''::text,
     lang text not null default '''ru''::text'::text,
@@ -183,80 +279,6 @@ const Dev: React.FC = () => {
     rating real not null default '0'::real,
     constraint authors_pkey primary key (author_id)
   ) tablespace pg_default;
-
-4. **Update the \'README.md\' file** to include a new section that documents the \`UserInfo\` component. This should include a feature description and usage instructions.
-
-The codebase is provided as a single file (\'MegaFile.txt\'). Each component in the \`/components\` and \`/components/ui\` folders can be used as examples for implementation. The \`adminDashboard.tsx\` file should serve as a reference for how to structure and format your response. Please ensure that the response is formatted for easy parsing and direct integration into the project.
-
-### Expected Output:
-0. **Branch Name**:
-   - Branch Name
-1. **Component Implementation**:
-   - The entire React component code should be provided, with the file path included as a comment at the top.
-   - 
-2. **Translation Keys**:
-   - The keys should be in a TypeScript format, matching the format used in \TranslationUtils.tsx\`.
-
-3. **Supabase Tables**:
-   - SQL commands required to create any new Supabase tables should be provided, formatted for direct integration.
-
-4. **README.md Update**:
-   - A markdown text ready to be appended to the existing \`README.md\` file, formatted with appropriate headers and code blocks.
-
-5. **bottomShelf.tsx**
-   - Please include implementation of adding new item to list "navigationLinks" and outputting new version of bottomShelf.tsx as a file (it can be extracted from megaFile - it is marked with "# components/ui/bottomShelf.tsx" and can be found by comment in the beginning of the file contents itself: "//componentsui/bottomShelf.tsx") and respective File: app/pageName/page.tsx. Include link to new page.ts in respective folder with the name of component like following:
-   //app/profile/page.tsx
-import Profile from "@/components/Profile";
-
-export default function ProfilePage() {
-  return <Profile />;
-}
-bottomShelf.tsx for reference:
-// components/ui/bottomShelf.tsx
-"use client";
-
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHome, faList, faPlus, faBell, faUser, faCalendarPlus, faLightbulb } from '@fortawesome/free-solid-svg-icons';
-import { useAppContext } from "@/context/AppContext";
-
-export interface NavigationLink {
-  href: string;
-  icon: any;
-  label: string;
-}
-
-const BottomShelf: React.FC = () => {
-  const pathname = usePathname();
-  const { t } = useAppContext();
-
-  const navigationLinks: NavigationLink[] = [
-    { href: '/', icon: faHome, label: t('home') },
-    { href: '/admin', icon: faList, label: t('admin') },
-    { href: '/createEvent', icon: faCalendarPlus, label: '' },
-    { href: '/referral', icon: faPlus, label: t('referral') },
-    //{ href: '/notifications', icon: faBell, label: t('notifications') },
-    //{ href: '/profile', icon: faUser, label: t('profile') },
-    { href: '/dev', icon: faLightbulb, label: t('dev') }
-  ];
-
-  return (
-    <footer className="fixed bottom-0 left-0 w-full h-16 bg-gray-900 text-white flex justify-around items-center z-20 backdrop-blur-lg shadow-lg">
-      {navigationLinks.map((link, index) => (
-        <Link
-          key={index}
-          href={link.href}
-          className="flex flex-col items-center justify-center w-12 h-12 text-blue-500">
-          <FontAwesomeIcon icon={link.icon} size={link.label ===''?"2x":"lg"} />
-          <span className="text-xs">{link.label}</span>
-        </Link>
-      ))}
-    </footer>
-  );
-};
-
-export default BottomShelf;
 
 Make sure to follow this format strictly to help automate the integration process.
 ---
@@ -483,6 +505,7 @@ CREATE TABLE referrals (
     ref_code text,
     referral_date timestamp with time zone DEFAULT current_timestamp NOT NULL
 );
+
 README.md Update:
 ## New Feature: User Information Component
 
@@ -522,11 +545,11 @@ File: components/NewComponent.tsx
 
   // Enhanced parser to extract branch name
   const parseResponse = (response: string): ParsedResponse => {
-    const branchNameRegex = /### 0\. \*\*Branch Name\*\*:\s*```bash\s*([^`]+)\s*```/;
-    const fileRegex = /### \d+\. \*\*Component Implementation\*\*:\s*\*\*File:\*\* `([^`]+)`\n```tsx([\s\S]*?)```/g;
-    const translationKeysRegex = /### \d+\. \*\*Translation Keys\*\*:\n```tsx([\s\S]*?)```/;
-    const sqlTablesRegex = /### \d+\. \*\*Supabase Tables\*\*:\n```sql([\s\S]*?)```/;
-    const readmeUpdateRegex = /### \d+\. \*\*README\.md Update\*\*:\n```md([\s\S]*?)```/;
+    const branchNameRegex = /###\s*\d*\.?\s*\**\s*Branch Name\s*\**\s*:*\s*\**\n`([^`]+)`/;
+    const fileRegex = /###\s*\d*\.*\s*\**\s*Component Implementation\s*\**\s*:*\s*\**\n*\**File:\s*`([^`]+)`\s*\**\n```tsx\n([\s\S]*?)```/gm;
+    const translationKeysRegex = /###\s*\d*\.?\s*\**\s*Translation Keys\s*\**\s*:*\s*\**\n```tsx([\s\S]*?)```/;
+    const sqlTablesRegex = /###\s*\d*\.?\s*\**\s*Supabase Tables\s*\**\s*:*\s*\**\n```sql([\s\S]*?)```/;
+    const readmeUpdateRegex = /###\s*\d*\.?\s*\**\s*README\.md Update\s*\**\s*:*\s*\**\n```md([\s\S]*?)```/;
 
     const parsedData: ParsedResponse = {
         branchName: '',
@@ -727,25 +750,25 @@ File: components/NewComponent.tsx
 
 return (
     <div className="dev-container p-4 bg-gray-100 rounded-md">
-      <h1 className="text-2xl font-bold mb-4">Developer Tool</h1>
-      <h2 className="text-xl font-semibold">Current Ideas</h2>
+      <h1 className="text-2xl font-bold mb-4">{t('developerToolTitle')}</h1>
+      <h2 className="text-xl font-semibold">{t('currentIdeasTitle')}</h2>
       <ul className="mt-4">
         {ideas.map((idea) => (
           <li key={idea.id} className="mb-4">
             <h3 className="font-bold text-lg">{idea.title}</h3>
             <p className="text-sm text-gray-700">{idea.description}</p>
-            <p className="text-xs text-gray-500">Contributors: {idea.contributors.join(', ')}</p>
+            <p className="text-xs text-gray-500">{t('contributorsLabel')}: {idea.contributors.join(', ')}</p>
           </li>
         ))}
       </ul>  
 
       {/* Idea Input */}
       <div>
-        <h2 className="text-xl font-semibold">Enter Your Idea</h2>
+        <h2 className="text-xl font-semibold">{t('enterYourIdeaTitle')}</h2>
         <textarea
           value={ideaText}
           onChange={(e) => setIdeaText(e.target.value)}
-          placeholder="Describe your idea..."
+          placeholder={t("describeYourIdeaPlaceholder")}
           className="w-full p-2 border rounded mb-4"
         />
         <Button 
@@ -753,14 +776,14 @@ return (
           className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
           variant="outline"
         >
-          Generate Request
+          {t('generateRequestButton')}
         </Button>
       </div>
   
       {/* Zero Stage Request Output */}
       {step >= 1 && (
         <div className="mt-4">
-          <h2 className="text-xl font-semibold">Zero Stage Request</h2>
+          <h2 className="text-xl font-semibold">{t('zeroStageRequestTitle')}</h2>
           <textarea
             value={requestText}
             onChange={(e) => setRequestText(e.target.value)}
@@ -778,7 +801,7 @@ return (
             variant="outline"
             className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
           >
-            Get Response from Clipboard
+            {t('getResponseButton')}
           </Button>
         </div>
       )}
@@ -786,15 +809,15 @@ return (
       {/* Display Parsed Response */}
       {step >= 2 && parsedData && (
         <div className="parsed-data">
-            <h1 className="text-2xl font-bold mb-4">Parsed Response Data</h1>
+            <h1 className="text-2xl font-bold mb-4">{t('parsedResponseDataTitle')}</h1>
             
             <section className="branch-name mb-6">
-                <h2 className="text-xl font-semibold">Branch Name</h2>
+                <h2 className="text-xl font-semibold">{t('branchNameTitle')}</h2>
                 <p className="bg-gray-100 p-2 rounded">{parsedData.branchName}</p>
             </section>
             
             <section className="component-implementation mb-6">
-                <h2 className="text-xl font-semibold">Component Implementations</h2>
+                <h2 className="text-xl font-semibold">{t('componentImplementationsTitle')}</h2>
                 {parsedData.files.map((file:ParsedFile, index:number) => (
                     <div key={index} className="file-item mb-4">
                         <h3 className="font-bold">{file.path}</h3>
@@ -804,19 +827,19 @@ return (
             </section>
 
             <section className="translations mb-6">
-                <h2 className="text-xl font-semibold">Translation Keys</h2>
+                <h2 className="text-xl font-semibold">{t('translationKeysTitle')}</h2>
                 <pre className="bg-gray-100 p-2 rounded overflow-x-auto">{JSON.stringify(parsedData.translations, null, 2)}</pre>
             </section>
 
             <section className="sql-tables mb-6">
-                <h2 className="text-xl font-semibold">Supabase Tables</h2>
+                <h2 className="text-xl font-semibold">{t('supabaseTablesTitle')}</h2>
                 {parsedData.sqlTables.map((sql:string[], index: number) => (
                     <pre key={index} className="bg-gray-100 p-2 rounded overflow-x-auto">{sql}</pre>
                 ))}
             </section>
 
             <section className="readme-update mb-6">
-                <h2 className="text-xl font-semibold">README.md Update</h2>
+                <h2 className="text-xl font-semibold">{t('readmeUpdateTitle')}</h2>
                 <pre className="bg-gray-100 p-2 rounded overflow-x-auto">{parsedData.readmeUpdate}</pre>
             </section>
         </div>
@@ -830,7 +853,7 @@ return (
             onClick={handleTryIt} 
             className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 mr-4"
           >
-            Try It
+            {t('tryItButton')}
           </Button>
         </div>
       )}
@@ -842,7 +865,7 @@ return (
             onClick={handleDeploy} 
             className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
           >
-            Deploy
+            {t('deployButton')}
           </Button>
         </div>
       )}
