@@ -32,6 +32,10 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/deploym
 # My TG Bot with Vercel UI
 
 This project integrates a Discord bot with a web UI component deployed on Vercel. The bot listens for requests and triggers workflows based on VIP status and request count.
+## New Feature: Quests for Earning Coins
+
+### Description:
+The `QuestsForCoins` component allows users to earn coins by completing various tasks, such as inviting friends through referrals or creating their first feature in dev mode. Each quest is presented with a description and an action button to initiate the task.
 
 ## Setup
 
