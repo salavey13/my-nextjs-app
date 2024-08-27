@@ -5,7 +5,7 @@ import React, { useState, useEffect } from 'react';
 import { useAppContext } from '@/context/AppContext';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
+import { Card } from '../components/ui/card';
 import LoadingSpinner  from '@/components/ui/LoadingSpinner';
 import { getEmotionGif, getEmotionEmoji } from '@/lib/emotionAnalyzer';
 

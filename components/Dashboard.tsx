@@ -2,11 +2,11 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "../lib/supabaseClient";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
+import { Card, CardHeader, CardTitle, CardContent } from "../components/ui/card";
+import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/Table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/Dialog";
 import { useAppContext } from "../context/AppContext";
 import DebugInfo from "../components/DebugInfo";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';

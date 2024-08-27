@@ -4,7 +4,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHome, faList, faPlus, faBell, faUser, faCalendarPlus, faLightbulb } from '@fortawesome/free-solid-svg-icons';
+import { faKeyboard, faStar, faGlobe, faHome, faList, faPlus, faBell, faUser, faCalendarPlus, faLightbulb } from '@fortawesome/free-solid-svg-icons';
 import { useAppContext } from "@/context/AppContext";
 
 export interface NavigationLink {
@@ -18,7 +18,7 @@ const BottomShelf: React.FC = () => {
   const { t } = useAppContext();
 
   const navigationLinks: NavigationLink[] = [    
-
+    { href: '/conflictawareness', icon: faGlobe, label: t('conflictawareness') },
     { href: '/', icon: faHome, label: t('home') },
     { href: '/admin', icon: faList, label: t('admin') },
     { href: '/createEvent', icon: faCalendarPlus, label: '' },
@@ -26,8 +26,8 @@ const BottomShelf: React.FC = () => {
     //{ href: '/notifications', icon: faBell, label: t('notifications') },
     //{ href: '/profile', icon: faUser, label: t('profile') },
     { href: '/dev', icon: faLightbulb, label: t('dev') },
-    { href: '/questsforcoins', icon: faLightbulb, label: t('questsforcoins') },
-    { href: '/hackbutton', icon: faLightbulb, label: t('hackbutton') },
+    { href: '/questsforcoins', icon: faStar, label: t('questsforcoins') },
+    { href: '/hackbutton', icon: faKeyboard, label: t('hackbutton') },
     //{ href: '/emotionmirror', icon: faLightbulb, label: t('emotionmirror') },
   ];
 
