@@ -18,7 +18,7 @@ const BottomShelf: React.FC = () => {
   const { t } = useAppContext();
 
   const navigationLinks: NavigationLink[] = [    
-    { href: '/conflictawareness', icon: faGlobe, label: t('conflictawareness') },
+    { href: '/conflictawareness', icon: faGlobe, label: '' },
     { href: '/', icon: faHome, label: t('home') },
     { href: '/admin', icon: faList, label: t('admin') },
     { href: '/createEvent', icon: faCalendarPlus, label: '' },
@@ -26,8 +26,8 @@ const BottomShelf: React.FC = () => {
     //{ href: '/notifications', icon: faBell, label: t('notifications') },
     //{ href: '/profile', icon: faUser, label: t('profile') },
     { href: '/dev', icon: faLightbulb, label: t('dev') },
-    { href: '/questsforcoins', icon: faStar, label: t('questsforcoins') },
-    { href: '/hackbutton', icon: faKeyboard, label: t('hackbutton') },
+    { href: '/questsforcoins', icon: faStar, label: '' },
+    { href: '/hackbutton', icon: faKeyboard, label: '' },
     //{ href: '/emotionmirror', icon: faLightbulb, label: t('emotionmirror') },
   ];
 
