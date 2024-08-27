@@ -5,7 +5,7 @@ import { supabase } from "../lib/supabaseClient";
 import { Card, CardHeader, CardTitle, CardContent } from "../components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/Dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { useAppContext } from "../context/AppContext";
 
 export default function CreateEvent() {

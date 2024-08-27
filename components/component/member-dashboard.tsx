@@ -8,8 +8,8 @@ import {
 import Link from "next/link";
 import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "../ui/card";
-import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/Table";
-import { Avatar, AvatarImage, AvatarFallback } from "../ui/Avatar";
+import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
+import { Avatar, AvatarImage, AvatarFallback } from "../ui/avatar";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/button";
 import { supabase } from "../../lib/supabaseClient"
