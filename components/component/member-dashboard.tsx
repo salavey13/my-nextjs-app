@@ -4,13 +4,13 @@ import { useEffect, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
 import { 
   Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator, BreadcrumbPage 
-} from "@/components/ui/Breadcrumb";
+} from "@/components/ui/breadcrumb";
 import Link from "next/link";
 import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "../ui/card";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
-import { Avatar, AvatarImage, AvatarFallback } from "../ui/avatar";
-import { Badge } from "@/components/ui/Badge";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { supabase } from "../../lib/supabaseClient"
 
