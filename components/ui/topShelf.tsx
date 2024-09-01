@@ -12,7 +12,7 @@ const TopShelf: React.FC = () => {
   const pathname = usePathname();
 
   return (
-    <header className="fixed top-0 left-0 w-full h-16 bg-gray-900 text-white flex justify-between items-center px-4 z-20 backdrop-blur-lg shadow-lg">
+    <header className="fixed top-0 left-0 w-full h-16 bg-gray-900 text-white flex justify-between items-center px-4 z-20  backdrop-blur-lg shadow-lg">
       <div className="flex items-center">
         <FontAwesomeIcon icon={faCrown} size="lg" className="mr-2" />
         <span className="text-lg">{t('rank')}: {user?.rank}</span>

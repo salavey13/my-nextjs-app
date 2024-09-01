@@ -172,7 +172,7 @@ export default function Rents() {
 
       <Dialog open={newItemModalOpen} onOpenChange={handleCloseNewItemModal}>
         <DialogContent
-            className="max-h-screen overflow-y-auto z-[9999] pt-69 pb-69 "
+            className="max-h-screen overflow-y-auto flex-grow pt-[64px] pb-[64px] min-h-[calc(100vh-128px)] overflow-y-auto backdrop-blur-lg"
         >
             <DialogHeader>
             <DialogTitle>{t("addNewItemTitle")}</DialogTitle>

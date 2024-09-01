@@ -18,7 +18,7 @@ const BottomShelf: React.FC = () => {
   const { t } = useAppContext();
 
   const navigationLinks: NavigationLink[] = [    //{ href: '/paymentnotification', icon: faLightbulb, label: t('paymentnotification') },
-    //{ href: '/dynamicitemform', icon: faLightbulb, label: t('dynamicitemform') },
+    { href: '/dynamicitemform', icon: faLightbulb, label: t('dynamicitemform') },
     //{ href: '/qrcodeform', icon: faLightbulb, label: t('qrcodeform') },
     //{ href: '/cryptopayment', icon: faLightbulb, label: t('cryptopayment') },
     { href: '/rent', icon: faStar, label: t('rent') },
@@ -36,7 +36,7 @@ const BottomShelf: React.FC = () => {
   ];
 
   return (
-    <footer className="fixed bottom-0 left-0 w-full h-16 bg-gray-900 text-white flex justify-around items-center z-20 backdrop-blur-lg shadow-lg">
+    <footer className="fixed bottom-0 left-0 w-full h-16 bg-gray-900 text-white flex justify-around items-center z-1 backdrop-blur-lg shadow-lg">
       {navigationLinks.map((link, index) => (
         <Link
           key={index}
