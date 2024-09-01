@@ -17,22 +17,21 @@ const BottomShelf: React.FC = () => {
   const pathname = usePathname();
   const { t } = useAppContext();
 
-  const navigationLinks: NavigationLink[] = [    { href: '/paymentnotification', icon: faLightbulb, label: t('paymentnotification') },
-    { href: '/dynamicitemform', icon: faLightbulb, label: t('dynamicitemform') },
-    { href: '/qrcodeform', icon: faLightbulb, label: t('qrcodeform') },
-    { href: '/cryptopayment', icon: faLightbulb, label: t('cryptopayment') },
+  const navigationLinks: NavigationLink[] = [    //{ href: '/paymentnotification', icon: faLightbulb, label: t('paymentnotification') },
+    //{ href: '/dynamicitemform', icon: faLightbulb, label: t('dynamicitemform') },
+    //{ href: '/qrcodeform', icon: faLightbulb, label: t('qrcodeform') },
+    //{ href: '/cryptopayment', icon: faLightbulb, label: t('cryptopayment') },
     { href: '/rent', icon: faStar, label: t('rent') },
-    { href: '/conflictawareness', icon: faGlobe, label: '' },
     { href: '/', icon: faHome, label: t('home') },
     { href: '/admin', icon: faList, label: t('admin') },
     { href: '/referral', icon: faLightbulb, label: t('referral') },
     { href: '/createEvent', icon: faCalendarPlus, label: '' },
-    { href: '/referral', icon: faPlus, label: t('referral') },
     //{ href: '/notifications', icon: faBell, label: t('notifications') },
     //{ href: '/profile', icon: faUser, label: t('profile') },
     { href: '/dev', icon: faLightbulb, label: t('dev') },
     { href: '/questsforcoins', icon: faStar, label: '' },
     { href: '/hackbutton', icon: faKeyboard, label: '' },
+    { href: '/conflictawareness', icon: faGlobe, label: '' },
     //{ href: '/emotionmirror', icon: faLightbulb, label: t('emotionmirror') },
   ];
 
