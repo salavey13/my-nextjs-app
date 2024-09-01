@@ -14,6 +14,7 @@ import {
 } from "../components/ui/card";
 import LoadingSpinner from "../components/ui/LoadingSpinner";
 import QRCode from "react-qr-code";
+import FormFooter from "../components/ui/FormFooter";
 
 interface FormField {
   name: string;
@@ -283,13 +284,15 @@ const DynamicItemForm: React.FC<DynamicItemFormProps> = ({ itemType }) => {
                   <Checkbox
                     checked={isAgreementChecked}
                     onCheckedChange={handleAgreementCheckboxChange}
-                    label={field.label}
+                    label=""//{field.label}
                     className="mr-2"
                   />
                 </div>
               ))}
             </div>
           )}
+
+          <FormFooter />
 
           {/* Submit Button */}
           <Button

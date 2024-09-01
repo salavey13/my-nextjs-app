@@ -336,6 +336,33 @@ export const useTranslation = () => {
     resendNotification: "Resend Notification",
     defaultLabel: "TBD",
     disableOptionLabel: "Service not provided",
+    
+    formTypes: {
+      evo: "Tow Truck",
+      car: "Car",
+      motorbike: "Motorbike",
+      bicycle: "Bicycle",
+    },
+  
+    // Form Labels
+    selectCity: "Select City",
+    enterYourName: "Enter your name",
+    mobileNumber: "Mobile Number",
+    landlineNumber: "Landline Number",
+    email: "Your email",
+    parkingAddress: "Tow Truck Parking Address",
+    adTitle: "Ad Title",
+    adDescription: "Ad Description",
+    cars: "Cars",
+    motorcycles: "Motorcycles",
+    suvs: "SUVs",
+    minibus: "Minibus",
+    suburbanTariff: "Suburban Tariff",
+    attachPhoto: "Attach Photo",
+    agreeToTerms: "I agree to the terms of service and the processing of my data.",
+    
+    // Buttons
+    upload: "Upload",
   },
   ru: {
     saveAndContinueInTelegram: "Сохранить и продолжить в Telegram",
@@ -517,6 +544,33 @@ contributorsLabel: "Соавторы",
     errorGeneratingLink: "Ошибка при создании ссылки на оплату.",
     defaultLabel: "ХЗ",
     disableOptionLabel: "Услугу не предоставляю",
+  
+    formTypes: {
+      evo: "Эвакуатор",
+      car: "Автомобиль",
+      motorbike: "Мотоцикл",
+      bicycle: "Велосипед",
+    },
+  
+    // Form Labels
+    selectCity: "Выберите город",
+    enterYourName: "Введите ваше имя",
+    mobileNumber: "Номер мобильного телефона",
+    landlineNumber: "Номер городского телефона",
+    email: "Ваш email",
+    parkingAddress: "Адрес стоянки эвакуатора",
+    adTitle: "Заголовок объявления",
+    adDescription: "Описание объявления",
+    cars: "Легковые автомобили",
+    motorcycles: "Мототехника",
+    suvs: "Внедорожники",
+    minibus: "Микроавтобус",
+    suburbanTariff: "Загородный тариф",
+    attachPhoto: "Прикрепите фотографию",
+    agreeToTerms: "Я соглашаюсь с правилами использования сервиса и с передачей и обработкой моих данных.",
+    
+    // Buttons
+    upload: "Загрузить",
     // Add more translations...
   },
   ukr: {
@@ -696,7 +750,34 @@ contributorsLabel: "Учасники",
     notificationSent: "Повідомлення успішно надіслано!",
     resendNotification: "Відправити повідомлення ще раз",
     saveAndContinueInTelegram: "Зберегти та продовжити в Telegram",
-    disableOptionLabel: "Сервіс не надається"
+    disableOptionLabel: "Сервіс не надається",
+    
+    formTypes: {
+      evo: "Евакуатор",
+      car: "Автомобіль",
+      motorbike: "Мотоцикл",
+      bicycle: "Велосипед",
+    },
+  
+    // Form Labels
+    selectCity: "Виберіть місто",
+    enterYourName: "Введіть ваше ім'я",
+    mobileNumber: "Номер мобільного телефону",
+    landlineNumber: "Номер стаціонарного телефону",
+    email: "Ваш email",
+    parkingAddress: "Адреса стоянки евакуатора",
+    adTitle: "Заголовок оголошення",
+    adDescription: "Опис оголошення",
+    cars: "Легкові автомобілі",
+    motorcycles: "Мотоцикли",
+    suvs: "Позашляховики",
+    minibus: "Мікроавтобус",
+    suburbanTariff: "Замісто тариф",
+    attachPhoto: "Додати фото",
+    agreeToTerms: "Я погоджуюсь з умовами використання сервісу та обробкою моїх даних.",
+    
+    // Buttons
+    upload: "Завантажити",
     // Add more translations...
   },
 };
