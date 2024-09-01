@@ -88,9 +88,9 @@ export default function Rents() {
   };
 
   return (
-    <div className="relative w-full min-h-screen h-[200vh] bg-muted/40">
+    <div className="relative w-full min-h-screen h-[150vh] bg-muted/40">
       {/* The iframe fills the whole 200vh */}
-      <div className="absolute top-0 left-0 w-full h-[200vh] z-0">
+      <div className="absolute top-0 left-0 w-full h-[150vh] z-0">
         <iframe
           width="100%"
           height="100%"
