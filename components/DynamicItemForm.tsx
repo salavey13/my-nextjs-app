@@ -303,7 +303,7 @@ const DynamicItemForm: React.FC<DynamicItemFormProps> = ({ itemType }) => {
           </Button>
 
           {/* Save and Continue in Telegram Button */}
-          {user?.id && (
+          {!user?.id && (
             <Button
               onClick={handleGenerateQrCode}
               variant="default"

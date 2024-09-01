@@ -2,6 +2,7 @@
 import { useState } from "react";
 import DynamicItemForm from "@/components/DynamicItemForm";
 import { useAppContext } from "@/context/AppContext";
+import { Button } from "@/components/ui/button";
 
 export default function DynamicItemFormPage() {
   const [itemType, setItemType] = useState<string>("evo");
@@ -14,30 +15,39 @@ export default function DynamicItemFormPage() {
   return (
     <div className="p-4">
       <div className="grid grid-cols-2 gap-4 mb-4">
-        <button
-          onClick={() => handleButtonClick("evo")}
-          className="bg-blue-500 text-white p-2 rounded"
-        >
-          {t("formTypes.evo")}
-        </button>
-        <button
-          onClick={() => handleButtonClick("car")}
-          className="bg-blue-500 text-white p-2 rounded"
-        >
-          {t("formTypes.car")}
-        </button>
-        <button
-          onClick={() => handleButtonClick("motorbike")}
-          className="bg-blue-500 text-white p-2 rounded"
-        >
-          {t("formTypes.motorbike")}
-        </button>
-        <button
-          onClick={() => handleButtonClick("bicycle")}
-          className="bg-blue-500 text-white p-2 rounded"
-        >
-          {t("formTypes.bicycle")}
-        </button>
+      <div className="grid grid-cols-2 gap-4 mb-4">
+                <Button
+                    onClick={() => handleButtonClick("evo")}
+                    className="bg-blue-500 text-white p-2 rounded"
+                >
+                    {t("formTypes.evo")}
+                </Button>
+                <Button
+                    onClick={() => handleButtonClick("car")}
+                    className="bg-blue-500 text-white p-2 rounded"
+                >
+                    {t("formTypes.car")}
+                </Button>
+                <Button
+                    onClick={() => handleButtonClick("motorbike")}
+                    className="bg-blue-500 text-white p-2 rounded"
+                >
+                    {t("formTypes.motorbike")}
+                </Button>
+                <Button
+                    onClick={() => handleButtonClick("bicycle")}
+                    className="bg-blue-500 text-white p-2 rounded"
+                >
+                    {t("formTypes.bicycle")}
+                </Button>
+                <Button
+                    onClick={() => handleButtonClick("dota2")}
+                    className="bg-blue-500 text-white p-2 rounded hover:text-white"
+                    variant="destructive"
+                >
+                    {t("formTypes.dota2")}
+                </Button>
+            </div>
       </div>
 
       <DynamicItemForm itemType={itemType} />

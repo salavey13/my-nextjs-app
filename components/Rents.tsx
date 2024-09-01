@@ -88,137 +88,132 @@ export default function Rents() {
   };
 
   return (
-    <div className="w-full min-h-screen bg-muted/40 flex flex-col p-4 overflow-auto">
-      <div className="flex flex-col">
+    <div className="relative w-full min-h-screen h-[200vh] bg-muted/40">
+      {/* The iframe fills the whole 200vh */}
+      <div className="absolute top-0 left-0 w-full h-[200vh] z-0">
         <iframe
           width="100%"
-          height="690"
-          src="https://excellent-lots-147907.framer.app"//{topEmbedUrl}
+          height="100%"
+          src="https://excellent-lots-147907.framer.app" // {topEmbedUrl}
           title="Top Embed"
           frameBorder="0"
           allowFullScreen
+          style={{ height: '100%' }} // 100% of the container's height (200vh)
         ></iframe>
       </div>
-
-      <div className="flex justify-between items-center mb-4 mt-4">
-        <h1 className="text-3xl font-bold">{t("rentsTitle")}</h1>
-        <Button onClick={handleOpenNewItemModal} variant="default">
-          {t("addNewItem")}
-        </Button>
+  
+      {/* Content positioned 64px from the bottom, occupying the bottom 100vh */}
+      <div className="absolute bottom-1 left-0 w-full z-10 overflow-auto bg-white max-h-screen">
+        <div className="p-4">
+          <div className="flex justify-between items-center mb-4">
+            <h1 className="text-3xl font-bold">{t("rentsTitle")}</h1>
+            <Button onClick={handleOpenNewItemModal} variant="default">
+              {t("addNewItem")}
+            </Button>
+          </div>
+  
+          <Card>
+            <CardHeader>
+              <CardTitle>{t("activeRentals")}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>{t("itemTitle")}</TableHead>
+                    <TableHead>{t("rentStart")}</TableHead>
+                    <TableHead>{t("rentEnd")}</TableHead>
+                    <TableHead>{t("status")}</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {rents.map((rent) => (
+                    <TableRow key={rent.id}>
+                      <TableCell>{getItemDetailsById(rent.item_id)}</TableCell>
+                      <TableCell>{new Date(rent.rent_start).toLocaleDateString()}</TableCell>
+                      <TableCell>{new Date(rent.rent_end).toLocaleDateString()}</TableCell>
+                      <TableCell>{t(rent.status)}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+  
+          <Card className="mt-4">
+            <CardHeader>
+              <CardTitle>{t("newItems")}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>{t("itemTitle")}</TableHead>
+                    <TableHead>{t("creatorShop")}</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {items.map((item) => (
+                    <TableRow key={item.id}>
+                      <TableCell>{item.title}</TableCell>
+                      <TableCell>{item.creator_ref_code}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </div>
       </div>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>{t("activeRentals")}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>{t("itemTitle")}</TableHead>
-                <TableHead>{t("rentStart")}</TableHead>
-                <TableHead>{t("rentEnd")}</TableHead>
-                <TableHead>{t("status")}</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {rents.map(rent => (
-                <TableRow key={rent.id}>
-                  <TableCell>{getItemDetailsById(rent.item_id)}</TableCell>
-                  <TableCell>{new Date(rent.rent_start).toLocaleDateString()}</TableCell>
-                  <TableCell>{new Date(rent.rent_end).toLocaleDateString()}</TableCell>
-                  <TableCell>{t(rent.status)}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
-
-      <Card className="mt-4">
-        <CardHeader>
-          <CardTitle>{t("newItems")}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>{t("itemTitle")}</TableHead>
-                <TableHead>{t("creatorShop")}</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {items.map(item => (
-                <TableRow key={item.id}>
-                  <TableCell>{item.title}</TableCell>
-                  <TableCell>{item.creator_ref_code}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
-
-      <div className="flex flex-col mt-4">
-        <iframe
-          width="100%"
-          height="315"
-          src={bottomEmbedUrl}
-          title="Bottom Embed"
-          frameBorder="0"
-          allowFullScreen
-        ></iframe>
-      </div>
-
+  
+      {/* Dialog remains unchanged */}
       <Dialog open={newItemModalOpen} onOpenChange={handleCloseNewItemModal}>
         <DialogContent
-            className="max-h-[calc(100vh-113px)] overflow-y-auto flex-grow min-h-[calc(100vh-128px)]  overflow-y-auto backdrop-blur-lg"
+          className="max-h-[calc(100vh-113px)] overflow-y-auto flex-grow min-h-[calc(100vh-128px)] overflow-y-auto backdrop-blur-lg"
         >
-            <DialogHeader>
+          <DialogHeader>
             <DialogTitle>{t("addNewItemTitle")}</DialogTitle>
             <DialogDescription>{t("addNewItemDescription")}</DialogDescription>
-            </DialogHeader>
-            <div className="grid grid-cols-2 gap-4 mb-4">
+          </DialogHeader>
+          <div className="grid grid-cols-2 gap-4 mb-4">
             <Button
-                onClick={() => handleButtonClick("evo")}
-                className="bg-blue-500 text-white p-2 rounded"
+              onClick={() => handleButtonClick("evo")}
+              className="bg-blue-500 text-white p-2 rounded"
             >
-                {t("formTypes.evo")}
+              {t("formTypes.evo")}
             </Button>
             <Button
-                onClick={() => handleButtonClick("car")}
-                className="bg-blue-500 text-white p-2 rounded"
+              onClick={() => handleButtonClick("car")}
+              className="bg-blue-500 text-white p-2 rounded"
             >
-                {t("formTypes.car")}
+              {t("formTypes.car")}
             </Button>
             <Button
-                onClick={() => handleButtonClick("motorbike")}
-                className="bg-blue-500 text-white p-2 rounded"
+              onClick={() => handleButtonClick("motorbike")}
+              className="bg-blue-500 text-white p-2 rounded"
             >
-                {t("formTypes.motorbike")}
+              {t("formTypes.motorbike")}
             </Button>
             <Button
-                onClick={() => handleButtonClick("bicycle")}
-                className="bg-blue-500 text-white p-2 rounded"
+              onClick={() => handleButtonClick("bicycle")}
+              className="bg-blue-500 text-white p-2 rounded"
             >
-                {t("formTypes.bicycle")}
+              {t("formTypes.bicycle")}
             </Button>
             <Button
-                onClick={() => handleButtonClick("dota2")}
-                className="bg-blue-500 text-white p-2 rounded hover:text-white"
-                variant="destructive"
+              onClick={() => handleButtonClick("dota2")}
+              className="bg-blue-500 text-white p-2 rounded hover:text-white"
+              variant="destructive"
             >
-                {t("formTypes.dota2")}
+              {t("formTypes.dota2")}
             </Button>
-            </div>
-            <DynamicItemForm itemType={itemType} />
+          </div>
+          <DynamicItemForm itemType={itemType} />
         </DialogContent>
-        </Dialog>
-
-
-
-
+      </Dialog>
+  
       <DebugInfo />
     </div>
   );
+  
 }
