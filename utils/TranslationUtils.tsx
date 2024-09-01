@@ -363,8 +363,10 @@ export const useTranslation = () => {
     
     // Buttons
     upload: "Upload",
+    rent: "Rent",
   },
   ru: {
+    rent: "Аренда",
     saveAndContinueInTelegram: "Сохранить и продолжить в Telegram",
     paymentSuccessMessage: "Привет, {username}! Ваш платеж был успешным. Премиум доступ будет активирован к {activationDate}.",
     notificationSent: "Уведомление успешно отправлено!",
@@ -778,6 +780,7 @@ contributorsLabel: "Учасники",
     
     // Buttons
     upload: "Завантажити",
+    rent: "Оренда",
     // Add more translations...
   },
 };
