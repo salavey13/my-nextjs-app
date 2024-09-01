@@ -36,6 +36,7 @@ interface UserData {
   ton_wallet?: string | null;
   initial_readings?: Record<string, any> | null;
   monthly_prices?: Record<string, any> | null;
+  site?: string | null;
 }
 
 interface AppContextType {

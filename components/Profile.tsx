@@ -1,10 +1,50 @@
+//components/Profile.tsx
 "use client";
 
+import { useState, useEffect} from 'react';
 import { useAppContext } from '../context/AppContext';
 import Image from 'next/image';
+import { supabase } from '../lib/supabaseClient';
+import { Button } from "./ui/button";
+import {Input} from "./ui/input";
+
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCrown } from '@fortawesome/free-solid-svg-icons';
 
 const Profile: React.FC = () => {
   const { user, t } = useAppContext();
+  const [site, setSite] = useState('');
+
+  useEffect(() => {
+    fetchSiteData();
+  }, [user]);
+
+  const fetchSiteData = async () => {
+    if (!user) return;
+
+    try {
+      const defaultSite = user.site ? user.site : "";
+      setSite(defaultSite);
+
+    } catch (error) {
+      console.error('Error fetching site data:', error);
+    }
+  };
+
+  const handleSiteChange = async (newSite: string) => {
+    try {
+      const { error } = await supabase
+        .from('users')
+        .update({ site: newSite })
+        .eq('id', user?.id);
+
+      if (error) throw error;
+
+    } catch (error) {
+      console.error('Error upadating personal site:', error);
+      throw error;
+    }
+  };
 
   return (
     <div className="p-8 shadow-lg rounded-lg max-w-lg mx-auto mt-10 bg-gradient-to-r from-gray-800 to-gray-900 text-white">
@@ -23,6 +63,26 @@ const Profile: React.FC = () => {
         </div>
       </div>
       <div className="space-y-1">
+        <div className="mb-4">
+          <label className="block text-gray-400 text-sm mb-1">
+            {t('site')}
+          </label>
+          <Input
+            value={site}
+            onChange={(e) => setSite(e.target.value)}
+            className="w-full bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            aria-label={t('referralName')}
+          />
+        </div>
+        <Button
+          onClick={() => handleSiteChange(site)}
+          className="flex items-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition justify-center w-full"
+          aria-label={t('sendInvite')}
+          variant="outline"
+        >
+          <FontAwesomeIcon icon={faCrown} className="mr-2" />
+          {t('saveSite')}
+        </Button>
         <div className="bg-gray-700 p-4 rounded-lg">
           <p className="text-sm font-medium text-gray-300">{t('rank')}:</p>
           <p className="text-lg font-semibold">{user?.rank}</p>

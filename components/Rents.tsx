@@ -1,3 +1,4 @@
+//components/Rents.tsx
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
@@ -5,12 +6,10 @@ import { supabase } from "../lib/supabaseClient";
 import { Card, CardHeader, CardTitle, CardContent } from "../components/ui/card";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { useAppContext } from "../context/AppContext";
 import DebugInfo from "../components/DebugInfo";
 import DynamicItemForm from "@/components/DynamicItemForm";
-import QRCode from "react-qr-code";
 
 interface Rent {
   id: number;
@@ -27,14 +26,19 @@ interface Item {
   creator_ref_code: string;
 }
 
+interface User {
+  id: number;
+  ref_code: string;
+  site: string;
+}
+
 export default function Rents() {
   const [rents, setRents] = useState<Rent[]>([]);
   const [items, setItems] = useState<Item[]>([]);
-  const [selectedItem, setSelectedItem] = useState<Item | null>(null);
+  const [users, setUsers] = useState<User[]>([]);
   const [newItemModalOpen, setNewItemModalOpen] = useState(false);
   const [itemType, setItemType] = useState<string>("evo"); // Default to "evo" type
-  const [topEmbedUrl, setTopEmbedUrl] = useState("");
-  const [bottomEmbedUrl, setBottomEmbedUrl] = useState(""); 
+  const [topEmbedUrl, setTopEmbedUrl] = useState("https://excellent-lots-147907.framer.app"); // Default URL
   const { user, t } = useAppContext();
 
   useEffect(() => {
@@ -65,14 +69,36 @@ export default function Rents() {
       }
     };
 
+    const fetchUsers = async () => {
+      const { data, error } = await supabase
+        .from("users")
+        .select("id, ref_code, site");
+
+      if (error) {
+        console.error("Error fetching users:", error);
+      } else {
+        setUsers(data || []);
+      }
+    };
+
     fetchRents();
     fetchItems();
+    fetchUsers();
   }, [user]);
 
   const getItemDetailsById = useCallback((itemId: number) => {
     const item = items.find(i => i.id === itemId);
     return item ? `${item.title} (Shop: ${item.creator_ref_code})` : t("unknownItem");
   }, [items, t]);
+
+  const handleRowClick = (item: Item) => {
+    const matchingUser = users.find(user => user.ref_code === item.creator_ref_code);
+    if (matchingUser && matchingUser.site) {
+      setTopEmbedUrl(matchingUser.site);
+    } else {
+      setTopEmbedUrl("https://excellent-lots-147907.framer.app"); // Fallback to default if no matching user
+    }
+  };
 
   const handleOpenNewItemModal = () => {
     setNewItemModalOpen(true);
@@ -94,14 +120,14 @@ export default function Rents() {
         <iframe
           width="100%"
           height="100%"
-          src="https://excellent-lots-147907.framer.app" // {topEmbedUrl}
+          src={topEmbedUrl}
           title="Top Embed"
           frameBorder="0"
           allowFullScreen
           style={{ height: '100%' }} // 100% of the container's height (200vh)
         ></iframe>
       </div>
-  
+
       {/* Content positioned 64px from the bottom, occupying the bottom 100vh */}
       <div className="absolute bottom-1 left-0 w-full z-10 overflow-auto bg-white max-h-screen">
         <div className="p-4">
@@ -111,7 +137,7 @@ export default function Rents() {
               {t("addNewItem")}
             </Button>
           </div>
-  
+
           <Card>
             <CardHeader>
               <CardTitle>{t("activeRentals")}</CardTitle>
@@ -139,7 +165,7 @@ export default function Rents() {
               </Table>
             </CardContent>
           </Card>
-  
+
           <Card className="mt-4">
             <CardHeader>
               <CardTitle>{t("newItems")}</CardTitle>
@@ -154,7 +180,7 @@ export default function Rents() {
                 </TableHeader>
                 <TableBody>
                   {items.map((item) => (
-                    <TableRow key={item.id}>
+                    <TableRow key={item.id} onClick={() => handleRowClick(item)} className="cursor-pointer">
                       <TableCell>{item.title}</TableCell>
                       <TableCell>{item.creator_ref_code}</TableCell>
                     </TableRow>
@@ -165,7 +191,7 @@ export default function Rents() {
           </Card>
         </div>
       </div>
-  
+
       {/* Dialog remains unchanged */}
       <Dialog open={newItemModalOpen} onOpenChange={handleCloseNewItemModal}>
         <DialogContent

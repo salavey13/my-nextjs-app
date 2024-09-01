@@ -46,7 +46,7 @@ const Referral: React.FC = () => {
 
   const generateReferralCode = async (defaultReferralName: string) => {
     try {
-      const newReferralCode = `${defaultReferralName}-${Date.now()}`;
+      const newReferralCode = `${defaultReferralName}}`;
       const { error } = await supabase
         .from('users')
         .update({ ref_code: newReferralCode })
