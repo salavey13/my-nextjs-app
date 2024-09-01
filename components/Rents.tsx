@@ -171,7 +171,9 @@ export default function Rents() {
       </div>
 
       <Dialog open={newItemModalOpen} onOpenChange={handleCloseNewItemModal}>
-        <DialogContent className="max-h-screen overflow-y-auto">
+        <DialogContent
+            className="max-h-screen overflow-y-auto z-[9999] pt-69 pb-69 "
+        >
             <DialogHeader>
             <DialogTitle>{t("addNewItemTitle")}</DialogTitle>
             <DialogDescription>{t("addNewItemDescription")}</DialogDescription>
@@ -204,7 +206,9 @@ export default function Rents() {
             </div>
             <DynamicItemForm itemType={itemType} />
         </DialogContent>
-      </Dialog>
+        </Dialog>
+
+
 
 
       <DebugInfo />
