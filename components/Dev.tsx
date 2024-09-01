@@ -66,7 +66,7 @@ const Dev: React.FC = () => {
 
 The codebase is provided as a single file (\'MegaFile.txt\'). Each component in the \`/components\` and \`/components/ui\` folders can be used as examples for implementation. The \`adminDashboard.tsx\` file should serve as a reference for how to structure and format your response. Please ensure that the response is formatted for easy parsing and direct integration into the project.
 
-### Expected Output:
+Expected Output:
 Branch Name
    - Branch Name
 Component Implementation
@@ -300,7 +300,7 @@ You can use existing tables as you wish:
 Make sure to follow this format strictly to help automate the integration process.
 ---
 
-### **Expected Response (Example)**
+Expected Response (Example)
 Branch Name:
 referrals_feature
 
@@ -544,15 +544,15 @@ tsx
 - Provide complete code snippets, not just differences, to make integration easier.
 - Ensure consistent formatting for ease of parsing by script.
 Remember Output format:
-File: app/pageName/page.tsx
+File: app/<pageName>/page.tsx
 """tsx
-// app/pageName/page.tsx
+// app/<pageName>/page.tsx
 <code here>
 """
 
-File: components/NewComponent.tsx
+File: components/<NewComponent>.tsx
 """tsx
-// components/NewComponent.tsx
+// components/<NewComponent>.tsx
 <code here>
 """
 `
@@ -560,14 +560,16 @@ File: components/NewComponent.tsx
     setStep(1);  // Activate the next step
   };
 
-  // Enhanced parser to extract branch name
-  const parseResponse = (response: string): ParsedResponse => {
-    const branchNameRegex = /###\s*Branch Name\s*\**\s*:*\s*\**\n`([^`]+)`/;
-    const fileRegex = /###\s*Component Implementation\s*:*\s*\n*\**File:\s*`([^`]+)`\s*\**\n```tsx\n([\s\S]*?)```/gm;
-    const translationKeysRegex = /###\s*Translation Keys\s*\n```tsx([\s\S]*?)###/;
-    const sqlTablesRegex = /###\s*Supabase Tables\s*\n```sql([\s\S]*?)```/;
-    const readmeUpdateRegex = /###\s*README\.md Update\s*\n```\.*([\s\S]*?)###/;
-    const bottomShelfRegex = /###\s*bottomShelf\.tsx\s*File:\s*`([^`]+)`\s*```tsx([\s\S]*?)```/;
+  // Regex execution integrated with parsing function
+const regex = /###\s*\d*\.*\s*\**\s*Component Implementation\s*\**\s*:*\s*\**\n*\**File:\s*`([^`]+)`\s*\**\n```tsx\n([\s\S]*?)```/gm;
+
+const parseResponse = (response: string): ParsedResponse => {
+    const branchNameRegex = /\s*\d*\.?\s*\**\s*Branch Name\s*\**\s*:*\s*\**\n`([^`]+)`/;
+    const fileRegex = /Component Implementation\s*\**\s*:*\s*\**\nFile:\s*`([^`]+)`\s*\**\n```tsx\n([\s\S]*?)```/gm;
+    const translationKeysRegex = /Translation Keys\s*\**\s*:\s*```tsx([\s\S]*?)```/;
+    const sqlTablesRegex = /\s*\d*\.?\s*\**\s*Supabase Tables\s*\**\s*:\s*```sql([\s\S]*?)```/;
+    const readmeUpdateRegex = /README\.md Update\s*\**\s*:\s*```markdown([\s\S]*?)```/;
+    const bottomShelfRegex = /\s*\d*\.?\s*\**\s*bottomShelf\.tsx\s*\**\s*:\s*File:\s*`([^`]+)`\s*```tsx([\s\S]*?)```/;
 
     const parsedData: ParsedResponse = {
         branchName: '',
@@ -620,14 +622,14 @@ File: components/NewComponent.tsx
         };
     }
 
-    // Debugging logs (similar to the Python version)
+    // Debugging logs
     console.log(`Parsed branch name: ${parsedData.branchName}`);
     parsedData.files.forEach((file, index) => {
         console.log(`Parsed component file [${index + 1}]: ${file.path}`);
         console.log(`File content [${index + 1}]:\n${file.content.slice(0, 1000)}...`); // Log first 1000 chars
     });
-    console.log(`Parsed translation keys:`, parsedData.translations);
-    console.log(`Parsed SQL tables:`, parsedData.sqlTables);
+    console.log('Parsed translation keys:', parsedData.translations);
+    console.log('Parsed SQL tables:', parsedData.sqlTables);
     console.log(`Parsed README.md update:\n${parsedData.readmeUpdate}`);
     if (parsedData.bottomShelf) {
         console.log(`Parsed bottomShelf.tsx file path: ${parsedData.bottomShelf.path}`);
@@ -637,6 +639,15 @@ File: components/NewComponent.tsx
     }
 
     return parsedData;
+};
+
+// Copy to clipboard utility function
+const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text).then(() => {
+        alert('Copied to clipboard!');
+    }, (err) => {
+        console.error('Failed to copy: ', err);
+    });
 };
 
   // Function to save extracted files to the local system
@@ -685,7 +696,7 @@ File: components/NewComponent.tsx
       setStep(2);  // Activate the next step
     } catch (error) {
       console.error('Error handling response:', error);
-      alert('There was an error processing the response.');
+      alert(`There was an error processing the response:${error}`);
     }
   };
 
@@ -845,22 +856,29 @@ return (
         </div>
       )}
   
-      {/* Display Parsed Response */}
-      {step >= 2 && parsedData && (
+    
+    {/*// Enhanced UI display Display Parsed Response */}
+    {step >= 2 && parsedData && (
         <div className="parsed-data">
             <h1 className="text-2xl font-bold mb-4">{t('parsedResponseDataTitle')}</h1>
-            
+
             <section className="branch-name mb-6">
                 <h2 className="text-xl font-semibold">{t('branchNameTitle')}</h2>
                 <p className="bg-gray-100 p-2 rounded">{parsedData.branchName}</p>
+                <Button onClick={() => copyToClipboard(parsedData.branchName)} className="mt-2 p-2 bg-blue-500 text-white rounded" variant="outline">
+                    {t('copyBranchName')}
+                </Button>
             </section>
-            
+
             <section className="component-implementation mb-6">
                 <h2 className="text-xl font-semibold">{t('componentImplementationsTitle')}</h2>
-                {parsedData.files.map((file:ParsedFile, index:number) => (
+                {parsedData.files.map((file: ParsedFile, index: number) => (
                     <div key={index} className="file-item mb-4">
                         <h3 className="font-bold">{file.path}</h3>
                         <pre className="bg-gray-100 p-2 rounded overflow-x-auto">{file.content}</pre>
+                        <Button onClick={() => copyToClipboard(file.content)} className="mt-2 p-2 bg-blue-500 text-white rounded" variant="outline">
+                            {t('copyFileContent')}
+                        </Button>
                     </div>
                 ))}
             </section>
@@ -868,21 +886,35 @@ return (
             <section className="translations mb-6">
                 <h2 className="text-xl font-semibold">{t('translationKeysTitle')}</h2>
                 <pre className="bg-gray-100 p-2 rounded overflow-x-auto">{JSON.stringify(parsedData.translations, null, 2)}</pre>
+                <Button onClick={() => copyToClipboard(JSON.stringify(parsedData.translations, null, 2))} className="mt-2 p-2 bg-blue-500 text-white rounded"
+          variant="outline">
+                    {t('copyTranslationKeys')}
+                </Button>
             </section>
 
             <section className="sql-tables mb-6">
                 <h2 className="text-xl font-semibold">{t('supabaseTablesTitle')}</h2>
-                {parsedData.sqlTables.map((sql:string[], index: number) => (
-                    <pre key={index} className="bg-gray-100 p-2 rounded overflow-x-auto">{sql}</pre>
+                {parsedData.sqlTables.map((sql: string, index: number) => (
+                    <div key={index} className="sql-item mb-4">
+                        <pre className="bg-gray-100 p-2 rounded overflow-x-auto">{sql}</pre>
+                        <Button onClick={() => copyToClipboard(sql)} className="mt-2 p-2 bg-blue-500 text-white rounded"
+          variant="outline">
+                            {t('copySQLTable')}
+                        </Button>
+                    </div>
                 ))}
             </section>
 
             <section className="readme-update mb-6">
                 <h2 className="text-xl font-semibold">{t('readmeUpdateTitle')}</h2>
                 <pre className="bg-gray-100 p-2 rounded overflow-x-auto">{parsedData.readmeUpdate}</pre>
+                <Button onClick={() => copyToClipboard(parsedData.readmeUpdate)} className="mt-2 p-2 bg-blue-500 text-white rounded"
+          variant="outline">
+                    {t('copyReadmeUpdate')}
+                </Button>
             </section>
         </div>
-      )}
+    )}
   
       {/* Try It and Deploy Buttons */}
       {step >= 2 && (
@@ -891,6 +923,7 @@ return (
           <Button 
             onClick={handleTryIt} 
             className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 mr-4"
+          variant="outline"
           >
             {t('tryItButton')}
           </Button>
@@ -903,6 +936,7 @@ return (
           <Button 
             onClick={handleDeploy} 
             className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+          variant="outline"
           >
             {t('deployButton')}
           </Button>

@@ -13,14 +13,12 @@ INPUTFILE = os.path.join(ROOT_DIR, 'input.txt')
 BOTTOMSHELF_COMMENT = "// components/ui/bottomShelf.tsx"
 
 def parse_response(response: str) -> dict:
-    #branch_name_regex = r'### \*\*Branch Name.\*\*\n\s*`([^`]+)`'
-    #file_regex = r'### \*\*Component Implementation:\*\*\s*\*\*File: `([^`]+)`\*\*\s*```tsx([\s\S]*?)```'
-    branch_name_regex = r'###\s*\d*\.?\s*\**\s*Branch Name\s*\**\s*:*\s*\**\n`([^`]+)`'
-    file_regex = r'###\s*\d*\.*\s*\**\s*Component Implementation\s*\**\s*:*\s*\**\n*\**File:\s*`([^`]+)`\s*\**\n```tsx\n([\s\S]*?)```'
-    translation_keys_regex = r'###\s*\d*\.?\s*\**\s*Translation Keys\s*\**\s*:\s*```tsx([\s\S]*?)```'
-    sql_tables_regex = r'###\s*\d*\.?\s*\**\s*Supabase Tables\s*\**\s*:\s*```sql([\s\S]*?)```'
-    readme_update_regex = r'###\s*\d*\.?\s*\**\s*README\.md Update\s*\**\s*:\s*```markdown([\s\S]*?)```'
-    bottom_shelf_regex = r'###\s*\d*\.?\s*\**\s*bottomShelf\.tsx\s*\**\s*:\s*File:\s*`([^`]+)`\s*```tsx([\s\S]*?)```'
+    branch_name_regex = r'\s*\d*\.?\s*\**\s*Branch Name\s*\**\s*:*\s*\**\n`([^`]+)`'
+    file_regex = r'Component Implementation\s*\**\s*:*\s*\**\n*\**File:\s*`([^`]+)`\s*\**\n```tsx\n([\s\S]*?)```'
+    translation_keys_regex = r'\s*\d*\.?\s*\**\s*Translation Keys\s*\**\s*:\s*```tsx([\s\S]*?)```'
+    sql_tables_regex = r'\s*\d*\.?\s*\**\s*Supabase Tables\s*\**\s*:\s*```sql([\s\S]*?)```'
+    readme_update_regex = r'\s*\d*\.?\s*\**\s*README\.md Update\s*\**\s*:\s*```markdown([\s\S]*?)```'
+    bottom_shelf_regex = r'\s*\d*\.?\s*\**\s*bottomShelf\.tsx\s*\**\s*:\s*File:\s*`([^`]+)`\s*```tsx([\s\S]*?)```'
 
 
     parsed_data = {

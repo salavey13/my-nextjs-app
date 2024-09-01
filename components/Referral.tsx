@@ -1,4 +1,4 @@
-//components/Referral.tsx
+// components/Referral.tsx
 "use client";
 
 import React, { useState, useEffect, Suspense, useCallback } from 'react';
@@ -7,8 +7,9 @@ import { useAppContext } from '../context/AppContext';
 import { useTranslation } from 'react-i18next';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUserPlus, faPaperPlane, faTrophy } from '@fortawesome/free-solid-svg-icons';
-import LoadingSpinner from "../components/ui/LoadingSpinner";
-import { Button } from "@/components/ui/button";
+import LoadingSpinner from "./ui/LoadingSpinner";
+import { Button } from "./ui/button";
+import {Input} from "./ui/input";
 
 const Referral: React.FC = () => {
   const { user, updateUserReferrals, t  } = useAppContext();
@@ -25,7 +26,7 @@ const Referral: React.FC = () => {
     if (!user) return;
 
     try {
-      const defaultReferralName = user.ref_code ? user.ref_code: user.telegram_username;
+      const defaultReferralName = user.ref_code ? user.ref_code : user.telegram_username;
       setReferralName(defaultReferralName || '');
 
       if (!user.ref_code) {
@@ -44,8 +45,8 @@ const Referral: React.FC = () => {
   };
 
   const generateReferralCode = async (defaultReferralName: string) => {
-    const newReferralCode = `${defaultReferralName}`;
     try {
+      const newReferralCode = `${defaultReferralName}-${Date.now()}`;
       const { error } = await supabase
         .from('users')
         .update({ ref_code: newReferralCode })
@@ -119,17 +120,17 @@ const Referral: React.FC = () => {
 
     const botToken = process.env.NEXT_PUBLIC_BOT_TOKEN;
     const inviteLink = `https://t.me/oneSitePlsBot/vip?ref=${referralCode}`;
-    const url = new URL(`https://api.telegram.org/bot${botToken}/sendPhoto`);
-    const message = `${t("playWithUs")} ${user?.telegram_username }! 🎮✨`;
-    url.searchParams.append("chat_id", user.telegram_id.toFixed());
-    url.searchParams.append("caption", message);
-    url.searchParams.append("photo", "https://th.bing.com/th/id/OIG2.fwYLXgRzLnnm2DMcdfl1");
+    const url = new URL(`https://api.telegram.org/bot${botToken}/sendMessage`);
+    const message = `${t('playWithUs')} ${user.telegram_username} ! 🎮✨`;
+
+    url.searchParams.append("chat_id", user.telegram_id.toString());
+    url.searchParams.append("text", message);
     url.searchParams.append("reply_markup", JSON.stringify({
       inline_keyboard: [
         [{ text: t("startPlaying"), url: inviteLink }],
         [{ text: t("visitSite"), url: "https://oneSitePls.framer.ai" }],
         [{ text: t("joinCommunity"), url: "https://t.me/aibotsites" }],
-        [{ text:  t("youtubeChannel"), url: "https://youtube.com/@salavey13" }],
+        [{ text: t("youtubeChannel"), url: "https://youtube.com/@salavey13" }],
       ],
     }));
 
@@ -140,7 +141,7 @@ const Referral: React.FC = () => {
     } catch (error) {
       console.error('Error sending Telegram message:', error);
     }
-  }, [user]); // Include all dependencies in the dependency array
+  }, [user]);
 
   return (
     <Suspense fallback={<LoadingSpinner />}>
@@ -153,18 +154,17 @@ const Referral: React.FC = () => {
           <label className="block text-gray-400 text-sm mb-1">
             {t('referralName')}
           </label>
-          <input
-            type="text"
+          <Input
             value={referralName}
             onChange={(e) => handleReferralNameChange(e.target.value)}
-            className="input input-bordered w-full bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-            aria-label="Referral Name"
+            className="w-full bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            aria-label={t('referralName')}
           />
         </div>
         <Button
           onClick={handleSendInvite}
-          className="btn btn-primary flex items-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition justify-center w-full"
-          aria-label="Send Invite"
+          className="flex items-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition justify-center w-full"
+          aria-label={t('sendInvite')}
           variant="outline"
         >
           <FontAwesomeIcon icon={faPaperPlane} className="mr-2" />

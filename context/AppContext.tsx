@@ -49,6 +49,9 @@ interface AppContextType {
   debugLogs: string[];
   addDebugLog: (log: string) => void;
   updateUserReferrals: (newReferralCode: string) => void;
+
+  formState: any; // Add this line
+  saveFormState: () => void; // Add this line
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -57,6 +60,13 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const [store, setStore] = useState(defaultStore);
   const [user, setUser] = useState<UserData | null>(null);
   const [debugLogs, setDebugLogs] = useState<string[]>([]);
+  const [formState, setFormState] = useState<any>({}); // Initialize formState
+  const saveFormState = () => {
+    // Implement the logic to save formState, maybe to Supabase or local storage
+    console.log("Saving form state:", formState);
+    // Example: Save to local storage
+    localStorage.setItem('formState', JSON.stringify(formState));
+  };
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
@@ -308,7 +318,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
   return (
     <Suspense fallback={<div>Loading...</div>}>
-      <AppContext.Provider value={{ store, setStore, user, setUser, fetchPlayer, t, changeLanguage, debugLogs, addDebugLog, updateUserReferrals }}>
+      <AppContext.Provider value={{ store, setStore, user, setUser, fetchPlayer, t, changeLanguage, debugLogs, addDebugLog, updateUserReferrals,formState, saveFormState }}>
         {children}
       </AppContext.Provider>
     </Suspense>

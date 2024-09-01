@@ -37,7 +37,7 @@ fi
 
 # Run the parser script
 echo "Running the Python parser script..."
-python parser.py
+python parser2.py
 
 # Check if the result folder exists
 if [ ! -d "result" ]; then

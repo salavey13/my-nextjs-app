@@ -17,7 +17,12 @@ const BottomShelf: React.FC = () => {
   const pathname = usePathname();
   const { t } = useAppContext();
 
-  const navigationLinks: NavigationLink[] = [    
+  const navigationLinks: NavigationLink[] = [    { href: '/paymentnotification', icon: faLightbulb, label: t('paymentnotification') },
+    { href: '/referral', icon: faLightbulb, label: t('referral') },
+    { href: '/dynamicitemform', icon: faLightbulb, label: t('dynamicitemform') },
+    { href: '/qrcodeform', icon: faLightbulb, label: t('qrcodeform') },
+    { href: '/cryptopayment', icon: faLightbulb, label: t('cryptopayment') },
+    
     { href: '/conflictawareness', icon: faGlobe, label: '' },
     { href: '/', icon: faHome, label: t('home') },
     { href: '/admin', icon: faList, label: t('admin') },

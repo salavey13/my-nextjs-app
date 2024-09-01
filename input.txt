@@ -1,0 +1,1323 @@
+### Branch Name
+`feature/premium-landing-pages`
+
+Component Implementation
+File: components/PremiumCustomLandingPages.tsx**
+```tsx
+// components/PremiumCustomLandingPages.tsx
+"use client";
+
+import React, { useState, useEffect } from 'react';
+import { useAppContext } from '../context/AppContext';
+import { Button, Input, LoadingSpinner, Card, Table } from '@/components/ui';
+import Link from 'next/link';
+
+const PremiumCustomLandingPages: React.FC = () => {
+  const { user, t } = useAppContext();
+  const [landingPages, setLandingPages] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Fetch the landing pages linked to the user
+    const fetchLandingPages = async () => {
+      try {
+        // Replace with actual fetch logic
+        const response = await fetch('/api/getUserLandingPages', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ userId: user?.id }),
+        });
+        const pages = await response.json();
+        setLandingPages(pages);
+      } catch (error) {
+        console.error('Failed to fetch landing pages', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchLandingPages();
+  }, [user]);
+
+  const handleRequestLandingPage = async () => {
+    // Logic to request a new custom landing page
+    alert(t('requestLandingPage'));
+  };
+
+  if (loading) return <LoadingSpinner />;
+
+  return (
+    <Card>
+      <h2 className="text-2xl font-bold mb-4">{t('premiumLandingPages')}</h2>
+      <Button onClick={handleRequestLandingPage} className="mb-4">
+        {t('requestLandingPage')}
+      </Button>
+      {landingPages.length > 0 ? (
+        <Table>
+          <thead>
+            <tr>
+              <th>{t('landingPageName')}</th>
+              <th>{t('actions')}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {landingPages.map((page, index) => (
+              <tr key={index}>
+                <td>{page.name}</td>
+                <td>
+                  <Link href={`/profile/landing-page/${page.id}`}>
+                    <Button>{t('view')}</Button>
+                  </Link>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </Table>
+      ) : (
+        <p>{t('noLandingPages')}</p>
+      )}
+    </Card>
+  );
+};
+
+export default PremiumCustomLandingPages;
+```
+
+Translation Keys
+```typescript
+// TranslationUtils.tsx
+export const translations = {
+  en: {
+    premiumLandingPages: "Premium Custom Landing Pages",
+    requestLandingPage: "Request New Landing Page",
+    landingPageName: "Landing Page Name",
+    actions: "Actions",
+    view: "View",
+    noLandingPages: "You have no custom landing pages yet.",
+  },
+  ru: {
+    premiumLandingPages: "Премиум Пользовательские Лэндинг-Страницы",
+    requestLandingPage: "Запросить новую Лэндинг-страницу",
+    landingPageName: "Название Лэндинг-страницы",
+    actions: "Действия",
+    view: "Просмотр",
+    noLandingPages: "У вас еще нет пользовательских лэндинг-страниц.",
+  },
+  ukr: {
+    premiumLandingPages: "Преміум Користувацькі Лендінг-Сторінки",
+    requestLandingPage: "Запросити нову Лендінг-сторінку",
+    landingPageName: "Назва Лендінг-сторінки",
+    actions: "Дії",
+    view: "Перегляд",
+    noLandingPages: "У вас ще немає користувацьких лендінг-сторінок.",
+  }
+};
+```
+
+### Supabase Tables
+**SQL Command:**
+```sql
+CREATE TABLE user_landing_pages (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES public.users(id) NOT NULL,
+    name TEXT NOT NULL,
+    content JSONB NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+README.md Update
+```markdown
+## Premium Custom Landing Pages
+
+### Description
+This component allows users to request and manage their premium custom landing pages. The landing pages are designed externally and integrated into the application, accessible via the user's profile. 
+
+### Usage
+To use this component, import it into the appropriate page or section of the application:
+
+```tsx
+import PremiumCustomLandingPages from '@/components/PremiumCustomLandingPages';
+
+const ProfilePage = () => {
+  return <PremiumCustomLandingPages />;
+};
+
+export default ProfilePage;
+```
+
+Users can request a new landing page and view their existing pages directly within their profile.
+```
+
+### bottomShelf.tsx Update
+File: components/ui/bottomShelf.tsx**
+```tsx
+// components/ui/bottomShelf.tsx
+"use client";
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faHome, faList, faPlus, faBell, faUser, faCalendarPlus, faLightbulb, faStar } from '@fortawesome/free-solid-svg-icons';
+import { useAppContext } from "@/context/AppContext";
+
+export interface NavigationLink {
+  href: string;
+  icon: any;
+  label: string;
+}
+
+const BottomShelf: React.FC = () => {
+  const pathname = usePathname();
+  const { t } = useAppContext();
+
+  const navigationLinks: NavigationLink[] = [
+    { href: '/', icon: faHome, label: t('home') },
+    { href: '/admin', icon: faList, label: t('admin') },
+    { href: '/createEvent', icon: faCalendarPlus, label: '' },
+    { href: '/referral', icon: faPlus, label: t('referral') },
+    { href: '/profile/premium-landing-pages', icon: faStar, label: t('premiumLandingPages') },
+    { href: '/dev', icon: faLightbulb, label: t('dev') }
+  ];
+
+  return (
+    <footer className="fixed bottom-0 left-0 w-full h-16 bg-gray-900 text-white flex justify-around items-center z-20 backdrop-blur-lg shadow-lg">
+      {navigationLinks.map((link, index) => (
+        <Link
+          key={index}
+          href={link.href}
+          className="flex flex-col items-center justify-center w-12 h-12 text-blue-500">
+          <FontAwesomeIcon icon={link.icon} size={link.label ===''?"2x":"lg"} />
+          <span className="text-xs">{link.label}</span>
+        </Link>
+      ))}
+    </footer>
+  );
+};
+
+export default BottomShelf;
+```
+
+File: app/profile/premium-landing-pages/page.tsx**
+```tsx
+// app/profile/premium-landing-pages/page.tsx
+import PremiumCustomLandingPages from "@/components/PremiumCustomLandingPages";
+
+export default function PremiumLandingPagesPage() {
+  return <PremiumCustomLandingPages />;
+}
+```
+
+This concludes the implementation details for the requested feature.
+
+Sure, let's get to work.
+
+### Branch Name:
+`feature/crypto-payment-support`
+
+Component Implementation
+File: `components/CryptoPayment.tsx`
+```tsx
+// components/CryptoPayment.tsx
+"use client";
+
+import React, { useState } from 'react';
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import { useAppContext } from '@/context/AppContext';
+
+const CryptoPayment: React.FC = () => {
+    const { t, user } = useAppContext();
+    const [amount, setAmount] = useState<number | string>('');
+    const [paymentLink, setPaymentLink] = useState<string | null>(null);
+    const [loading, setLoading] = useState<boolean>(false);
+
+    const handleGeneratePaymentLink = async () => {
+        if (!amount || isNaN(Number(amount))) {
+            alert(t('invalidAmount'));
+            return;
+        }
+        setLoading(true);
+        try {
+            // Replace with actual link generation logic
+            const link = `https://ton.org/send?amount=${amount}&to=${user?.ton_wallet}`;
+            setPaymentLink(link);
+        } catch (error) {
+            console.error('Error generating payment link:', error);
+            alert(t('errorGeneratingLink'));
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return (
+        <div className="p-6 bg-gray-800 rounded-lg shadow-lg">
+            <h1 className="text-2xl font-bold text-white mb-4">
+                {t('cryptoPayment')}
+            </h1>
+            <div className="mb-4">
+                <label className="block text-gray-400 text-sm mb-1">
+                    {t('amount')}
+                </label>
+                <Input
+                    type="text"
+                    value={amount}
+                    onChange={(e) => setAmount(e.target.value)}
+                    className="input input-bordered w-full bg-gray-700 text-white"
+                    aria-label={t('amount')}
+                />
+            </div>
+            <Button
+                onClick={handleGeneratePaymentLink}
+                className="btn btn-primary w-full"
+                disabled={loading}
+            >
+                {loading ? <LoadingSpinner /> : t('generatePaymentLink')}
+            </Button>
+            {paymentLink && (
+                <div className="mt-4">
+                    <p className="text-gray-400">{t('paymentLinkGenerated')}</p>
+                    <a
+                        href={paymentLink}
+                        className="text-blue-500 underline"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        {paymentLink}
+                    </a>
+                </div>
+            )}
+        </div>
+    );
+};
+
+export default CryptoPayment;
+```
+
+Translation Keys
+```typescript
+export const translations = {
+  en: {
+    cryptoPayment: "Crypto Payment",
+    amount: "Amount",
+    generatePaymentLink: "Generate Payment Link",
+    paymentLinkGenerated: "Payment link has been generated:",
+    invalidAmount: "Invalid amount.",
+    errorGeneratingLink: "Error generating payment link.",
+  },
+  ru: {
+    cryptoPayment: "Крипто Платеж",
+    amount: "Сумма",
+    generatePaymentLink: "Сгенерировать ссылку на оплату",
+    paymentLinkGenerated: "Ссылка на оплату была сгенерирована:",
+    invalidAmount: "Недопустимая сумма.",
+    errorGeneratingLink: "Ошибка при создании ссылки на оплату.",
+  },
+  ukr: {
+    cryptoPayment: "Крипто Платіж",
+    amount: "Сума",
+    generatePaymentLink: "Згенерувати посилання на оплату",
+    paymentLinkGenerated: "Посилання на оплату було згенеровано:",
+    invalidAmount: "Недійсна сума.",
+    errorGeneratingLink: "Помилка при створенні посилання на оплату.",
+  }
+};
+```
+
+### Supabase Tables
+```sql
+CREATE TABLE crypto_payments (
+    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    user_id UUID REFERENCES users(id) NOT NULL,
+    amount NUMERIC NOT NULL,
+    payment_link TEXT NOT NULL,
+    payment_status TEXT DEFAULT 'pending',
+    created_at TIMESTAMPTZ DEFAULT current_timestamp,
+    confirmed_at TIMESTAMPTZ
+);
+```
+
+README.md Update
+```markdown
+## New Feature: Crypto Payment Support
+
+- **Description**: This component allows users to generate payment links for the TON network, enabling crypto payments for premium services like custom landing pages. The user receives a notification upon successful payment, and the requested feature is activated manually.
+- **Usage**:
+  
+```tsx
+import CryptoPayment from '@/components/CryptoPayment';
+
+const App = () => {
+    return <CryptoPayment />;
+};
+
+export default App;
+```
+```
+
+### Updated bottomShelf.tsx
+File: `components/ui/bottomShelf.tsx`
+```tsx
+// components/ui/bottomShelf.tsx
+"use client";
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faHome, faList, faPlus, faBell, faUser, faCalendarPlus, faLightbulb, faBitcoin } from '@fortawesome/free-solid-svg-icons';
+import { useAppContext } from "@/context/AppContext";
+
+export interface NavigationLink {
+  href: string;
+  icon: any;
+  label: string;
+}
+
+const BottomShelf: React.FC = () => {
+  const pathname = usePathname();
+  const { t } = useAppContext();
+
+  const navigationLinks: NavigationLink[] = [
+    { href: '/', icon: faHome, label: t('home') },
+    { href: '/admin', icon: faList, label: t('admin') },
+    { href: '/createEvent', icon: faCalendarPlus, label: '' },
+    { href: '/referral', icon: faPlus, label: t('referral') },
+    { href: '/cryptoPayment', icon: faBitcoin, label: t('cryptoPayment') },
+    { href: '/dev', icon: faLightbulb, label: t('dev') }
+  ];
+
+  return (
+    <footer className="fixed bottom-0 left-0 w-full h-16 bg-gray-900 text-white flex justify-around items-center z-20 backdrop-blur-lg shadow-lg">
+      {navigationLinks.map((link, index) => (
+        <Link
+          key={index}
+          href={link.href}
+          className="flex flex-col items-center justify-center w-12 h-12 text-blue-500">
+          <FontAwesomeIcon icon={link.icon} size={link.label ===''?"2x":"lg"} />
+          <span className="text-xs">{link.label}</span>
+        </Link>
+      ))}
+    </footer>
+  );
+};
+
+export default BottomShelf;
+```
+
+### New Page for Crypto Payment
+File: `app/cryptoPayment/page.tsx`
+```tsx
+// app/cryptoPayment/page.tsx
+import CryptoPayment from "@/components/CryptoPayment";
+
+export default function CryptoPaymentPage() {
+  return <CryptoPayment />;
+}
+```
+
+---
+
+This output provides all necessary details in the format required. It includes the branch name, component implementation, translation keys, Supabase table creation commands, and updates to the `README.md` and `bottomShelf.tsx` files, along with the new page routing.
+
+### Branch Name:
+`feature/qr-code-sharing`
+
+Component Implementation
+File: `components/QrCodeForm.tsx`
+
+```tsx
+// components/QrCodeForm.tsx
+"use client";
+
+import React, { useState, useEffect } from "react";
+import { useAppContext } from "@/context/AppContext";
+import { Button } from "@/components/ui/Button";
+import QRCode from "qrcode.react";
+import { useRouter } from "next/navigation";
+
+const QrCodeForm: React.FC = () => {
+  const { formState, saveFormState, t } = useAppContext();
+  const [qrCodeUrl, setQrCodeUrl] = useState<string | null>(null);
+  const router = useRouter();
+
+  useEffect(() => {
+    generateQrCode();
+  }, [formState]);
+
+  const generateQrCode = () => {
+    const formStateString = JSON.stringify(formState);
+    const encodedState = encodeURIComponent(formStateString);
+    const qrUrl = `${window.location.origin}${router.pathname}?state=${encodedState}`;
+    setQrCodeUrl(qrUrl);
+  };
+
+  const handleSaveState = () => {
+    saveFormState();
+    generateQrCode();
+  };
+
+  return (
+    <div className="p-4 bg-gray-800 rounded-lg shadow-md">
+      <h2 className="text-lg font-semibold text-white mb-2">
+        {t('qrCodeTitle')}
+      </h2>
+      <div className="mb-4 text-white">
+        {t('qrCodeDescription')}
+      </div>
+      {qrCodeUrl && (
+        <div className="mb-4 flex justify-center">
+          <QRCode value={qrCodeUrl} size={150} />
+        </div>
+      )}
+      <Button onClick={handleSaveState} className="btn btn-primary">
+        {t('generateQrCode')}
+      </Button>
+    </div>
+  );
+};
+
+export default QrCodeForm;
+```
+
+Translation Keys
+```typescript
+// TranslationUtils.tsx
+
+export const translations = {
+  en: {
+    qrCodeTitle: "Continue on Another Device",
+    qrCodeDescription: "Scan this QR code with your mobile device to continue filling out the form.",
+    generateQrCode: "Generate QR Code",
+  },
+  ru: {
+    qrCodeTitle: "Продолжить на другом устройстве",
+    qrCodeDescription: "Сканируйте этот QR-код на мобильном устройстве, чтобы продолжить заполнение формы.",
+    generateQrCode: "Создать QR-код",
+  },
+  ukr: {
+    qrCodeTitle: "Продовжити на іншому пристрої",
+    qrCodeDescription: "Скануйте цей QR-код на своєму мобільному пристрої, щоб продовжити заповнення форми.",
+    generateQrCode: "Згенерувати QR-код",
+  }
+};
+```
+
+### Supabase Tables:
+No new Supabase tables are required for this feature as it is primarily client-side and utilizes existing state management.
+
+README.md Update
+
+```markdown
+## New Feature: QR Code Sharing
+
+### Description:
+The `QrCodeForm` component allows users to generate a QR code that encodes the current form state. This QR code can be scanned on a different device to load the form with the same state, enabling seamless transitions between devices.
+
+### Usage:
+To use the `QrCodeForm` component, simply import and include it in the form you want to enable with QR code sharing:
+
+```tsx
+import QrCodeForm from '@/components/QrCodeForm';
+
+const MyFormPage = () => {
+  return (
+    <div>
+      <MyFormComponent />
+      <QrCodeForm />
+    </div>
+  );
+};
+
+export default MyFormPage;
+```
+```
+
+### Updated `bottomShelf.tsx` and `page.tsx`
+
+File: `components/ui/bottomShelf.tsx`
+
+```tsx
+// components/ui/bottomShelf.tsx
+"use client";
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faHome, faList, faPlus, faBell, faUser, faCalendarPlus, faLightbulb, faQrcode } from "@fortawesome/free-solid-svg-icons";
+import { useAppContext } from "@/context/AppContext";
+
+export interface NavigationLink {
+  href: string;
+  icon: any;
+  label: string;
+}
+
+const BottomShelf: React.FC = () => {
+  const pathname = usePathname();
+  const { t } = useAppContext();
+
+  const navigationLinks: NavigationLink[] = [
+    { href: "/", icon: faHome, label: t("home") },
+    { href: "/admin", icon: faList, label: t("admin") },
+    { href: "/createEvent", icon: faCalendarPlus, label: "" },
+    { href: "/referral", icon: faPlus, label: t("referral") },
+    { href: "/qrCodeForm", icon: faQrcode, label: t("qrCode") },
+    { href: "/dev", icon: faLightbulb, label: t("dev") }
+  ];
+
+  return (
+    <footer className="fixed bottom-0 left-0 w-full h-16 bg-gray-900 text-white flex justify-around items-center z-20 backdrop-blur-lg shadow-lg">
+      {navigationLinks.map((link, index) => (
+        <Link
+          key={index}
+          href={link.href}
+          className="flex flex-col items-center justify-center w-12 h-12 text-blue-500">
+          <FontAwesomeIcon icon={link.icon} size={link.label === "" ? "2x" : "lg"} />
+          <span className="text-xs">{link.label}</span>
+        </Link>
+      ))}
+    </footer>
+  );
+};
+
+export default BottomShelf;
+```
+
+File: `app/qrCodeForm/page.tsx`
+
+```tsx
+// app/qrCodeForm/page.tsx
+import QrCodeForm from "@/components/QrCodeForm";
+
+export default function QrCodeFormPage() {
+  return <QrCodeForm />;
+}
+```
+
+### Explanation
+- **Branch Name:** `feature/qr-code-sharing` aligns with the feature implementation for QR code sharing functionality.
+Component Implementation `QrCodeForm.tsx` contains the full implementation of the QR code generation feature. It uses existing components and context, ensuring seamless integration.
+- **Translation Keys:** Added translation keys for English, Russian, and Ukrainian languages for the new component.
+- **Supabase Tables:** No new tables were necessary as the feature relies on client-side state.
+- **README.md Update:** Included documentation on the new `QrCodeForm` component with usage instructions.
+- **BottomShelf.tsx and Page.tsx Updates:** Added the QR code link to the navigation bar and provided the corresponding page implementation.
+
+This should provide a comprehensive guide to implementing the QR code feature.
+**Branch Name:**
+`feature/dynamic-item-form`
+
+---
+
+Component Implementation
+
+File: `components/DynamicItemForm.tsx`
+```tsx
+// components/DynamicItemForm.tsx
+"use client";
+
+import React, { useState, useEffect, Suspense, useCallback } from 'react';
+import { supabase } from '../lib/supabaseClient';
+import { useAppContext } from '../context/AppContext';
+import { Button, Input, Card, LoadingSpinner, Table } from "@/components/ui";
+
+interface FormField {
+  name: string;
+  label: string;
+  type: string;
+  value: any;
+}
+
+interface DynamicItemFormProps {
+  itemType: string;
+}
+
+const DynamicItemForm: React.FC<DynamicItemFormProps> = ({ itemType }) => {
+  const { t } = useAppContext();
+  const [formFields, setFormFields] = useState<FormField[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    fetchFormFields();
+  }, [itemType]);
+
+  const fetchFormFields = async () => {
+    setLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('item_types')
+        .select('fields')
+        .eq('type', itemType)
+        .single();
+
+      if (error) throw error;
+
+      const fields = data.fields.map((field: any) => ({
+        name: field.name,
+        label: t(field.label),
+        type: field.type,
+        value: '',
+      }));
+
+      setFormFields(fields);
+    } catch (error) {
+      console.error('Error fetching form fields:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleInputChange = (index: number, value: any) => {
+    const updatedFields = [...formFields];
+    updatedFields[index].value = value;
+    setFormFields(updatedFields);
+  };
+
+  const handleSubmit = async () => {
+    setLoading(true);
+    try {
+      const itemData = formFields.reduce((acc, field) => {
+        acc[field.name] = field.value;
+        return acc;
+      }, {});
+
+      const { error } = await supabase
+        .from('items')
+        .insert({ type: itemType, data: itemData });
+
+      if (error) throw error;
+
+      alert(t('itemAddedSuccessfully'));
+    } catch (error) {
+      console.error('Error adding item:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return <LoadingSpinner />;
+  }
+
+  return (
+    <Card>
+      <form className="space-y-4">
+        {formFields.map((field, index) => (
+          <div key={field.name}>
+            <label className="block text-gray-700">{field.label}</label>
+            <Input
+              type={field.type}
+              value={field.value}
+              onChange={(e) => handleInputChange(index, e.target.value)}
+            />
+          </div>
+        ))}
+        <Button onClick={handleSubmit} variant="primary" className="w-full">
+          {t('submit')}
+        </Button>
+      </form>
+    </Card>
+  );
+};
+
+export default DynamicItemForm;
+```
+
+---
+Translation Keys
+```typescript
+export const translations = {
+  en: {
+    dynamicForm: "Dynamic Form",
+    submit: "Submit",
+    itemAddedSuccessfully: "Item added successfully",
+  },
+  ru: {
+    dynamicForm: "Динамическая форма",
+    submit: "Отправить",
+    itemAddedSuccessfully: "Элемент успешно добавлен",
+  },
+  ukr: {
+    dynamicForm: "Динамічна форма",
+    submit: "Надіслати",
+    itemAddedSuccessfully: "Елемент успішно додано",
+  },
+};
+```
+
+---
+
+**Supabase Tables:**
+
+```sql
+-- Table to store different item types and their form fields
+CREATE TABLE item_types (
+    id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
+    type text NOT NULL,
+    fields jsonb NOT NULL
+);
+
+-- Table to store items with their dynamic data
+CREATE TABLE items (
+    id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
+    type text REFERENCES item_types(type),
+    data jsonb NOT NULL,
+    created_at timestamp with time zone DEFAULT current_timestamp NOT NULL
+);
+```
+
+---
+
+README.md Update
+
+```markdown
+## New Feature: Dynamic Item Form
+
+### Description:
+This component allows users to dynamically fill out forms based on the type of item they are adding (e.g., car, bike, forklift). The form fields are dynamically generated based on the item type selected and are fetched from the database. The component integrates with Supabase to store item-specific data.
+
+### Usage:
+```tsx
+import DynamicItemForm from '@/components/DynamicItemForm';
+
+const ItemPage = () => {
+    return <DynamicItemForm itemType="car" />;
+};
+
+export default ItemPage;
+```
+
+### Supabase Setup:
+- **item_types**: Stores the configuration for form fields specific to each item type.
+- **items**: Stores the actual items with their respective dynamic data.
+```
+
+---
+
+**BottomShelf Update:**
+
+File: `components/ui/bottomShelf.tsx`
+```tsx
+// components/ui/bottomShelf.tsx
+"use client";
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faHome, faList, faPlus, faBell, faUser, faCalendarPlus, faLightbulb, faClipboard } from '@fortawesome/free-solid-svg-icons';
+import { useAppContext } from "@/context/AppContext";
+
+export interface NavigationLink {
+  href: string;
+  icon: any;
+  label: string;
+}
+
+const BottomShelf: React.FC = () => {
+  const pathname = usePathname();
+  const { t } = useAppContext();
+
+  const navigationLinks: NavigationLink[] = [
+    { href: '/', icon: faHome, label: t('home') },
+    { href: '/admin', icon: faList, label: t('admin') },
+    { href: '/createEvent', icon: faCalendarPlus, label: '' },
+    { href: '/referral', icon: faPlus, label: t('referral') },
+    { href: '/dynamicItemForm', icon: faClipboard, label: t('dynamicForm') }, // New link added
+    { href: '/dev', icon: faLightbulb, label: t('dev') }
+  ];
+
+  return (
+    <footer className="fixed bottom-0 left-0 w-full h-16 bg-gray-900 text-white flex justify-around items-center z-20 backdrop-blur-lg shadow-lg">
+      {navigationLinks.map((link, index) => (
+        <Link
+          key={index}
+          href={link.href}
+          className="flex flex-col items-center justify-center w-12 h-12 text-blue-500">
+          <FontAwesomeIcon icon={link.icon} size={link.label ===''?"2x":"lg"} />
+          <span className="text-xs">{link.label}</span>
+        </Link>
+      ))}
+    </footer>
+  );
+};
+
+export default BottomShelf;
+```
+
+File: `app/dynamicItemForm/page.tsx`
+```tsx
+// app/dynamicItemForm/page.tsx
+import DynamicItemForm from "@/components/DynamicItemForm";
+
+export default function DynamicItemFormPage() {
+  return <DynamicItemForm itemType="car" />;
+}
+```
+
+### Branch Name:
+`feature/referral-links-custom-pages`
+
+Component Implementation
+File: `components/Referral.tsx`
+```tsx
+// components/Referral.tsx
+"use client";
+
+import React, { useState, useEffect, Suspense, useCallback } from 'react';
+import { supabase } from '../lib/supabaseClient';
+import { useAppContext } from '../context/AppContext';
+import { useTranslation } from 'react-i18next';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faUserPlus, faPaperPlane, faTrophy } from '@fortawesome/free-solid-svg-icons';
+import LoadingSpinner from "./ui/LoadingSpinner";
+import { Button } from "./ui/Button";
+import Input from "./ui/Input";
+
+const Referral: React.FC = () => {
+  const { user, updateUserReferrals, t  } = useAppContext();
+  const [referralName, setReferralName] = useState('');
+  const [referralCode, setReferralCode] = useState<string | null>(null);
+  const [inviteCount, setInviteCount] = useState(0);
+  const [isUpdating, setIsUpdating] = useState(false);
+
+  useEffect(() => {
+    fetchReferralData();
+  }, [user]);
+
+  const fetchReferralData = async () => {
+    if (!user) return;
+
+    try {
+      const defaultReferralName = user.ref_code ? user.ref_code : user.telegram_username;
+      setReferralName(defaultReferralName || '');
+
+      if (!user.ref_code) {
+        const newReferralCode = await generateReferralCode(defaultReferralName);
+        setReferralCode(newReferralCode);
+      } else {
+        setReferralCode(user.ref_code);
+      }
+
+      const count = await getInviteCount(user.ref_code);
+      setInviteCount(count);
+
+    } catch (error) {
+      console.error('Error fetching referral data:', error);
+    }
+  };
+
+  const generateReferralCode = async (defaultReferralName: string) => {
+    try {
+      const newReferralCode = `${defaultReferralName}-${Date.now()}`;
+      const { error } = await supabase
+        .from('users')
+        .update({ ref_code: newReferralCode })
+        .eq('id', user?.id);
+
+      if (error) throw error;
+      return newReferralCode;
+
+    } catch (error) {
+      console.error('Error generating referral code:', error);
+      throw error;
+    }
+  };
+
+  const getInviteCount = async (referralCode: string | null) => {
+    if (!referralCode) return 0;
+
+    try {
+      const { count, error } = await supabase
+        .from('referrals')
+        .select('*', { count: 'exact' })
+        .eq('ref_code', referralCode);
+
+      if (error) throw error;
+      return count || 0;
+
+    } catch (error) {
+      console.error('Error fetching invite count:', error);
+      return 0;
+    }
+  };
+
+  const handleSendInvite = useCallback(async () => {
+    if (!referralCode) return;
+
+    try {
+      const inviteLink = `https://t.me/oneSitePlsBot/vip?ref=${referralCode}`;
+      await navigator.clipboard.writeText(inviteLink);
+
+      await sendTelegramInvite(referralCode);
+
+    } catch (error) {
+      console.error('Error sending invite:', error);
+    }
+  }, [referralCode]);
+
+  const handleReferralNameChange = async (newName: string) => {
+    if (newName.trim() === '' || isUpdating) return;
+
+    setIsUpdating(true);
+
+    try {
+      const newReferralCode = await generateReferralCode(newName);
+      setReferralCode(newReferralCode);
+      setReferralName(newName);
+      updateUserReferrals(newReferralCode);
+
+    } catch (error) {
+      console.error('Error updating referral name:', error);
+
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const sendTelegramInvite = useCallback(async (referralCode: string) => {
+    if (!process.env.NEXT_PUBLIC_BOT_TOKEN || !user) {
+      console.error('Bot token is missing');
+      return;
+    }
+
+    const botToken = process.env.NEXT_PUBLIC_BOT_TOKEN;
+    const inviteLink = `https://t.me/oneSitePlsBot/vip?ref=${referralCode}`;
+    const url = new URL(`https://api.telegram.org/bot${botToken}/sendMessage`);
+    const message = `${t('playWithUs')} ${user.telegram_username} ! 🎮✨`;
+
+    url.searchParams.append("chat_id", user.telegram_id.toString());
+    url.searchParams.append("text", message);
+    url.searchParams.append("reply_markup", JSON.stringify({
+      inline_keyboard: [
+        [{ text: t("startPlaying"), url: inviteLink }],
+        [{ text: t("visitSite"), url: "https://oneSitePls.framer.ai" }],
+        [{ text: t("joinCommunity"), url: "https://t.me/aibotsites" }],
+        [{ text: t("youtubeChannel"), url: "https://youtube.com/@salavey13" }],
+      ],
+    }));
+
+    try {
+      const response = await fetch(url.toString());
+      if (!response.ok) throw new Error('Failed to send Telegram message');
+
+    } catch (error) {
+      console.error('Error sending Telegram message:', error);
+    }
+  }, [user]);
+
+  return (
+    <Suspense fallback={<LoadingSpinner />}>
+      <div className="p-6 bg-gray-800 rounded-lg shadow-lg">
+        <h1 className="text-2xl font-bold text-white mb-4">
+          <FontAwesomeIcon icon={faUserPlus} className="mr-2" />
+          {t('inviteFriend')}
+        </h1>
+        <div className="mb-4">
+          <label className="block text-gray-400 text-sm mb-1">
+            {t('referralName')}
+          </label>
+          <Input
+            value={referralName}
+            onChange={(e) => handleReferralNameChange(e.target.value)}
+            className="w-full bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            aria-label={t('referralName')}
+          />
+        </div>
+        <Button
+          onClick={handleSendInvite}
+          className="flex items-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition justify-center w-full"
+          aria-label={t('sendInvite')}
+          variant="outline"
+        >
+          <FontAwesomeIcon icon={faPaperPlane} className="mr-2" />
+          {t('sendInvite')}
+        </Button>
+        <div className="mt-6 text-center">
+          <FontAwesomeIcon icon={faTrophy} className="text-yellow-400 mb-2" />
+          <p className="text-gray-400">
+            {t('successfulInvites')}: {inviteCount}
+          </p>
+        </div>
+      </div>
+    </Suspense>
+  );
+};
+
+export default Referral;
+```
+
+Translation Keys
+```typescript
+export const translationKeys = {
+  en: {
+    inviteFriend: "Invite a Friend",
+    referralName: "Referral Name",
+    sendInvite: "Send Invite",
+    successfulInvites: "Successful Invites",
+    playWithUs: "Play with us,",
+    startPlaying: "Start Playing",
+    visitSite: "Visit our Site",
+    joinCommunity: "Join our Community",
+    youtubeChannel: "YouTube Channel"
+  },
+  ru: {
+    inviteFriend: "Пригласить друга",
+    referralName: "Имя реферала",
+    sendInvite: "Отправить приглашение",
+    successfulInvites: "Успешные приглашения",
+    playWithUs: "Играй с нами,",
+    startPlaying: "Начать игру",
+    visitSite: "Посетить сайт",
+    joinCommunity: "Присоединиться к сообществу",
+    youtubeChannel: "Канал YouTube"
+  },
+  ukr: {
+    inviteFriend: "Запросити друга",
+    referralName: "Ім'я реферала",
+    sendInvite: "Надіслати запрошення",
+    successfulInvites: "Успішні запрошення",
+    playWithUs: "Грай з нами,",
+    startPlaying: "Почати гру",
+    visitSite: "Відвідати сайт",
+    joinCommunity: "Приєднатись до спільноти",
+    youtubeChannel: "YouTube канал"
+  }
+};
+```
+
+### Supabase Tables:
+```sql
+CREATE TABLE referral_links (
+    id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
+    user_id bigint REFERENCES users(telegram_id) NOT NULL,
+    custom_page_url text NOT NULL,
+    ref_code text NOT NULL UNIQUE,
+    created_at timestamp with time zone DEFAULT current_timestamp NOT NULL
+);
+
+CREATE TABLE referral_rewards (
+    id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
+    referral_id uuid REFERENCES referral_links(id) NOT NULL,
+    user_id bigint REFERENCES users(telegram_id) NOT NULL,
+    reward_amount integer NOT NULL,
+    reward_date timestamp with time zone DEFAULT current_timestamp NOT NULL
+);
+```
+
+README.md Update
+```markdown
+## New Feature: Referral System for Custom Landing Pages
+
+- **Description**: This feature allows users to generate referral links for specific custom landing pages. These links can be shared via QR codes or direct Telegram messages. When a new client signs up and purchases a premium feature through the referral, the user who generated the link earns a reward.
+
+- **Usage**:
+  
+  ```tsx
+ ### Branch Name:
+`feature/telegram-payment-notification`
+
+---
+
+Component Implementation
+File: `components/PaymentNotification.tsx`
+
+```tsx
+// components/PaymentNotification.tsx
+"use client";
+
+import React, { useEffect, useState } from "react";
+import { useAppContext } from "@/context/AppContext";
+import { supabase } from "@/lib/supabaseClient";
+import Button from "@/components/ui/Button";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
+
+const PaymentNotification: React.FC = () => {
+  const { user, t } = useAppContext();
+  const [loading, setLoading] = useState(false);
+  const [notificationSent, setNotificationSent] = useState(false);
+
+  useEffect(() => {
+    if (user && !notificationSent) {
+      sendPaymentNotification();
+    }
+  }, [user]);
+
+  const sendPaymentNotification = async () => {
+    setLoading(true);
+
+    try {
+      const botToken = process.env.NEXT_PUBLIC_BOT_TOKEN;
+      if (!botToken) {
+        console.error("Bot token is missing");
+        return;
+      }
+
+      const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
+      const message = t("paymentSuccessMessage", {
+        username: user?.telegram_username,
+        activationDate: new Date().toLocaleDateString(),
+      });
+
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          chat_id: user?.telegram_id,
+          text: message,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to send Telegram message");
+      }
+
+      setNotificationSent(true);
+    } catch (error) {
+      console.error("Error sending Telegram message:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="p-6 bg-gray-800 rounded-lg shadow-lg">
+      {loading ? (
+        <LoadingSpinner />
+      ) : notificationSent ? (
+        <p className="text-green-500">{t("notificationSent")}</p>
+      ) : (
+        <Button onClick={sendPaymentNotification} className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
+          {t("resendNotification")}
+        </Button>
+      )}
+    </div>
+  );
+};
+
+export default PaymentNotification;
+```
+
+---
+
+Translation Keys
+```typescript
+export const translations = {
+  en: {
+    paymentSuccessMessage: "Hello, {username}! Your payment was successful. Your premium access will be activated by {activationDate}.",
+    notificationSent: "Notification sent successfully!",
+    resendNotification: "Resend Notification",
+  },
+  ru: {
+    paymentSuccessMessage: "Привет, {username}! Ваш платеж был успешным. Премиум доступ будет активирован к {activationDate}.",
+    notificationSent: "Уведомление успешно отправлено!",
+    resendNotification: "Отправить уведомление снова",
+  },
+  ukr: {
+    paymentSuccessMessage: "Привіт, {username}! Ваш платіж пройшов успішно. Преміум доступ буде активовано до {activationDate}.",
+    notificationSent: "Повідомлення успішно надіслано!",
+    resendNotification: "Відправити повідомлення ще раз",
+  },
+};
+```
+
+---
+
+### Supabase Tables:
+**New Table:** `public.payment_notifications`
+
+```sql
+CREATE TABLE public.payment_notifications (
+  id BIGINT GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+  user_id BIGINT REFERENCES public.users(telegram_id) NOT NULL,
+  notification_sent BOOLEAN NOT NULL DEFAULT FALSE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL
+);
+```
+
+---
+README.md Update
+```markdown
+## New Feature: Payment Notification via Telegram Bot
+
+### Description:
+This component automatically sends a payment confirmation notification to the user via Telegram after they complete a crypto payment. The notification includes details about when their premium access will be activated.
+
+### Usage:
+```tsx
+import PaymentNotification from "@/components/PaymentNotification";
+
+const App = () => {
+  return <PaymentNotification />;
+};
+
+export default App;
+```
+
+### Additional Notes:
+- Ensure that the environment variable `NEXT_PUBLIC_BOT_TOKEN` is set with the appropriate Telegram bot token.
+- The component integrates with the existing AppContext to fetch user information and sends a message to their associated Telegram account.
+```
+
+---
+
+### `bottomShelf.tsx` and Page Implementation:
+
+File: `components/ui/bottomShelf.tsx`
+```tsx
+// components/ui/bottomShelf.tsx
+"use client";
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faHome, faList, faPlus, faBell, faUser, faCalendarPlus, faLightbulb } from "@fortawesome/free-solid-svg-icons";
+import { useAppContext } from "@/context/AppContext";
+
+export interface NavigationLink {
+  href: string;
+  icon: any;
+  label: string;
+}
+
+const BottomShelf: React.FC = () => {
+  const pathname = usePathname();
+  const { t } = useAppContext();
+
+  const navigationLinks: NavigationLink[] = [
+    { href: "/", icon: faHome, label: t("home") },
+    { href: "/admin", icon: faList, label: t("admin") },
+    { href: "/createEvent", icon: faCalendarPlus, label: "" },
+    { href: "/referral", icon: faPlus, label: t("referral") },
+    { href: "/notifications", icon: faBell, label: t("notifications") }, // Newly added item
+    { href: "/dev", icon: faLightbulb, label: t("dev") },
+  ];
+
+  return (
+    <footer className="fixed bottom-0 left-0 w-full h-16 bg-gray-900 text-white flex justify-around items-center z-20 backdrop-blur-lg shadow-lg">
+      {navigationLinks.map((link, index) => (
+        <Link key={index} href={link.href} className="flex flex-col items-center justify-center w-12 h-12 text-blue-500">
+          <FontAwesomeIcon icon={link.icon} size={link.label === "" ? "2x" : "lg"} />
+          <span className="text-xs">{link.label}</span>
+        </Link>
+      ))}
+    </footer>
+  );
+};
+
+export default BottomShelf;
+```
+
+File: `app/notifications/page.tsx`
+```tsx
+// app/notifications/page.tsx
+import PaymentNotification from "@/components/PaymentNotification";
+
+export default function NotificationsPage() {
+  return <PaymentNotification />;
+}
+```
