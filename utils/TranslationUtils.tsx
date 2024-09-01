@@ -364,6 +364,16 @@ export const useTranslation = () => {
     // Buttons
     upload: "Upload",
     rent: "Rent",
+    rentsTitle: "My Rentals",
+    addNewItem: "Add New Item",
+    activeRentals: "Active Rentals",
+    itemTitle: "Item Title",
+    rentStart: "Rent Start",
+    rentEnd: "Rent End",
+    newItems: "New Items",
+    creatorShop: "Creator's Shop",
+    addNewItemTitle: "Add a New Item",
+    addNewItemDescription: "Fill in the details for the new item",
   },
   ru: {
     rent: "Аренда",
@@ -547,11 +557,21 @@ contributorsLabel: "Соавторы",
     defaultLabel: "ХЗ",
     disableOptionLabel: "Услугу не предоставляю",
   
+    rentsTitle: "Мои Аренды",
+    addNewItem: "Добавить Новый Элемент",
+    activeRentals: "Активные Аренды",
+    itemTitle: "Название Элемента",
+    rentStart: "Начало Аренды",
+    rentEnd: "Конец Аренды",
+    newItems: "Новые Элементы",
+    creatorShop: "Магазин Создателя",
+    addNewItemTitle: "Добавить Новый Элемент",
+    addNewItemDescription: "Заполните детали для нового элемента",
     formTypes: {
       evo: "Эвакуатор",
-      car: "Автомобиль",
+      car: "Машина",
       motorbike: "Мотоцикл",
-      bicycle: "Велосипед",
+      bicycle: "Велосипед"
     },
   
     // Form Labels
@@ -754,11 +774,21 @@ contributorsLabel: "Учасники",
     saveAndContinueInTelegram: "Зберегти та продовжити в Telegram",
     disableOptionLabel: "Сервіс не надається",
     
+    rentsTitle: "Мої Оренди",
+    addNewItem: "Додати Новий Елемент",
+    activeRentals: "Активні Оренди",
+    itemTitle: "Назва Елемента",
+    rentStart: "Початок Оренди",
+    rentEnd: "Кінець Оренди",
+    newItems: "Нові Елементи",
+    creatorShop: "Магазин Творця",
+    addNewItemTitle: "Додати Новий Елемент",
+    addNewItemDescription: "Заповніть деталі для нового елемента",
     formTypes: {
       evo: "Евакуатор",
-      car: "Автомобіль",
+      car: "Машина",
       motorbike: "Мотоцикл",
-      bicycle: "Велосипед",
+      bicycle: "Велосипед"
     },
   
     // Form Labels
