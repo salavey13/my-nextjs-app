@@ -296,6 +296,16 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     initTelegramWebApp();
   }, [user?.id]);
 
+  useEffect(() => {
+    if (searchParams) {
+      const refItemId = searchParams.get('ref_item');
+      if (refItemId) {
+        //router.push(`/rents?item=${refItemId}`);
+        // Store item ID in context or any other way to open the modal with preloaded data
+      }
+    }
+  }, [searchParams]);
+
   const setupTelegramBackButton = () => {
     const backButton = window.Telegram?.WebApp?.BackButton;
     if (backButton) {

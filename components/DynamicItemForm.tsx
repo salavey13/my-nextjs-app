@@ -1,3 +1,4 @@
+//components/DynamicItemForm.tsx
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -155,8 +156,7 @@ const DynamicItemForm: React.FC<DynamicItemFormProps> = ({ itemType }) => {
 
       const { error } = await supabase
         .from("items")
-        .insert({ type: itemType, data: itemData, user_id: user?.id });
-
+        .insert({ item_type: itemType, details: itemData, user_ref_code: user?.ref_code, title: itemData.ad_info.title });
       if (error) throw error;
 
       alert(t("itemAddedSuccessfully"));
@@ -172,7 +172,7 @@ const DynamicItemForm: React.FC<DynamicItemFormProps> = ({ itemType }) => {
     try {
       const { data, error } = await supabase
         .from("items")
-        .insert({ type: itemType, data: {}, user_id: null }) // Save draft
+        .insert({ item_type: itemType, details: {}, creator_ref_code: "anon", title: "Temp" }) // Save draft
         .select("id")
         .single();
 
@@ -286,13 +286,11 @@ const DynamicItemForm: React.FC<DynamicItemFormProps> = ({ itemType }) => {
                     onCheckedChange={handleAgreementCheckboxChange}
                     label=""//{field.label}
                     className="mr-2"
-                  />
+                  /><FormFooter />
                 </div>
               ))}
             </div>
           )}
-
-          <FormFooter />
 
           {/* Submit Button */}
           <Button

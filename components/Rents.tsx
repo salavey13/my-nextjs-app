@@ -89,10 +89,10 @@ export default function Rents() {
 
   return (
     <div className="w-full min-h-screen bg-muted/40 flex flex-col p-4 overflow-auto">
-      <div className="flex flex-col mb-4">
+      <div className="flex flex-col">
         <iframe
           width="100%"
-          height="315"
+          height="690"
           src="https://excellent-lots-147907.framer.app"//{topEmbedUrl}
           title="Top Embed"
           frameBorder="0"
@@ -100,7 +100,7 @@ export default function Rents() {
         ></iframe>
       </div>
 
-      <div className="flex justify-between items-center mb-4">
+      <div className="flex justify-between items-center mb-4 mt-4">
         <h1 className="text-3xl font-bold">{t("rentsTitle")}</h1>
         <Button onClick={handleOpenNewItemModal} variant="default">
           {t("addNewItem")}
@@ -172,7 +172,7 @@ export default function Rents() {
 
       <Dialog open={newItemModalOpen} onOpenChange={handleCloseNewItemModal}>
         <DialogContent
-            className="max-h-screen overflow-y-auto flex-grow pt-[64px] pb-[64px] min-h-[calc(100vh-128px)] overflow-y-auto backdrop-blur-lg"
+            className="max-h-[calc(100vh-113px)] overflow-y-auto flex-grow min-h-[calc(100vh-128px)]  overflow-y-auto backdrop-blur-lg"
         >
             <DialogHeader>
             <DialogTitle>{t("addNewItemTitle")}</DialogTitle>
@@ -202,6 +202,13 @@ export default function Rents() {
                 className="bg-blue-500 text-white p-2 rounded"
             >
                 {t("formTypes.bicycle")}
+            </Button>
+            <Button
+                onClick={() => handleButtonClick("dota2")}
+                className="bg-blue-500 text-white p-2 rounded hover:text-white"
+                variant="destructive"
+            >
+                {t("formTypes.dota2")}
             </Button>
             </div>
             <DynamicItemForm itemType={itemType} />

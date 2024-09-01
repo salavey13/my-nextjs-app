@@ -342,6 +342,7 @@ export const useTranslation = () => {
       car: "Car",
       motorbike: "Motorbike",
       bicycle: "Bicycle",
+      dota2: "Dota 2",
     },
   
     // Form Labels
@@ -571,7 +572,8 @@ contributorsLabel: "Соавторы",
       evo: "Эвакуатор",
       car: "Машина",
       motorbike: "Мотоцикл",
-      bicycle: "Велосипед"
+      bicycle: "Велосипед",
+      dota2: "Dota 2",
     },
   
     // Form Labels
@@ -788,7 +790,8 @@ contributorsLabel: "Учасники",
       evo: "Евакуатор",
       car: "Машина",
       motorbike: "Мотоцикл",
-      bicycle: "Велосипед"
+      bicycle: "Велосипед",
+      dota2: "Dota 2",
     },
   
     // Form Labels

@@ -4,7 +4,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faKeyboard, faStar, faGlobe, faHome, faList, faPlus, faBell, faUser, faCalendarPlus, faLightbulb } from '@fortawesome/free-solid-svg-icons';
+import { faKeyboard, faStar, faGlobe, faHome, faList, faPlus, faBell, faUser, faCalendarPlus, faLightbulb, faCrown } from '@fortawesome/free-solid-svg-icons';
 import { useAppContext } from "@/context/AppContext";
 
 export interface NavigationLink {
@@ -18,12 +18,12 @@ const BottomShelf: React.FC = () => {
   const { t } = useAppContext();
 
   const navigationLinks: NavigationLink[] = [    //{ href: '/paymentnotification', icon: faLightbulb, label: t('paymentnotification') },
-    { href: '/dynamicitemform', icon: faLightbulb, label: t('dynamicitemform') },
+    { href: '/dynamicitemform', icon: faList, label: t('') },
     //{ href: '/qrcodeform', icon: faLightbulb, label: t('qrcodeform') },
     //{ href: '/cryptopayment', icon: faLightbulb, label: t('cryptopayment') },
     { href: '/rent', icon: faStar, label: t('rent') },
     { href: '/', icon: faHome, label: t('home') },
-    { href: '/admin', icon: faList, label: t('admin') },
+    { href: '/admin', icon: faCrown, label: t('admin') },
     { href: '/referral', icon: faLightbulb, label: t('referral') },
     { href: '/createEvent', icon: faCalendarPlus, label: '' },
     //{ href: '/notifications', icon: faBell, label: t('notifications') },
