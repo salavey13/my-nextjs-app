@@ -14,40 +14,38 @@ export default function DynamicItemFormPage() {
 
   return (
     <div className="p-4">
-      <div className="grid grid-cols-2 gap-4 mb-4">
-      <div className="grid grid-cols-2 gap-4 mb-4">
-                <Button
-                    onClick={() => handleButtonClick("evo")}
-                    className="bg-blue-500 text-white p-2 rounded"
-                >
-                    {t("formTypes.evo")}
-                </Button>
-                <Button
-                    onClick={() => handleButtonClick("car")}
-                    className="bg-blue-500 text-white p-2 rounded"
-                >
-                    {t("formTypes.car")}
-                </Button>
-                <Button
-                    onClick={() => handleButtonClick("motorbike")}
-                    className="bg-blue-500 text-white p-2 rounded"
-                >
-                    {t("formTypes.motorbike")}
-                </Button>
-                <Button
-                    onClick={() => handleButtonClick("bicycle")}
-                    className="bg-blue-500 text-white p-2 rounded"
-                >
-                    {t("formTypes.bicycle")}
-                </Button>
-                <Button
-                    onClick={() => handleButtonClick("dota2")}
-                    className="bg-blue-500 text-white p-2 rounded hover:text-white"
-                    variant="destructive"
-                >
-                    {t("formTypes.dota2")}
-                </Button>
-            </div>
+      <div className="flex justify-around items-center mb-4">
+          <Button
+              onClick={() => handleButtonClick("evo")}
+              className="bg-blue-500 text-white p-2 rounded"
+          >
+              {t("formTypes.evo")}
+          </Button>
+          <Button
+              onClick={() => handleButtonClick("car")}
+              className="bg-blue-500 text-white p-2 rounded"
+          >
+              {t("formTypes.car")}
+          </Button>
+          <Button
+              onClick={() => handleButtonClick("motorbike")}
+              className="bg-blue-500 text-white p-2 rounded"
+          >
+              {t("formTypes.motorbike")}
+          </Button>
+          <Button
+              onClick={() => handleButtonClick("bicycle")}
+              className="bg-blue-500 text-white p-2 rounded"
+          >
+              {t("formTypes.bicycle")}
+          </Button>
+          <Button
+              onClick={() => handleButtonClick("dota2")}
+              className="bg-blue-500 text-white p-2 rounded hover:text-white"
+              variant="destructive"
+          >
+              {t("formTypes.dota2")}
+          </Button>
       </div>
 
       <DynamicItemForm itemType={itemType} />
