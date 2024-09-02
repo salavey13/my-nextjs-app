@@ -1,11 +1,8 @@
-// components/PaymentComponent.tsx
-
-import { FC, useState, useEffect } from "react";
+import { FC, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input"; // Assuming you have this Input component
-import { useAppContext } from "@/context/AppContext"; // Adjust import according to your file structure
-import { t } from "i18next"; // Assuming you're using i18next for translation
-import { supabase } from "../lib/supabaseClient"; // Import the Supabase client
+import { Input } from "@/components/ui/input";
+import { useAppContext } from "../context/AppContext";
+import { supabase } from "../lib/supabaseClient";
 
 interface PaymentComponentProps {
   item: Item;
@@ -15,92 +12,82 @@ const PaymentComponent: FC<PaymentComponentProps> = ({ item }) => {
   const [startDate, setStartDate] = useState<string>(new Date().toISOString().split('T')[0]);
   const [endDate, setEndDate] = useState<string>(new Date(new Date().setDate(new Date().getDate() + 1)).toISOString().split('T')[0]);
   const [totalPrice, setTotalPrice] = useState<number>(0);
-  const [tonPrice, setTonPrice] = useState<number>(1); // TON price in RUB
-  const [rubPrice, setRubPrice] = useState<number>(0.01); // RUB price in USD
-  const { user, t } = useAppContext(); // Assuming useAppContext provides user
-
-  // Example fetch function to get exchange rates (replace with real API calls)
-  const fetchCurrentPrices = async () => {
-    // Use a real API for exchange rates
-    setTonPrice(1); // Assuming 1 TON = 1 RUB
-    setRubPrice(0.01); // Example RUB to USD rate
-  };
-
-  useEffect(() => {
-    fetchCurrentPrices();
-  }, []);
+  const { user, t } = useAppContext();
 
   const calculatePrice = () => {
     const start = new Date(startDate);
     const end = new Date(endDate);
     const days = (end.getTime() - start.getTime()) / (1000 * 3600 * 24);
 
-    // Assuming `item.details` contains price per day in RUB
-    const pricePerDayRUB = item.details?.general_info.price || 0;
-    
-    // Convert price to TON
-    const pricePerDayUSD = pricePerDayRUB * rubPrice; // Convert RUB to USD
-    const pricePerDayTON = pricePerDayUSD / tonPrice; // Convert USD to TON
-    
-    setTotalPrice(days * pricePerDayTON);
+    // Assuming `item.details.general_info.price` is in TON per day
+    const pricePerDay = item.details?.general_info.price || 0;
+    setTotalPrice(days * pricePerDay);
   };
 
   const handlePayment = async () => {
-    // Create the payment link from the user's wallet to the target wallet
-    const targetWallet = item.creator_ref_code; // Replace with the actual target wallet address
-    const paymentLink = `ton://transfer/${user?.ton_wallet}?amount=${totalPrice}&to=${targetWallet}`;
-    
-    // Save rent to the database
-    await saveRentToDatabase();
-    
-    // Open payment link
-    window.open(paymentLink, '_blank');
-  };
+    if (!user) {
+      console.error("User is not logged in");
+      return;
+    }
 
-  const saveRentToDatabase = async () => {
-    const { data, error } = await supabase
+    const { data: userData, error: userError } = await supabase
+      .from('users')
+      .select('ton_wallet')
+      .eq('telegram_id', user.telegram_id)
+      .single();
+
+    if (userError) {
+      console.error("Error fetching user data:", userError);
+      return;
+    }
+
+    const targetWallet = item.creator_ref_code; // Adjust according to your setup
+
+    // Save to the rents table
+    const { error: insertError } = await supabase
       .from('rents')
       .insert({
-        user_id: user?.telegram_id, // Adjust field names as per your database schema
-        rent_start: startDate,
-        rent_end: endDate,
-        item_id: item.id,
+        user_id: user.telegram_id,
+        rent_start: new Date(startDate).toISOString(),
+        rent_end: new Date(endDate).toISOString(),
         status: 'unpaid',
+        item_id: item.id
       });
 
-    if (error) {
-      console.error('Failed to save rent to database:', error.message);
-    } else {
-      console.log('Rent saved successfully:', data);
+    if (insertError) {
+      console.error("Error inserting rent:", insertError);
+      return;
     }
+
+    // Create the payment link
+    const paymentLink = `ton://transfer/${userData.ton_wallet}?amount=${totalPrice}&to=${targetWallet}`;
+    window.open(paymentLink, '_blank');
   };
 
   return (
     <div className="mt-4">
-      <label>{t('rentStartDate')}</label>
+      <label className="mt-4">{t('rentStartDate')}</label>
       <Input
         type="date"
         value={startDate}
         onChange={(e) => setStartDate(e.target.value)}
-        className="border p-2 w-full"
       />
 
-      <label>{t('rentEndDate')}</label>
-      <Input
+      <label className="mt-4">{t('rentEndDate')}</label>
+      <Input 
         type="date"
         value={endDate}
         onChange={(e) => setEndDate(e.target.value)}
-        className="border p-2 w-full"
       />
 
-      <Button onClick={calculatePrice} className="mt-2 bg-blue-500 text-white">
+      <Button onClick={calculatePrice} variant="outline" className="mt-4 bg-blue-500 text-white p-2 rounded">
         {t('calculatePrice')}
       </Button>
 
       {totalPrice > 0 && (
         <div className="mt-4">
           <p>{t('totalPrice')}: {totalPrice.toFixed(2)} TON</p>
-          <Button onClick={handlePayment} className="mt-2 bg-green-500 text-white">
+          <Button onClick={handlePayment} variant="outline" className="mt-4 bg-green-500 text-white p-2 rounded">
             {t('proceedToPayment')}
           </Button>
         </div>

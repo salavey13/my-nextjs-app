@@ -47,10 +47,421 @@ const Dev: React.FC = () => {
   const [step, setStep] = useState<number>(0);  // Tracking the current step
   const [branchName, setBranchName] = useState<string | null>(null);
 
+// Handle the creation of the zero stage request
+const handleZeroStageRequestType = () => {
+    const zeroStageRequest = 
+    `Please create item type description similar to existing for the following idea of a task/rent/item "${ideaText} ":
+{
+  "ad_info": {
+    "title": "Информация об объявлении",
+    "fields": [
+      {
+        "name": "title",
+        "type": "text",
+        "label": "Заголовок объявления",
+        "max_length": 50,
+        "placeholder": "Не более 50 символов"
+      },
+      {
+        "name": "description",
+        "type": "textarea",
+        "label": "Описание объявления",
+        "max_length": 50,
+        "placeholder": "Не более 50 символов"
+      }
+    ]
+  },
+  "pricing": {
+    "title": "Цены",
+    "fields": [
+      {
+        "name": "cars",
+        "type": "number",
+        "label": "Легковые автомобили",
+        "placeholder": "TON",
+        "disabled_option": "Услугу не оказываю",
+        "disable_checkbox": true
+      },
+      {
+        "name": "motorcycles",
+        "type": "number",
+        "label": "Мототехника",
+        "placeholder": "TON",
+        "disabled_option": "Услугу не оказываю",
+        "disable_checkbox": true
+      },
+      {
+        "name": "suvs",
+        "type": "number",
+        "label": "Внедорожник",
+        "placeholder": "TON",
+        "disabled_option": "Услугу не оказываю",
+        "disable_checkbox": true
+      },
+      {
+        "name": "minibus",
+        "type": "number",
+        "label": "Микроавтобус",
+        "placeholder": "TON",
+        "disabled_option": "Услугу не оказываю",
+        "disable_checkbox": true
+      },
+      {
+        "name": "suburban_tariff",
+        "type": "number",
+        "label": "Загородный тариф",
+        "placeholder": "TON/км",
+        "disabled_option": "Услугу не оказываю",
+        "disable_checkbox": true
+      }
+    ]
+  },
+  "agreement": {
+    "title": "Согласие",
+    "fields": [
+      {
+        "name": "consent",
+        "type": "checkbox",
+        "label": "Я соглашаюсь с правилами использования сервиса, а также с передачей и обработкой моих данных в oneSitePls. Я подтверждаю своё совершеннолетие и ответственность за размещение"
+      }
+    ]
+  },
+  "general_info": {
+    "title": "Общая информация",
+    "fields": [
+      {
+        "name": "city",
+        "type": "dropdown",
+        "label": "Выберите город",
+        "options": [
+          "Москва",
+          "Санкт-Петербург",
+          "Новосибирск"
+        ],
+        "placeholder": "Москва"
+      },
+      {
+        "name": "name",
+        "type": "text",
+        "label": "Ваше имя",
+        "placeholder": "Введите ваше имя"
+      },
+      {
+        "name": "mobile_number",
+        "type": "text",
+        "label": "Номер мобильного телефона",
+        "placeholder": "+7 (999) 999 99 99"
+      },
+      {
+        "name": "landline_number",
+        "type": "text",
+        "label": "Номер городского телефона",
+        "placeholder": "+7 (999) 999 99 99"
+      },
+      {
+        "name": "email",
+        "type": "text",
+        "label": "Ваш email",
+        "placeholder": "example@gmail.com"
+      },
+      {
+        "name": "parking_address",
+        "type": "text",
+        "label": "Адрес стоянки эвакуатора",
+        "placeholder": "Введите адрес стоянки"
+      }
+    ]
+  },
+  "photo_upload": {
+    "title": "Фото",
+    "fields": [
+      {
+        "name": "photo",
+        "type": "file",
+        "label": "Прикрепите фотографию к объявлению",
+        "button_text": "Загрузить"
+      }
+    ]
+  }
+}
+  
+{
+  "ad_info": {
+    "title": "Информация об объявлении",
+    "fields": [
+      {
+        "name": "title",
+        "type": "text",
+        "label": "Заголовок объявления",
+        "max_length": 50,
+        "placeholder": "Не более 50 символов"
+      },
+      {
+        "name": "description",
+        "type": "textarea",
+        "label": "Описание объявления",
+        "max_length": 50,
+        "placeholder": "Не более 50 символов"
+      }
+    ]
+  },
+  "pricing": {
+    "title": "Цены",
+    "fields": [
+      {
+        "name": "cars",
+        "type": "number",
+        "label": "Легковые автомобили",
+        "placeholder": "TON",
+        "disabled_option": "Услугу не оказываю",
+        "disable_checkbox": true
+      },
+      {
+        "name": "motorcycles",
+        "type": "number",
+        "label": "Мототехника",
+        "placeholder": "TON",
+        "disabled_option": "Услугу не оказываю",
+        "disable_checkbox": true
+      },
+      {
+        "name": "suvs",
+        "type": "number",
+        "label": "Внедорожник",
+        "placeholder": "TON",
+        "disabled_option": "Услугу не оказываю",
+        "disable_checkbox": true
+      },
+      {
+        "name": "minibus",
+        "type": "number",
+        "label": "Микроавтобус",
+        "placeholder": "TON",
+        "disabled_option": "Услугу не оказываю",
+        "disable_checkbox": true
+      },
+      {
+        "name": "suburban_tariff",
+        "type": "number",
+        "label": "Загородный тариф",
+        "placeholder": "руб/км",
+        "disabled_option": "Услугу не оказываю",
+        "disable_checkbox": true
+      }
+    ]
+  },
+  "agreement": {
+    "title": "Согласие",
+    "fields": [
+      {
+        "name": "consent",
+        "type": "checkbox",
+        "label": "Я соглашаюсь с правилами использования сервиса, а также с передачей и обработкой моих данных в oneSitePls. Я подтверждаю своё совершеннолетие и ответственность за размещение"
+      }
+    ]
+  },
+  "general_info": {
+    "title": "Общая информация",
+    "fields": [
+      {
+        "name": "city",
+        "type": "dropdown",
+        "label": "Выберите город",
+        "options": [
+          "Москва",
+          "Санкт-Петербург",
+          "Новосибирск"
+        ],
+        "placeholder": "Москва"
+      },
+      {
+        "name": "name",
+        "type": "text",
+        "label": "Ваше имя",
+        "placeholder": "Введите ваше имя"
+      },
+      {
+        "name": "mobile_number",
+        "type": "text",
+        "label": "Номер мобильного телефона",
+        "placeholder": "+7 (999) 999 99 99"
+      },
+      {
+        "name": "landline_number",
+        "type": "text",
+        "label": "Номер городского телефона",
+        "placeholder": "+7 (999) 999 99 99"
+      },
+      {
+        "name": "email",
+        "type": "text",
+        "label": "Ваш email",
+        "placeholder": "example@gmail.com"
+      },
+      {
+        "name": "parking_address",
+        "type": "text",
+        "label": "Адрес стоянки эвакуатора",
+        "placeholder": "Введите адрес стоянки"
+      }
+    ]
+  },
+  "photo_upload": {
+    "title": "Фото",
+    "fields": [
+      {
+        "name": "photo",
+        "type": "file",
+        "label": "Прикрепите фотографию к объявлению",
+        "button_text": "Загрузить"
+      }
+    ]
+  }
+}
 
+Example for Dota 2 personal lesson:) Please imagine some funny paid experience in dota)):
+{
+  "lesson_info": {
+    "title": "Информация о занятии",
+    "fields": [
+      {
+        "name": "title",
+        "type": "text",
+        "label": "Название занятия",
+        "max_length": 50,
+        "placeholder": "Например: 'Мастер-класс по Pudge'"
+      },
+      {
+        "name": "description",
+        "type": "textarea",
+        "label": "Описание занятия",
+        "max_length": 100,
+        "placeholder": "Опишите, чему вы будете учить (например: 'Как не фидить на миде')"
+      }
+    ]
+  },
+  "pricing": {
+    "title": "Цены",
+    "fields": [
+      {
+        "name": "solo_lesson",
+        "type": "number",
+        "label": "Индивидуальное занятие",
+        "placeholder": "TON",
+        "disabled_option": "Услугу не оказываю",
+        "disable_checkbox": true
+      },
+      {
+        "name": "party_lesson",
+        "type": "number",
+        "label": "Занятие для пати (до 5 игроков)",
+        "placeholder": "TON",
+        "disabled_option": "Услугу не оказываю",
+        "disable_checkbox": true
+      },
+      {
+        "name": "in_game_coaching",
+        "type": "number",
+        "label": "Коучинг во время игры",
+        "placeholder": "TON/час",
+        "disabled_option": "Услугу не оказываю",
+        "disable_checkbox": true
+      },
+      {
+        "name": "replay_analysis",
+        "type": "number",
+        "label": "Анализ реплея",
+        "placeholder": "TON за один реплей",
+        "disabled_option": "Услугу не оказываю",
+        "disable_checkbox": true
+      },
+      {
+        "name": "meme_builds",
+        "type": "number",
+        "label": "Создание мемных билдов",
+        "placeholder": "TON",
+        "disabled_option": "Услугу не оказываю",
+        "disable_checkbox": true
+      }
+    ]
+  },
+  "agreement": {
+    "title": "Согласие",
+    "fields": [
+      {
+        "name": "consent",
+        "type": "checkbox",
+        "label": "Я соглашаюсь с тем, что мои MMR и нервы могут пострадать в процессе обучения, а также с передачей и обработкой моих данных в oneSitePls. Я подтверждаю своё совершеннолетие и готовность к Dota 2 мукам."
+      }
+    ]
+  },
+  "general_info": {
+    "title": "Общая информация",
+    "fields": [
+      {
+        "name": "username",
+        "type": "text",
+        "label": "Ваш ник в Dota 2",
+        "placeholder": "Введите ваш ник"
+      },
+      {
+        "name": "discord_tag",
+        "type": "text",
+        "label": "Ваш Discord тег",
+        "placeholder": "Например: Gamer#1234"
+      },
+      {
+        "name": "preferred_role",
+        "type": "dropdown",
+        "label": "Предпочитаемая роль",
+        "options": [
+          "Carry",
+          "Mid",
+          "Offlane",
+          "Support",
+          "Hard Support"
+        ],
+        "placeholder": "Выберите роль"
+      },
+      {
+        "name": "favorite_hero",
+        "type": "text",
+        "label": "Любимый герой",
+        "placeholder": "Введите имя героя"
+      },
+      {
+        "name": "tilt_level",
+        "type": "dropdown",
+        "label": "Уровень тильта",
+        "options": [
+          "Не тильтую",
+          "Немного тильтую",
+          "Всегда тильтую"
+        ],
+        "placeholder": "Выберите уровень"
+      }
+    ]
+  },
+  "photo_upload": {
+    "title": "Фото",
+    "fields": [
+      {
+        "name": "profile_picture",
+        "type": "file",
+        "label": "Прикрепите фото профиля (опционально)",
+        "button_text": "Загрузить"
+      }
+    ]
+  }
+}
+`
+    
+
+    setRequestText(zeroStageRequest);
+    setStep(1);  // Activate the next step
+  };
   // Handle the creation of the zero stage request
   const handleZeroStageRequest = () => {
-    //const zeroStageRequest = `Please rephrase the following idea for use in future development stages: "${ideaText}". Format it as a unified request, using best practices for clarity and completeness.`;
     
     const zeroStageRequest = 
     `You are provided with the attached codebase which contains the current state of the project. Your task is to:
@@ -827,6 +1238,13 @@ return (
           variant="outline"
         >
           {t('generateRequestButton')}
+        </Button>
+        <Button 
+          onClick={handleZeroStageRequestType} 
+          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+          variant="destructive"
+        >
+          {t('generateRequestButton')}4TYPE
         </Button>
       </div>
   

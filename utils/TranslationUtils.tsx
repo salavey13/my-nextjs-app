@@ -422,8 +422,34 @@ export const useTranslation = () => {
       calculatePrice: "Calculate Price",
       totalPrice: "Total Price",
       proceedToPayment: "Proceed to Payment",
-  },
+      itemDetailsTitle: "Item Details",
+      itemDetailsDescription: "Description",
+      gpt: "Failed to parse the JSON from your clipboard. Please ensure that the clipboard contains valid JSON. If you're unsure, visit the Dev page where you can use a specialized item type generation tool powered by GPT to create JSON that meets the requirements for adding new types here.",
+      newRentNotification: "Someone attempted to rent your item",
+      viewItem: "View Item"
+    },
+    ad_info: {
+      title_label: "Title",
+      description_label: "Description"
+    },
+    general_info: {
+      make_label: "Make",
+      year_label: "Year",
+      color_label: "Color",
+      model_label: "Model",
+      price_label: "Price"
+    },
+    photo_upload: {
+      photo_label: "Photo",
+      photo_alt: "Item Photo"
+    },
+    common: {
+      n_a: "N/A"
+    },
   ru: {
+    newRentNotification: "Кто-то пытался арендовать ваш предмет",
+      viewItem: "Просмотреть элемент",
+    gpt: "Не удалось распарсить JSON из буфера обмена. Пожалуйста, убедитесь, что в буфере обмена находится корректный JSON. Если возникают сомнения, посетите страницу разработчика, где можно воспользоваться специальным инструментом на базе GPT для генерации JSON, который соответствует требованиям для добавления новых типов здесь.",
     rent: "Аренда",
     saveAndContinueInTelegram: "Сохранить и продолжить в Telegram",
     paymentSuccessMessage: "Привет, {username}! Ваш платеж был успешным. Премиум доступ будет активирован к {activationDate}.",
@@ -656,6 +682,9 @@ contributorsLabel: "Соавторы",
     description: "Описание процесса оплаты"
   },
   ad_info: {
+    
+    title_label: "Название",
+    description_label: "Описание",
     title: "Информация об объявлении",
     fields: {
       title: "Заголовок объявления",
@@ -669,6 +698,11 @@ contributorsLabel: "Соавторы",
     },
   },
   general_info: {
+    make_label: "Марка",
+    year_label: "Год",
+    color_label: "Цвет",
+    model_label: "Модель",
+    price_label: "Цена",
     title: "Общая информация",
     fields: {
       make: "Марка",
@@ -680,6 +714,8 @@ contributorsLabel: "Соавторы",
     },
   },
   photo_upload: {
+    photo_label: "Фото",
+    photo_alt: "Фото предмета",
     title: "Фото",
     fields: {
       photo: "Фотография",
@@ -691,7 +727,13 @@ contributorsLabel: "Соавторы",
   totalPrice: "Общая цена",
   
   proceedToPayment: "Перейти к оплате",
+  itemDetailsTitle: "Cведения об элементе",
+      itemDetailsDescription: "Описание",
+
+  common: {
+    n_a: "Нет данных"
   },
+},
   ukr: {
     defaultLabel: "ХЗ",
     conflictAwarenessTitle: "Усвідомлення конфлікту та гуманітарна підтримка",
@@ -917,13 +959,14 @@ contributorsLabel: "Учасники",
   cryptoManagement: "Управління криптовалютою",
   site: "Сайт",
   telegramUsername: "Ім'я користувача в Telegram",
-  walletAddress: "Адреса гаманця"
-  },
+  walletAddress: "Адреса гаманця",
   payment: {
     title: "Payment",
     description: "Description of payment process"
   },
   ad_info: {
+    title_label: "Назва",
+    description_label: "Опис",
     title: "Ad information",
     fields: {
       title: "Ad title",
@@ -933,10 +976,15 @@ contributorsLabel: "Учасники",
   agreement: {
     title: "Consent",
     fields: {
-consent: "I agree with the terms of use of the service...",
+        consent: "I agree with the terms of use of the service...",
     },
   },
 general_info: {
+    make_label: "Марка",
+    year_label: "Рік",
+    color_label: "Колір",
+    model_label: "Модель",
+    price_label: "Ціна",
     title: "General information",
     fields: {
       make: "Brand",
@@ -948,14 +996,26 @@ general_info: {
     },
   },
   photo_upload: {
+    photo_label: "Фото",
+    photo_alt: "Фото предмета",
     title: "Photo",
     fields: {
-photo: "Photography",
+        photo: "Photography",
     },
+    
   },
   rentStartDate: "Дата початку оренди",
       rentEndDate: "Дата закінчення оренди",
       calculatePrice: "Обчислити ціну",
       totalPrice: "Загальна ціна",
       proceedToPayment: "Перейти до оплати",
+      itemDetailsTitle: "Назва подробиць елемента",
+      itemDetailsDescription: "Опис подробиць елемента",
+      gpt: "Не вдалося розібрати JSON з буфера обміну. Будь ласка, переконайтеся, що в буфері обміну знаходиться коректний JSON. Якщо у вас є сумніви, відвідайте сторінку розробника, де ви можете скористатися спеціальним інструментом для генерації типів елементів на основі GPT, щоб створити JSON, який відповідатиме вимогам для додавання нових типів тут.",
+      newRentNotification: "Хтось намагався орендувати ваш товар",
+      viewItem: "Переглянути елемент",
+      common: {
+        n_a: "Немає даних",
+      },
+    }
 };
