@@ -382,7 +382,46 @@ export const useTranslation = () => {
     cryptoManagement: "Crypto Management",
     site: "Site",
     telegramUsername: "Telegram Username",
-    walletAddress: "Wallet Address"
+    walletAddress: "Wallet Address",
+    payment: {
+        title: "Payment",
+        description: "Description of the payment process"
+      },
+      ad_info: {
+        title: "Ad information",
+        fields: {
+          title: "Ad title",
+          description: "Ad description",
+        },
+      },
+      agreement: {
+        title: "Consent",
+        fields: {
+    consent: "I agree with the terms of use of the service...",
+        },
+      },
+      general_info: {
+        title: "General information",
+        fields: {
+          make: "Brand",
+          model: "Model",
+          year: "Year of issue",
+          color: "Color",
+          price: "Price",
+          mileage: "Mileage",
+        },
+      },
+      photo_upload: {
+        title: "Photo",
+        fields: {
+    photo: "Photography",
+        },
+      },
+      rentStartDate: "Rent Start Date",
+      rentEndDate: "Rent End Date",
+      calculatePrice: "Calculate Price",
+      totalPrice: "Total Price",
+      proceedToPayment: "Proceed to Payment",
   },
   ru: {
     rent: "Аренда",
@@ -611,7 +650,47 @@ contributorsLabel: "Соавторы",
   cryptoManagement: "Управление криптовалютой",
   site: "Сайт",
   telegramUsername: "Имя пользователя в Telegram",
-  walletAddress: "Адрес кошелька"
+  walletAddress: "Адрес кошелька",
+  payment: {
+    title: "Оплата",
+    description: "Описание процесса оплаты"
+  },
+  ad_info: {
+    title: "Информация об объявлении",
+    fields: {
+      title: "Заголовок объявления",
+      description: "Описание объявления",
+    },
+  },
+  agreement: {
+    title: "Согласие",
+    fields: {
+      consent: "Я соглашаюсь с правилами использования сервиса...",
+    },
+  },
+  general_info: {
+    title: "Общая информация",
+    fields: {
+      make: "Марка",
+      model: "Модель",
+      year: "Год выпуска",
+      color: "Цвет",
+      price: "Цена",
+      mileage: "Пробег",
+    },
+  },
+  photo_upload: {
+    title: "Фото",
+    fields: {
+      photo: "Фотография",
+    },
+  },
+  rentStartDate: "Дата начала аренды",
+  rentEndDate: "Дата окончания аренды",
+  calculatePrice: "Рассчитать цену",
+  totalPrice: "Общая цена",
+  
+  proceedToPayment: "Перейти к оплате",
   },
   ukr: {
     defaultLabel: "ХЗ",
@@ -840,4 +919,43 @@ contributorsLabel: "Учасники",
   telegramUsername: "Ім'я користувача в Telegram",
   walletAddress: "Адреса гаманця"
   },
+  payment: {
+    title: "Payment",
+    description: "Description of payment process"
+  },
+  ad_info: {
+    title: "Ad information",
+    fields: {
+      title: "Ad title",
+      description: "Ad description",
+    },
+  },
+  agreement: {
+    title: "Consent",
+    fields: {
+consent: "I agree with the terms of use of the service...",
+    },
+  },
+general_info: {
+    title: "General information",
+    fields: {
+      make: "Brand",
+      model: "Model",
+      year: "Year of issue",
+      color: "Color",
+      price: "Price",
+      mileage: "Mileage",
+    },
+  },
+  photo_upload: {
+    title: "Photo",
+    fields: {
+photo: "Photography",
+    },
+  },
+  rentStartDate: "Дата початку оренди",
+      rentEndDate: "Дата закінчення оренди",
+      calculatePrice: "Обчислити ціну",
+      totalPrice: "Загальна ціна",
+      proceedToPayment: "Перейти до оплати",
 };

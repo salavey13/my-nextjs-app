@@ -10,6 +10,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { useAppContext } from "../context/AppContext";
 import DebugInfo from "../components/DebugInfo";
 import DynamicItemForm from "@/components/DynamicItemForm";
+import DynamicItemDetails from "@/components/DynamicItemDetails";
+import PaymentComponent from "@/components/PaymentComponent";
 
 interface Rent {
   id: number;
@@ -24,6 +26,8 @@ interface Item {
   id: number;
   title: string;
   creator_ref_code: string;
+  item_type: string;
+  details: any;
 }
 
 interface User {
@@ -39,8 +43,11 @@ export default function Rents() {
   const [newItemModalOpen, setNewItemModalOpen] = useState(false);
   const [itemType, setItemType] = useState<string>("evo"); // Default to "evo" type
   const [topEmbedUrl, setTopEmbedUrl] = useState("https://excellent-lots-147907.framer.app"); // Default URL
+  const [selectedItem, setSelectedItem] = useState<Item | null>(null);
+  const [itemDetailsModalOpen, setItemDetailsModalOpen] = useState(false);
   const { user, t } = useAppContext();
-
+  const [itemDetails, setItemDetails] = useState<any>(null); // Adjust type if needed
+  
   useEffect(() => {
     if (!user) return;
 
@@ -91,15 +98,6 @@ export default function Rents() {
     return item ? `${item.title} (Shop: ${item.creator_ref_code})` : t("unknownItem");
   }, [items, t]);
 
-  const handleRowClick = (item: Item) => {
-    const matchingUser = users.find(user => user.ref_code === item.creator_ref_code);
-    if (matchingUser && matchingUser.site) {
-      setTopEmbedUrl(matchingUser.site);
-    } else {
-      setTopEmbedUrl("https://excellent-lots-147907.framer.app"); // Fallback to default if no matching user
-    }
-  };
-
   const handleOpenNewItemModal = () => {
     setNewItemModalOpen(true);
   };
@@ -111,6 +109,44 @@ export default function Rents() {
 
   const handleButtonClick = (type: string) => {
     setItemType(type);
+  };
+
+  const handleRowClick = async (item: Item) => {
+    const matchingUser = users.find(user => user.ref_code === item.creator_ref_code);
+    if (matchingUser && matchingUser.site) {
+      setTopEmbedUrl(matchingUser.site);
+    } else {
+      setTopEmbedUrl("https://excellent-lots-147907.framer.app"); // Fallback to default if no matching user
+    }
+
+    try {
+        // Fetch item type schema from Supabase
+        const { data: itemTypeSchema, error } = await supabase
+          .from('item_types')
+          .select('fields')
+          .eq('type', item.item_type)
+          .single();
+    
+        if (error) {
+          throw error;
+        }
+    
+        // Check if itemTypeSchema is not null and has fields
+        if (itemTypeSchema) {
+            setItemDetails(itemTypeSchema);
+          }
+      } catch (error) {
+        console.error('Error fetching item type schema:', error);
+      }
+    
+    // Set selected item and open details modal
+    setSelectedItem(item);
+    setItemDetailsModalOpen(true);
+  };
+
+  const handleCloseItemDetailsModal = () => {
+    setItemDetailsModalOpen(false);
+    setSelectedItem(null);
   };
 
   return (
@@ -129,7 +165,7 @@ export default function Rents() {
       </div>
 
       {/* Content positioned 64px from the bottom, occupying the bottom 100vh */}
-      <div className="absolute bottom-1 left-0 w-full z-10 overflow-auto bg-white max-h-screen backdrop-blur-lg">
+      <div className="absolute bottom-1 left-0 w-full z-10 overflow-auto bg-white max-h-screen backdrop-blur-lg rounded-t-2xl">
         <div className="p-4">
           <div className="flex justify-between items-center mb-4">
             <h1 className="text-3xl font-bold">{t("rentsTitle")}</h1>
@@ -235,6 +271,35 @@ export default function Rents() {
             </Button>
           </div>
           <DynamicItemForm itemType={itemType} />
+        </DialogContent>
+      </Dialog>
+
+      {/* Modal for showing item details and payment */}
+      <Dialog open={itemDetailsModalOpen} onOpenChange={handleCloseItemDetailsModal}>
+        <DialogContent className="max-h-[calc(100vh-113px)] overflow-y-auto flex-grow min-h-[calc(100vh-128px)] overflow-y-auto backdrop-blur-lg">
+          <DialogHeader>
+            <DialogTitle>{t("itemDetailsTitle")}</DialogTitle>
+            <DialogDescription>{t("itemDetailsDescription")}</DialogDescription>
+          </DialogHeader>
+
+          {selectedItem && (
+            <div>
+              {/* Dynamic item details */}
+                {itemDetails && (
+                    <DynamicItemDetails item={selectedItem} />
+                )}
+
+              {/* Payment component */}
+              <PaymentComponent item={selectedItem} />
+            </div>
+          )}
+          
+
+          <div className="mt-4">
+            <Button onClick={handleCloseItemDetailsModal}>
+              {t("close")}
+            </Button>
+          </div>
         </DialogContent>
       </Dialog>
   
