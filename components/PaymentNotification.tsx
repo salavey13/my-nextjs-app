@@ -1,12 +1,11 @@
 // components/PaymentNotification.tsx
-"use client";
+"use client"
 
 import React, { useEffect, useState } from "react";
 import { useAppContext } from "@/context/AppContext";
-import { Button } from "@/components/ui/button";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
-
-const PaymentNotification: React.FC<{ link?: string | null }> = ({ link }) => {
+import { generateQrCodeBase64 } from "../utils/qrcodeUtils"
+const PaymentNotification: React.FC<{ link?: string }> = ({ link }) => {
   const { user, t } = useAppContext();
   const [loading, setLoading] = useState(false);
   const [notificationSent, setNotificationSent] = useState(false);
@@ -21,37 +20,65 @@ const PaymentNotification: React.FC<{ link?: string | null }> = ({ link }) => {
     setLoading(true);
 
     try {
-      const botToken = process.env.NEXT_PUBLIC_BOT_TOKEN;
-      if (!botToken) {
-        console.error("Bot token is missing");
-        return;
-      }
+        const botToken = process.env.NEXT_PUBLIC_BOT_TOKEN;
+        if (!botToken) {
+            console.error("Bot token is missing");
+            return;
+        }
 
-      const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
-      const message = `${t("paymentSuccessMessage")} ${user?.telegram_username}\n${link}`;
+        const qrCodeImage = await generateQrCodeBase64(link);
+        if (!qrCodeImage) {
+            throw new Error("Failed to generate QR code image");
+        }
 
-      const response = await fetch(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          chat_id: user?.telegram_id,
-          text: message,
-        }),
-      });
+        const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
+        const qrUrl = `https://api.telegram.org/bot${botToken}/sendPhoto`;
 
-      if (!response.ok) {
-        throw new Error("Failed to send Telegram message");
-      }
+        const responseMessage = await fetch(url, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                chat_id: user?.telegram_id,
+                text: `${t("paymentSuccessMessage")}`,
+                reply_markup: {
+                    inline_keyboard: [
+                        [
+                            {
+                                text: t("payNow"),
+                                url: link,
+                            },
+                        ],
+                    ],
+                },
+                parse_mode: "Markdown",
+            }),
+        });
 
-      setNotificationSent(true);
+        const responseQR = await fetch(qrUrl, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                chat_id: user?.telegram_id,
+                photo: qrCodeImage,
+                caption: `${t("scanQR")}`,
+            }),
+        });
+
+        if (!responseMessage.ok || !responseQR.ok) {
+            throw new Error("Failed to send Telegram message or QR code");
+        }
+
+        setNotificationSent(true);
     } catch (error) {
-      console.error("Error sending Telegram message:", error);
+        console.error("Error sending Telegram message:", error);
     } finally {
-      setLoading(false);
+        setLoading(false);
     }
-  };
+};
 
   return (
     <div className="p-6 bg-gray-800 rounded-lg shadow-lg">
@@ -60,9 +87,12 @@ const PaymentNotification: React.FC<{ link?: string | null }> = ({ link }) => {
       ) : notificationSent ? (
         <p className="text-green-500">{t("notificationSent")}</p>
       ) : (
-        <Button onClick={() => sendPaymentNotification(link || '')} className="bg-blue-600 text-white  hover:bg-blue-700px-4 py-2 rounded-lg">
+        <button
+          onClick={() => sendPaymentNotification(link || "")}
+          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg"
+        >
           {t("resendNotification")}
-        </Button>
+        </button>
       )}
     </div>
   );

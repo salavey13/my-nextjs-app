@@ -12,7 +12,7 @@ import { useAppContext } from "../context/AppContext";
 import DebugInfo from "../components/DebugInfo";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTachometerAlt } from '@fortawesome/free-solid-svg-icons';
-import CryptoPayment from "@/components/CryptoPayment";
+import { fetchTargetWallet, CryptoPayment}  from "@/components/CryptoPayment";
 import CryptoWithdrawal from "@/components/CryptoWithdrawal";
 
 // Define the shape of the bet data
@@ -200,7 +200,7 @@ export default function Dashboard() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Crypto Deposit */}
             <div>
-              <CryptoPayment />
+              <CryptoPayment creatorTelegramId={user?.ton_wallet? user.ton_wallet : ""}/>
             </div>
             {/* Crypto Withdrawal */}
             <div>
@@ -222,7 +222,7 @@ export default function Dashboard() {
                 <TableHead>{t("title")}</TableHead>
                 <TableHead>{t("amount")}</TableHead>
                 <TableHead>{t("outcome")}</TableHead>
-                {/*<TableHead>{t("status")}</TableHead>*/}
+                <TableHead>{t("pay")}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -233,18 +233,19 @@ export default function Dashboard() {
                     <TableCell>{title}</TableCell>
                     <TableCell>{bet.amount}</TableCell>
                     <TableCell>{t(bet.outcome)}</TableCell>
-                    {/* <TableCell>
+                    <TableCell>
                       {bet.status === 'active' ? (
-                        <Button variant="ghost" size="sm">
+                        <CryptoPayment creatorTelegramId={bet?.user_id.toString()}/>
+                        /*{<Button variant="ghost" size="sm">
                           {t("active")}
-                        </Button>
+                        </Button>}*/
                       ) : (
                         <Button variant="destructive" size="sm" 
                         disabled={true}>
                           {bet.status}
                         </Button>
                       )}
-                    </TableCell> */}
+                    </TableCell>
                   </TableRow>
                 );
               })}
