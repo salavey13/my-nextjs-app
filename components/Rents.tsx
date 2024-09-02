@@ -129,7 +129,7 @@ export default function Rents() {
       </div>
 
       {/* Content positioned 64px from the bottom, occupying the bottom 100vh */}
-      <div className="absolute bottom-1 left-0 w-full z-10 overflow-auto bg-white max-h-screen">
+      <div className="absolute bottom-1 left-0 w-full z-10 overflow-auto bg-white max-h-screen backdrop-blur-lg">
         <div className="p-4">
           <div className="flex justify-between items-center mb-4">
             <h1 className="text-3xl font-bold">{t("rentsTitle")}</h1>
