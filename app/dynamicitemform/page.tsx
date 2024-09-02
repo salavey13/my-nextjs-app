@@ -14,7 +14,7 @@ export default function DynamicItemFormPage() {
 
   return (
     <div className="p-4">
-      <div className="flex justify-around items-center mb-4">
+      <div className="flex justify-around items-center mb-4 overflow-x-auto">
           <Button
               onClick={() => handleButtonClick("evo")}
               className="bg-blue-500 text-white p-2 rounded"

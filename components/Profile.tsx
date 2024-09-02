@@ -25,7 +25,10 @@ const Profile: React.FC = () => {
 
     try {
       const defaultSite = user.site ? user.site : "";
+      const defaultWallet = user.ton_wallet ? user.ton_wallet : "";
       setSite(defaultSite);
+      setTelegramUsername(user.telegram_username)
+      setWalletAddress(defaultWallet)
 
     } catch (error) {
       console.error('Error fetching site data:', error);
@@ -53,7 +56,8 @@ const Profile: React.FC = () => {
         .from('users')
         .update({ 
           telegram_username: telegramUsername,
-          ton_wallet: walletAddress 
+          ton_wallet: walletAddress,
+          site: site
         })
         .eq('id', user?.id);
 
@@ -79,7 +83,7 @@ const Profile: React.FC = () => {
           />
           {walletAddress && (
             <div className="absolute bottom-0 right-0 p-2 bg-gray-700 rounded-full">
-              <QRCode value={walletAddress} size={50} />
+              <QRCode value={walletAddress} size={100} />
             </div>
           )}
         </div>
