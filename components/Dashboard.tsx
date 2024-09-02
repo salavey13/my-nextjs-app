@@ -191,24 +191,24 @@ export default function Dashboard() {
         </h1>
       </div>
 
-      {/* Crypto Section */}
+      {/* Crypto Section }
       <Card className="mb-4">
         <CardHeader>
           <CardTitle>{t("cryptoManagement")}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Crypto Deposit */}
+            { Crypto Deposit }
             <div>
               <CryptoPayment creatorTelegramId={user?.ton_wallet? user.ton_wallet : ""}/>
             </div>
-            {/* Crypto Withdrawal */}
+            { Crypto Withdrawal }
             <div>
               <CryptoWithdrawal />
             </div>
           </div>
         </CardContent>
-      </Card>
+      </Card>*/}
       
 
       <Card>
