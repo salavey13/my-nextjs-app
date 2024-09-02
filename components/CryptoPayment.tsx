@@ -1,17 +1,34 @@
 // components/CryptoPayment.tsx
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
-import { Input }  from "@/components/ui/input";
+import { Input } from "@/components/ui/input";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { useAppContext } from '@/context/AppContext';
+import QRCode from "react-qr-code";
+import PaymentNotification from './PaymentNotification';
 
 const CryptoPayment: React.FC = () => {
     const { t, user } = useAppContext();
     const [amount, setAmount] = useState<number | string>('');
     const [paymentLink, setPaymentLink] = useState<string | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
+    const [qrCodeUrl, setQrCodeUrl] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (paymentLink) {
+            generateQrCode(paymentLink);
+        }
+    }, [paymentLink]);
+
+    const generateQrCode = async (link: string) => {
+        try {
+            setQrCodeUrl(link);
+        } catch (error) {
+            console.error('Error generating QR code:', error);
+        }
+    };
 
     const handleGeneratePaymentLink = async () => {
         if (!amount || isNaN(Number(amount))) {
@@ -20,8 +37,8 @@ const CryptoPayment: React.FC = () => {
         }
         setLoading(true);
         try {
-            // Replace with actual link generation logic
-            const link = `https://ton.org/send?amount=${amount}&to=${user?.ton_wallet}`;
+            const userWalletAddress = user?.ton_wallet;
+            const link = `ton://transfer/${userWalletAddress}?amount=${amount}&to=${userWalletAddress}`;
             setPaymentLink(link);
         } catch (error) {
             console.error('Error generating payment link:', error);
@@ -66,8 +83,14 @@ const CryptoPayment: React.FC = () => {
                     >
                         {paymentLink}
                     </a>
+                    {qrCodeUrl && (
+                        <div className="flex justify-center mt-4">
+                        <QRCode value={qrCodeUrl} size={150} />
+                      </div>
+                    )}
                 </div>
             )}
+            <PaymentNotification link={paymentLink} />
         </div>
     );
 };

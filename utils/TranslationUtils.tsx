@@ -375,6 +375,14 @@ export const useTranslation = () => {
     creatorShop: "Creator's Shop",
     addNewItemTitle: "Add a New Item",
     addNewItemDescription: "Fill in the details for the new item",
+    errorProcessingWithdrawal: "Error processing withdrawal",
+    cryptoWithdrawal: "Crypto Withdrawal",
+    processWithdrawal: "Process Withdrawal",
+    withdrawalProcessed: "Withdrawal processed successfully",
+    cryptoManagement: "Crypto Management",
+    site: "Site",
+    telegramUsername: "Telegram Username",
+    walletAddress: "Wallet Address"
   },
   ru: {
     rent: "Аренда",
@@ -596,6 +604,14 @@ contributorsLabel: "Соавторы",
     // Buttons
     upload: "Загрузить",
     // Add more translations...
+  errorProcessingWithdrawal: "Ошибка при обработке вывода",
+  cryptoWithdrawal: "Криптовывод",
+  processWithdrawal: "Обработать вывод",
+  withdrawalProcessed: "Вывод успешно обработан",
+  cryptoManagement: "Управление криптовалютой",
+  site: "Сайт",
+  telegramUsername: "Имя пользователя в Telegram",
+  walletAddress: "Адрес кошелька"
   },
   ukr: {
     defaultLabel: "ХЗ",
@@ -815,5 +831,13 @@ contributorsLabel: "Учасники",
     upload: "Завантажити",
     rent: "Оренда",
     // Add more translations...
+  errorProcessingWithdrawal: "Помилка при обробці виводу",
+  cryptoWithdrawal: "Криптовиведення",
+  processWithdrawal: "Обробити виведення",
+  withdrawalProcessed: "Виведення успішно оброблено",
+  cryptoManagement: "Управління криптовалютою",
+  site: "Сайт",
+  telegramUsername: "Ім'я користувача в Telegram",
+  walletAddress: "Адреса гаманця"
   },
 };

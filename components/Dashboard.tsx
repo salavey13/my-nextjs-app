@@ -1,3 +1,4 @@
+// components/Dashboard.tsx
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
@@ -11,6 +12,8 @@ import { useAppContext } from "../context/AppContext";
 import DebugInfo from "../components/DebugInfo";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTachometerAlt } from '@fortawesome/free-solid-svg-icons';
+import CryptoPayment from "@/components/CryptoPayment";
+import CryptoWithdrawal from "@/components/CryptoWithdrawal";
 
 // Define the shape of the bet data
 interface Bet {
@@ -42,24 +45,25 @@ export default function Dashboard() {
   const [allEvents, setAllEvents] = useState<Event[]>([]);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [betAmount, setBetAmount] = useState<string>('');
-  const { user, setUser, t, store } = useAppContext(); // Assuming `language` provides current language
+  const { user, setUser, t, store } = useAppContext();
 
   useEffect(() => {
     if (!user) return;
-  
+
     const fetchBets = async () => {
       const { data, error } = await supabase
         .from('bets')
         .select('*')
         .eq('user_id', user.telegram_id);
-  
+
       if (error) {
         console.error("Error fetching bets:", error);
       } else {
         setBets(data || []);
       }
     };
-  
+
+ 
     const fetchEvents = async () => {
       const { data, error } = await supabase
         .from('events')
@@ -72,42 +76,40 @@ export default function Dashboard() {
         setEvents(data || []);
       }
     };
-  
     const fetchAllEvents = async () => {
       const { data, error } = await supabase
         .from('events')
         .select('*');
-  
+
       if (error) {
         console.error("Error fetching all events:", error);
       } else {
         setAllEvents(data || []);
       }
     };
-  
-    fetchBets();  // Fetch bets only on mount or when the user changes
-    fetchAllEvents();  // Fetch all events only once or when the user changes
-  }, [user]);  // Remove `bets` from dependencies to avoid multiple triggers
-  
-  // Separate useEffect for fetching events whenever bets change
+
+    fetchBets();  
+    fetchAllEvents();  
+  }, [user]);
+
   useEffect(() => {
     if (!user) return;
-  
+
     const fetchEvents = async () => {
       const { data, error } = await supabase
         .from('events')
         .select('*')
         .not('id', 'in', `(${bets.map(bet => bet.event_id).join(',')})`);
-  
+
       if (error) {
         console.error("Error fetching events:", error);
       } else {
         setEvents(data || []);
       }
     };
-  
+
     fetchEvents();
-  }, [bets]);  // Only refetch events when bets change
+  }, [bets]);// Only refetch events when bets change
 
   const getEventDetailsById = useCallback((eventId: number) => {
     const event = allEvents.find(e => e.id === eventId);
@@ -149,7 +151,7 @@ export default function Dashboard() {
         setSelectedEvent(null);
         setBetAmount('');
   
-        // Manually update bets after placing a bet
+         // Manually update bets after placing a bet                                           
         const { data: betsData, error: fetchError } = await supabase
           .from('bets')
           .select('*')
@@ -161,7 +163,7 @@ export default function Dashboard() {
           setBets(betsData || []);
         }
   
-        // Update the user's rank
+        // Update the user's rank                         
         const updatedRank = (parseInt(user.rank, 10) || 0) + 1;
         const { error: rankError } = await supabase
           .from('users')
@@ -179,7 +181,6 @@ export default function Dashboard() {
       }
     }
   };
-  
 
   return (
     <div className="w-full min-h-screen bg-muted/40 flex flex-col p-4 overflow-auto">
@@ -189,6 +190,27 @@ export default function Dashboard() {
           {t("calcTitle")}
         </h1>
       </div>
+
+      {/* Crypto Section */}
+      <Card className="mb-4">
+        <CardHeader>
+          <CardTitle>{t("cryptoManagement")}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Crypto Deposit */}
+            <div>
+              <CryptoPayment />
+            </div>
+            {/* Crypto Withdrawal */}
+            <div>
+              <CryptoWithdrawal />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+      
+
       <Card>
         <CardHeader>
           <CardTitle>{t("activeBets")}</CardTitle>
@@ -230,6 +252,7 @@ export default function Dashboard() {
           </Table>
         </CardContent>
       </Card>
+      
       <Card className="mt-4">
         <CardHeader>
           <CardTitle>{t("upcomingEvents")}</CardTitle>
@@ -267,7 +290,9 @@ export default function Dashboard() {
           </Table>
         </CardContent>
       </Card>
+      
       <DebugInfo />
+      
       {selectedEvent && (
         <Dialog open={true} onOpenChange={() => setSelectedEvent(null)}>
           <DialogContent>

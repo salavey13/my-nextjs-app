@@ -1,19 +1,20 @@
-//components/Profile.tsx
 "use client";
 
-import { useState, useEffect} from 'react';
+import { useState, useEffect } from 'react';
 import { useAppContext } from '../context/AppContext';
 import Image from 'next/image';
 import { supabase } from '../lib/supabaseClient';
 import { Button } from "./ui/button";
-import {Input} from "./ui/input";
-
+import { Input } from "./ui/input";
+import QRCode from 'react-qr-code';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCrown } from '@fortawesome/free-solid-svg-icons';
 
 const Profile: React.FC = () => {
   const { user, t } = useAppContext();
   const [site, setSite] = useState('');
+  const [telegramUsername, setTelegramUsername] = useState(user?.telegram_username || '');
+  const [walletAddress, setWalletAddress] = useState(user?.ton_wallet || '');
 
   useEffect(() => {
     fetchSiteData();
@@ -41,7 +42,25 @@ const Profile: React.FC = () => {
       if (error) throw error;
 
     } catch (error) {
-      console.error('Error upadating personal site:', error);
+      console.error('Error updating personal:', error);
+      throw error;
+    }
+  };
+
+  const handleProfileUpdate = async () => {
+    try {
+      const { error } = await supabase
+        .from('users')
+        .update({ 
+          telegram_username: telegramUsername,
+          ton_wallet: walletAddress 
+        })
+        .eq('id', user?.id);
+
+      if (error) throw error;
+
+    } catch (error) {
+      console.error('Error updating profile:', error);
       throw error;
     }
   };
@@ -50,19 +69,26 @@ const Profile: React.FC = () => {
     <div className="p-8 shadow-lg rounded-lg max-w-lg mx-auto mt-10 bg-gradient-to-r from-gray-800 to-gray-900 text-white">
       <h1 className="text-3xl font-bold mb-6">{t('profile')}</h1>
       <div className="flex items-center mb-6">
-        <Image 
-          src="/placeholder-user.jpg" 
-          alt={t('profilePicture')} 
-          width={100} 
-          height={100} 
-          className="rounded-full border-4 border-gray-700"
-        />
+        <div className="relative">
+          <Image 
+            src="/placeholder-user.jpg" 
+            alt={t('profilePicture')} 
+            width={100} 
+            height={100} 
+            className="rounded-full border-4 border-gray-700"
+          />
+          {walletAddress && (
+            <div className="absolute bottom-0 right-0 p-2 bg-gray-700 rounded-full">
+              <QRCode value={walletAddress} size={50} />
+            </div>
+          )}
+        </div>
         <div className="ml-6">
-          <p className="text-xl font-semibold">{user?.telegram_username}</p>
+          <p className="text-xl font-semibold">{telegramUsername}</p>
           <p className="text-sm text-gray-400">{t('userId')}: {user?.telegram_id}</p>
         </div>
       </div>
-      <div className="space-y-1">
+      <div className="space-y-4">
         <div className="mb-4">
           <label className="block text-gray-400 text-sm mb-1">
             {t('site')}
@@ -71,17 +97,39 @@ const Profile: React.FC = () => {
             value={site}
             onChange={(e) => setSite(e.target.value)}
             className="w-full bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-            aria-label={t('referralName')}
+            aria-label={t('site')}
+          />
+        </div>
+        <div className="mb-4">
+          <label className="block text-gray-400 text-sm mb-1">
+            {t('telegramUsername')}
+          </label>
+          <Input
+            value={telegramUsername}
+            onChange={(e) => setTelegramUsername(e.target.value)}
+            className="w-full bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            aria-label={t('telegramUsername')}
+          />
+        </div>
+        <div className="mb-4">
+          <label className="block text-gray-400 text-sm mb-1">
+            {t('walletAddress')}
+          </label>
+          <Input
+            value={walletAddress}
+            onChange={(e) => setWalletAddress(e.target.value)}
+            className="w-full bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            aria-label={t('walletAddress')}
           />
         </div>
         <Button
-          onClick={() => handleSiteChange(site)}
+          onClick={handleProfileUpdate}
           className="flex items-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition justify-center w-full"
-          aria-label={t('sendInvite')}
+          aria-label={t('saveProfile')}
           variant="outline"
         >
           <FontAwesomeIcon icon={faCrown} className="mr-2" />
-          {t('saveSite')}
+          {t('saveProfile')}
         </Button>
         <div className="bg-gray-700 p-4 rounded-lg">
           <p className="text-sm font-medium text-gray-300">{t('rank')}:</p>
