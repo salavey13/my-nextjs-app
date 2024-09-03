@@ -433,6 +433,7 @@ export default function Rents() {
                 </CardContent>
             </Card>
             </div>
+            <div className="h-1"></div>
         </div>
       </div>
 
