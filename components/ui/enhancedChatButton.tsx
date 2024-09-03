@@ -34,9 +34,7 @@ const EnhancedChatButton = () => {
         onClick={handleOpenChatGPT}
         className="group flex flex-col items-center justify-center text-gray-400 w-12 h-12 hover:text-blue-500 transition-all duration-300 transform hover:scale-110"
       >
-        <span className="text-sm w-full mb-1 transition-all duration-300 group-hover:text-blue-500">
-          ChatGPT
-        </span>
+        <span className="text-sm mb-1 transition-all duration-300 group-hover:text-blue-500">ChatGPT</span>
         <svg
           className="w-12 h-12 text-gray-400 group-hover:text-blue-500 transition-all duration-300"
           fill="none"

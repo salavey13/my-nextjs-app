@@ -1232,7 +1232,7 @@ return (
           placeholder={t("describeYourIdeaPlaceholder")}
           className="w-full p-2 border rounded mb-4"
         />
-        <Button 
+        <div className="grid grid-cols-1 gap-4"><Button 
           onClick={handleZeroStageRequest} 
           className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
           variant="outline"
@@ -1246,6 +1246,7 @@ return (
         >
           {t('generateRequestButton')}4TYPE
         </Button>
+        </div>
       </div>
   
       {/* Zero Stage Request Output */}
@@ -1261,9 +1262,9 @@ return (
         </div>
       )}
   
-      {/* Button to Get Response */}
+      {/* Button to Get Response 
       {step >= 1 && (
-        <div className="mt-4">
+        <div className="grid grid-cols-1 gap-4">
           <Button 
             onClick={handleGetResponse} 
             variant="outline"
@@ -1272,7 +1273,7 @@ return (
             {t('getResponseButton')}
           </Button>
         </div>
-      )}
+      )}*/}
   
     
     {/*// Enhanced UI display Display Parsed Response */}

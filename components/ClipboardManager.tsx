@@ -21,7 +21,7 @@ const ClipboardManager: React.FC<ClipboardManagerProps> = ({ requestText }) => {
   };
 
   return (
-    <div className="clipboard-manager mt-4">
+    <div className="clipboard-manager grid grid-cols-1 gap-4">
       <h2 className="text-xl font-semibold">Clipboard Manager</h2>
 
       <Button 

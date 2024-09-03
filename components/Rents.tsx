@@ -250,6 +250,7 @@ export default function Rents() {
         const jsonEndIndex = text.lastIndexOf('}') + 1;
   
         if (jsonStartIndex === -1 || jsonEndIndex === -1) {
+          showAlert("Invalid JSON format");
           throw new Error("Invalid JSON format");
         }
   
@@ -371,7 +372,7 @@ export default function Rents() {
       </div>
 
       {/* Content positioned 64px from the bottom, occupying the bottom 100vh overflow-auto*/}
-      <div className="absolute bottom-0 left-0 w-full z-10  bg-white max-h-[calc(100vh-113px)] backdrop-blur-lg rounded-t-2xl">
+      <div className="absolute bottom-0 left-0 w-full z-10  bg-white max-h-[calc(100vh-128px)] backdrop-blur-lg rounded-t-2xl">
         <div className="p-4">
           <div className="relative flex justify-between items-center mb-4">
             <h1 className="text-3xl font-bold">{t("rentsTitle")}</h1>
