@@ -15,9 +15,9 @@ const EnhancedChatButton = () => {
 
   useEffect(() => {
     if (tg) {
-      showMainButton('Start Chat');
+      showMainButton('ChatGPT');
       tg.MainButton?.onClick(handleOpenChatGPT)
-      tg.MainButton?.setParams({color: "#FFFFFF", text_color: "#000000"})
+      tg.MainButton?.setParams({color: "#000000", text_color: "#e1ff01"})
       //showBackButton();
     }
   }, [tg, showMainButton, showBackButton]);

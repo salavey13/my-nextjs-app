@@ -249,8 +249,8 @@ export default function Rents() {
         const text = event.data;
         if (!text) return
         // Process the text retrieved from the clipboard
-        const jsonStartIndex = text.indexOf('{');
-        const jsonEndIndex = text.lastIndexOf('}') + 1;
+        const jsonStartIndex = text?.indexOf('{');
+        const jsonEndIndex = text?.lastIndexOf('}') + 1;
   
         if (jsonStartIndex === -1 || jsonEndIndex === -1) {
           showAlert("Invalid JSON format");
@@ -297,6 +297,7 @@ export default function Rents() {
           }
   
         } catch (error) {
+            showAlert("Failed to parse JSONlast");
             throw new Error("Failed to parse JSON");
         }
       });
@@ -441,7 +442,7 @@ export default function Rents() {
             
             </div>
         </div>
-        <div className="h-1"></div>
+        
       </div>
 
       <Dialog open={newItemModalOpen} onOpenChange={handleCloseNewItemModal}>
