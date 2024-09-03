@@ -35,6 +35,7 @@ interface Item {
 
 interface User {
   id: number;
+  telegram_id: string;
   ref_code: string;
   site: string;
 }
@@ -123,7 +124,7 @@ export default function Rents() {
     const fetchUsers = async () => {
       const { data, error } = await supabase
         .from("users")
-        .select("id, ref_code, site");
+        .select("id, ref_code, site, telegram_id");
 
       if (error) {
         console.error("Error fetching users:", error);
@@ -304,7 +305,7 @@ export default function Rents() {
       }
     };
 
-  const sendNotificationToCreator = useCallback(async (userId: number, itemId: number, rentId: number) => {
+  const sendNotificationToCreator = useCallback(async (userId: string, itemId: number, rentId: number) => {
     if (!process.env.NEXT_PUBLIC_BOT_TOKEN || !user) {
       console.error('Bot token is missing');
       return;
@@ -351,7 +352,7 @@ export default function Rents() {
       // Send notification to the item creator
       const matchingUser = users.find(user => user.ref_code === item.creator_ref_code);
       if (matchingUser) {
-        await sendNotificationToCreator(matchingUser.id,  item.id, rent.id);
+        await sendNotificationToCreator(matchingUser.telegram_id,  item.id, rent.id);
       }
     }
   };
@@ -495,7 +496,7 @@ export default function Rents() {
         </DialogContent>
       </Dialog>
   
-      <DebugInfo />
+      {/*<DebugInfo />*/}
     </div>
   );
 }
