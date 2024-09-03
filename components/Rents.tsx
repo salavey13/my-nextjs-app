@@ -381,13 +381,13 @@ export default function Rents() {
       {/* Content positioned 64px from the bottom, occupying the bottom 100vh overflow-auto*/}
       <div className="absolute bottom-0 left-0 w-full z-10 max-h-[calc(100vh-128px)] backdrop-blur-lg rounded-t-2xl">
         <div className="p-4">
-          <div className="relative flex justify-between items-center mb-4">
+          <div className="relative flex justify-between items-center mb-4 h-[100px]">
             <h1 className="text-3xl font-bold">{t("rentsTitle")}</h1>
             <Button onClick={handleOpenNewItemModal} variant="default">
               {t("addNewItem")}
             </Button>
           </div>
-          <div className="relative w-full z-10 overflow-scroll">
+          <div className="relative w-full z-10 overflow-scroll  max-h-[calc(100vh-228px)]">
             <Card>
                 <CardHeader>
                 <CardTitle>{t("activeRentals")}</CardTitle>
