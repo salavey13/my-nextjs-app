@@ -1,29 +1,56 @@
 // src/types/global.d.ts
 
+// Define the interface for theme parameters that Telegram might provide
 interface TelegramThemeParams {
-    [key: string]: string; // Adjust this type based on what themeParams is supposed to contain
-  }
-  
-  // Define the BackButton interface
-  interface TelegramBackButton {
+    [key: string]: string; // Adjust this type based on the specific structure of themeParams
+}
+
+// Define the MainButton interface with the possible actions
+interface TelegramMainButton {
+    setText(text: string): void;
     show(): void;
     hide(): void;
     onClick(callback: () => void): void;
-  }
-  
-  // Define the TelegramWebApp interface
-  interface TelegramWebApp {
+    setParams(params: { [key: string]: any }): void; // Optional, adjust based on your use case
+}
+
+// Define the BackButton interface for the Telegram WebApp
+interface TelegramBackButton {
+    show(): void;
+    hide(): void;
+    onClick(callback: () => void): void;
+}
+
+// Define the interface for opening a link within the Telegram WebApp
+interface TelegramWebApp {
     expand(): void;
     initData: string;
-    themeParams?: TelegramThemeParams;
-    BackButton?: TelegramBackButton; // Add this line to include BackButton
-  }
-  
-  interface Window {
-    Telegram?: {
-      WebApp?: TelegramWebApp;
+    initDataUnsafe: {
+        user?: {
+            id: number;
+            first_name: string;
+            last_name?: string;
+            username: string;
+            language_code: string;
+            photo_url?: string;
+        };
+        [key: string]: any; // Additional fields Telegram might provide
     };
-  }
+    themeParams?: TelegramThemeParams;
+    MainButton?: TelegramMainButton; // Include MainButton functionalities
+    BackButton?: TelegramBackButton; // Include BackButton functionalities
+    openLink(url: string): void;
+    close(): void;
+    ready(): void;
+    colorScheme: 'light' | 'dark'; // Define the color scheme that can be light or dark
+}
+
+// Extend the global Window interface to include the Telegram WebApp
+interface Window {
+    Telegram?: {
+        WebApp?: TelegramWebApp;
+    };
+}
 
   interface AdInfo {
     title: string;
@@ -44,6 +71,7 @@ interface TelegramThemeParams {
   
   interface ItemDetails {
     ad_info: AdInfo;
+    lesson_info: AdInfo;
     agreement: any; // Not used in this example
     general_info: GeneralInfo;
     photo_upload: PhotoUpload;

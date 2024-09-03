@@ -14,7 +14,8 @@ import DynamicItemDetails from "@/components/DynamicItemDetails";
 import PaymentComponent from "@/components/PaymentComponent";
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-
+import useTelegram from '../hooks/useTelegram';
+  
 interface Rent {
   id: number;
   user_id: number;
@@ -57,6 +58,25 @@ export default function Rents() {
   const [itemDetails, setItemDetails] = useState<any>(null); // Adjust type if needed
   const [itemTypes, setItemTypes] = useState<ItemType[]>([]);
   const router = useRouter(); // Initialize the router here
+  const {
+    tg,
+    theme,
+    openLink,
+    showMainButton,
+    hideMainButton,
+    showBackButton,
+    closeWebApp,
+    showPopup,
+    showAlert,
+    showConfirm,
+    showScanQrPopup,
+    closeScanQrPopup,
+    readTextFromClipboard,
+    enableVerticalSwipes,
+    disableVerticalSwipes,
+    setHeaderColor,
+    setBackgroundColor,
+  } = useTelegram();
 
   useEffect(() => {
     const fetchItemTypes = async () => {
@@ -115,6 +135,7 @@ export default function Rents() {
     fetchRents();
     fetchItems();
     fetchUsers();
+    disableVerticalSwipes();
   }, [user]);
 
   useEffect(() => {
@@ -222,50 +243,63 @@ export default function Rents() {
 
   const handleAddNewItemType = async () => {
     try {
-      const text = await navigator.clipboard.readText();
-      const jsonStartIndex = text.indexOf('{');
-      const jsonEndIndex = text.lastIndexOf('}') + 1;
+      // Call readTextFromClipboard with a callback function
+      tg?.readTextFromClipboard(async(text) => {
+        // Process the text retrieved from the clipboard
+        const jsonStartIndex = text.indexOf('{');
+        const jsonEndIndex = text.lastIndexOf('}') + 1;
   
-      if (jsonStartIndex === -1 || jsonEndIndex === -1) {
-        throw new Error("Invalid JSON format");
+        if (jsonStartIndex === -1 || jsonEndIndex === -1) {
+          throw new Error("Invalid JSON format");
+        }
+  
+        // Extract the JSON substring
+        const jsonString = text.substring(jsonStartIndex, jsonEndIndex);
+        
+        // Parse the JSON
+        try {
+          const jsonObject = JSON.parse(jsonString);
+          console.log("Parsed JSON object:", jsonObject);
+
+          if (!jsonObject || typeof jsonObject !== "object") {
+            throw new Error("Invalid JSON structure");
+          }
+      
+          // Define a type name for the new item type
+          const typeName = prompt(t("newItemTypeNameRequest"));
+      
+          if (!typeName) return; // User canceled the prompt
+      
+          // Insert the new item type into Supabase
+          const { data, error } = await supabase
+            .from("item_types")
+            .insert([{ type: typeName, fields: jsonObject }]);
+      
+          if (error) {
+            console.error("Error inserting new item type:", error);
+            showAlert("Error adding new item type. Please try again.");
+            return;
+          }
+      
+          // Reload item types after successful insertion
+          const { data: newTypes, error: fetchError } = await supabase.from("item_types").select("*");
+      
+          if (fetchError) {
+            console.error("Error fetching item types:", fetchError);
+          } else {
+            setItemTypes(newTypes || []);
+          }
+
+
+        } catch (error) {
+            throw new Error("Failed to parse JSON");
+          }
+        });
+      } catch (error) {
+        console.error("Error handling new item type:", error);
+        showAlert(t("gpt"));
       }
-  
-      const jsonString = text.slice(jsonStartIndex, jsonEndIndex);
-      const parsedJson = JSON.parse(jsonString);
-  
-      if (!parsedJson || typeof parsedJson !== "object") {
-        throw new Error("Invalid JSON structure");
-      }
-  
-      // Define a type name for the new item type
-      const typeName = prompt("Enter a name for the new item type:");
-  
-      if (!typeName) return; // User canceled the prompt
-  
-      // Insert the new item type into Supabase
-      const { data, error } = await supabase
-        .from("item_types")
-        .insert([{ type: typeName, fields: parsedJson }]);
-  
-      if (error) {
-        console.error("Error inserting new item type:", error);
-        alert("Error adding new item type. Please try again.");
-        return;
-      }
-  
-      // Reload item types after successful insertion
-      const { data: newTypes, error: fetchError } = await supabase.from("item_types").select("*");
-  
-      if (fetchError) {
-        console.error("Error fetching item types:", fetchError);
-      } else {
-        setItemTypes(newTypes || []);
-      }
-    } catch (err) {
-      console.error("Error processing clipboard data:", err);
-      alert(t("gpt"));
-    }
-  };
+    };
 
   const sendNotificationToCreator = useCallback(async (userId: number, itemId: number, rentId: number) => {
     if (!process.env.NEXT_PUBLIC_BOT_TOKEN || !user) {
