@@ -438,9 +438,10 @@ export default function Rents() {
                 </Table>
                 </CardContent>
             </Card>
+            
             </div>
-            <div className="h-1"></div>
         </div>
+        <div className="h-1"></div>
       </div>
 
       <Dialog open={newItemModalOpen} onOpenChange={handleCloseNewItemModal}>
