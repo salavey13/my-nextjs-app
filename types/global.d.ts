@@ -166,14 +166,38 @@ interface Window {
     general_info: GeneralInfo;
     photo_upload: PhotoUpload;
   }
-  
-  interface Item {
-    id: number;
-    item_type: string;
-    details: ItemDetails;
-    creator_ref_code: string;
-  }
+
   
   interface DynamicItemDetailsProps {
     item: Item;
+  }
+
+  interface Rent {
+    id: number;
+    user_id: number;
+    item_id: number;
+    rent_start: string;
+    rent_end: string;
+    status: string;
+  }
+  
+  interface Item {
+    id: number;
+    title: string;
+    creator_ref_code: string;
+    item_type: string;
+    details: any;
+  }
+  
+  interface User {
+    id: number;
+    telegram_id: string;
+    ref_code: string;
+    site: string;
+  }
+  
+  interface ItemType {
+    id: string;
+    type: string;
+    fields: any;
   }

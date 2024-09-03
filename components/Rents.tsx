@@ -6,13 +6,14 @@ import { supabase } from "../lib/supabaseClient";
 import { Card, CardHeader, CardTitle, CardContent } from "../components/ui/card";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { useAppContext } from "../context/AppContext";
 import DebugInfo from "../components/DebugInfo";
 import DynamicItemForm from "@/components/DynamicItemForm";
 import DynamicItemDetails from "@/components/DynamicItemDetails";
 import PaymentComponent from "@/components/PaymentComponent";
-import { faPlus } from '@fortawesome/free-solid-svg-icons';
+import { faPlus, faMinus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import useTelegram from '../hooks/useTelegram';
   
@@ -59,6 +60,12 @@ export default function Rents() {
   const [itemDetails, setItemDetails] = useState<any>(null); // Adjust type if needed
   const [itemTypes, setItemTypes] = useState<ItemType[]>([]);
   const router = useRouter(); // Initialize the router here
+  const [showForm, setShowForm] = useState(false);
+    const [typeName, setTypeName] = useState('');
+    const [jsonInput, setJsonInput] = useState('');
+    const [jsonError, setJsonError] = useState('');
+    const [typeNameError, setTypeNameError] = useState('');
+    const [hasTriedToSave, setHasTriedToSave] = useState(false); // Track save attempts
   const {
     tg,
     theme,
@@ -205,6 +212,7 @@ export default function Rents() {
   };
 
   const handleRowClick = async (item: Item) => {
+    // Send notification to the item creator
     const matchingUser = users.find(user => user.ref_code === item.creator_ref_code);
     if (matchingUser && matchingUser.site) {
       setTopEmbedUrl(matchingUser.site);
@@ -237,79 +245,86 @@ export default function Rents() {
     setItemDetailsModalOpen(true);
   };
 
-  const handleCloseItemDetailsModal = () => {
-    setItemDetailsModalOpen(false);
-    setSelectedItem(null);
-  };
+    const handleCloseItemDetailsModal = () => {
+        setItemDetailsModalOpen(false);
+        setSelectedItem(null);
+    };
 
-  const handleAddNewItemType = () => {
-    try {
-      // Attach an event handler for the clipboardTextReceived event
-      tg?.onEvent('clipboardTextReceived', async (event) => {
-        const text = event.data;
-        if (!text) return
-        // Process the text retrieved from the clipboard
-        const jsonStartIndex = text?.indexOf('{');
-        const jsonEndIndex = text?.lastIndexOf('}') + 1;
-  
-        if (jsonStartIndex === -1 || jsonEndIndex === -1) {
-          showAlert("Invalid JSON format");
-          throw new Error("Invalid JSON format");
-        }
-  
-        // Extract the JSON substring
-        const jsonString = text.substring(jsonStartIndex, jsonEndIndex);
-        
-        // Parse the JSON
+    // Validate JSON on input change
+    useEffect(() => {
         try {
-          const jsonObject = JSON.parse(jsonString);
-          console.log("Parsed JSON object:", jsonObject);
-          showAlert("Parsed JSON object");
-  
-          if (!jsonObject || typeof jsonObject !== "object") {
-            showAlert("Invalid JSON structure");
-            throw new Error("Invalid JSON structure");
-          }
-      
-          // Define a type name for the new item type
-          const typeName = prompt(t("newItemTypeNameRequest"));
-      
-          if (!typeName) return; // User canceled the prompt
-      
-          // Insert the new item type into Supabase
-          const { data, error } = await supabase
-            .from("item_types")
-            .insert([{ type: typeName, fields: jsonObject }]);
-      
-          if (error) {
-            console.error("Error inserting new item type:", error);
-            showAlert("Error adding new item type. Please try again.");
-            return;
-          }
-      
-          // Reload item types after successful insertion
-          const { data: newTypes, error: fetchError } = await supabase.from("item_types").select("*");
-      
-          if (fetchError) {
-            console.error("Error fetching item types:", fetchError);
-          } else {
-            setItemTypes(newTypes || []);
-          }
-  
+            if (jsonInput.trim()) {
+                const parsedJson = JSON.parse(jsonInput);
+                if (typeof parsedJson === 'object') {
+                    setJsonError(''); // JSON is valid
+                } else {
+                    setJsonError(t('gpt')); // JSON structure is invalid
+                }
+            } else {
+                setJsonError(t('gpt')); // JSON is empty or invalid
+            }
         } catch (error) {
-            showAlert("Failed to parse JSONlast");
-            throw new Error("Failed to parse JSON");
+            setJsonError(t('gpt')); // JSON parsing failed
         }
-      });
-  
-      // Trigger the reading from the clipboard
-      tg?.readTextFromClipboard();
-      
-    } catch (error) {
-      console.error("Error handling new item type:", error);
-      showAlert(t("gpt"));
-    }
-  };
+    }, [jsonInput, t]);
+
+    // Validate typeName on input change
+    useEffect(() => {
+        // Derive existing item names from itemTypes array
+        const existingItemNames = itemTypes.map((item) => item.type);
+        if (typeName.trim()) {
+            if (existingItemNames.includes(typeName.trim())) {
+                setTypeNameError(t('gptTypeName')); // Handle name collision
+            } else {
+                setTypeNameError(''); // Name is valid
+            }
+        } else {
+            setTypeNameError(t('emptyTypeName')); // Name is empty
+        }
+    }, [typeName, t]);
+
+    const handleAddNewItemType = async () => {
+        setHasTriedToSave(true); // Mark that the user tried to save
+        if (jsonError || typeNameError) {
+            // Prevent saving if there's an error
+            return;
+        }
+
+        try {
+            // Parse the JSON input
+            const jsonObject = JSON.parse(jsonInput);
+
+            // Insert the new item type into Supabase
+            const { data, error } = await supabase
+                .from('item_types')
+                .insert([{ type: typeName, fields: jsonObject }]);
+
+            if (error) {
+                console.error('Error inserting new item type:', error);
+                showAlert(t('errorInsert')); // Add a translation for this
+                return;
+            }
+
+            // Reload item types after successful insertion
+            const { data: newTypes, error: fetchError } = await supabase
+                .from('item_types')
+                .select('*');
+
+            if (fetchError) {
+                console.error('Error fetching item types:', fetchError);
+            } else {
+                setItemTypes(newTypes || []);
+            }
+
+            // Clear the form inputs after successful submission
+            setTypeName('');
+            setJsonInput('');
+            setShowForm(false);
+        } catch (error) {
+            console.error('Error processing new item type:', error);
+            showAlert(t('gpt')); // Handle JSON parsing errors
+        }
+    };
 
   const sendNotificationToCreator = useCallback(async (userId: string, itemId: number, rentId: number) => {
     if (!process.env.NEXT_PUBLIC_BOT_TOKEN || !user) {
@@ -354,12 +369,6 @@ export default function Rents() {
         greyedOut: true // Flag to indicate greyed-out dates
       });
       setItemDetailsModalOpen(true);
-  
-      // Send notification to the item creator
-      const matchingUser = users.find(user => user.ref_code === item.creator_ref_code);
-      if (matchingUser) {
-        await sendNotificationToCreator(matchingUser.telegram_id,  item.id, rent.id);
-      }
     }
   };
 
@@ -379,7 +388,7 @@ export default function Rents() {
       </div>
 
       {/* Content positioned 64px from the bottom, occupying the bottom 100vh overflow-auto*/}
-      <div className="absolute bottom-0 left-0 w-full z-10 max-h-[calc(100vh-128px)] backdrop-blur-lg rounded-t-2xl">
+      <div className="absolute bottom-0 left-0 scrollbars-hide w-full z-10 max-h-[calc(100vh-128px)] backdrop-blur-lg rounded-t-2xl">
         <div className="p-4">
           <div className="relative flex justify-between items-center mb-4 h-[100px]">
             <h1 className="text-3xl font-bold">{t("rentsTitle")}</h1>
@@ -465,12 +474,44 @@ export default function Rents() {
             ))}
             {/* Add new type button */}
             <Button
-                onClick={handleAddNewItemType}
+                onClick={() => setShowForm(!showForm)}
                 className="bg-green-500 text-white p-2 rounded"
             >
-                <FontAwesomeIcon icon={faPlus} size="lg" />
+                <FontAwesomeIcon icon={showForm ? faMinus : faPlus} size="lg" />
             </Button>
             </div>
+                {/* Conditionally render the form */}
+                {showForm && (
+                    <div className="mt-4">
+                        <Input
+                            type="text"
+                            value={typeName}
+                            onChange={(e) => setTypeName(e.target.value)}
+                            placeholder={t('enterTitleKey')}
+                            className="p-2 border rounded mb-2 w-full"
+                        />
+                        {hasTriedToSave && typeNameError && (
+                            <p className="text-red-500 text-sm mb-2">{typeNameError}</p>
+                        )}
+                        <textarea
+                            value={jsonInput}
+                            onChange={(e) => setJsonInput(e.target.value)}
+                            placeholder={t('enterJsonData')}
+                            className="p-2 border rounded mb-2 w-full"
+                            rows={4}
+                        />
+                        {hasTriedToSave && jsonError && (
+                            <p className="text-red-500 text-sm mb-2">{jsonError}</p>
+                        )}
+                        <Button
+                            onClick={handleAddNewItemType}
+                            className="bg-blue-500 text-white p-2 rounded"
+                            disabled={!!jsonError || !!typeNameError || !jsonInput || !typeName}
+                        >
+                            {t('save')}
+                        </Button>
+                    </div>
+                )}
             <DynamicItemForm itemType={itemType} />
         </DialogContent>
         </Dialog>
@@ -496,7 +537,7 @@ export default function Rents() {
           )}
 
           <div className="mt-4">
-            <Button onClick={handleCloseItemDetailsModal} variant="destructive">
+            <Button onClick={handleCloseItemDetailsModal} variant="default">
               {t("close")}
             </Button>
           </div>
