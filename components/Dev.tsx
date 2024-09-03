@@ -1212,7 +1212,7 @@ const copyToClipboard = (text: string) => {
 return (
     <div className="dev-container p-4 bg-gray-100 rounded-md">
       <h1 className="text-2xl font-bold mb-4">{t('developerToolTitle')}</h1>
-      <h2 className="text-xl font-semibold">{t('currentIdeasTitle')}</h2>
+      {/* <h2 className="text-xl font-semibold">{t('currentIdeasTitle')}</h2>
       <ul className="mt-4">
         {ideas.map((idea) => (
           <li key={idea.id} className="mb-4">
@@ -1221,7 +1221,7 @@ return (
             <p className="text-xs text-gray-500">{t('contributorsLabel')}: {idea.contributors.join(', ')}</p>
           </li>
         ))}
-      </ul>  
+      </ul>   */}
 
       {/* Idea Input */}
       <div>
