@@ -31,7 +31,7 @@ const BottomShelf: React.FC = () => {
     { href: '/dev', icon: faLightbulb, label: t('dev') },
     { href: '/questsforcoins', icon: faStar, label: '' },
     { href: '/hackbutton', icon: faKeyboard, label: '' },
-    { href: '/conflictawareness', icon: faGlobe, label: '' },
+    //{ href: '/conflictawareness', icon: faGlobe, label: '' },
     //{ href: '/emotionmirror', icon: faLightbulb, label: t('emotionmirror') },
   ];
 
