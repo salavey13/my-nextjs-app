@@ -242,10 +242,12 @@ export default function Rents() {
     setSelectedItem(null);
   };
 
-  const handleAddNewItemType = async () => {
+  const handleAddNewItemType = () => {
     try {
-      // Call readTextFromClipboard with a callback function
-      tg?.readTextFromClipboard(async(text) => {
+      // Attach an event handler for the clipboardTextReceived event
+      tg?.onEvent('clipboardTextReceived', async (event) => {
+        const text = event.data;
+        if (!text) return
         // Process the text retrieved from the clipboard
         const jsonStartIndex = text.indexOf('{');
         const jsonEndIndex = text.lastIndexOf('}') + 1;
@@ -263,7 +265,7 @@ export default function Rents() {
           const jsonObject = JSON.parse(jsonString);
           console.log("Parsed JSON object:", jsonObject);
           showAlert("Parsed JSON object");
-
+  
           if (!jsonObject || typeof jsonObject !== "object") {
             showAlert("Invalid JSON structure");
             throw new Error("Invalid JSON structure");
@@ -293,17 +295,20 @@ export default function Rents() {
           } else {
             setItemTypes(newTypes || []);
           }
-
-
+  
         } catch (error) {
             throw new Error("Failed to parse JSON");
-          }
-        });
-      } catch (error) {
-        console.error("Error handling new item type:", error);
-        showAlert(t("gpt"));
-      }
-    };
+        }
+      });
+  
+      // Trigger the reading from the clipboard
+      tg?.readTextFromClipboard();
+      
+    } catch (error) {
+      console.error("Error handling new item type:", error);
+      showAlert(t("gpt"));
+    }
+  };
 
   const sendNotificationToCreator = useCallback(async (userId: string, itemId: number, rentId: number) => {
     if (!process.env.NEXT_PUBLIC_BOT_TOKEN || !user) {
@@ -373,7 +378,7 @@ export default function Rents() {
       </div>
 
       {/* Content positioned 64px from the bottom, occupying the bottom 100vh overflow-auto*/}
-      <div className="absolute bottom-0 left-0 w-full z-10  bg-white max-h-[calc(100vh-128px)] backdrop-blur-lg rounded-t-2xl">
+      <div className="absolute bottom-0 left-0 w-full z-10 max-h-[calc(100vh-128px)] backdrop-blur-lg rounded-t-2xl">
         <div className="p-4">
           <div className="relative flex justify-between items-center mb-4">
             <h1 className="text-3xl font-bold">{t("rentsTitle")}</h1>
