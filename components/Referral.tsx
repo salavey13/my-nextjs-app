@@ -6,7 +6,7 @@ import { supabase } from '../lib/supabaseClient';
 import { useAppContext } from '../context/AppContext';
 import { useTranslation } from 'react-i18next';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUserPlus, faPaperPlane, faTrophy } from '@fortawesome/free-solid-svg-icons';
+import { faUserPlus, faPaperPlane, faTrophy, faSave } from '@fortawesome/free-solid-svg-icons';
 import LoadingSpinner from "./ui/LoadingSpinner";
 import { Button } from "./ui/button";
 import {Input} from "./ui/input";
@@ -16,7 +16,6 @@ const Referral: React.FC = () => {
   const [referralName, setReferralName] = useState('');
   const [referralCode, setReferralCode] = useState<string | null>(null);
   const [inviteCount, setInviteCount] = useState(0);
-  const [isUpdating, setIsUpdating] = useState(false);
 
   useEffect(() => {
     fetchReferralData();
@@ -46,7 +45,7 @@ const Referral: React.FC = () => {
 
   const generateReferralCode = async (defaultReferralName: string) => {
     try {
-      const newReferralCode = `${defaultReferralName}}`;
+      const newReferralCode = `${defaultReferralName}`;
       const { error } = await supabase
         .from('users')
         .update({ ref_code: newReferralCode })
@@ -79,6 +78,21 @@ const Referral: React.FC = () => {
     }
   };
 
+  const handleSaveRefName = useCallback(async () => {
+    if (!referralName) return;
+
+    try {
+        const newReferralCode = await generateReferralCode(referralName);
+        setReferralCode(newReferralCode);
+        setReferralName(referralName);
+        updateUserReferrals(newReferralCode);
+  
+      } catch (error) {
+        console.error('Error updating referral name:', error);
+  
+      }
+  }, [referralName]);
+
   const handleSendInvite = useCallback(async () => {
     if (!referralCode) return;
 
@@ -94,22 +108,9 @@ const Referral: React.FC = () => {
   }, [referralCode]);
 
   const handleReferralNameChange = async (newName: string) => {
-    if (newName.trim() === '' || isUpdating) return;
+    if (newName.trim() === '') return;
 
-    setIsUpdating(true);
-
-    try {
-      const newReferralCode = await generateReferralCode(newName);
-      setReferralCode(newReferralCode);
-      setReferralName(newName);
-      updateUserReferrals(newReferralCode);
-
-    } catch (error) {
-      console.error('Error updating referral name:', error);
-
-    } finally {
-      setIsUpdating(false);
-    }
+    setReferralName(newName); 
   };
 
   const sendTelegramInvite = useCallback(async (referralCode: string) => {
@@ -162,8 +163,17 @@ const Referral: React.FC = () => {
           />
         </div>
         <Button
-          onClick={handleSendInvite}
+          onClick={handleSaveRefName}
           className="flex items-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition justify-center w-full"
+          aria-label={t('sendInvite')}
+          variant="outline"
+        >
+          <FontAwesomeIcon icon={faSave} className="mr-2" />
+          {t('saveRefCode')}
+        </Button>
+        <Button
+          onClick={handleSendInvite}
+          className="flex mt-6 items-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition justify-center w-full"
           aria-label={t('sendInvite')}
           variant="outline"
         >

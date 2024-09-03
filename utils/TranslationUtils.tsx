@@ -64,6 +64,7 @@ export const useTranslation = () => {
     en: {
     saveAndContinueInTelegram: "Save And Continue In Telegram",
     copy: "Copy Request to Clipboard",
+    saveRefCode: "Save",
     name: "English",
     welcome: "Welcome",
     task: "Task",
@@ -344,6 +345,7 @@ export const useTranslation = () => {
       bicycle: "Bicycle",
       dota2: "Dota 2",
       promtgramming: "Promtgramming",
+      AI: "AI",
     },
   
     // Form Labels
@@ -447,7 +449,10 @@ export const useTranslation = () => {
     common: {
       n_a: "N/A"
     },
+    newItemTypeNameRequest: "Enter a name for the new item type:",
   ru: {
+    newItemTypeNameRequest: "Введите имя для нового типа элемента:",
+    saveRefCode: "Сохранить",
     newRentNotification: "Кто-то пытался арендовать ваш предмет",
       viewItem: "Просмотреть элемент",
     gpt: "Не удалось распарсить JSON из буфера обмена. Пожалуйста, убедитесь, что в буфере обмена находится корректный JSON. Если возникают сомнения, посетите страницу разработчика, где можно воспользоваться специальным инструментом на базе GPT для генерации JSON, который соответствует требованиям для добавления новых типов здесь.",
@@ -649,6 +654,7 @@ contributorsLabel: "Соавторы",
       bicycle: "Велосипед",
       dota2: "Dota 2",
       promtgramming: "ПРОМТграммирование",
+      AI: "AI",
     },
   
     // Form Labels
@@ -932,6 +938,7 @@ contributorsLabel: "Учасники",
       bicycle: "Велосипед",
       dota2: "Dota 2",
       promtgramming: "Прогтрамування",
+      AI: "AI",
     },
   
     // Form Labels
@@ -1020,5 +1027,7 @@ general_info: {
       common: {
         n_a: "Немає даних",
       },
+      newItemTypeNameRequest: "Введіть назву для нового типу елемента:",
+      saveRefCode: "Зберегти"
     }
 };

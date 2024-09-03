@@ -260,8 +260,10 @@ export default function Rents() {
         try {
           const jsonObject = JSON.parse(jsonString);
           console.log("Parsed JSON object:", jsonObject);
+          showAlert("Parsed JSON object");
 
           if (!jsonObject || typeof jsonObject !== "object") {
+            showAlert("Invalid JSON structure");
             throw new Error("Invalid JSON structure");
           }
       
@@ -354,9 +356,9 @@ export default function Rents() {
   };
 
   return (
-    <div className="relative w-full min-h-screen h-[150vh] bg-muted/40">
+    <div className="relative w-full h-[calc(200vh-128px)] bg-muted/40">
       {/* The iframe fills the whole 200vh */}
-      <div className="absolute top-0 left-0 w-full h-[150vh] z-0">
+      <div className="absolute top-0 left-0 w-full h-[calc(200vh-128px)] z-0">
         <iframe
           width="100%"
           height="100%"
@@ -364,71 +366,72 @@ export default function Rents() {
           title="Top Embed"
           frameBorder="0"
           allowFullScreen
-          style={{ height: '100%' }} // 100% of the container's height (200vh)
+          style={{ height: '100%' }} // 100% of the container's height (200vh)h-[200vh]
         ></iframe>
       </div>
 
-      {/* Content positioned 64px from the bottom, occupying the bottom 100vh */}
-      <div className="absolute bottom-1 left-0 w-full z-10 overflow-auto bg-white max-h-screen backdrop-blur-lg rounded-t-2xl">
+      {/* Content positioned 64px from the bottom, occupying the bottom 100vh overflow-auto*/}
+      <div className="absolute bottom-0 left-0 w-full z-10  bg-white max-h-[calc(100vh-113px)] backdrop-blur-lg rounded-t-2xl">
         <div className="p-4">
-          <div className="flex justify-between items-center mb-4">
+          <div className="relative flex justify-between items-center mb-4">
             <h1 className="text-3xl font-bold">{t("rentsTitle")}</h1>
             <Button onClick={handleOpenNewItemModal} variant="default">
               {t("addNewItem")}
             </Button>
           </div>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>{t("activeRentals")}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>{t("itemTitle")}</TableHead>
-                    <TableHead>{t("rentStart")}</TableHead>
-                    <TableHead>{t("rentEnd")}</TableHead>
-                    <TableHead>{t("status")}</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {rents.map((rent) => (
-                    <TableRow key={rent.id} onClick={() => handleActiveRentClick(rent)} className="cursor-pointer">
-                      <TableCell>{getItemDetailsById(rent.item_id)}</TableCell>
-                      <TableCell>{new Date(rent.rent_start).toLocaleDateString()}</TableCell>
-                      <TableCell>{new Date(rent.rent_end).toLocaleDateString()}</TableCell>
-                      <TableCell>{t(rent.status)}</TableCell>
+          <div className="relative w-full z-10 overflow-auto bg-white max-h-screen rounded-t-2xl">
+            <Card>
+                <CardHeader>
+                <CardTitle>{t("activeRentals")}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                <Table>
+                    <TableHeader>
+                    <TableRow>
+                        <TableHead>{t("itemTitle")}</TableHead>
+                        <TableHead>{t("rentStart")}</TableHead>
+                        <TableHead>{t("rentEnd")}</TableHead>
+                        <TableHead>{t("status")}</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
+                    </TableHeader>
+                    <TableBody>
+                    {rents.map((rent) => (
+                        <TableRow key={rent.id} onClick={() => handleActiveRentClick(rent)} className="cursor-pointer">
+                        <TableCell>{getItemDetailsById(rent.item_id)}</TableCell>
+                        <TableCell>{new Date(rent.rent_start).toLocaleDateString()}</TableCell>
+                        <TableCell>{new Date(rent.rent_end).toLocaleDateString()}</TableCell>
+                        <TableCell>{t(rent.status)}</TableCell>
+                        </TableRow>
+                    ))}
+                    </TableBody>
+                </Table>
+                </CardContent>
+            </Card>
 
-          <Card className="mt-4">
-            <CardHeader>
-              <CardTitle>{t("newItems")}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>{t("itemTitle")}</TableHead>
-                    <TableHead>{t("creatorShop")}</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {items.map((item) => (
-                    <TableRow key={item.id} onClick={() => handleRowClick(item)} className="cursor-pointer">
-                      <TableCell>{item.title}</TableCell>
-                      <TableCell>{item.creator_ref_code}</TableCell>
+            <Card className="mt-4">
+                <CardHeader>
+                <CardTitle>{t("newItems")}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                <Table>
+                    <TableHeader>
+                    <TableRow>
+                        <TableHead>{t("itemTitle")}</TableHead>
+                        <TableHead>{t("creatorShop")}</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
+                    </TableHeader>
+                    <TableBody>
+                    {items.map((item) => (
+                        <TableRow key={item.id} onClick={() => handleRowClick(item)} className="cursor-pointer">
+                        <TableCell>{item.title}</TableCell>
+                        <TableCell>{item.creator_ref_code}</TableCell>
+                        </TableRow>
+                    ))}
+                    </TableBody>
+                </Table>
+                </CardContent>
+            </Card>
+            </div>
         </div>
       </div>
 
@@ -483,7 +486,7 @@ export default function Rents() {
           )}
 
           <div className="mt-4">
-            <Button onClick={handleCloseItemDetailsModal}>
+            <Button onClick={handleCloseItemDetailsModal} variant="destructive">
               {t("close")}
             </Button>
           </div>

@@ -36,7 +36,7 @@ const Dev: React.FC = () => {
   const [ideaText, setIdeaText] = useState<string>("");  // Idea input state
   const [ideas, setIdeas] = useState([
     { id: 1, title: "HackButton", description: "a big button in the middle of the screen that upon clicking adds me 13k coins to the balance with flying congratulations message \"You hacked the system!\"", contributors: ["SALAVEY13"] },
-    { id: 2, title: "quest4coins", description: "quests for earning coins with different type of tasks, from inviting 3 friends through referrals to creating first feature in dev mode. quests should be loaded from quests table from supabase - states for quests for particular user should be saved to quests_ststes table: new/in_progress/finished/reward_claimed - at first no state means new, after first click state is updated to in progress and current rank of user is checked (users table id(int4), telegram_id(int8), telegram_username, rank(int4), coins(int4)) if quest is about reaching 1st rank - if rank is ≥=1 then state is changed to finished and lable \"get reward is shown\", to get reward user clicks on thisfinished wuest and his coins are incremented by 13k, then state of quest is saved as reward_claimed and grays out. create similar flows for all types of quests. quest should contain url field on db what to open upon clicking if needed for sharing or something", contributors: ["SALAVEY13"] },
+    { id: 2, title: "quest4coins", description: "quests for earning coins with different type of tasksW", contributors: ["SALAVEY13"] },
     // Add more ideas as needed
   ]);
   const [requestText, setRequestText] = useState<string>("");  // Zero stage request text
@@ -1242,7 +1242,7 @@ return (
         <Button 
           onClick={handleZeroStageRequestType} 
           className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-          variant="destructive"
+          variant="outline"
         >
           {t('generateRequestButton')}4TYPE
         </Button>

@@ -16,28 +16,20 @@ const EnhancedChatButton = () => {
   useEffect(() => {
     if (tg) {
       showMainButton('Start Chat');
-      showBackButton();
+      tg.MainButton?.onClick(handleOpenChatGPT)
+      tg.MainButton?.setParams({color: "#FFFFFF", text_color: "#000000"})
+      //showBackButton();
     }
   }, [tg, showMainButton, showBackButton]);
 
   const handleOpenChatGPT = () => {
     openLink('https://chatgpt.com/?temporary-chat=true');
     hideMainButton();
-    closeWebApp();
+    //closeWebApp();
   };
 
   return (
     <div className={`flex flex-col items-center justify-center ${theme === 'dark' ? 'bg-black' : 'bg-white'} p-4`}>
-      <div className="flex flex-col items-center mb-4">
-        <img
-          src={user?.photo_url || '/default-avatar.png'}
-          alt="User Avatar"
-          className="w-16 h-16 rounded-full mb-4"
-        />
-        <p className={`text-sm ${theme === 'dark' ? 'text-white' : 'text-black'}`}>
-          Welcome, {user?.first_name || 'User'}!
-        </p>
-      </div>
       <button
         onClick={handleOpenChatGPT}
         className="group flex flex-col items-center justify-center text-gray-400 w-12 h-12 hover:text-blue-500 transition-all duration-300 transform hover:scale-110"

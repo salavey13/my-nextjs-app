@@ -80,7 +80,7 @@ const PaymentComponent: FC<PaymentComponentProps> = ({ item }) => {
         onChange={(e) => setEndDate(e.target.value)}
       />
 
-      <Button onClick={calculatePrice} variant="outline" className="mt-4 bg-blue-500 text-white p-2 rounded">
+      <Button onClick={calculatePrice} variant="default" className="mt-4 bg-blue-500 text-white p-2 rounded">
         {t('calculatePrice')}
       </Button>
 

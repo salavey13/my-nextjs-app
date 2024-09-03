@@ -301,7 +301,6 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     if (searchParams) {
       const refItemId = searchParams.get('ref_item');
       if (refItemId) {
-        //router.push(`/rents?item=${refItemId}`);
         // Store item ID in context or any other way to open the modal with preloaded data
       }
     }
