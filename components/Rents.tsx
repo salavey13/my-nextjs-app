@@ -439,7 +439,7 @@ export default function Rents() {
                 </Table>
                 </CardContent>
             </Card>
-            
+            <div className="h-[calc(64px)]"></div>
             </div>
         </div>
         
