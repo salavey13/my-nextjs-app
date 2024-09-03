@@ -10,76 +10,7 @@ interface User {
   photo_url?: string;
 }
 
-interface TelegramThemeParams {
-  [key: string]: string;
-}
 
-interface PopupButton {
-  type: string;
-  text?: string;
-}
-
-interface PopupParams {
-  title?: string;
-  message: string;
-  buttons: PopupButton[];
-}
-
-interface ScanQrPopupParams {
-  text?: string;
-}
-
-interface TelegramWebApp {
-  expand(): void;
-  initData: string;
-  initDataUnsafe: {
-    user?: User;
-    [key: string]: any;
-  };
-  themeParams?: TelegramThemeParams;
-  MainButton?: {
-    text: string; // Current button text
-  color: string; // Current button color
-  textColor: string; // Current button text color
-  isVisible: boolean; // Shows whether the button is visible
-  isActive: boolean; // Shows whether the button is active
-  isProgressVisible: boolean; // Readonly. Shows whether the button is displaying a loading indicator
-  setText(text: string): void; // Set the button text
-  onClick(callback: () => void): void; // Set the button press event handler
-  offClick(callback: () => void): void; // Remove the button press event handler
-  show(): void; // Make the button visible
-  hide(): void; // Hide the button
-  enable(): void; // Enable the button
-  disable(): void; // Disable the button
-  showProgress(leaveActive?: boolean): void; // Show a loading indicator on the button
-  hideProgress(): void; // Hide the loading indicator
-  setParams(params: {
-    text?: string;
-    color?: string;
-    text_color?: string;
-    is_active?: boolean;
-    is_visible?: boolean;
-  }): void; // Set multiple button parameters at once
-  };
-  BackButton?: {
-    show(): void;
-    hide(): void;
-  };
-  openLink(url: string, options?: { [key: string]: any }): void;
-  close(): void;
-  ready(): void;
-  colorScheme: 'light' | 'dark';
-  showPopup(params: PopupParams, callback?: (buttonId: string) => void): void;
-  showAlert(message: string, callback?: () => void): void;
-  showConfirm(message: string, callback?: (confirmed: boolean) => void): void;
-  showScanQrPopup(params: ScanQrPopupParams, callback?: (text: string) => void): void;
-  closeScanQrPopup(): void;
-  readTextFromClipboard(callback?: (text: string) => void): void;
-  enableVerticalSwipes(): void;
-  disableVerticalSwipes(): void;
-  setHeaderColor(color: string): void;
-  setBackgroundColor(color: string): void;
-}
 
 const useTelegram = () => {
   const [tg, setTg] = useState<TelegramWebApp | null>(null);

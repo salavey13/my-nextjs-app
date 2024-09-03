@@ -381,7 +381,7 @@ export default function Rents() {
               {t("addNewItem")}
             </Button>
           </div>
-          <div className="relative w-full z-10 overflow-auto bg-white max-h-screen rounded-t-2xl">
+          <div className="relative w-full z-10 overflow-auto">
             <Card>
                 <CardHeader>
                 <CardTitle>{t("activeRentals")}</CardTitle>
