@@ -108,7 +108,7 @@ const useTelegram = () => {
   };
 
   const showProgress = (leaveActive: boolean) => {
-    tg?.showProgress(leaveActive);
+    tg?.MainButton?.showProgress(leaveActive);
   };
 
   return {

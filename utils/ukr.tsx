@@ -337,6 +337,7 @@ ai: "ШІ",
 groupLesson: "Групова Мозголомка",
 promptReview: "Розпил Промптів",
 projectAssistance: "Проектна Допомога",
-promtgramming: "Кодоманія"
+promtgramming: "Кодоманія",
+darkTheme: "Темна тема",
 
     }

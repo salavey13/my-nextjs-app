@@ -35,29 +35,33 @@ interface TelegramThemeParams {
     };
     themeParams?: TelegramThemeParams;
     MainButton?: {
-      text: string; // Current button text
-    color: string; // Current button color
-    textColor: string; // Current button text color
-    isVisible: boolean; // Shows whether the button is visible
-    isActive: boolean; // Shows whether the button is active
-    isProgressVisible: boolean; // Readonly. Shows whether the button is displaying a loading indicator
-    setText(text: string): void; // Set the button text
-    onClick(callback: () => void): void; // Set the button press event handler
-    offClick(callback: () => void): void; // Remove the button press event handler
-    show(): void; // Make the button visible
-    hide(): void; // Hide the button
-    enable(): void; // Enable the button
-    disable(): void; // Disable the button
-    showProgress(leaveActive?: boolean): void; // Show a loading indicator on the button
-    hideProgress(): void; // Hide the loading indicator
-    setParams(params: {
-      text?: string;
-      color?: string;
-      text_color?: string;
-      is_active?: boolean;
-      is_visible?: boolean;
-    }): void; // Set multiple button parameters at once
+        text: string; // Current button text
+        color: string; // Current button color
+        textColor: string; // Current button text color
+        isVisible: boolean; // Shows whether the button is visible
+        isActive: boolean; // Shows whether the button is active
+        isProgressVisible: boolean; // Readonly. Shows whether the button is displaying a loading indicator
+        setText(text: string): void; // Set the button text
+        onClick(callback: () => void): void; // Set the button press event handler
+        offClick(callback: () => void): void; // Remove the button press event handler
+        show(): void; // Make the button visible
+        hide(): void; // Hide the button
+        enable(): void; // Enable the button
+        disable(): void; // Disable the button
+        showProgress(leaveActive?: boolean): void; // Show a loading indicator on the button
+        hideProgress(): void; // Hide the loading indicator
+        setParams(params: {
+            text?: string;
+            color?: string;
+            text_color?: string;
+            is_active?: boolean;
+            is_visible?: boolean;
+        }): void; // Set multiple button parameters at once
     };
+    SettingsButton?: {
+        show(): void;
+        onClick(callback: () => void): void; // Set the settings button press event handler
+    }
     BackButton?: {
       show(): void;
       hide(): void;
@@ -79,6 +83,7 @@ interface TelegramThemeParams {
     setBackgroundColor(color: string): void;
     onEvent(eventType: TelegramWebAppEventType, callback: (event: any) => void): void; // Add onEvent method
     showProgress(lweaveActive: boolean): void;
+    toggleThemeSettings(callback?: () => void): void;
 }
 
 // Define the MainButton interface with the possible actions

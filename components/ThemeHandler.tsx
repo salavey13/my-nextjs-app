@@ -1,35 +1,22 @@
-// components/ThemeHandler.tsx
+// components\ThemeHandler.tsx
+import { useContext } from 'react';
+import { useAppContext } from '@/context/AppContext'; 
 
-"use client";
+const ThemeToggle: React.FC = () => {
+  const { t, user, toggleTheme } = useAppContext();
 
-import { useEffect } from "react";
-
-const ThemeHandler = () => {
-//   useEffect(() => {
-//     const prefersDarkScheme = window.matchMedia("(prefers-color-scheme: dark)").matches;
-
-//     if (prefersDarkScheme) {
-//       document.documentElement.classList.add("dark");
-//     } else {
-//       document.documentElement.classList.remove("dark");
-//     }
-
-//     const themeChangeListener = (e: MediaQueryListEvent) => {
-//       if (e.matches) {
-//         document.documentElement.classList.add("dark");
-//       } else {
-//         document.documentElement.classList.remove("dark");
-//       }
-//     };
-
-//     window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", themeChangeListener);
-
-//     return () => {
-//       window.matchMedia("(prefers-color-scheme: dark)").removeEventListener("change", themeChangeListener);
-//     };
-//   }, []);
-
-  return null;
+  return (
+    <div>
+      <label>
+        {t("darkTheme")}
+        <input 
+          type="checkbox" 
+          checked={user? user.dark_theme : true} 
+          onChange={toggleTheme} 
+        />
+      </label>
+    </div>
+  );
 };
 
-export default ThemeHandler;
+export default ThemeToggle;

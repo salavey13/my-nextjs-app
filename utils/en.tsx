@@ -269,7 +269,7 @@ export const en: LanguageDictionary = {
     generateQrCode: "Generate QR Code",
     dynamicForm: "Dynamic Form",
     submit: "Submit",
-    itemAddedSuccessfully: "Item added successfully",
+    itemAddedSuccessfully: "Item added successfully, please refresh the page",
     paymentSuccessMessage: "Hello, {username}! Your payment was successful. Your premium access will be activated by {activationDate}.",
     notificationSent: "Notification sent successfully!",
     resendNotification: "Resend Notification",
@@ -433,5 +433,6 @@ ai: "AI",
 groupLesson: "Group Nerd Herd",
 promptReview: "Prompt Roast",
 projectAssistance: "Project S.O.S.",
-promtgramming: "Code Whispering"
+promtgramming: "Code Whispering",
+darkTheme: "Dark Theme",
 }

@@ -3,28 +3,54 @@
 @tailwind utilities;
 
 @layer base {
-  /* Hardcode light theme colors */
+  /* Light and Dark Theme Variables */
   :root {
-    --background: 0 0% 100%; /* White background */
-    --foreground: 0 0% 0%; /* Black text */
-    --card: 0 0% 100%; /* White card background */
-    --card-foreground: 0 0% 0%; /* Black card text */
-    --popover: 0 0% 100%; /* White popover background */
-    --popover-foreground: 0 0% 0%; /* Black popover text */
-    --primary: 220.9 39.3% 11%; /* Dark blue primary color */
-    --primary-foreground: 210 20% 98%; /* Light text on primary */
-    --secondary: 220 14.3% 95.9%; /* Light secondary background */
-    --secondary-foreground: 0 0% 0%; /* Black secondary text */
-    --muted: 220 14.3% 95.9%; /* Light muted background */
-    --muted-foreground: 220 8.9% 46.1%; /* Muted foreground */
-    --accent: 220 14.3% 95.9%; /* Light accent background */
-    --accent-foreground: 220.9 39.3% 11%; /* Dark accent text */
-    --destructive: 0 84.2% 60.2%; /* Red destructive color */
-    --destructive-foreground: 210 20% 98%; /* Light text on destructive */
-    --border: 220 13% 91%; /* Light border color */
-    --input: 220 13% 91%; /* Light input background */
-    --ring: 224 71.4% 4.1%; /* Dark ring color */
-    --radius: 0.5rem; /* Border radius */
+    --background: 0 0% 100%;
+    --foreground: 0 0% 0%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 0%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 0%;
+    --primary: 220.9 39.3% 11%;
+    --primary-foreground: 210 20% 98%;
+    --secondary: 220 14.3% 95.9%;
+    --secondary-foreground: 0 0% 0%;
+    --muted: 220 14.3% 95.9%;
+    --muted-foreground: 220 8.9% 46.1%;
+    --accent: 220 14.3% 95.9%;
+    --accent-foreground: 220.9 39.3% 11%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 20% 98%;
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 224 71.4% 4.1%;
+    --radius: 0.5rem;
+    --accent-color: #E1FF01; /* Bright yellow accent */
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --background: 220 13% 18%;
+      --foreground: 210 15% 98%;
+      --card: 220 13% 24%;
+      --card-foreground: 210 15% 98%;
+      --popover: 220 13% 24%;
+      --popover-foreground: 210 15% 98%;
+      --primary: 210 20% 40%;
+      --primary-foreground: 210 15% 98%;
+      --secondary: 220 13% 28%;
+      --secondary-foreground: 210 15% 98%;
+      --muted: 220 13% 24%;
+      --muted-foreground: 220 15% 70%;
+      --accent: 220 13% 24%;
+      --accent-foreground: 210 15% 98%;
+      --destructive: 0 84.2% 60.2%;
+      --destructive-foreground: 210 15% 98%;
+      --border: 220 13% 30%;
+      --input: 220 13% 28%;
+      --ring: 220 20% 40%;
+      --radius: 0.5rem;
+    }
   }
 
   body {
@@ -42,7 +68,6 @@
     height: 100%;
   }
 
-  /* Apply a 3-point purple gradient to all h1 headers */
   h1 {
     background: linear-gradient(45deg, #8e2de2, #4a00e0, #9c27b0);
     -webkit-background-clip: text;
@@ -68,24 +93,18 @@
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
   }
-  
-  .gradient-icon {
-    background: linear-gradient(45deg, #ff6f61, #d4a5a5);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
 
   .main-content {
     min-height: calc(100vh - 128px);
     padding-top: 64px;
     padding-bottom: 64px;
     backdrop-filter: blur(10px);
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.9) 0%, rgba(240, 240, 240, 0.8) 100%); /* Light gradient */
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.9) 0%, rgba(240, 240, 240, 0.8) 100%);
   }
 
   header, footer {
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1); /* Light shadow */
-    background-color: hsl(var(--background) / 0.8); /* Light background */
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    background-color: hsl(var(--background) / 0.8);
     backdrop-filter: blur(10px);
   }
 
@@ -93,7 +112,6 @@
     @apply border-border;
   }
 
-  /* Loading spinner */
   .loader {
     border-top-color: hsl(var(--primary));
   }
@@ -103,14 +121,78 @@
                 0 0 16px rgba(136, 255, 0, 0.322),
                 0 0 24px rgba(132, 0, 255, 0.007);
   }
-}
 
-/* Hide scrollbar for WebKit browsers */
-.scrollbar-hide::-webkit-scrollbar {
-  display: none;
-}
+  /* Custom Scrollbars */
+  ::-webkit-scrollbar {
+    width: 12px;
+  }
 
-/* Hide scrollbar for Firefox */
-.scrollbar-hide {
-  scrollbar-width: none;
+  ::-webkit-scrollbar-track {
+    background: hsl(var(--background));
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: hsl(var(--primary));
+    border-radius: 10px;
+    border: 3px solid hsl(var(--background));
+  }
+
+  /* Button Ripple Effect */
+  @keyframes ripple {
+    to {
+      transform: scale(4);
+      opacity: 0;
+    }
+  }
+
+  .button-ripple {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .button-ripple::after {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.4);
+    pointer-events: none;
+    border-radius: 50%;
+    transform: scale(0);
+    animation: ripple 0.6s linear;
+  }
+
+  .button-ripple:active::after {
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%) scale(0);
+  }
+
+  /* Neumorphism */
+  .neumorphism {
+    background: hsl(var(--background));
+    border-radius: var(--radius);
+    box-shadow: 8px 8px 16px hsl(var(--background) / 0.4), -8px -8px 16px hsl(var(--foreground) / 0.2);
+  }
+
+  .input-neumorphism {
+    @apply neumorphism;
+    padding: 0.5rem 1rem;
+    border: none;
+  }
+
+  .checkbox-neumorphism {
+    @apply neumorphism;
+    width: 24px;
+    height: 24px;
+  }
+
+  .button-hover {
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .button-hover:hover {
+    background-color: var(--accent-color);
+    box-shadow: 0 0 10px var(--accent-color);
+  }
 }

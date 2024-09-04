@@ -236,7 +236,6 @@ const toCamelCase = (str:string) => {
                       />
                       <Checkbox
                         checked={field.value === field.disabled_option}
-                        label={t("disableOptionLabel")}
                         onCheckedChange={(checked) =>
                           handleCheckboxChange(
                             sectionIndex,
@@ -246,6 +245,7 @@ const toCamelCase = (str:string) => {
                         }
                         className="mr-2"
                       />
+                      <p>{t("disableOptionLabel")}</p>
                     </div>
                   ) : field.type != "checkbox" ? (
                     <Input

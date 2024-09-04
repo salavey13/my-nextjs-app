@@ -6,6 +6,7 @@ import { LanguageDictionary, translations } from "../utils/TranslationUtils";
 import { usePathname, useSearchParams } from 'next/navigation';
 import { updateUserReferral, increaseReferrerX, addReferralEntry } from '../services/ReferralService';
 import useTelegram from '../hooks/useTelegram';
+import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
 // Default store state
 const defaultStore = {
@@ -14,7 +15,8 @@ const defaultStore = {
   coins: '2000000',
   rp: '420',
   lang: 'ru',
-  X: '69'
+  X: '69',
+  dark_theme: true,
 };
 
 interface UserData {
@@ -38,6 +40,7 @@ interface UserData {
   initial_readings?: Record<string, any> | null;
   monthly_prices?: Record<string, any> | null;
   site?: string | null;
+  dark_theme: boolean,
 }
 
 interface AppContextType {
@@ -51,7 +54,7 @@ interface AppContextType {
   debugLogs: string[];
   addDebugLog: (log: string) => void;
   updateUserReferrals: (newReferralCode: string) => void;
-
+  toggleTheme: () => void,
   formState: any;
   saveFormState: () => void;
 }
@@ -111,6 +114,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
           X: data.X.toString(),
           tasksTodo: data.tasksTodo ? JSON.parse(data.tasksTodo) : [],
           currentGameId: data.currentgameId || '',
+          dark_theme: data.dark_theme,
         }));
         setUser(data);
       } else {
@@ -241,18 +245,25 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     // Initialize Telegram WebApp and fetch user data
     if (tg) {
       tg.ready();
+      tg.toggleThemeSettings(toggleTheme)
       setTheme("dark"); // Set the dark theme immediately
 
-      const user = tg.initDataUnsafe?.user;
-      if (user) {
-        fetchPlayer(user.id, user.username, user.language_code);
+      const tgUser = tg.initDataUnsafe?.user;
+      if (tgUser) {
+        fetchPlayer(tgUser.id, tgUser.username, tgUser.language_code);
       } else {
         fetchPlayer(defaultStore.tg_id, defaultStore.username, defaultStore.lang);
       }
-
+      setTheme(user? user.dark_theme ? "dark" :"light" :"dark"); // Set the dark theme immediately
+      if (user && !user.dark_theme) {
+        setHeaderColor("#FFFFFF"); // Set the header color to black
+        setBackgroundColor("#FFFFFF"); // Set the background color to black
+      }
+      else {
+        setHeaderColor("#000000"); // Set the header color to black
+        setBackgroundColor("#000000"); // Set the background color to black
+      }
       disableVerticalSwipes(); // Disable vertical swipes in the Telegram WebApp
-      setHeaderColor("#000000"); // Set the header color to black
-      setBackgroundColor("#000000"); // Set the background color to black
     }
   }, [tg]);
 
@@ -285,9 +296,28 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     }
   }
 
+  // Function to toggle theme and save to Supabase
+  const toggleTheme = async () => {
+    if (user) {
+      const newTheme = !user.dark_theme;
+      setUser({ ...user, dark_theme: newTheme });
+      setStore((prev) => ({ ...prev, dark_theme: newTheme }));
+      
+      const { error } = await supabase
+        .from('users')
+        .update({ dark_theme: newTheme })
+        .eq('telegram_id', user.telegram_id);
+      
+      if (error) {
+        console.error('Error updating theme in Supabase:', error);
+        addDebugLog(`Error updating theme in Supabase: ${error.message}`);
+      }
+    }
+  };
+
   return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <AppContext.Provider value={{ store, setStore, user, setUser, fetchPlayer, t, changeLanguage, debugLogs, addDebugLog, updateUserReferrals,formState, saveFormState }}>
+    <Suspense fallback={<LoadingSpinner />}>
+      <AppContext.Provider value={{ store, setStore, user, setUser, fetchPlayer, t, changeLanguage, debugLogs, addDebugLog, updateUserReferrals,formState, saveFormState, toggleTheme }}>
         {children}
       </AppContext.Provider>
     </Suspense>
