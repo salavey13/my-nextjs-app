@@ -1,3 +1,4 @@
+// hooks/useTelegram.tsx
 import { useEffect, useState } from 'react';
 
 // Define types for new functionalities
@@ -106,10 +107,15 @@ const useTelegram = () => {
     tg?.setBackgroundColor(color);
   };
 
+  const showProgress = (leaveActive: boolean) => {
+    tg?.showProgress(leaveActive);
+  };
+
   return {
     tg,
     user,
     theme,
+    setTheme,
     openLink,
     showMainButton,
     hideMainButton,
@@ -125,6 +131,7 @@ const useTelegram = () => {
     disableVerticalSwipes,
     setHeaderColor,
     setBackgroundColor,
+    showProgress,
   };
 };
 

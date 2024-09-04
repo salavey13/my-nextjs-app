@@ -117,10 +117,6 @@ export default function Rents() {
     fetchRents();
     fetchItems();
     fetchUsers();
-    disableVerticalSwipes();
-    
-    setHeaderColor("#FFFFFF")
-    setBackgroundColor("#FFFFFF")
   }, [user]);
 
   useEffect(() => {
@@ -279,7 +275,6 @@ export default function Rents() {
 
             if (error) {
                 console.error('Error inserting new item type:', error);
-                showAlert(t('errorInsert')); // Add a translation for this
                 return;
             }
 
@@ -300,7 +295,6 @@ export default function Rents() {
             setShowForm(false);
         } catch (error) {
             console.error('Error processing new item type:', error);
-            showAlert(t('gpt')); // Handle JSON parsing errors
         }
     };
 

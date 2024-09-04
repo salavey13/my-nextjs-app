@@ -5,6 +5,7 @@ import { supabase } from '../lib/supabaseClient';
 import { LanguageDictionary, translations } from "../utils/TranslationUtils";
 import { usePathname, useSearchParams } from 'next/navigation';
 import { updateUserReferral, increaseReferrerX, addReferralEntry } from '../services/ReferralService';
+import useTelegram from '../hooks/useTelegram';
 
 // Default store state
 const defaultStore = {
@@ -51,8 +52,8 @@ interface AppContextType {
   addDebugLog: (log: string) => void;
   updateUserReferrals: (newReferralCode: string) => void;
 
-  formState: any; // Add this line
-  saveFormState: () => void; // Add this line
+  formState: any;
+  saveFormState: () => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -61,15 +62,21 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const [store, setStore] = useState(defaultStore);
   const [user, setUser] = useState<UserData | null>(null);
   const [debugLogs, setDebugLogs] = useState<string[]>([]);
-  const [formState, setFormState] = useState<any>({}); // Initialize formState
-  const saveFormState = () => {
-    // Implement the logic to save formState, maybe to Supabase or local storage
-    console.log("Saving form state:", formState);
-    // Example: Save to local storage
-    localStorage.setItem('formState', JSON.stringify(formState));
-  };
+  const [formState, setFormState] = useState<any>({});
+  const {
+    tg,
+    setTheme,
+    setHeaderColor,
+    setBackgroundColor,
+    disableVerticalSwipes,
+  } = useTelegram();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+
+  const saveFormState = () => {
+    console.log("Saving form state:", formState);
+    localStorage.setItem('formState', JSON.stringify(formState));
+  };
 
   const updateUserReferrals = (newReferralCode: string) => {
     setUser((prevUser: any) => ({ ...prevUser, ref_code: newReferralCode }));
@@ -78,8 +85,6 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const addDebugLog = (log: string) => {
     setDebugLogs((prevLogs) => [...prevLogs, log]);
   };
-
-  let isUserBeingInserted = false;
 
   const fetchPlayer = async (tg_id: number, username: string, lang: string) => {
     try {
@@ -109,92 +114,64 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         }));
         setUser(data);
       } else {
-        // Only call insertNewUser if no other insert is in progress
-        if (!isUserBeingInserted) {
-          isUserBeingInserted = true;
-          await insertNewUser(tg_id, username, lang);
-          isUserBeingInserted = false;
-        }
+        // Handle new user insertion
+        await insertNewUser(tg_id, username, lang);
       }
     } catch (error) {
       console.error('Fetch/Insert error:', error);
       addDebugLog(`Fetch/Insert error: ${error}`);
     }
-  }
+  };
 
   const insertNewUser = async (tg_id: number, username: string, lang: string) => {
-    console.error("INSIDE INSERT");
     try {
+      const { data: newUser, error } = await supabase
+        .from('users')
+        .insert([{ telegram_id: tg_id, telegram_username: username, lang: lang }])
+        .single();
 
-        // if (existingUser) {
-        //     console.error('User already exists, skipping insert.');
-        //     return;
-        // }
+      if (error) {
+        console.error("Insert error: ", error.message);
+        throw error;
+      }
 
-        const { data: newUser, error } = await supabase
-            .from('users')
-            .insert([{ telegram_id: tg_id, telegram_username: username, lang: lang }])
-            .single();
+      const { data: existingUser, error: fetchError } = await supabase
+        .from('users')
+        .select('*')
+        .eq('telegram_id', tg_id)
+        .single();
 
-        if (error) {
-            console.error("INSIDE INSERT error1 ", error.message);
-            throw error;
-        }
-        const { data: existingUser, error: fetchError } = await supabase
-            .from('users')
-            .select('*')
-            .eq('telegram_id', tg_id)
-            .single();
+      if (fetchError && fetchError.code !== 'PGRST116') {
+        console.error('Fetch after insert error:', fetchError);
+        return;
+      }
 
-        if (fetchError && fetchError.code !== 'PGRST116') {
-            console.error('Fetch before insert error:', fetchError);
-            return;
-        }
+      if (existingUser) {
+        setStore((prev) => ({
+          ...prev,
+          tg_id: existingUser.telegram_id,
+          username: existingUser.telegram_username || '',
+          coins: existingUser.coins?.toString() || '0',
+          rp: existingUser.rp?.toString() || '0',
+          lang: existingUser.lang,
+          X: existingUser.X?.toString() || '0',
+          tasksTodo: existingUser.tasksTodo ? JSON.parse(existingUser.tasksTodo) : [],
+          currentGameId: existingUser.currentgameId || '',
+        }));
+        setUser(existingUser);
 
-        console.error("INSIDE INSERT 2", newUser); // Log the result of the insert operation
-        console.error("INSIDE INSERT 3", existingUser); // Log the result of the insert operation
-
-        if (!newUser) {
-          console.error("Insert operation returned null or undefined.");
-          if (!existingUser) {
-            console.error("Fetch after Insert operation returned null or undefined too.");
-            return;
+        if (searchParams) {
+          const refCode = searchParams.get('ref');
+          if (refCode) {
+            await handleReferral(refCode, existingUser);
           }
         }
-
-        const userData: UserData = existingUser as UserData;
-        if (userData) {
-            console.error("INSIDE INSERT userData", userData); // Log userData
-
-            setStore((prev) => ({
-                ...prev,
-                tg_id: userData.telegram_id,
-                username: userData.telegram_username || '',
-                coins: userData.coins?.toString() || '0',
-                rp: userData.rp?.toString() || '0',
-                lang: userData.lang,
-                X: userData.X?.toString() || '0',
-                tasksTodo: userData.tasksTodo ? JSON.parse(userData.tasksTodo) : [],
-                currentGameId: userData.currentgameId || '',
-            }));
-            setUser(userData);
-
-            if (searchParams) {
-                console.error("INSIDE INSERT searchParams");
-                // Immediately trigger referral check after user creation
-                const refCode = searchParams.get('ref');
-                if (refCode) {
-                    console.error("INSIDE INSERT refCode", refCode);
-                    await handleReferral(refCode, userData);
-                }
-            }
-        }
+      }
     } catch (error) {
-        console.error('Insert error:', error);
-        addDebugLog(`Insert error: ${error}`);
+      console.error('Insert error:', error);
+      addDebugLog(`Insert error: ${error}`);
     }
-};
-
+  };
 
   const handleReferral = async (refCode: string, user: UserData) => {
     try {
@@ -261,41 +238,23 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   };
 
   useEffect(() => {
-    const initTelegramWebApp = () => {
-      const script = document.createElement("script");
-      script.src = "https://telegram.org/js/telegram-web-app.js";
-      script.async = true;
-      document.head.appendChild(script);
+    // Initialize Telegram WebApp and fetch user data
+    if (tg) {
+      tg.ready();
+      setTheme("dark"); // Set the dark theme immediately
 
-      script.onload = () => {
-        if (window.Telegram?.WebApp) {
-          const initData = window.Telegram.WebApp.initData;
+      const user = tg.initDataUnsafe?.user;
+      if (user) {
+        fetchPlayer(user.id, user.username, user.language_code);
+      } else {
+        fetchPlayer(defaultStore.tg_id, defaultStore.username, defaultStore.lang);
+      }
 
-          if (initData) {
-            const urlParams = new URLSearchParams(initData);
-            const userParam = urlParams.get("user");
-
-            if (userParam) {
-              const user = JSON.parse(decodeURIComponent(userParam));
-              if (!user.id) return;
-
-              fetchPlayer(user.id, user.username, user.language_code);
-            }
-
-            setupTelegramBackButton();
-          } else {
-            fetchPlayer(defaultStore.tg_id, defaultStore.username, defaultStore.lang);
-          }
-        }
-      };
-
-      return () => {
-        document.head.removeChild(script);
-      };
-    };
-
-    initTelegramWebApp();
-  }, [user?.id]);
+      disableVerticalSwipes(); // Disable vertical swipes in the Telegram WebApp
+      setHeaderColor("#000000"); // Set the header color to black
+      setBackgroundColor("#000000"); // Set the background color to black
+    }
+  }, [tg]);
 
   useEffect(() => {
     if (searchParams) {
