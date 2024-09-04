@@ -24,7 +24,7 @@ const DynamicItemDetails: React.FC<DynamicItemDetailsProps> = ({
   const renderNestedDetails = (data: Record<string, any>, level: number = 0) => {
     return Object.entries(data).map(([key, value]) => (
       <div key={key} className={`mb-2 ml-${level * 4}`}>
-        <h4 className="text-md font-bold text-gray-800">{t(key)}</h4>
+        <h4 className="text-md font-bold text-gray-800">{t(toCamelCase(key))}</h4>
         {typeof value === "object" && value !== null ? (
           renderNestedDetails(value, level + 1)
         ) : (
@@ -48,6 +48,11 @@ const DynamicItemDetails: React.FC<DynamicItemDetailsProps> = ({
         return null;
       }
     });
+  };
+    
+  // Utility function to convert underscored keys to camelCase
+const toCamelCase = (str:string) => {
+    return str.replace(/_([a-z])/g, (match, letter) => letter.toUpperCase());
   };
 
   return (

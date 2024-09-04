@@ -181,13 +181,22 @@ interface Window {
     status: string;
   }
   
-  interface Item {
-    id: number;
-    title: string;
-    creator_ref_code: string;
-    item_type: string;
-    details: any;
-  }
+    interface Item {
+        id: number;
+        details: {
+          general_info?: {
+              [key: string]: string;
+              price: string;
+          };
+          pricing?: {
+            [key: string]: string; // Changed to handle the object structure
+          };
+          [key: string]: any;
+        };
+        title: string;
+        creator_ref_code: string;
+        item_type: string;
+      }
   
   interface User {
     id: number;
