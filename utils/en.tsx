@@ -387,7 +387,6 @@ export const en: LanguageDictionary = {
     enterTitleKey: "Enter a cool title for your new item type",
     enterJsonData: "Paste your JSON magic here",
     errorInsert: "Yikes! Something went wrong while saving. Please try again.",
-    evo: "Evo",
     noData: "No Data",
     generalInfo: "General Information",
     city: "City",
@@ -424,6 +423,11 @@ make: "Make",
 year: "Year",
 color: "Color",
 model: "Model",
-price: "Price"
-
+price: "Price",
+agreementSectionTitle: "Consent",
+car: "Car",
+motorbike: "Motorbike",
+bicycle: "Bicycle",
+evo: "Evacuator",
+ai: "AI"
 }

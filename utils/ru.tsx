@@ -239,8 +239,8 @@ contributorsLabel: "Соавторы",
   },
   adInfo: {
     
-    title_label: "Название",
-    description_label: "Описание",
+    titleLabel: "Название",
+    descriptionLabel: "Описание",
     title: "Информация об объявлении",
     fields: {
       title: "Заголовок объявления",
@@ -270,7 +270,7 @@ contributorsLabel: "Соавторы",
     },
   },
   photoUpload: {
-    photo_label: "Фото",
+    photoLabel: "Фото",
     photoAlt: "Фото предмета",
     title: "Фото",
     fields: {
@@ -296,7 +296,6 @@ contributorsLabel: "Соавторы",
   enterTitleKey: "Введите классное название для нового типа элемента",
   enterJsonData: "Вставьте свою магию JSON сюда",
   errorInsert: "Ой! Что-то пошло не так при сохранении. Попробуйте снова.",
-  evo: "Эво",
   noData: "Нет данных",
   city: "Город",
   russian: "Русский",
@@ -332,4 +331,9 @@ color: "Цвет",
 model: "Модель",
 price: "Цена",
 agreementSectionTitle: "Согласие",
+car: "Автомобиль",
+motorbike: "Мотоцикл",
+bicycle: "Велосипед",
+evo: "Эвакуатор",
+ai: "ИИ"
 }

@@ -65,11 +65,11 @@ const toCamelCase = (str:string) => {
           {ad_info && (
             <div className="mt-4">
               <div className="border-b border-gray-200 pb-2">
-                <label className="font-bold">{t('ad_info.title_label')}:</label>
+                <label className="font-bold">{t(toCamelCase('ad_info.title_label'))}:</label>
                 <p>{ad_info.title || t('common.n_a')}</p>
               </div>
               <div className="border-b border-gray-200 pb-2">
-                <label className="font-bold">{t('ad_info.description_label')}:</label>
+                <label className="font-bold">{t(toCamelCase('ad_info.description_label'))}:</label>
                 <p>{ad_info.description || t('common.n_a')}</p>
               </div>
             </div>
@@ -78,11 +78,11 @@ const toCamelCase = (str:string) => {
           {lesson_info && (
             <div className="mt-4">
               <div className="border-b border-gray-200 pb-2">
-                <label className="font-bold">{t('lesson_info.title_label')}:</label>
+                <label className="font-bold">{t(toCamelCase('lesson_info.title_label'))}:</label>
                 <p>{lesson_info.title || t('common.n_a')}</p>
               </div>
               <div className="border-b border-gray-200 pb-2">
-                <label className="font-bold">{t('lesson_info.description_label')}:</label>
+                <label className="font-bold">{t(toCamelCase('lesson_info.description_label'))}:</label>
                 <p>{lesson_info.description || t('common.n_a')}</p>
               </div>
             </div>
@@ -90,14 +90,14 @@ const toCamelCase = (str:string) => {
 
           {general_info && (
             <div className="mt-4">
-              <h3 className="text-lg font-bold text-gray-800">{t('general_info.title')}</h3>
+              <h3 className="text-lg font-bold text-gray-800">{t(toCamelCase('general_info.title'))}</h3>
               {renderNestedDetails(general_info)}
             </div>
           )}
 
           {pricing && (
             <div className="mt-4">
-              <h3 className="text-lg font-bold text-gray-800">{t('pricing.title')}</h3>
+              <h3 className="text-lg font-bold text-gray-800">{t(toCamelCase('pricing.title'))}</h3>
               {renderNestedDetails(pricing)}
             </div>
           )}
@@ -106,11 +106,11 @@ const toCamelCase = (str:string) => {
 
           {photo_upload && photo_upload.photo ? (
             <div className="border-b border-gray-200 pb-2 rounded-2xl">
-              <img src={photo_upload.photo} alt={t('photo_upload.photo_alt')} className="w-full h-auto" />
+              <img src={photo_upload.photo} alt={t(toCamelCase('photo_upload.photo_alt'))} className="w-full h-auto" />
             </div>
           ) : (
             <div className="border-b border-gray-200 pb-2">
-              <label className="font-bold">{t('photo_upload.photo_label')}:</label>
+              <label className="font-bold">{t(toCamelCase('photo_upload.photo_label'))}:</label>
               <p>{t('common.n_a')}</p>
             </div>
           )}
@@ -121,7 +121,7 @@ const toCamelCase = (str:string) => {
             <h3 className="text-lg font-bold text-gray-800">{t("additionalInformation")}</h3>
             {Object.entries(unparsedFields).map(([key, value]) => (
               <div key={key} className="mb-4">
-                <h3 className="text-lg font-bold text-gray-800">{t(key)}</h3>
+                <h3 className="text-lg font-bold text-gray-800">{t(toCamelCase(key))}</h3>
                 <p className="text-gray-700">{JSON.stringify(value)}</p>
               </div>
             ))}

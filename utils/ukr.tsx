@@ -233,7 +233,7 @@ contributorsLabel: "Учасники",
   },
   adInfo: {
     titleLabel: "Назва",
-    description_label: "Опис",
+    descriptionLabel: "Опис",
     title: "Ad information",
     fields: {
       title: "Ad title",
@@ -292,7 +292,6 @@ generalInfo: {
       enterTitleKey: "Введіть круту назву для нового типу елемента",
       enterJsonData: "Вставте свою JSON-магію сюди",
       errorInsert: "Ой! Щось пішло не так під час збереження. Спробуйте знову.",
-      evo: "Ево",
       noData: "Немає даних",
       city: "Місто",
       russian: "Російська",
@@ -329,6 +328,11 @@ year: "Рік",
 color: "Колір",
 model: "Модель",
 price: "Ціна",
-agreementSectionTitle: "Згода"
+agreementSectionTitle: "Згода",
+car: "Автомобіль",
+motorbike: "Мотоцикл",
+bicycle: "Велосипед",
+evo: "Евакуатор",
+ai: "ШІ"
 
     }
