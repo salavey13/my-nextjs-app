@@ -66,7 +66,7 @@ const DynamicItemForm: React.FC<DynamicItemFormProps> = ({ itemType }) => {
 
       const sections: FormSection[] = Object.keys(data.fields).map((sectionKey) => {
         const section = data.fields[sectionKey];
-        const sectionTitle = t(toCamelCase(`${sectionKey}.title`)); // Use sectionKey as the title
+        const sectionTitle = sectionKey // Use sectionKey as the title
 
         const fields = Array.isArray(section.fields)
           ? section.fields.map((field: any) => ({
@@ -197,7 +197,7 @@ const toCamelCase = (str:string) => {
           {formSections.map((section, sectionIndex) => (
             <div key={sectionIndex}>
               <h3 className="text-lg font-bold text-gray-800 mb-2">
-                {section.title}
+                {t(`${toCamelCase(section.title)}.title`)}
               </h3>
               {section.fields.map((field, fieldIndex) => (
                 <div key={field.name} className="mb-4">
@@ -247,7 +247,7 @@ const toCamelCase = (str:string) => {
                         className="mr-2"
                       />
                     </div>
-                  ) : (
+                  ) : field.type != "checkbox" ? (
                     <Input
                       type={field.type}
                       value={field.value}
@@ -260,6 +260,8 @@ const toCamelCase = (str:string) => {
                         )
                       }
                     />
+                  ):(
+                    <div/>
                   )}
                 </div>
               ))}
