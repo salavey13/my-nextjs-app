@@ -140,7 +140,7 @@ const PaymentComponent: FC<PaymentComponentProps> = ({ item }) => {
     }
 
     // Create the payment link
-    const paymentLink = `ton://transfer/${targetWallet}?amount=${totalPrice}&message=Payment%20for%20item%20${item.id}`;
+    const paymentLink = `ton://transfer/${targetWallet.ton_wallet}?amount=${totalPrice}&message=Payment%20for%20item%20${item.id}`;
     window.open(paymentLink, '_blank');
     
     // Send notification to the item creator
@@ -151,7 +151,7 @@ const PaymentComponent: FC<PaymentComponentProps> = ({ item }) => {
   };
 
   // Utility function to convert underscored keys to camelCase
-const toCamelCase = (str:string) => {
+    const toCamelCase = (str:string) => {
     return str.replace(/_([a-z])/g, (match, letter) => letter.toUpperCase());
   };
 
