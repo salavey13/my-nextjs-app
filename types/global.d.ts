@@ -1,4 +1,4 @@
-// src/types/global.d.ts
+// types/global.d.ts
 
 interface TelegramThemeParams {
     [key: string]: string;

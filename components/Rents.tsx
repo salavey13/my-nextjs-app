@@ -17,35 +17,7 @@ import { faPlus, faMinus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import useTelegram from '../hooks/useTelegram';
   
-interface Rent {
-  id: number;
-  user_id: number;
-  item_id: number;
-  rent_start: string;
-  rent_end: string;
-  status: string;
-}
 
-interface Item {
-  id: number;
-  title: string;
-  creator_ref_code: string;
-  item_type: string;
-  details: any;
-}
-
-interface User {
-  id: number;
-  telegram_id: string;
-  ref_code: string;
-  site: string;
-}
-
-interface ItemType {
-  id: string;
-  type: string;
-  fields: any;
-}
 
 export default function Rents() {
   const [rents, setRents] = useState<Rent[]>([]);
@@ -326,36 +298,7 @@ export default function Rents() {
         }
     };
 
-  const sendNotificationToCreator = useCallback(async (userId: string, itemId: number, rentId: number) => {
-    if (!process.env.NEXT_PUBLIC_BOT_TOKEN || !user) {
-      console.error('Bot token is missing');
-      return;
-    }
-
-    const botToken = process.env.NEXT_PUBLIC_BOT_TOKEN;
-    const inviteLink = `https://t.me/oneSitePlsBot/vip?ref=${itemId}-${rentId}`;
-    const url = new URL(`https://api.telegram.org/bot${botToken}/sendMessage`);
-    const message = `${t('newRentNotification')} ${user.telegram_username} ! 🎮✨`;
-
-    url.searchParams.append("chat_id", userId.toString());
-    url.searchParams.append("text", message);
-    url.searchParams.append("reply_markup", JSON.stringify({
-      inline_keyboard: [
-        [{ text: t("viewItem"), url: inviteLink }],
-        [{ text: t("visitSite"), url: "https://oneSitePls.framer.ai" }],
-        [{ text: t("joinCommunity"), url: "https://t.me/aibotsites" }],
-        [{ text: t("youtubeChannel"), url: "https://youtube.com/@salavey13" }],
-      ],
-    }));
-
-    try {
-      const response = await fetch(url.toString());
-      if (!response.ok) throw new Error('Failed to send Telegram message');
-
-    } catch (error) {
-      console.error('Error sending Telegram message:', error);
-    }
-  }, [user, t]);
+  
 
   const handleActiveRentClick = async (rent: Rent) => {
     const item = items.find(i => i.id === rent.item_id);
@@ -528,7 +471,7 @@ export default function Rents() {
             <div>
               {/* Dynamic item details */}
                 {itemDetails && (
-                    <DynamicItemDetails item={selectedItem} />
+                    <DynamicItemDetails itemType={selectedItem.item_type} itemDetails={selectedItem.details} />
                 )}
 
               {/* Payment component */}

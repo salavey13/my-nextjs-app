@@ -1,4 +1,3 @@
-//components/DynamicItemForm.tsx
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -7,6 +6,8 @@ import { useAppContext } from "../context/AppContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
+
+import FormFooter from "../components/ui/FormFooter";
 import {
   Card,
   CardHeader,
@@ -15,7 +16,6 @@ import {
 } from "../components/ui/card";
 import LoadingSpinner from "../components/ui/LoadingSpinner";
 import QRCode from "react-qr-code";
-import FormFooter from "../components/ui/FormFooter";
 
 interface FormField {
   name: string;
@@ -40,10 +40,10 @@ export interface DynamicItemFormProps {
 const DynamicItemForm: React.FC<DynamicItemFormProps> = ({ itemType }) => {
   const { t, user } = useAppContext();
   const [formSections, setFormSections] = useState<FormSection[]>([]);
-  const [agreementSection, setAgreementSection] = useState<FormSection | null>(null);
   const [loading, setLoading] = useState(false);
   const [qrCodeUrl, setQrCodeUrl] = useState<string | null>(null);
   const [isAgreementChecked, setIsAgreementChecked] = useState(false);
+  const [agreementText, setAgreementText] = useState<string>("");
 
   useEffect(() => {
     fetchFormFields();
@@ -64,50 +64,31 @@ const DynamicItemForm: React.FC<DynamicItemFormProps> = ({ itemType }) => {
         throw new Error("Invalid fields data structure");
       }
 
-      const sections: FormSection[] = [];
-      let agreementSection: FormSection | null = null;
-
-      Object.keys(data.fields).forEach((sectionKey: string) => {
+      const sections: FormSection[] = Object.keys(data.fields).map((sectionKey) => {
         const section = data.fields[sectionKey];
-        const sectionTitle = t(typeof section.title === "string" ? section.title : "");
+        const sectionTitle = t(sectionKey); // Use sectionKey as the title
 
-        if (sectionKey === "agreement") {
-          agreementSection = {
-            title: sectionTitle,
-            fields: Array.isArray(section.fields)
-              ? section.fields.map((field: any) => ({
-                  name: field.name,
-                  label: t(typeof field.label === "string" ? field.label : "defaultLabel"),
-                  type: field.type === "file" ? "text" : field.type,
-                  value: field.value || "",
-                  disabled_option: field.disabled_option,
-                  disable_checkbox: field.disable_checkbox,
-                  placeholder: field.placeholder || "", // Ensure placeholder is present
-                  options: field.options || [], // Ensure options are present
-                }))
-              : [],
-          };
-        } else {
-          sections.push({
-            title: sectionTitle,
-            fields: Array.isArray(section.fields)
-              ? section.fields.map((field: any) => ({
-                  name: field.name,
-                  label: t(typeof field.label === "string" ? field.label : "defaultLabel"),
-                  type: field.type === "file" ? "text" : field.type,
-                  value: field.value || "",
-                  disabled_option: field.disabled_option,
-                  disable_checkbox: field.disable_checkbox,
-                  placeholder: field.placeholder || "", // Ensure placeholder is present
-                  options: field.options || [], // Ensure options are present
-                }))
-              : [],
-          });
-        }
+        const fields = Array.isArray(section.fields)
+          ? section.fields.map((field: any) => ({
+              name: field.name,
+              label: t(field.label || "defaultLabel"),
+              type: field.type === "file" ? "text" : field.type,
+              value: field.value || "",
+              disabled_option: field.disabled_option,
+              disable_checkbox: field.disable_checkbox,
+              placeholder: field.placeholder || "",
+              options: field.options || [],
+            }))
+          : [];
+
+        return { title: sectionTitle, fields };
       });
 
       setFormSections(sections);
-      setAgreementSection(agreementSection);
+
+      setAgreementText(
+        data.fields.agreement?.fields[0].label || t("agreeToTerms")
+      );
     } catch (error) {
       console.error("Error fetching form fields:", error);
     } finally {
@@ -146,9 +127,11 @@ const DynamicItemForm: React.FC<DynamicItemFormProps> = ({ itemType }) => {
     try {
       const itemData = formSections.reduce<{ [key: string]: any }>(
         (acc, section) => {
-          section.fields.forEach((field) => {
-            acc[field.name] = field.value;
-          });
+          const sectionKey = section.title.replace(/\s+/g, '_').toLowerCase();
+          acc[sectionKey] = section.fields.reduce<{ [key: string]: any }>((fieldAcc, field) => {
+            fieldAcc[field.name] = field.value;
+            return fieldAcc;
+          }, {});
           return acc;
         },
         {}
@@ -156,7 +139,13 @@ const DynamicItemForm: React.FC<DynamicItemFormProps> = ({ itemType }) => {
 
       const { error } = await supabase
         .from("items")
-        .insert({ item_type: itemType, details: itemData, user_ref_code: user?.ref_code, title: itemData.ad_info.title });
+        .insert({
+          item_type: itemType,
+          details: itemData,
+          creator_ref_code: user?.ref_code,
+          title: itemData.ad_info?.title || itemData.lesson_info?.title || "Untitled",
+        });
+
       if (error) throw error;
 
       alert(t("itemAddedSuccessfully"));
@@ -273,26 +262,23 @@ const DynamicItemForm: React.FC<DynamicItemFormProps> = ({ itemType }) => {
             </div>
           ))}
 
-          {/* Display Agreement Section at the End */}
-          {agreementSection && (
+          {/* Agreement Section <p className="text-gray-700 mb-4">{agreementText}</p>*/}
+          {agreementText && (
             <div>
               <h3 className="text-lg font-bold text-gray-800 mb-2">
-                {agreementSection.title}
+                {t("agreementSectionTitle")}
               </h3>
-              {agreementSection.fields.map((field) => (
-                <div key={field.name} className="mb-4 flex items-center">
-                  <Checkbox
-                    checked={isAgreementChecked}
-                    onCheckedChange={handleAgreementCheckboxChange}
-                    label=""//{field.label}
-                    className="mr-2"
-                  /><FormFooter />
-                </div>
-              ))}
+              
+              <div className="mb-4 flex items-center">
+                <Checkbox
+                  checked={isAgreementChecked}
+                  onCheckedChange={handleAgreementCheckboxChange}
+                  className="mr-2"
+                /><FormFooter />
+              </div>
             </div>
           )}
 
-          {/* Submit Button */}
           <Button
             onClick={handleSubmit}
             variant="default"
@@ -302,7 +288,6 @@ const DynamicItemForm: React.FC<DynamicItemFormProps> = ({ itemType }) => {
             {t("submit")}
           </Button>
 
-          {/* Save and Continue in Telegram Button */}
           {!user?.id && (
             <Button
               onClick={handleGenerateQrCode}
