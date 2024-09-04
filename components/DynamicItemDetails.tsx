@@ -22,17 +22,29 @@ const DynamicItemDetails: React.FC<DynamicItemDetailsProps> = ({
   }
 
   const renderNestedDetails = (data: Record<string, any>, level: number = 0) => {
-    return Object.entries(data).map(([key, value]) => (
-      <div key={key} className={`mb-2 ml-${level * 4}`}>
-        <h4 className="text-md font-bold text-gray-800">{t(toCamelCase(key))}</h4>
-        {typeof value === "object" && value !== null ? (
-          renderNestedDetails(value, level + 1)
-        ) : (
-          <p className="text-gray-700 ml-${level * 2}">{value !== undefined ? value : t('common.n_a')}</p>
-        )}
-      </div>
-    ));
-  };
+    return Object.entries(data).map(([key, value]) => {
+        // Determine if the value is empty or not
+        const isEmpty = value === undefined || value === null || value === '';
+
+        if (isEmpty) {
+            // If value is empty, skip rendering
+            return null;
+        }
+
+        return (
+            <div key={key} className={`mb-2 ml-${level * 4}`}>
+                <h4 className="text-md font-bold text-gray-800">{t(toCamelCase(key))}</h4>
+                {typeof value === "object" && value !== null ? (
+                    renderNestedDetails(value, level + 1)
+                ) : (
+                    <p className={`text-gray-700 ml-${level * 2}`}>
+                        {value}
+                    </p>
+                )}
+            </div>
+        );
+    });
+};
 
   const renderDetails = () => {
     return Object.entries(otherDetails).map(([key, value]) => {

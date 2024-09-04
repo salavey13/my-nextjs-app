@@ -171,7 +171,7 @@ contributorsLabel: "Учасники",
     generateQrCode: "Згенерувати QR-код",
     dynamicForm: "Динамічна форма",
     submit: "Надіслати",
-    itemAddedSuccessfully: "Елемент успішно додано",
+    itemAddedSuccessfully: "Елемент успішно додано, будь ласка, оновіть сторінку",
     paymentSuccessMessage: "Привіт, {username}! Ваш платіж пройшов успішно. Преміум доступ буде активовано до {activationDate}.",
     notificationSent: "Повідомлення успішно надіслано!",
     resendNotification: "Відправити повідомлення ще раз",
@@ -333,6 +333,10 @@ car: "Автомобіль",
 motorbike: "Мотоцикл",
 bicycle: "Велосипед",
 evo: "Евакуатор",
-ai: "ШІ"
+ai: "ШІ",
+groupLesson: "Групова Мозголомка",
+promptReview: "Розпил Промптів",
+projectAssistance: "Проектна Допомога",
+promtgramming: "Кодоманія"
 
     }

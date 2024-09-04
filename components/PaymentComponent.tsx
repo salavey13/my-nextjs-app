@@ -79,7 +79,7 @@ const PaymentComponent: FC<PaymentComponentProps> = ({ item }) => {
     }
 
     const botToken = process.env.NEXT_PUBLIC_BOT_TOKEN;
-    const inviteLink = `https://t.me/oneSitePlsBot/vip?ref=${itemId}-${rentId}`;
+    const inviteLink = `https://t.me/oneSitePlsBot/vip?ref_rent=${rentId}`;
     const url = new URL(`https://api.telegram.org/bot${botToken}/sendMessage`);
     const message = `${t('newRentNotification')} ${user.telegram_username} ! 🎮✨`;
 
@@ -185,7 +185,7 @@ const PaymentComponent: FC<PaymentComponentProps> = ({ item }) => {
                 className={`p-2 rounded ${selectedPricingOption === key ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
                 disabled={item.details.pricing![key] === "Услугу не оказываю"}
               >
-                {t(toCamelCase(key))}: {item.details.pricing![key]}
+                {t(toCamelCase(key))}: {item.details.pricing![key]} TON
               </Button>
             </div>
           ))}

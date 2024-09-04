@@ -58,6 +58,18 @@ export default function Rents() {
     setBackgroundColor,
   } = useTelegram();
 
+  const fetchItems = async () => {
+    const { data, error } = await supabase
+      .from("items")
+      .select("*");
+
+    if (error) {
+      console.error("Error fetching items:", error);
+    } else {
+      setItems(data || []);
+    }
+  };
+
   useEffect(() => {
     const fetchItemTypes = async () => {
       const { data, error } = await supabase.from("item_types").select("*");
@@ -88,17 +100,7 @@ export default function Rents() {
       }
     };
 
-    const fetchItems = async () => {
-      const { data, error } = await supabase
-        .from("items")
-        .select("*");
-
-      if (error) {
-        console.error("Error fetching items:", error);
-      } else {
-        setItems(data || []);
-      }
-    };
+    
 
     const fetchUsers = async () => {
       const { data, error } = await supabase
@@ -116,6 +118,9 @@ export default function Rents() {
     fetchItems();
     fetchUsers();
     disableVerticalSwipes();
+    
+    setHeaderColor("#FFFFFF")
+    setBackgroundColor("#FFFFFF")
   }, [user]);
 
   useEffect(() => {
@@ -177,6 +182,7 @@ export default function Rents() {
   const handleCloseNewItemModal = () => {
     setNewItemModalOpen(false);
     setItemType("evo"); // Reset item type when closing modal
+    fetchItems();
   };
 
   const handleButtonClick = (type: string) => {

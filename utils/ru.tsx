@@ -11,7 +11,7 @@ export const ru: LanguageDictionary = {
     resendNotification: "Отправить уведомление снова",
     dynamicForm: "Динамическая форма",
     submit: "Отправить",
-    itemAddedSuccessfully: "Элемент успешно добавлен",
+    itemAddedSuccessfully: "Элемент успешно добавлен, зарефреште страницу",
     qrCodeTitle: "Продолжить на другом устройстве",
     qrCodeDescription: "Сканируйте этот QR-код на мобильном устройстве, чтобы продолжить заполнение формы.",
     generateQrCode: "Создать QR-код",
@@ -335,5 +335,9 @@ car: "Автомобиль",
 motorbike: "Мотоцикл",
 bicycle: "Велосипед",
 evo: "Эвакуатор",
-ai: "ИИ"
+ai: "ИИ",
+groupLesson: "Групповая Мозголомка",
+promptReview: "Распил Промптов",
+projectAssistance: "Проектная Поддержка",
+promtgramming: "Кодомантия"
 }

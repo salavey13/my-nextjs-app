@@ -429,5 +429,9 @@ car: "Car",
 motorbike: "Motorbike",
 bicycle: "Bicycle",
 evo: "Evacuator",
-ai: "AI"
+ai: "AI",
+groupLesson: "Group Nerd Herd",
+promptReview: "Prompt Roast",
+projectAssistance: "Project S.O.S.",
+promtgramming: "Code Whispering"
 }
