@@ -39,7 +39,7 @@ const DynamicItemDetails: React.FC<DynamicItemDetailsProps> = ({
       if (typeof value === "string" || typeof value === "number") {
         return (
           <div key={key} className="mb-4">
-            <h3 className="text-lg font-bold text-gray-800">{t(key)}</h3>
+            <h3 className="text-lg font-bold text-gray-800">{t(toCamelCase(key))}</h3>
             <p className="text-gray-700">{value}</p>
           </div>
         );

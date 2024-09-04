@@ -237,7 +237,7 @@ contributorsLabel: "Соавторы",
     title: "Оплата",
     description: "Описание процесса оплаты"
   },
-  ad_info: {
+  adInfo: {
     
     title_label: "Название",
     description_label: "Описание",
@@ -253,12 +253,12 @@ contributorsLabel: "Соавторы",
       consent: "Я соглашаюсь с правилами использования сервиса...",
     },
   },
-  general_info: {
-    make_label: "Марка",
-    year_label: "Год",
-    color_label: "Цвет",
-    model_label: "Модель",
-    price_label: "Цена",
+  generalInfo: {
+    makeLabel: "Марка",
+    yearLabel: "Год",
+    coloLlabel: "Цвет",
+    modelLabel: "Модель",
+    pricLabel: "Цена",
     title: "Общая информация",
     fields: {
       make: "Марка",
@@ -269,9 +269,9 @@ contributorsLabel: "Соавторы",
       mileage: "Пробег",
     },
   },
-  photo_upload: {
+  photoUpload: {
     photo_label: "Фото",
-    photo_alt: "Фото предмета",
+    photoAlt: "Фото предмета",
     title: "Фото",
     fields: {
       photo: "Фотография",
@@ -298,7 +298,6 @@ contributorsLabel: "Соавторы",
   errorInsert: "Ой! Что-то пошло не так при сохранении. Попробуйте снова.",
   evo: "Эво",
   noData: "Нет данных",
-  generalInfo: "Общая информация",
   city: "Город",
   russian: "Русский",
   yourEmail: "Ваш email",
@@ -326,6 +325,11 @@ favoriteHero: "Любимый герой",
 preferredRole: "Предпочтительная роль",
 support: "Поддержка",
 replayAnalysis: "Анализ реплея",
-inGameCoaching: "Внутриигровое обучение"
-
+inGameCoaching: "Внутриигровое обучение",
+make: "Марка",
+year: "Год",
+color: "Цвет",
+model: "Модель",
+price: "Цена",
+agreementSectionTitle: "Согласие",
 }

@@ -231,8 +231,8 @@ contributorsLabel: "Учасники",
     title: "Payment",
     description: "Description of payment process"
   },
-  ad_info: {
-    title_label: "Назва",
+  adInfo: {
+    titleLabel: "Назва",
     description_label: "Опис",
     title: "Ad information",
     fields: {
@@ -246,12 +246,12 @@ contributorsLabel: "Учасники",
         consent: "I agree with the terms of use of the service...",
     },
   },
-general_info: {
-    make_label: "Марка",
-    year_label: "Рік",
-    color_label: "Колір",
-    model_label: "Модель",
-    price_label: "Ціна",
+generalInfo: {
+    makeLabel: "Марка",
+    yearLabel: "Рік",
+    colorLabel: "Колір",
+    modelLabel: "Модель",
+    priceLabel: "Ціна",
     title: "General information",
     fields: {
       make: "Brand",
@@ -262,9 +262,9 @@ general_info: {
       mileage: "Mileage",
     },
   },
-  photo_upload: {
-    photo_label: "Фото",
-    photo_alt: "Фото предмета",
+  photoUpload: {
+    photoLabel: "Фото",
+    photoAlt: "Фото предмета",
     title: "Photo",
     fields: {
         photo: "Photography",
@@ -294,7 +294,6 @@ general_info: {
       errorInsert: "Ой! Щось пішло не так під час збереження. Спробуйте знову.",
       evo: "Ево",
       noData: "Немає даних",
-      generalInfo: "Загальна інформація",
       city: "Місто",
       russian: "Російська",
       yourEmail: "Ваш email",
@@ -324,6 +323,12 @@ favoriteHero: "Улюблений герой",
 preferredRole: "Улюблена роль",
 support: "Підтримка",
 replayAnalysis: "Аналіз повтору",
-inGameCoaching: "Навчання в грі"
+inGameCoaching: "Навчання в грі",
+make: "Марка",
+year: "Рік",
+color: "Колір",
+model: "Модель",
+price: "Ціна",
+agreementSectionTitle: "Згода"
 
     }

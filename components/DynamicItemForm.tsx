@@ -66,7 +66,7 @@ const DynamicItemForm: React.FC<DynamicItemFormProps> = ({ itemType }) => {
 
       const sections: FormSection[] = Object.keys(data.fields).map((sectionKey) => {
         const section = data.fields[sectionKey];
-        const sectionTitle = t(sectionKey); // Use sectionKey as the title
+        const sectionTitle = t(toCamelCase(`${sectionKey}.title`)); // Use sectionKey as the title
 
         const fields = Array.isArray(section.fields)
           ? section.fields.map((field: any) => ({
@@ -182,6 +182,10 @@ const DynamicItemForm: React.FC<DynamicItemFormProps> = ({ itemType }) => {
   if (loading) {
     return <LoadingSpinner />;
   }
+    // Utility function to convert underscored keys to camelCase
+const toCamelCase = (str:string) => {
+  return str.replace(/_([a-z])/g, (match, letter) => letter.toUpperCase());
+};
 
   return (
     <Card>
@@ -197,7 +201,7 @@ const DynamicItemForm: React.FC<DynamicItemFormProps> = ({ itemType }) => {
               </h3>
               {section.fields.map((field, fieldIndex) => (
                 <div key={field.name} className="mb-4">
-                  <label className="block text-gray-700">{field.label}</label>
+                  <label className="block text-gray-700">{t(toCamelCase(field.label))}</label>
                   {field.type === "dropdown" ? (
                     <select
                       value={field.value}

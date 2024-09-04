@@ -328,9 +328,9 @@ export const en: LanguageDictionary = {
         title: "Payment",
         description: "Description of the payment process"
       },
-      ad_info: {
-        title_label: "Title",
-        description_label: "Description",
+      adInfo: {
+        titleLabel: "Title",
+        descriptionLabel: "Description",
         title: "Ad information",
         fields: {
           title: "Ad title",
@@ -343,12 +343,12 @@ export const en: LanguageDictionary = {
     consent: "I agree with the terms of use of the service...",
         },
       },
-      general_info: {
-        make_label: "Make",
-        year_label: "Year",
-        color_label: "Color",
-        model_label: "Model",
-        price_label: "Price",
+      generalOnfo: {
+        makeLabel: "Make",
+        yearLabel: "Year",
+        colorLabel: "Color",
+        modelLabel: "Model",
+        priceLabel: "Price",
         title: "General information",
         fields: {
           make: "Brand",
@@ -359,9 +359,9 @@ export const en: LanguageDictionary = {
           mileage: "Mileage",
         },
       },
-      photo_upload: {
-        photo_label: "Photo",
-        photo_alt: "Item Photo",
+      photoUpload: {
+        photoLabel: "Photo",
+        photoAlt: "Item Photo",
         title: "Photo",
         fields: {
             photo: "Photography",
@@ -419,6 +419,11 @@ favoriteHero: "Favorite Hero",
 preferredRole: "Preferred Role",
 support: "Support",
 replayAnalysis: "Replay Analysis",
-inGameCoaching: "In-Game Coaching"
+inGameCoaching: "In-Game Coaching",
+make: "Make",
+year: "Year",
+color: "Color",
+model: "Model",
+price: "Price"
 
 }
