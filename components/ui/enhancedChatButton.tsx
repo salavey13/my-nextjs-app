@@ -23,13 +23,32 @@ const EnhancedChatButton = () => {
   }, [tg, showMainButton, showBackButton]);
 
   const handleOpenChatGPT = () => {
-    openLink('https://chatgpt.com/?temporary-chat=true');
+    openLink('https://chatgpt.com/');
     hideMainButton();
-    //closeWebApp();
   };
 
+  const handleOpenVPN = () => {
+    openLink('https://s3.amazonaws.com/psiphon/web/mjr4-p23r-puwl/download.html#direct');
+  };
+  
   return (
-    <div className={`flex flex-col items-center justify-center ${theme === 'dark' ? 'bg-black' : 'bg-white'} p-4`}>
+    <div className={`flex items-center justify-center ${theme === 'dark' ? 'bg-black' : 'bg-white'} p-4`}>
+      <button
+        onClick={handleOpenVPN}
+        className="group flex flex-col items-center justify-center text-gray-400 w-12 h-12 hover:text-blue-500 transition-all duration-300 transform hover:scale-110"
+      >
+        <span className="text-sm mb-1 transition-all duration-300 group-hover:text-blue-500">VPN</span>
+        <svg
+          className="w-8 h-8 text-gray-400 group-hover:text-blue-500 transition-all duration-300"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          viewBox="0 0 13 13"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" d="M8 17l4-4m0 0l4 4m-4-4v6"></path>
+        </svg>
+      </button>
       <button
         onClick={handleOpenChatGPT}
         className="group flex flex-col items-center justify-center text-gray-400 w-12 h-12 hover:text-blue-500 transition-all duration-300 transform hover:scale-110"
