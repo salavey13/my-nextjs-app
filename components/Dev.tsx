@@ -16,6 +16,7 @@ import { Input } from "@/components/ui/input";
 import NavigationLink from "./ui/bottomShelf"
 
 import { updateReadme, fetchBottomShelfCode } from '../utils/githubUtils'; // Import the utility function
+import { Textarea } from './ui/textarea';
 //import { saveUpdatedBottomShelf } from '../utils/githubUtils';
 type ParsedFile = {
     path: string;
@@ -1226,11 +1227,10 @@ return (
       {/* Idea Input */}
       <div>
         <h2 className="text-xl font-semibold">{t('enterYourIdeaTitle')}</h2>
-        <textarea
+        <Textarea
           value={ideaText}
           onChange={(e) => setIdeaText(e.target.value)}
           placeholder={t("describeYourIdeaPlaceholder")}
-          className="w-full p-2 border rounded mb-4"
         />
         <div className="grid grid-cols-1 gap-4"><Button 
           onClick={handleZeroStageRequest} 
@@ -1253,10 +1253,9 @@ return (
       {step >= 1 && (
         <div className="mt-4">
           <h2 className="text-xl font-semibold">{t('zeroStageRequestTitle')}</h2>
-          <textarea
+          <Textarea
             value={requestText}
             onChange={(e) => setRequestText(e.target.value)}
-            className="w-full p-2 border rounded mb-4"
           />
           <ClipboardManager requestText={requestText} />
         </div>

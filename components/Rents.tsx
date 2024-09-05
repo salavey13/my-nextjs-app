@@ -16,6 +16,7 @@ import PaymentComponent from "@/components/PaymentComponent";
 import { faPlus, faMinus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import useTelegram from '../hooks/useTelegram';
+import { Textarea } from "./ui/textarea";
   
 
 
@@ -38,25 +39,6 @@ export default function Rents() {
     const [jsonError, setJsonError] = useState('');
     const [typeNameError, setTypeNameError] = useState('');
     const [hasTriedToSave, setHasTriedToSave] = useState(false); // Track save attempts
-  const {
-    tg,
-    theme,
-    openLink,
-    showMainButton,
-    hideMainButton,
-    showBackButton,
-    closeWebApp,
-    showPopup,
-    showAlert,
-    showConfirm,
-    showScanQrPopup,
-    closeScanQrPopup,
-    readTextFromClipboard,
-    enableVerticalSwipes,
-    disableVerticalSwipes,
-    setHeaderColor,
-    setBackgroundColor,
-  } = useTelegram();
 
   const fetchItems = async () => {
     const { data, error } = await supabase
@@ -436,11 +418,10 @@ export default function Rents() {
                         {hasTriedToSave && typeNameError && (
                             <p className="text-red-500 text-sm mb-2">{typeNameError}</p>
                         )}
-                        <textarea
+                        <Textarea
                             value={jsonInput}
                             onChange={(e) => setJsonInput(e.target.value)}
                             placeholder={t('enterJsonData')}
-                            className="p-2 border rounded mb-2 w-full"
                             rows={4}
                         />
                         {hasTriedToSave && jsonError && (

@@ -6,6 +6,7 @@ import axios from 'axios';
 import { supabase } from '../lib/supabaseClient';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from './ui/textarea';
 
 const GitHubManager: React.FC = () => {
   const { t } = useAppContext(); // Translation context
@@ -392,7 +393,7 @@ const GitHubManager: React.FC = () => {
           onChange={(e) => setTranslationLanguage(e.target.value)}
           className="mb-2 p-2 border border-gray-300 rounded"
         />
-        <textarea
+        <Textarea
           placeholder={t("placeholder.translationsJson")}
           value={JSON.stringify(translations, null, 2)}
           onChange={(e) => setTranslations(JSON.parse(e.target.value))}

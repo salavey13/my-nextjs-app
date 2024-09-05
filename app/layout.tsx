@@ -11,7 +11,7 @@ import React, { Suspense } from "react";
 import TopShelf from "@/components/ui/topShelf";
 import BottomShelf from "../components/ui/bottomShelf";
 import LoadingSpinner from "../components/ui/LoadingSpinner"; 
-import ThemeHandler from "../components/ThemeHandler";
+//import ThemeHandler from "../components/ThemeHandler";
 
 const inter = Inter({ subsets: ["latin"] });
 

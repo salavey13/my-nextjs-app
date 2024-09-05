@@ -245,7 +245,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     // Initialize Telegram WebApp and fetch user data
     if (tg) {
       tg.ready();
-      tg.toggleThemeSettings(toggleTheme)
+      //tg.toggleThemeSettings(toggleTheme)
       setTheme("dark"); // Set the dark theme immediately
 
       const tgUser = tg.initDataUnsafe?.user;

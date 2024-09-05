@@ -111,6 +111,17 @@ const useTelegram = () => {
     tg?.MainButton?.showProgress(leaveActive);
   };
 
+  // Integration with Telegram's SettingsButton
+  const toggleThemeSettings = (callback: () => void) => {
+    tg?.SettingsButton?.onClick(() => {
+        // Your settings button click handler logic here
+        callback()
+        console.log("Settings button clicked");
+      });
+  };
+
+    
+
   return {
     tg,
     user,
@@ -132,6 +143,7 @@ const useTelegram = () => {
     setHeaderColor,
     setBackgroundColor,
     showProgress,
+    toggleThemeSettings,
   };
 };
 

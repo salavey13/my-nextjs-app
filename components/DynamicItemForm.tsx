@@ -16,6 +16,7 @@ import {
 } from "../components/ui/card";
 import LoadingSpinner from "../components/ui/LoadingSpinner";
 import QRCode from "react-qr-code";
+import { Dropdown } from "./ui/dropdown";
 
 interface FormField {
   name: string;
@@ -203,7 +204,7 @@ const toCamelCase = (str:string) => {
                 <div key={field.name} className="mb-4">
                   <label className="block text-gray-700">{t(toCamelCase(field.label))}</label>
                   {field.type === "dropdown" ? (
-                    <select
+                    <Dropdown
                       value={field.value}
                       onChange={(e) =>
                         handleInputChange(sectionIndex, fieldIndex, e.target.value)
@@ -218,7 +219,7 @@ const toCamelCase = (str:string) => {
                           {option}
                         </option>
                       ))}
-                    </select>
+                    </Dropdown>
                   ) : field.disable_checkbox ? (
                     <div className="flex items-center space-x-4">
                       <Input
@@ -243,7 +244,6 @@ const toCamelCase = (str:string) => {
                             !!checked
                           )
                         }
-                        className="mr-2"
                       />
                       <p>{t("disableOptionLabel")}</p>
                     </div>
@@ -279,7 +279,6 @@ const toCamelCase = (str:string) => {
                 <Checkbox
                   checked={isAgreementChecked}
                   onCheckedChange={handleAgreementCheckboxChange}
-                  className="mr-2"
                 /><FormFooter />
               </div>
             </div>
