@@ -12,7 +12,7 @@ const ThemeToggle: React.FC = () => {
         <input 
           type="checkbox" 
           checked={user? user.dark_theme : true} 
-          onChange={toggleTheme} 
+          onChange={() =>toggleTheme()} 
         />
       </label>
     </div>

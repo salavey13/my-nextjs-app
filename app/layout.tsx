@@ -1,3 +1,5 @@
+// app\layout.tsx
+
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
@@ -44,14 +46,15 @@ export default function RootLayout({
   //   return () => {
   //     window.matchMedia("(prefers-color-scheme: dark)").removeEventListener("change", themeChangeListener);
   //   };
-  // }, []);bg-black text-white 
+  // }, []);//bg-black text-white 
+
 
   return (
     <html lang="en">
       <body
         className={`${inter.className} flex flex-col min-h-screen`}
       >
-        <ThemeHandler />
+        {/* <ThemeHandler /> */}
         <Suspense fallback={<LoadingSpinner />}>  {/* Use the custom loading component */}
           <AppProvider>
             <TopShelf />
