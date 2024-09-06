@@ -124,7 +124,8 @@
 
   /* Custom Scrollbars */
   ::-webkit-scrollbar {
-    width: 12px;
+    width: 0px;
+    height: 0px;
   }
 
   ::-webkit-scrollbar-track {
@@ -195,4 +196,70 @@
     background-color: var(--accent-color);
     box-shadow: 0 0 10px var(--accent-color);
   }
+
+  .textarea-neumorphism, .dropdown-neumorphism {
+    @apply neumorphism;
+    padding: 0.5rem 1rem;
+    border: none;
+    background: hsl(var(--background));
+    color: hsl(var(--foreground));
+  }
+  
+  .textarea-neumorphism::placeholder, .dropdown-neumorphism::placeholder {
+    color: hsl(var(--muted-foreground));
+  }
+
+  /* Dark mode: Adjust the background and accent color for checkboxes */
+  @media (prefers-color-scheme: dark) {
+    .checkbox-neumorphism {
+      background-color: hsl(var(--background));
+    }
+
+    .peer:checked + .CheckboxIndicator {
+      background-color: hsl(var(--accent-color));
+    }
+  }
+
+  /* Example CSS for animations */
+.game-board {
+  position: relative;
+  width: 100vw;
+  height: 80vh;
+  overflow: hidden;
+}
+
+.card {
+  position: absolute;
+  width: 100px;
+  height: 150px;
+  transition: transform 0.5s ease, opacity 0.3s ease;
+  cursor: grab;
+}
+
+.card.flipped {
+  transform: rotateY(180deg);
+}
+
+.card::after {
+  content: '';
+  display: block;
+  padding-top: 150%;
+}
+
+.shuffle-button {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.shuffle-button:hover {
+  background-color: #0056b3;
+}
 }

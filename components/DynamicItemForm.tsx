@@ -1,3 +1,4 @@
+// components\DynamicItemForm.tsx                           
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -6,7 +7,6 @@ import { useAppContext } from "../context/AppContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
-
 import FormFooter from "../components/ui/FormFooter";
 import {
   Card,
@@ -45,6 +45,7 @@ const DynamicItemForm: React.FC<DynamicItemFormProps> = ({ itemType }) => {
   const [qrCodeUrl, setQrCodeUrl] = useState<string | null>(null);
   const [isAgreementChecked, setIsAgreementChecked] = useState(false);
   const [agreementText, setAgreementText] = useState<string>("");
+  const [gameType, setGameType] = useState<string | null>(null); // Add game type state
 
   useEffect(() => {
     fetchFormFields();
@@ -65,25 +66,27 @@ const DynamicItemForm: React.FC<DynamicItemFormProps> = ({ itemType }) => {
         throw new Error("Invalid fields data structure");
       }
 
-      const sections: FormSection[] = Object.keys(data.fields).map((sectionKey) => {
-        const section = data.fields[sectionKey];
-        const sectionTitle = sectionKey // Use sectionKey as the title
+      const sections: FormSection[] = Object.keys(data.fields).map(
+        (sectionKey) => {
+          const section = data.fields[sectionKey];
+          const sectionTitle = sectionKey; // Use sectionKey as the title
 
-        const fields = Array.isArray(section.fields)
-          ? section.fields.map((field: any) => ({
-              name: field.name,
-              label: t(field.label || "defaultLabel"),
-              type: field.type === "file" ? "text" : field.type,
-              value: field.value || "",
-              disabled_option: field.disabled_option,
-              disable_checkbox: field.disable_checkbox,
-              placeholder: field.placeholder || "",
-              options: field.options || [],
-            }))
-          : [];
+          const fields = Array.isArray(section.fields)
+            ? section.fields.map((field: any) => ({
+                name: field.name,
+                label: t(field.label || "defaultLabel"),
+                type: field.type === "file" ? "text" : field.type,
+                value: field.value || "",
+                disabled_option: field.disabled_option,
+                disable_checkbox: field.disable_checkbox,
+                placeholder: field.placeholder || "",
+                options: field.options || [],
+              }))
+            : [];
 
-        return { title: sectionTitle, fields };
-      });
+          return { title: sectionTitle, fields };
+        }
+      );
 
       setFormSections(sections);
 
@@ -123,29 +126,41 @@ const DynamicItemForm: React.FC<DynamicItemFormProps> = ({ itemType }) => {
     setIsAgreementChecked(checked);
   };
 
+  const handleGameTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setGameType(e.target.value); // Set the selected game type
+  };
+
   const handleSubmit = async () => {
     setLoading(true);
     try {
       const itemData = formSections.reduce<{ [key: string]: any }>(
         (acc, section) => {
-          const sectionKey = section.title.replace(/\s+/g, '_').toLowerCase();
-          acc[sectionKey] = section.fields.reduce<{ [key: string]: any }>((fieldAcc, field) => {
-            fieldAcc[field.name] = field.value;
-            return fieldAcc;
-          }, {});
+          const sectionKey = section.title
+            .replace(/\s+/g, "_")
+            .toLowerCase();
+          acc[sectionKey] = section.fields.reduce<{ [key: string]: any }>(
+            (fieldAcc, field) => {
+              fieldAcc[field.name] = field.value;
+              return fieldAcc;
+            },
+            {}
+          );
           return acc;
         },
         {}
       );
 
-      const { error } = await supabase
-        .from("items")
-        .insert({
-          item_type: itemType,
-          details: itemData,
-          creator_ref_code: user?.ref_code,
-          title: itemData.ad_info?.title || itemData.lesson_info?.title || "Untitled",
-        });
+      const { error } = await supabase.from("items").insert({
+        item_type: itemType,
+        details: itemData,
+        creator_ref_code: user?.ref_code,
+        title:
+          itemData.ad_info?.title ||
+          itemData.lesson_info?.title ||
+          itemData.game_info?.title ||
+          "Untitled",
+        game_type: gameType, // Include the selected game type in submission
+      });
 
       if (error) throw error;
 
@@ -162,7 +177,12 @@ const DynamicItemForm: React.FC<DynamicItemFormProps> = ({ itemType }) => {
     try {
       const { data, error } = await supabase
         .from("items")
-        .insert({ item_type: itemType, details: {}, creator_ref_code: "anon", title: "Temp" }) // Save draft
+        .insert({
+          item_type: itemType,
+          details: {},
+          creator_ref_code: "anon",
+          title: "Temp",
+        }) // Save draft
         .select("id")
         .single();
 
@@ -183,10 +203,11 @@ const DynamicItemForm: React.FC<DynamicItemFormProps> = ({ itemType }) => {
   if (loading) {
     return <LoadingSpinner />;
   }
-    // Utility function to convert underscored keys to camelCase
-const toCamelCase = (str:string) => {
-  return str.replace(/_([a-z])/g, (match, letter) => letter.toUpperCase());
-};
+
+  // Utility function to convert underscored keys to camelCase
+  const toCamelCase = (str: string) => {
+    return str.replace(/_([a-z])/g, (match, letter) => letter.toUpperCase());
+  };
 
   return (
     <Card>
@@ -202,12 +223,18 @@ const toCamelCase = (str:string) => {
               </h3>
               {section.fields.map((field, fieldIndex) => (
                 <div key={field.name} className="mb-4">
-                  <label className="block text-gray-700">{t(toCamelCase(field.label))}</label>
+                  <label className="block text-gray-700">
+                    {t(toCamelCase(field.label))}
+                  </label>
                   {field.type === "dropdown" ? (
                     <Dropdown
                       value={field.value}
                       onChange={(e) =>
-                        handleInputChange(sectionIndex, fieldIndex, e.target.value)
+                        handleInputChange(
+                          sectionIndex,
+                          fieldIndex,
+                          e.target.value
+                        )
                       }
                       className="border rounded p-2"
                     >
@@ -247,11 +274,10 @@ const toCamelCase = (str:string) => {
                       />
                       <p>{t("disableOptionLabel")}</p>
                     </div>
-                  ) : field.type != "checkbox" ? (
+                  ) : field.type != "checkbox" ? (   
                     <Input
                       type={field.type}
                       value={field.value}
-                      placeholder={field.placeholder}
                       onChange={(e) =>
                         handleInputChange(
                           sectionIndex,
@@ -259,6 +285,7 @@ const toCamelCase = (str:string) => {
                           e.target.value
                         )
                       }
+                      placeholder={field.placeholder}
                     />
                   ):(
                     <div/>
@@ -269,6 +296,9 @@ const toCamelCase = (str:string) => {
           ))}
 
           {/* Agreement Section <p className="text-gray-700 mb-4">{agreementText}</p>*/}
+                                        
+                                                                             
+           
           {agreementText && (
             <div>
               <h3 className="text-lg font-bold text-gray-800 mb-2">
@@ -284,30 +314,17 @@ const toCamelCase = (str:string) => {
             </div>
           )}
 
+          <Button onClick={handleSubmit}>{t("submitForm")}</Button>
+
           <Button
-            onClick={handleSubmit}
-            variant="default"
-            className="w-full"
-            disabled={!isAgreementChecked || !user?.id}
+            variant="secondary"
+            onClick={handleGenerateQrCode}
+            disabled={!isAgreementChecked}
           >
-            {t("submit")}
+            {t("generateQrCode")}
           </Button>
 
-          {!user?.id && (
-            <Button
-              onClick={handleGenerateQrCode}
-              variant="default"
-              className="w-full mt-2"
-            >
-              {t("saveAndContinueInTelegram")}
-            </Button>
-          )}
-
-          {qrCodeUrl && (
-            <div className="flex justify-center mt-4">
-              <QRCode value={qrCodeUrl} size={150} />
-            </div>
-          )}
+          {qrCodeUrl && <QRCode value={qrCodeUrl} />}
         </form>
       </CardContent>
     </Card>

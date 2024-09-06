@@ -6,6 +6,7 @@ import { useAppContext } from '@/context/AppContext';
 import { Button } from '@/components/ui/button';
 import { toast } from 'react-toastify';
 import { supabase } from "../lib/supabaseClient";
+import GameBoard from './game/GameBoard';
 
 const HackButton: React.FC = () => {
   const { t, store } = useAppContext();
@@ -48,13 +49,14 @@ const HackButton: React.FC = () => {
   };
 
   return (
-    <div className="flex justify-center items-center h-screen">
-      <Button
+    <div className="flex justify-center items-center min-h-[calc(100vh-128px)]">
+      {/* <Button
         onClick={handleClick}
         className="bg-blue-500 text-white text-xl px-6 py-3 rounded-lg shadow-lg hover:bg-blue-600 transition-all"
       >
         {t('hackButton')}
-      </Button>
+      </Button> */}
+      <GameBoard/>
     </div>
   );
 };

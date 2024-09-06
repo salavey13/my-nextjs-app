@@ -1,0 +1,479 @@
+You are provided with the attached codebase which contains the current state of the project. Your task is to:
+**Create a new React component** : 
+
+
+
+Gameboard for card game, and a card, shaffleCards and invite button, guest list component.
+
+so supabased stores normalized cordinates like from owner perspective - second joined player sees the board upside dodown and movements of card made by first player are animated on second players screen upside down how they suppose to - this is handled by gamboard enzime, that interprets cooridate shifts respective to what player is observing - quantum level stuff, yet we hav't yet introduced even third player - spectators for simplicity will see everything by default first player view, but on steroids - xray vision plus statistics, why not, bets and shit, like those tv shows of poker games, bets are in nearest tab, just a reminder - by the way, have i mentioned direct notifications to users via tgbot? yeah, already inplemented - we can evolve it to notify betters on game outcomes outomatically or something like this ez)
+so this json is a set of parameters for enzime hooks, and hooks implementation depends on enzime parameter set and description of purpose, we attach related components code as examples, basicly nothing fancy {user} = useAppContext contains item from users supadb. 
+i guess origin game_type json should contain current json substructure to hold current 1 card position and ownership - second player can also move the card, and it will be flipped if he drags it to his side himself, starts to own it this way, so hooks are also should be described in enzime as animation transition parameters for base functions - "rules" of the game are just the reality of current game conditions 
+Normalized Coordinates & Perspective Shifts
+So, here’s how this works at the JSON and enzyme level:
+
+Player 1's perspective: Cards move in a straightforward manner; coordinates flow naturally (top-left to bottom-right).
+Player 2's perspective: Player 1's movements are inverted. When Player 1 moves a card from their bottom to top, Player 2 sees it moving from top to bottom. The enzyme will handle this coordinate inversion on Player 2’s side.
+Storing Normalized Coordinates in Supabase
+In Supabase, we store normalized coordinates. They represent the "objective truth" of where the card is on the board, but the enzyme interprets these coordinates for each player’s perspective.
+
+Example JSON Structure
+{
+  "game_type": "one_card_fool",
+  "details": {
+    "cards": {
+      "card1": {
+        "position": { "x": 0.5, "y": 0.3 },  // Normalized coordinates
+        "owner": "player1",  // Player 1 owns the card currently
+        "flipped": false  // Card face-up or down
+      }
+    },
+    "players": {
+      "player1": { "perspective": "normal" },
+      "player2": { "perspective": "inverted" }
+    }
+  }
+}
+Game Board Enzyme (Handling Coordinate Inversion)
+This is where the game board enzyme comes in hot—it’s not just interpreting movements, it’s converting coordinates relative to the player’s perspective.
+
+const gameBoardEnzyme = (card, currentPlayer) => {
+  let normalizedPosition = card.position;
+
+  // If the current player has an inverted perspective (Player 2)
+  if (currentPlayer === "player2") {
+    // Invert the Y-coordinate (from top-to-bottom to bottom-to-top)
+    normalizedPosition = {
+      x: 1 - card.position.x,  // Horizontal flip (if necessary)
+      y: 1 - card.position.y   // Vertical flip
+    };
+  }
+
+  // Return the card with updated position for the current player’s perspective
+  return {
+    ...card,
+    position: normalizedPosition
+  };
+};
+Movement Logic with Ownership Change
+Cards can change ownership based on the game’s rules. For now, if Player 2 drags Player 1’s card to their side, they automatically own it, and the card flips. Here’s how we handle this with enzymes:
+
+ts
+Copy code
+const handleDragComplete = (cardId, newPosition, currentPlayer) => {
+  // Update card position in Supabase (normalized coordinates)
+  updateCardPosition(gameId, cardId, newPosition);
+
+  // Handle card ownership change if dragged into Player 2’s territory
+  if (newPosition.y > 0.5 && currentPlayer === "player2") {
+    // Flip the card and update the owner
+    updateCardOwnership(gameId, cardId, "player2", true);
+  }
+
+  // Re-run the game board enzyme
+  const updatedCard = gameBoardEnzyme({ id: cardId, position: newPosition }, currentPlayer);
+
+  // Animate the card movement and flip based on new ownership
+  animateCardMovementAndFlip(updatedCard);
+};
+
+ Each component in the `/components` and `/components/ui` folders can be used as examples for implementation. The `adminDashboard.tsx` file should serve as a reference for how to structure and format your response. Please ensure that the response is formatted for easy parsing and direct integration into the project.
+
+Expected Output:
+Component Implementation
+   - The entire React component code should be provided, with the file path included as a comment at the top.
+    - Output the entire file for this step, including the relative path on the first line as a comment.
+    - Make sure the output is formatted for easy replacement in project files.
+    - Provide complete code snippets, not just differences, to make integration easier.
+    - Ensure consistent formatting for ease of parsing by script.
+Remember Output format:
+File: components/<NewComponent>.tsx
+"""tsx
+// components/<NewComponent>.tsx
+<code here>
+"""
+
+
+EXAMPLES AND REFERENCES:
+ create table
+  public.item_types (
+    id uuid not null default extensions.uuid_generate_v4 (),
+    type text not null,
+    fields jsonb not null,
+    constraint item_types_pkey primary key (id)
+  ) tablespace pg_default;
+  create table
+  public.items (
+    id bigint generated by default as identity not null,
+    title text not null,
+    creator_ref_code text not null,
+    item_type text not null,
+    details jsonb not null, 
+    created_at timestamp with time zone not null default now(),
+    game_type text null default 'FOOL'::text,
+    constraint items_pkey primary key (id)
+  ) tablespace pg_default;
+  example game item:```
+  id
+int8
+27
+title
+text
+Untitled
+
+creator_ref_code
+text
+salavey13
+
+item_type
+text
+oneHandFool
+
+details
+jsonb
+{"game_info": {"status": "", "game_id": "", "game_type": "oneHandFool"}, "game_state": {}, "player_info": {"player1_name": "", "player2_name": ""}, "card_settings": {"owner_card_positions": "", "opponent_card_positions": ""}, "board_settings": {"gameboard_url": "", "coordinate_normalization": ""}, "button_settings": {"invite_button_position": "", "shuffle_button_position": ""}, "form_visibility": {}, "game_components": {}, "trigger_settings": {"card_on_click_bitmask": "", "card_on_drag_end_bitmask": ""}}
+
+game_state: {
+  "game_info": {
+    "title": "Game Information",
+    "fields": [
+      {
+        "name": "game_type",
+        "type": "text",
+        "label": "Game Type",
+        "placeholder": "Enter game type",
+        "default_value": "OneHandFool"
+      },
+      {
+        "name": "game_id",
+        "type": "text",
+        "label": "Game ID",
+        "placeholder": "Unique game identifier",
+        "default_value": "unique_game_id_001"
+      },
+      {
+        "name": "status",
+        "type": "dropdown",
+        "label": "Game Status",
+        "options": [
+          "setup",
+          "in_progress",
+          "endgame"
+        ],
+        "default_value": "setup"
+      }
+    ]
+  },
+  "game_state": {
+    "id": "unique_game_id_001",
+    "turn": 1,
+    "status": "setup",
+    "player1": {
+      "name": "Player 1",
+      "cards": [
+        {
+          "x": 100,
+          "y": 300,
+          "id": 1,
+          "flipped": false
+        },
+        {
+          "x": 200,
+          "y": 300,
+          "id": 2,
+          "flipped": false
+        }
+      ]
+    },
+    "player2": {
+      "name": "Player 2",
+      "cards": [
+        {
+          "x": 100,
+          "y": 50,
+          "id": 3,
+          "flipped": false
+        },
+        {
+          "x": 200,
+          "y": 50,
+          "id": 4,
+          "flipped": false
+        }
+      ]
+    },
+    "spectators": [],
+    "active_card": null
+  },
+  "player_info": {
+    "title": "Player Information",
+    "fields": [
+      {
+        "name": "player1_name",
+        "type": "text",
+        "label": "Player 1 Name",
+        "placeholder": "Enter Player 1 Name",
+        "default_value": "Player 1"
+      },
+      {
+        "name": "player2_name",
+        "type": "text",
+        "label": "Player 2 Name",
+        "placeholder": "Enter Player 2 Name",
+        "default_value": "Player 2"
+      }
+    ]
+  },
+  "card_settings": {
+    "title": "Card Settings",
+    "fields": [
+      {
+        "name": "owner_card_positions",
+        "type": "position",
+        "label": "Owner's Card Positions",
+        "placeholder": "Position data (e.g., x, y)",
+        "default_value": [
+          {
+            "x": 100,
+            "y": 300,
+            "id": 1
+          },
+          {
+            "x": 200,
+            "y": 300,
+            "id": 2
+          }
+        ]
+      },
+      {
+        "name": "opponent_card_positions",
+        "type": "position",
+        "label": "Opponent's Card Positions",
+        "placeholder": "Position data (e.g., x, y)",
+        "default_value": [
+          {
+            "x": 100,
+            "y": 50,
+            "id": 3
+          },
+          {
+            "x": 200,
+            "y": 50,
+            "id": 4
+          }
+        ]
+      }
+    ]
+  },
+  "board_settings": {
+    "title": "Game Board Settings",
+    "fields": [
+      {
+        "name": "gameboard_url",
+        "type": "url",
+        "label": "Game Board URL",
+        "placeholder": "https://example.com",
+        "default_value": "https://embeded-framer-gameboard.com"
+      },
+      {
+        "name": "coordinate_normalization",
+        "type": "checkbox",
+        "label": "Coordinate Normalization",
+        "default_value": true
+      }
+    ]
+  },
+  
+  "form_visibility": {
+    "excluded_fields": [
+      "game_state.id",
+      "game_state.status",
+      "player1.name",
+      "player2.name",
+      "game_components.card.triggers.cardOnClick",
+      "game_components.inviteButton.triggers.inviteButtonOnClick",
+      "game_components.shuffleButton.triggers.shuffleButtonOnClick"
+    ]
+  },
+  "game_components": {
+    "card": {
+      "triggers": {
+        "cardOnClick": {
+          "css": {
+            "tailwind": "hover:scale-110 transform duration-500",
+            "custom_css": {
+              "width": "100px",
+              "height": "150px",
+              "background-color": "#ffffff"
+            }
+          },
+          "trigger_bitmask": {
+            "setup": {
+              "owner": "1",
+              "opponent": "0",
+              "spectator": "0"
+            },
+            "endgame": {
+              "owner": "1",
+              "opponent": "1",
+              "spectator": "0"
+            },
+            "in_progress": {
+              "owner": "1",
+              "opponent": "1",
+              "spectator": "0"
+            }
+          }
+        },
+        "cardOnDragEnd": {
+          "css": {
+            "tailwind": "cursor-grab",
+            "custom_css": {
+              "border": "2px solid #333"
+            }
+          },
+          "trigger_bitmask": {
+            "setup": {
+              "owner": "1",
+              "opponent": "0",
+              "spectator": "0"
+            },
+            "endgame": {
+              "owner": "1",
+              "opponent": "1",
+              "spectator": "0"
+            },
+            "in_progress": {
+              "owner": "1",
+              "opponent": "1",
+              "spectator": "0"
+            }
+          }
+        }
+      }
+    },
+  "trigger_settings": {
+    "title": "Trigger Settings",
+    "fields": [
+      {
+        "name": "card_on_click_bitmask",
+        "type": "bitmask",
+        "label": "Card OnClick Bitmask",
+        "default_value": {
+          "setup": {
+            "owner": "1",
+            "opponent": "0",
+            "spectator": "0"
+          },
+          "endgame": {
+            "owner": "1",
+            "opponent": "1",
+            "spectator": "0"
+          },
+          "in_progress": {
+            "owner": "1",
+            "opponent": "1",
+            "spectator": "0"
+          }
+        }
+      },
+      {
+        "name": "card_on_drag_end_bitmask",
+        "type": "bitmask",
+        "label": "Card OnDragEnd Bitmask",
+        "default_value": {
+          "setup": {
+            "owner": "1",
+            "opponent": "0",
+            "spectator": "0"
+          },
+          "endgame": {
+            "owner": "1",
+            "opponent": "1",
+            "spectator": "0"
+          },
+          "in_progress": {
+            "owner": "1",
+            "opponent": "1",
+            "spectator": "0"
+          }
+        }
+      }
+    ]
+  }
+}
+```
+
+Make sure to follow this format strictly to help automate the integration process.
+---
+
+Expected Response (Example):
+Component Implementation:
+File: components/Dashboard.tsx
+
+```tsx
+// components/HackButton.tsx
+"use client";
+
+import React, { useState } from 'react';
+import { useAppContext } from '@/context/AppContext';
+import { Button } from '@/components/ui/button';
+import { toast } from 'react-toastify';
+import { supabase } from "../lib/supabaseClient";
+
+const HackButton: React.FC = () => {
+  const { t, store } = useAppContext();
+
+  const handleClick = async () => {
+    try {
+      // Update the user balance
+      // Step 1: Fetch the current value of the 'coins' field
+      const { data: user, error: fetchError } = await supabase
+        .from('users')
+        .select('coins')
+        .eq('telegram_id', store.tg_id)
+        .single();
+
+      if (fetchError) {
+        console.error('Error fetching user data:', fetchError);
+        return;
+      }
+
+      // Step 2: Increment the 'coins' field by 13000
+      const newCoinsValue = user.coins + 13000;
+
+      const { data, error } = await supabase
+        .from('users')
+        .update({ coins: newCoinsValue })
+        .eq('telegram_id', store.tg_id);
+
+      if (error) {
+        console.error('Error updating coins:', error);
+      } else {
+        console.log('Coins updated successfully:', data);
+      }
+
+      // Show success message
+      alert(t('congratulationsMessage'));
+    } catch (error) {
+      console.error('Error updating balance:', error);
+    } finally {
+    }
+  };
+
+  return (
+    <div className="flex justify-center items-center h-screen">
+      <Button
+        onClick={handleClick}
+        className="bg-blue-500 text-white text-xl px-6 py-3 rounded-lg shadow-lg hover:bg-blue-600 transition-all"
+      >
+        {t('hackButton')}
+      </Button>
+    </div>
+  );
+};
+
+export default HackButton;
+
+```
+
+
