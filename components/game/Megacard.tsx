@@ -85,7 +85,7 @@ const Megacard: React.FC<MegacardProps> = ({ gameState, cardId}) => {
         boxShadow: shadow.to((s) => `0px ${s}px ${2 * s}px rgba(0,0,0,0.2)`),
         width: '100px', 
         height: '150px',
-        backgroundImage: isFlipped ? `url(${cardsImages[cardId as keyof typeof cardsImages]})` : undefined,
+        backgroundImage: isFlipped ? `url(${cardsImages[cardId as keyof typeof cardsImages]})` : `url(${cardsImages["shirt"]})`,
         backgroundColor: isFlipped ? 'darkblue' : 'lightblue',
         borderRadius: '8px',
         cursor: 'grab',
