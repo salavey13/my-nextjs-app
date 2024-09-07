@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useSpring, animated } from 'react-spring';
 import { useGesture } from '@use-gesture/react';
@@ -11,7 +12,7 @@ interface Point {
 
 interface Card {
   id: string;
-  position: Point; // Relative position in percentage (0 to 1)
+  position: Point; // Relative position (0 to 1)
   flipped: boolean;
   last_trajectory?: Point[];
 }
@@ -29,15 +30,14 @@ interface MegacardProps {
 
 const Megacard: React.FC<MegacardProps> = ({ gameState, cardId }) => {
   const [cardState, setCardState] = useState<Card | null>(null);
-  const [trajectory, setTrajectory] = useState<Point[]>([]);
+  const [initialPosition, setInitialPosition] = useState<Point>({ x: 0, y: 0 });
   const [isFlipped, setFlipped] = useState(false);
 
-  // Position, rotation, shadow animation setup
   const [{ x, y, shadow }, set] = useSpring(() => ({
     x: 0,
     y: 0,
     shadow: 5,
-    config: { mass: 1, tension: 150, friction: 20 },
+    config: { mass: 1, tension: 200, friction: 30 },
   }));
 
   useEffect(() => {
@@ -45,11 +45,14 @@ const Megacard: React.FC<MegacardProps> = ({ gameState, cardId }) => {
       const card = gameState.cards.find((c) => c.id === cardId);
       if (card) {
         setCardState(card);
-        set({ x: card.position.x * window.innerWidth, y: card.position.y * window.innerHeight });
+        const posX = card.position.x * window.innerWidth;
+        const posY = card.position.y * window.innerHeight;
+        setInitialPosition({ x: posX, y: posY });
+        set({ x: posX, y: posY });
         setFlipped(card.flipped);
       }
     }
-  }, [gameState, cardId]);
+  }, [gameState, cardId, set]);
 
   const isNearTrashPlace = (x: number, y: number) => {
     const trashPlace = { x: 200, y: 200 };
@@ -63,7 +66,7 @@ const Megacard: React.FC<MegacardProps> = ({ gameState, cardId }) => {
     const updatedGameState = {
       ...gameState,
       cards: gameState.cards.map((card) =>
-        card.id === cardId ? { ...card, position: { x: 200 / window.innerWidth, y: 200 / window.innerHeight }, last_trajectory: trajectory } : card
+        card.id === cardId ? { ...card, position: { x: 200 / window.innerWidth, y: 200 / window.innerHeight } } : card
       ),
     };
     const { error } = await supabase.from('rents').update({ game_state: updatedGameState }).eq('id', '28');
@@ -71,45 +74,33 @@ const Megacard: React.FC<MegacardProps> = ({ gameState, cardId }) => {
   };
 
   const bind = useGesture({
-    onDrag: ({ down, movement: [mx, my], velocity }) => {
-      const safeVelocity = typeof velocity === 'number' ? velocity : 0;
-      const newX = mx + (cardState?.position.x || 0) * window.innerWidth;
-      const newY = my + (cardState?.position.y || 0) * window.innerHeight;
-      set({
-        x: newX,
-        y: newY,
-        shadow: down ? Math.min(30, safeVelocity * 20) : 5,
-      });
-      setTrajectory([{ x: newX, y: newY }]);
+    onDrag: ({ down, movement: [mx, my], offset: [ox, oy] }) => {
+      if (down) {
+        set({
+          x: initialPosition.x + ox,
+          y: initialPosition.y + oy,
+          shadow: Math.min(30, Math.abs(ox + oy) / 10),
+        });
+      }
     },
-    onDragEnd: async ({ velocity: [vx, vy] }) => {
-      if (isNearTrashPlace(x.get(), y.get())) {
+    onDragEnd: async ({ movement: [mx, my], velocity }) => {
+      const newX = initialPosition.x + mx;
+      const newY = initialPosition.y + my;
+      
+      if (isNearTrashPlace(newX, newY)) {
         await moveToTrashPlace();
       } else {
-        // Apply inertia effect
-        const bounceFactor = 0.7; // Bouncing factor
-        const boundaryPadding = 20; // Padding from the edge of the container
-        const containerWidth = window.innerWidth;
-        const containerHeight = window.innerHeight;
-        const xPos = x.get();
-        const yPos = y.get();
+        set({
+          x: newX,
+          y: newY,
+          shadow: 5,
+          config: { mass: 1, tension: 200, friction: 30 },
+        });
 
-        // Bounce off the edges
-        let newX = xPos + vx * 10;
-        let newY = yPos + vy * 10;
-        if (newX < boundaryPadding || newX > containerWidth - boundaryPadding) {
-          newX = boundaryPadding + Math.sign(vx) * bounceFactor * (containerWidth - boundaryPadding - xPos);
-        }
-        if (newY < boundaryPadding || newY > containerHeight - boundaryPadding) {
-          newY = boundaryPadding + Math.sign(vy) * bounceFactor * (containerHeight - boundaryPadding - yPos);
-        }
-        set({ x: newX, y: newY, shadow: 5 });
-        
-        // Update card state in Supabase
         const updatedGameState = {
           ...gameState,
           cards: gameState.cards.map((card) =>
-            card.id === cardId ? { ...card, position: { x: newX / window.innerWidth, y: newY / window.innerHeight }, last_trajectory: trajectory } : card
+            card.id === cardId ? { ...card, position: { x: newX / window.innerWidth, y: newY / window.innerHeight } } : card
           ),
         };
         const { error } = await supabase.from('rents').update({ game_state: updatedGameState }).eq('id', '28');
@@ -122,7 +113,7 @@ const Megacard: React.FC<MegacardProps> = ({ gameState, cardId }) => {
     <animated.div
       {...bind()}
       style={{
-        transform: `translate(${x.get()}px, ${y.get()}px)`,
+        transform: x.interpolate((x) => `translate(${x}px, ${y.get()}px)`),
         boxShadow: shadow.to((s) => `0px ${s}px ${2 * s}px rgba(0,0,0,0.2)`),
         width: '100px',
         height: '150px',
@@ -132,6 +123,7 @@ const Megacard: React.FC<MegacardProps> = ({ gameState, cardId }) => {
         cursor: 'grab',
         backgroundSize: 'cover',
         position: 'absolute',
+        touchAction: 'none',
       }}
     >
       <div>{/* Additional card content if needed */}</div>
