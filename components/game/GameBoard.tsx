@@ -110,7 +110,7 @@ useEffect(() => {
 
     // Shuffle the cards array
     const shuffledCards = gameState.cards
-      .map(card => ({ ...card, position: { x: Math.random() * 800, y: Math.random() * 600 } })) // Randomize positions
+      .map(card => ({ ...card, position: { x: Math.random(), y: Math.random() } })) // Randomize positions
       .sort(() => Math.random() - 0.5); // Shuffle array
 
     // Update the game state with the shuffled cards
