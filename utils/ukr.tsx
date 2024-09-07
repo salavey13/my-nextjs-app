@@ -339,5 +339,5 @@ promptReview: "Розпил Промптів",
 projectAssistance: "Проектна Допомога",
 promtgramming: "Кодоманія",
 darkTheme: "Темна тема",
-
+shuffle: "Перемішати картки",
     }
