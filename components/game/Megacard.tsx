@@ -1,4 +1,4 @@
-
+// components\game\Megacard.tsx
 import React, { useState, useEffect } from 'react';
 import { useSpring, animated } from 'react-spring';
 import { useGesture } from '@use-gesture/react';
@@ -37,7 +37,7 @@ const Megacard: React.FC<MegacardProps> = ({ gameState, cardId }) => {
     x: 0,
     y: 0,
     shadow: 5,
-    config: { mass: 1, tension: 200, friction: 30 },
+    config: { mass: 1, tension: 200, friction: 13 },
   }));
 
   useEffect(() => {

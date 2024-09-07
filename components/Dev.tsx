@@ -479,45 +479,9 @@ Example for Dota 2 personal lesson:) Please imagine some funny paid experience i
 The codebase is provided as a single file (\'MegaFile.txt\'). Each component in the \`/components\` and \`/components/ui\` folders can be used as examples for implementation. The \`adminDashboard.tsx\` file should serve as a reference for how to structure and format your response. Please ensure that the response is formatted for easy parsing and direct integration into the project.
 
 Expected Output:
-Branch Name
-   - Branch Name
 Component Implementation
    - The entire React component code should be provided, with the file path included as a comment at the top.
-   - 
-Translation Keys
-   - The keys should be in a TypeScript format, matching the format used in \TranslationUtils.tsx\`.
-    en: {
-        userInfo: "User Information",
-        email: "Email",
-        joined: "Joined",
-        error: "Error"
-    },
-    ru: {
-        userInfo: "Информация о пользователе",
-        email: "Электронная почта",
-        joined: "Присоединился",
-        error: "Ошибка"
-    },
-    ukr: {
-        userInfo: "Інформація про користувача",
-        email: "Електронна пошта",
-        joined: "Приєднався",
-        error: "Помилка"
-    }
-Supabase Tables
-   - SQL commands required to create any new Supabase tables should be provided, formatted for direct integration.
 
-README.md Update
-   - A markdown text ready to be appended to the existing \`README.md\` file, formatted with appropriate headers and code blocks.
-
-bottomShelf.tsx
-   - Please include implementation of adding new item to list "navigationLinks" and outputting new version of bottomShelf.tsx as a file (it can be extracted from megaFile - it is marked with "# components/ui/bottomShelf.tsx" and can be found by comment in the beginning of the file contents itself: "//componentsui/bottomShelf.tsx") and respective File: app/pageName/page.tsx. Include link to new page.ts in respective folder with the name of component like following:
-//app/profile/page.tsx
-import Profile from "@/components/Profile";
-
-export default function ProfilePage() {
-  return <Profile />;
-}
 
 EXAMPLES AND REFERENCES:
 bottomShelf.tsx for reference:
@@ -566,8 +530,289 @@ const BottomShelf: React.FC = () => {
 };
 
 export default BottomShelf;
+// components\game\Megacard.tsx
+import React, { useState, useEffect } from 'react';
+import { useSpring, animated } from 'react-spring';
+import { useGesture } from '@use-gesture/react';
+import { supabase } from '../../lib/supabaseClient';
+import { cardsImages } from './CardsImgs';
 
-You can use existing tables as you wish:
+interface Point {
+  x: number;
+  y: number;
+}
+
+interface Card {
+  id: string;
+  position: Point; // Relative position (0 to 1)
+  flipped: boolean;
+  last_trajectory?: Point[];
+}
+
+interface GameState {
+  cards: Card[];
+}
+
+type CardId = keyof typeof cardsImages;
+
+interface MegacardProps {
+  gameState: GameState;
+  cardId: string;
+}
+
+const Megacard: React.FC<MegacardProps> = ({ gameState, cardId }) => {
+  const [cardState, setCardState] = useState<Card | null>(null);
+  const [initialPosition, setInitialPosition] = useState<Point>({ x: 0, y: 0 });
+  const [isFlipped, setFlipped] = useState(false);
+
+  const [{ x, y, shadow }, set] = useSpring(() => ({
+    x: 0,
+    y: 0,
+    shadow: 5,
+    config: { mass: 1, tension: 200, friction: 13 },
+  }));
+
+  useEffect(() => {
+    if (gameState) {
+      const card = gameState.cards.find((c) => c.id === cardId);
+      if (card) {
+        setCardState(card);
+        const posX = card.position.x * window.innerWidth;
+        const posY = card.position.y * window.innerHeight;
+        setInitialPosition({ x: posX, y: posY });
+        set({ x: posX, y: posY });
+        setFlipped(card.flipped);
+      }
+    }
+  }, [gameState, cardId, set]);
+
+  const isNearTrashPlace = (x: number, y: number) => {
+    const trashPlace = { x: 200, y: 200 };
+    const radius = 50;
+    const distance = Math.sqrt((x - trashPlace.x) ** 2 + (y - trashPlace.y) ** 2);
+    return distance < radius;
+  };
+
+  const moveToTrashPlace = async () => {
+    set({ x: 200, y: 200, shadow: 5 });
+    const updatedGameState = {
+      ...gameState,
+      cards: gameState.cards.map((card) =>
+        card.id === cardId ? { ...card, position: { x: 200 / window.innerWidth, y: 200 / window.innerHeight } } : card
+      ),
+    };
+    const { error } = await supabase.from('rents').update({ game_state: updatedGameState }).eq('id', '28');
+    if (error) console.error('Error updating game state:', error);
+  };
+
+  const bind = useGesture({
+    onDrag: ({ down, movement: [mx, my], offset: [ox, oy] }) => {
+      if (down) {
+        set({
+          x: initialPosition.x + ox,
+          y: initialPosition.y + oy,
+          shadow: Math.min(30, Math.abs(ox + oy) / 10),
+        });
+      }
+    },
+    onDragEnd: async ({ movement: [mx, my], velocity }) => {
+      const newX = initialPosition.x + mx;
+      const newY = initialPosition.y + my;
+      
+      if (isNearTrashPlace(newX, newY)) {
+        await moveToTrashPlace();
+      } else {
+        set({
+          x: newX,
+          y: newY,
+          shadow: 5,
+          config: { mass: 1, tension: 200, friction: 30 },
+        });
+
+        const updatedGameState = {
+          ...gameState,
+          cards: gameState.cards.map((card) =>
+            card.id === cardId ? { ...card, position: { x: newX / window.innerWidth, y: newY / window.innerHeight } } : card
+          ),
+        };
+        const { error } = await supabase.from('rents').update({ game_state: updatedGameState }).eq('id', '28');
+        if (error) console.error('Error updating game state:', error);
+      }
+    },
+  });
+
+  return (
+    <animated.div
+      {...bind()}
+      style={{
+        transform: x.interpolate((x) => \`translate(\${x}px, \${y.get()}px)\`),
+        boxShadow: shadow.to((s) => \`0px \${s}px \${2 * s}px rgba(0,0,0,0.2)\`),
+        width: '100px',
+        height: '150px',
+        backgroundImage: isFlipped ? \`url(\${cardsImages[cardId as CardId]})\` : \`url(\${cardsImages["shirt"]})\`,
+        backgroundColor: isFlipped ? 'darkblue' : 'lightblue',
+        borderRadius: '8px',
+        cursor: 'grab',
+        backgroundSize: 'cover',
+        position: 'absolute',
+        touchAction: 'none',
+      }}
+    >
+      <div>{/* Additional card content if needed */}</div>
+    </animated.div>
+  );
+};
+
+export default Megacard;
+// components/GameBoard.tsx
+"use client";
+// game_id,game_state
+// test_game_1,"{
+//   ""cards"": [
+//     {
+//       ""id"": ""card1"",
+//       ""position"": { ""x"": 100, ""y"": 200 },
+//       ""last_trajectory"": [
+//         { ""x"": 100, ""y"": 200 },
+//         { ""x"": 120, ""y"": 220 },
+//         { ""x"": 140, ""y"": 240 }
+//       ],
+//       ""is_flipped"": false
+//     },
+//     {
+//       ""id"": ""card2"",
+//       ""position"": { ""x"": 300, ""y"": 100 },
+//       ""last_trajectory"": [
+//         { ""x"": 300, ""y"": 100 },
+//         { ""x"": 320, ""y"": 80 },
+//         { ""x"": 340, ""y"": 60 }
+//       ],
+//       ""is_flipped"": true
+//     },
+//     {
+//       ""id"": ""trash_card"",
+//       ""position"": { ""x"": 600, ""y"": 400 },
+//       ""last_trajectory"": [
+//         { ""x"": 600, ""y"": 400 },
+//         { ""x"": 580, ""y"": 380 },
+//         { ""x"": 560, ""y"": 360 }
+//       ],
+//       ""is_flipped"": false
+//     }
+//   ]
+// }"
+
+import React, { useEffect, useState } from 'react';
+import { supabase } from '../../lib/supabaseClient';
+import { Button } from '@/components/ui/button';
+import Megacard from './Megacard'; // Import the Megacard component
+import { useAppContext } from '@/context/AppContext';
+
+const GAME_ID = 28;  // Replace with actual game ID
+
+interface Card {
+  id: string;
+  position: { x: number; y: number };
+  flipped: boolean;
+}
+
+interface GameState {
+  cards: Card[];
+}
+
+const GameBoard: React.FC = () => {
+  const [gameState, setGameState] = useState<GameState | null>(null);
+  const [subscription, setSubscription] = useState<any>(null);
+  const { user, t } = useAppContext();
+
+  useEffect(() => {
+    // Subscribe to changes in the \`rents\` table for the current game
+    const handleSubscription = async () => {
+      // Initial fetch for game state
+      const { data, error } = await supabase
+        .from('rents')
+        .select('game_state')
+        .eq('id', GAME_ID)
+        .single();
+
+      if (error) {
+        console.error('Error fetching game state:', error);
+      } else {
+        setGameState(data.game_state);
+      }
+
+      // Set up the real-time subscription using a Supabase Channel
+      const channel = supabase
+        .channel('game-updates')
+        .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'rents', filter: \`id=eq.\${GAME_ID}\` }, (payload) => {
+          setGameState(payload.new.game_state);
+        })
+        .subscribe();
+
+      // Clean up the subscription on unmount
+      setSubscription(channel);
+      return () => {
+        supabase.removeChannel(channel);
+      };
+    };
+
+    handleSubscription();
+  }, [GAME_ID]);
+
+   // Fetch game state from Supabase
+useEffect(() => {
+    const fetchGameState = async () => {
+      const { data, error } = await supabase
+        .from('rents')
+        .select('game_state')
+        .eq('id', GAME_ID)
+        .single();
+      if (!error) setGameState(data.game_state);
+    };
+    fetchGameState();
+  }, []);                              
+  const shuffleCards = async () => {
+    if (!gameState) return;
+
+    // Shuffle the cards array
+    const shuffledCards = gameState.cards
+      .map(card => ({ ...card, position: { x: Math.random(), y: Math.random() } })) // Randomize positions
+      .sort(() => Math.random() - 0.5); // Shuffle array
+
+    // Update the game state with the shuffled cards
+    const updatedGameState = { ...gameState, cards: shuffledCards };
+
+    // Save the updated game state to Supabase
+    const { error } = await supabase
+      .from('rents')
+      .update({ game_state: updatedGameState })
+      .eq('id', GAME_ID);
+
+    if (error) {
+      console.error('Error updating game state:', error);
+    } else {
+      setGameState(updatedGameState); // Update local state
+    }
+  };
+
+  return (
+    <div className="game-board">
+      {/* Render cards */}
+      <div>
+        {gameState && gameState.cards.map((card) => (
+          <Megacard key={card.id} gameState={gameState} cardId={card.id} />
+        ))}
+      </div>
+
+      <Button className="shuffle-button" onClick={shuffleCards}>
+        {t("shuffle")}
+      </Button>
+    </div>
+  );
+};
+
+export default GameBoard;
+You can use/modify existing tables and components as you wish:
   public.users (
     telegram_username text not null default ''::text,
     lang text not null default '''ru''::text'::text,
@@ -683,39 +928,109 @@ You can use existing tables as you wish:
     constraint bets_event_id_fkey foreign key (event_id) references events (id),
     constraint bets_user_id_fkey foreign key (user_id) references users (telegram_id) on delete cascade
   ) tablespace pg_default;
-  public.authors (
-    author_id bigint generated by default as identity not null,
-    name text not null default ''::text,
-    image_url text not null default ''::text,
-    rating real not null default '0'::real,
-    constraint authors_pkey primary key (author_id)
+  public.item_types (
+    id uuid not null default extensions.uuid_generate_v4 (),
+    type text not null,
+    fields jsonb not null,
+    constraint item_types_pkey primary key (id)
   ) tablespace pg_default;
-  public.aid_organizations (
+  public.items (
     id bigint generated by default as identity not null,
-    name text not null,
-    description text null,
-    donation_link text not null,
-    created_at timestamp with time zone null default current_timestamp,
-    constraint aid_organizations_pkey primary key (id)
-  ) tablespace pg_default;
-  public.forum_posts (
-    id bigint generated by default as identity not null,
-    user_id bigint null,
     title text not null,
-    content text not null,
-    created_at timestamp with time zone null default current_timestamp,
-    updated_at timestamp with time zone null default current_timestamp,
-    constraint forum_posts_pkey primary key (id),
-    constraint forum_posts_user_id_fkey foreign key (user_id) references users (telegram_id)
+    creator_ref_code text not null,
+    item_type text not null,
+    details jsonb not null,   EXAMPLE:{
+  "game_info": {
+    "status": "",
+    "game_id": "",
+    "game_type": ""
+  },
+  "game_state": {},
+  "player_info": {
+    "player1_name": "",
+    "player2_name": ""
+  },
+  "card_settings": {
+    "owner_card_positions": "",
+    "opponent_card_positions": ""
+  },
+  "board_settings": {
+    "gameboard_url": "",
+    "coordinate_normalization": ""
+  },
+  "button_settings": {
+    "invite_button_position": "",
+    "shuffle_button_position": ""
+  },
+  "form_visibility": {},
+  "game_components": {},
+  "trigger_settings": {
+    "card_on_click_bitmask": "",
+    "card_on_drag_end_bitmask": ""
+  }
+}EXAMPLE2{
+  "ad_info": {
+    "title": "",
+    "description": ""
+  },
+  "pricing": {
+    "meme_builds": "",
+    "solo_lesson": "",
+    "party_lesson": "",
+    "replay_analysis": "",
+    "in_game_coaching": ""
+  },
+  "agreement": {
+    "consent": ""
+  },
+  "general_info": {
+    "username": "",
+    "tilt_level": "",
+    "discord_tag": "",
+    "favorite_hero": "",
+    "preferred_role": ""
+  },
+  "photo_upload": {
+    "profile_picture": ""
+  }
+}EXAMPLEOFF
+    created_at timestamp with time zone not null default now(),
+    game_type text null default 'FOOL'::text,
+    constraint items_pkey primary key (id)
   ) tablespace pg_default;
-
+  public.rents (
+    id bigint generated by default as identity not null,
+    user_id integer not null,
+    rent_start timestamp with time zone not null default now(),
+    rent_end timestamp with time zone not null,
+    status text not null default 'active'::text,
+    item_id bigint not null,
+    game_state jsonb null, EXAMPLE{
+  "cards": [
+    {
+      "id": "6_of_clubs",
+      "position": {
+        "x": 0.018670388180612,
+        "y": 0.043583865879121664
+      },
+      "is_flipped": true,
+      "last_trajectory": [
+        {
+          "x": 0.513767244829,
+          "y": 0.0578535623573
+        }
+      ]
+    },...
+  ]
+}EXAMPLEOFF
+    constraint rents_pkey primary key (id),
+    constraint rents_item_id_fkey foreign key (item_id) references items (id) on delete cascade,
+    constraint rents_user_id_fkey foreign key (user_id) references users (telegram_id) on delete cascade
+  ) tablespace pg_default;
 Make sure to follow this format strictly to help automate the integration process.
 ---
 
 Expected Response (Example)
-Branch Name:
-referrals_feature
-
 Component Implementation:
 File: components/Referral.tsx
 """tsx
@@ -905,50 +1220,6 @@ const Referral: React.FC = () => {
 export default Referral;
 
 """
-Translation Keys
-  en: {
-    userInfo: "User Information",
-    email: "Email",
-    joined: "Joined",
-    error: "Error"
-  },
-  ru: {
-    userInfo: "Информация о пользователе",
-    email: "Электронная почта",
-    joined: "Присоединился",
-    error: "Ошибка"
-  },
-  ukr: {
-    userInfo: "Інформація про користувача",
-    email: "Електронна пошта",
-    joined: "Приєднався",
-    error: "Помилка"
-  }
-};
-
-Supabase Tables
-CREATE TABLE referrals (
-    id uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
-    user_id uuid REFERENCES users(id) NOT NULL,
-    referred_user_id uuid REFERENCES users(id),
-    ref_code text,
-    referral_date timestamp with time zone DEFAULT current_timestamp NOT NULL
-);
-
-README.md Update
-## New Feature: User Information Component
-
-- **Description**: This component displays detailed user information fetched from Supabase, such as the user's email and the date they joined.
-- **Usage**:
-  
-tsx
-  import UserInfo from '@/components/UserInfo';
-
-  const App = () => {
-      return <UserInfo />;
-  };
-
-  export default App;
 
 
 - Output the entire file for this step, including the relative path on the first line as a comment.
@@ -956,11 +1227,6 @@ tsx
 - Provide complete code snippets, not just differences, to make integration easier.
 - Ensure consistent formatting for ease of parsing by script.
 Remember Output format:
-File: app/<pageName>/page.tsx
-"""tsx
-// app/<pageName>/page.tsx
-<code here>
-"""
 
 File: components/<NewComponent>.tsx
 """tsx
