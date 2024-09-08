@@ -341,4 +341,5 @@ promptReview: "Распил Промптов",
 projectAssistance: "Проектная Поддержка",
 promtgramming: "Кодомантия",
 darkTheme: "Темная тема",
+shufle: "Перетасовать карты",
 }

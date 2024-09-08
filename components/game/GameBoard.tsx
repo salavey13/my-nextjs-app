@@ -1,37 +1,21 @@
 // components/GameBoard.tsx
 "use client";
 // game_id,game_state
-// test_game_1,"{
+// 28,"{
 //   ""cards"": [
 //     {
 //       ""id"": ""card1"",
-//       ""position"": { ""x"": 100, ""y"": 200 },
+//       ""position"": { ""x"": 0.1, ""y"": 0.1 },
 //       ""last_trajectory"": [
-//         { ""x"": 100, ""y"": 200 },
-//         { ""x"": 120, ""y"": 220 },
-//         { ""x"": 140, ""y"": 240 }
+//         { ""x"": 0.1, ""y"": 0.1 }
 //       ],
 //       ""is_flipped"": false
-//     },
+//     }
+//   ],
+//   ""players"": [
 //     {
-//       ""id"": ""card2"",
-//       ""position"": { ""x"": 300, ""y"": 100 },
-//       ""last_trajectory"": [
-//         { ""x"": 300, ""y"": 100 },
-//         { ""x"": 320, ""y"": 80 },
-//         { ""x"": 340, ""y"": 60 }
-//       ],
-//       ""is_flipped"": true
-//     },
-//     {
-//       ""id"": ""trash_card"",
-//       ""position"": { ""x"": 600, ""y"": 400 },
-//       ""last_trajectory"": [
-//         { ""x"": 600, ""y"": 400 },
-//         { ""x"": 580, ""y"": 380 },
-//         { ""x"": 560, ""y"": 360 }
-//       ],
-//       ""is_flipped"": false
+//       ""id"": ""413553377"",
+//       ""position"": { ""x"": 100, ""y"": 200 }
 //     }
 //   ]
 // }"
@@ -39,7 +23,7 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 import { Button } from '@/components/ui/button';
-import Megacard from './Megacard'; // Import the Megacard component
+import Megacard from './Megacard_0.1'; // Import the Megacard component
 import { useAppContext } from '@/context/AppContext';
 
 const GAME_ID = 28;  // Replace with actual game ID
@@ -77,7 +61,7 @@ const GameBoard: React.FC = () => {
 
       // Set up the real-time subscription using a Supabase Channel
       const channel = supabase
-        .channel('game-updates')
+        .channel('notify_game_updates')
         .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'rents', filter: `id=eq.${GAME_ID}` }, (payload) => {
           setGameState(payload.new.game_state);
         })

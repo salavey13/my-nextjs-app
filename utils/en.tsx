@@ -435,5 +435,5 @@ promptReview: "Prompt Roast",
 projectAssistance: "Project S.O.S.",
 promtgramming: "Code Whispering",
 darkTheme: "Dark Theme",
-shuffle: "shuffle Cards",
+shufle: "shufle Cards",
 }
