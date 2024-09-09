@@ -5,7 +5,44 @@ import MegaCard from './MegaCard'; // Import MegaCard component
 import { Button } from '@/components/ui/button';
 import { useAppContext } from '@/context/AppContext';
 import PhysicsControls from './PhysicsControls';
-
+// {
+//     "cards": [
+//       {
+//         "id": "ace_of_spades",
+//         "position": {
+//           "x": 0.13347488956238615,
+//           "y": 0.596567085140635
+//         },
+//         "is_flipped": false,
+//         "trajectory": {
+//           "position": {
+//             "x": 0.1,
+//             "y": 0.1
+//           },
+//           "rotation": 15,
+//           "velocity": {
+//             "x": 0.5,
+//             "y": 0.5
+//           },
+//           "rotationSpeed": 0.02
+//         },
+//         "target_position": {
+//           "x": 0.6,
+//           "y": 0.5
+//         },
+//         "target_rotation": 90
+//       }
+//     ],
+//     "players": [
+//       {
+//         "id": "43",
+//         "position": {
+//           "x": 184.60638548158315,
+//           "y": 64.82521728032322
+//         }
+//       }
+//     ]
+//   }
 const GAME_ID = 28;  // Replace with actual game ID
 interface Point {
     x: number;

@@ -1,3 +1,4 @@
+// components\game\MegaCard.tsx
 import React, { useState, useEffect, useRef } from 'react';
 import { useSpring, animated } from 'react-spring';
 import { useGesture } from '@use-gesture/react';
