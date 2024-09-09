@@ -2,23 +2,30 @@
 "use client";
 // game_id,game_state
 // 28,"{
-  // "cards": [
-  //   {
-  //     ""id"": ""card1"",
-  //     ""position"": { ""x"": 0.1, ""y"": 0.1 },
-  //     ""last_trajectory"": [
-  //       { ""x"": 0.1, ""y"": 0.1 }
-  //     ],
-  //     ""is_flipped"": false
-  //   }
-  // ],
-  // "players": [
-  //   {
-  //     ""id"": ""413553377"",
-  //     ""position"": { ""x"": 100, ""y"": 200 }
-  //   }
-  // ]
-// }"
+  // {
+  //   "cards": [
+  //     {
+  //       "id": "ace_of_spades",
+  //       "position": { "x": 0.45, "y": 0.16 },
+  //       "is_flipped": false,
+  //       "trajectory": {
+  //         "position": { "x": 0.1, "y": 0.1 },
+  //         "rotation": 15,
+  //         "velocity": { "x": 0.5, "y": 0.5 },
+  //         "rotationSpeed": 0.02
+  //       },
+  //       "target_position": { "x": 0.6, "y": 0.5 },
+  //       "target_rotation": 0
+  //     }
+  //   ],
+  //   "players": [
+  //     {
+  //       "id": "43",
+  //       "position": { "x": 184, "y": 64 }
+  //     }
+  //   ]
+  // }
+  
 
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabaseClient';

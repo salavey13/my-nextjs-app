@@ -260,8 +260,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         setBackgroundColor("#FFFFFF"); // Set the background color to black
       }
       else {
-        setHeaderColor("#000000"); // Set the header color to black
-        setBackgroundColor("#000000"); // Set the background color to black
+        setHeaderColor("#282c33"); // Set the header color to black
+        setBackgroundColor("#282c33"); // Set the background color to black
       }
       disableVerticalSwipes(); // Disable vertical swipes in the Telegram WebApp
     }

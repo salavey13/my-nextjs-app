@@ -4,23 +4,27 @@ import MegaAvatar from './MegaAvatar'; // Import the updated MegaAvatar componen
 import MegaCard from './MegaCard'; // Import MegaCard component
 import { Button } from '@/components/ui/button';
 import { useAppContext } from '@/context/AppContext';
+import PhysicsControls from './PhysicsControls';
 
 const GAME_ID = 28;  // Replace with actual game ID
 interface Point {
     x: number;
     y: number;
   }
+
+  interface Trajectory {
+    position: Point;
+    rotation: number;
+    velocity: Point;
+    rotationSpeed: number;
+  }
 interface Card {
-  id: string;
-  position: Point;
-  flipped: boolean;
-  last_trajectory?: Point[];
-  trajectory: {
-    position: Point,
-    rotation: number,
-    velocity: Point,
-    rotationSpeed: number,
-  };
+    id: string;
+    position: Point;
+    flipped: boolean;
+    trajectory: Trajectory;
+    target_position: Point;
+    target_rotation: number;
 }
 interface MegaAvatarProps {
     playerId: number;
@@ -194,6 +198,8 @@ const GameBoard: React.FC = () => {
       <Button className="shuffle-button" onClick={shuffleCards}>
         {t("shufle")}
       </Button>
+      
+      {/* <PhysicsControls setPhysicsParams={setPhysicsParams} /> */}
 
       {/* Target frame outline */}
       <div
