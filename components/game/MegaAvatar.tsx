@@ -1,18 +1,61 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { supabase } from './supabaseClient'; // Supabase for state management
+import { supabase } from "../../lib/supabaseClient"; // Supabase for state management
+import { useSpring, animated } from 'react-spring';
+import { useGesture } from '@use-gesture/react';
+
+const GAME_ID = 28; // Replace with actual game ID
 
 // WebRTC configuration
-const rtcConfig = {
+const rtcConfig: RTCConfiguration = {
   iceServers: [
     { urls: 'stun:stun.l.google.com:19302' } // Public STUN server for connection establishment
   ]
 };
 
-const MegaAvatar = ({ playerId, initialPosition, onPositionChange }) => {
-  const [stream, setStream] = useState(null);
-  const videoRef = useRef(null);
-  const [position, setPosition] = useState(initialPosition);
-  const peerConnection = useRef(null);
+// Type for the player object
+interface Player {
+  id: string;
+  iceCandidates?: RTCIceCandidateInit[];
+}
+interface Card {
+  id: string;
+  position: Point; // Relative position (0 to 1)
+  flipped: boolean;
+  last_trajectory?: Point[];
+  trajectory: {
+    position: Point,
+    rotation: number,
+    velocity: Point,
+    rotationSpeed: number,
+  };
+}
+interface Point {
+  x: number;
+  y: number;
+}
+interface GameState {
+  cards: Card[];
+  players: Player[];
+}
+interface MegaAvatarProps {
+  gameState: GameState;
+  playerId: number;
+  initialPosition: Point;
+  onPositionChange: (playerId: number, position: Point) => void;
+}
+
+const MegaAvatar: React.FC<MegaAvatarProps> = ({ gameState, playerId, initialPosition, onPositionChange }) => {
+  const [stream, setStream] = useState<MediaStream | null>(null);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const [position, setPosition] = useState<Point>(initialPosition);
+  const peerConnection = useRef<RTCPeerConnection | null>(null);
+  const [{ x, y, shadow }, set] = useSpring(() => ({
+    x: initialPosition.x,
+    y: initialPosition.y,
+    shadow: 5,
+    config: { mass: 1, tension: 200, friction: 13 },
+  }));
+  const [isDragging, setIsDragging] = useState(false);
 
   // Initialize local media stream (camera + microphone)
   useEffect(() => {
@@ -20,8 +63,10 @@ const MegaAvatar = ({ playerId, initialPosition, onPositionChange }) => {
       try {
         const webcamStream = await navigator.mediaDevices.getUserMedia({ video: true });
         setStream(webcamStream);
-        videoRef.current.srcObject = webcamStream;
-        videoRef.current.play();
+        if (videoRef.current) {
+          videoRef.current.srcObject = webcamStream;
+          videoRef.current.play();
+        }
       } catch (error) {
         console.error("Error accessing webcam:", error);
       }
@@ -41,35 +86,26 @@ const MegaAvatar = ({ playerId, initialPosition, onPositionChange }) => {
     const initWebRTC = async () => {
       peerConnection.current = new RTCPeerConnection(rtcConfig);
 
-      // Add local stream to peer connection
       if (stream) {
-        stream.getTracks().forEach(track => peerConnection.current.addTrack(track, stream));
+        stream.getTracks().forEach(track => peerConnection.current?.addTrack(track, stream));
       }
 
-      // Handle ICE candidates
-      peerConnection.current.onicecandidate = event => {
+      peerConnection.current!.onicecandidate = event => {
         if (event.candidate) {
           sendIceCandidateToPeers(event.candidate);
         }
       };
 
-      // Handle remote stream
-      peerConnection.current.ontrack = event => {
-        // Handle remote stream
+      peerConnection.current!.ontrack = event => {
+        if (videoRef.current) {
+          videoRef.current.srcObject = event.streams[0];
+        }
       };
 
-      // Fetch existing ICE candidates and add them to peer connection
-      const { data } = await supabase
-        .from('rents')
-        .select('game_state')
-        .eq('id', 'your_rent_id') // Replace with actual rent ID
-        .single();
-
-      const gameState = data?.game_state || {};
-      const player = gameState.players.find(p => p.id === playerId);
+      const player = gameState.players.find((p) => p.id === String(playerId));
       if (player && player.iceCandidates) {
-        player.iceCandidates.forEach(candidate => {
-          peerConnection.current.addIceCandidate(new RTCIceCandidate(candidate));
+        player.iceCandidates.forEach((candidate: RTCIceCandidateInit) => {
+          peerConnection.current?.addIceCandidate(new RTCIceCandidate(candidate));
         });
       }
     };
@@ -77,50 +113,84 @@ const MegaAvatar = ({ playerId, initialPosition, onPositionChange }) => {
     initWebRTC();
 
     return () => {
-      if (peerConnection.current) {
-        peerConnection.current.close();
-      }
+      peerConnection.current?.close();
     };
-  }, [playerId, stream]);
+  }, [playerId, gameState, stream]);
 
-  const sendIceCandidateToPeers = async (candidate) => {
-    const { data, error } = await supabase
-      .from('rents')
-      .select('game_state')
-      .eq('id', 'your_rent_id') // Replace with actual rent ID
-      .single();
-
-    const gameState = data?.game_state || {};
-    const player = gameState.players.find(player => player.id === playerId);
+  const sendIceCandidateToPeers = async (candidate: RTCIceCandidateInit) => {
+    const player = gameState.players.find((p) => p.id === String(playerId));
     if (player) {
       player.iceCandidates = player.iceCandidates || [];
       player.iceCandidates.push(candidate);
-      await supabase
+      const updatedGameState = { ...gameState };
+
+      const { error } = await supabase
         .from('rents')
-        .update({ game_state: gameState })
-        .eq('id', 'your_rent_id'); // Replace with actual rent ID
+        .update({ game_state: updatedGameState })
+        .eq('id', GAME_ID);
+
+      if (error) {
+        console.error('Error updating game state:', error);
+      }
     }
   };
 
-  const handleDrag = (e) => {
-    const newPos = { x: e.clientX, y: e.clientY };
-    setPosition(newPos);
-    onPositionChange(playerId, newPos);
+  const handleDragEnd = async (newX: number, newY: number) => {
+    setIsDragging(false);
+    set({ x: newX, y: newY, shadow: 5 });
+
+    const updatedPosition = { x: newX, y: newY };
+    setPosition(updatedPosition);
+    onPositionChange(playerId, updatedPosition);
+
+    const updatedGameState = {
+      ...gameState,
+      players: gameState.players.map(player => 
+        player.id === playerId.toString()
+          ? { ...player, position: updatedPosition }
+          : player
+      )
+    };
+
+    const { error } = await supabase
+      .from('rents')
+      .update({ game_state: updatedGameState })
+      .eq('id', GAME_ID);
+
+    if (error) {
+      console.error('Error updating game state:', error);
+    }
   };
 
+  const bind = useGesture({
+    onDrag: ({ down, movement: [mx, my], memo = { x: 0, y: 0 } }) => {
+      if (down) {
+        setIsDragging(true);
+        const newX = memo.x + mx;
+        const newY = memo.y + my;
+        set({ x: newX, y: newY, shadow: Math.min(30, Math.abs(mx + my) / 10) });
+        return memo;
+      } else {
+        handleDragEnd(x.get(), y.get());
+        return memo;
+      }
+    },
+  });
+
   return (
-    <div
+    <animated.div
+      {...bind()}
       style={{
-        position: 'absolute',
-        left: position.x,
-        top: position.y,
+        transform: x.interpolate((x) => `translate(${x}px, ${y.get()}px)`),
+        boxShadow: shadow.to((s) => `0px ${s}px ${2 * s}px rgba(0,0,0,0.2)`),
         width: '256px',
         height: '256px',
         borderRadius: '50%',
-        backgroundColor: 'transparent',
-        cursor: 'pointer'
+        // backgroundColor: 'transparent',
+        cursor: 'grab',
+        position: 'absolute',
+        touchAction: 'none',
       }}
-      onMouseDown={handleDrag}
     >
       <video
         ref={videoRef}
@@ -128,10 +198,11 @@ const MegaAvatar = ({ playerId, initialPosition, onPositionChange }) => {
           width: '100%',
           height: '100%',
           borderRadius: '50%',
+          objectFit: 'cover',
         }}
         muted
       />
-    </div>
+    </animated.div>
   );
 };
 

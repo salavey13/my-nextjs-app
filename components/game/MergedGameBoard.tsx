@@ -22,13 +22,22 @@ interface Card {
     rotationSpeed: number,
   };
 }
-
+interface MegaAvatarProps {
+    playerId: number;
+    initialPosition: Point;
+    onPositionChange: (playerId: number, position: Point) => void;
+  }
 interface Player {
     id: string;
     position: { x: number; y: number };
     iceCandidates?: any[]; // Optional array for iceCandidates
   }
 
+
+  interface Point {
+    x: number;
+    y: number;
+  }
 interface GameState {
   cards: Card[];
   players: Player[];
@@ -96,7 +105,7 @@ const GameBoard: React.FC = () => {
     registerPlayer();
   }, [user?.id]);
 
-  const handlePositionChange = (playerId: string, newPos: { x: number; y: number }) => {
+  const handlePositionChange = (playerId: number, newPos: Point) => {
     setPlayerPositions(prev => ({ ...prev, [playerId]: newPos }));
 
     if (gameState) {
@@ -106,7 +115,7 @@ const GameBoard: React.FC = () => {
             game_state: {
               ...gameState,
               players: gameState.players.map((player) =>
-                player.id === playerId ? { ...player, position: newPos } : player
+                player.id === String(playerId) ? { ...player, position: newPos } : player
               ),
             },
           })
@@ -163,11 +172,12 @@ const GameBoard: React.FC = () => {
   };
 
   return (
-    <div className="game-board-container" style={{ position: "relative", width: "1000px", height: "600px", backgroundColor: "#ddd" }}>
-      {/* {Object.keys(playerPositions).map(playerId => (
+    <div className="game-board-container" style={{ position: "relative", width: "1000px", height: "600px" }}>{/*}, backgroundColor: "#ddd"*/}
+      {/* {gameState && Object.keys(playerPositions).map(playerId => (
         <MegaAvatar
+          gameState={gameState}
           key={playerId}
-          playerId={playerId}
+          playerId={Number(playerId)}
           initialPosition={playerPositions[playerId]}
           onPositionChange={handlePositionChange}
         />

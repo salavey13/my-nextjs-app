@@ -2,22 +2,22 @@
 "use client";
 // game_id,game_state
 // 28,"{
-//   ""cards"": [
-//     {
-//       ""id"": ""card1"",
-//       ""position"": { ""x"": 0.1, ""y"": 0.1 },
-//       ""last_trajectory"": [
-//         { ""x"": 0.1, ""y"": 0.1 }
-//       ],
-//       ""is_flipped"": false
-//     }
-//   ],
-//   ""players"": [
-//     {
-//       ""id"": ""413553377"",
-//       ""position"": { ""x"": 100, ""y"": 200 }
-//     }
-//   ]
+  // "cards": [
+  //   {
+  //     ""id"": ""card1"",
+  //     ""position"": { ""x"": 0.1, ""y"": 0.1 },
+  //     ""last_trajectory"": [
+  //       { ""x"": 0.1, ""y"": 0.1 }
+  //     ],
+  //     ""is_flipped"": false
+  //   }
+  // ],
+  // "players": [
+  //   {
+  //     ""id"": ""413553377"",
+  //     ""position"": { ""x"": 100, ""y"": 200 }
+  //   }
+  // ]
 // }"
 
 import React, { useEffect, useState } from 'react';
