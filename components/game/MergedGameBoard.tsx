@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabaseClient'; // Supabase for state management
 import MegaAvatar from './MegaAvatar'; // Import the updated MegaAvatar component
-import Megacard from './MegaCard'; // Import MegaCard component
+import Megacard from "@/components/game/MegaCard"; // Import MegaCard component
 import { Button } from '@/components/ui/button';
 import { useAppContext } from '@/context/AppContext';
 import PhysicsControls from './PhysicsControls';
