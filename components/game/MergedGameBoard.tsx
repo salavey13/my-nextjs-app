@@ -5,6 +5,8 @@ import MegaCard from './MegaCard'; // Import MegaCard component
 import { Button } from '@/components/ui/button';
 import { useAppContext } from '@/context/AppContext';
 import PhysicsControls from './PhysicsControls';
+import { useGesture } from '@use-gesture/react'; // Ensure you import this for gesture handling
+
 // {
 //     "cards": [
 //       {
@@ -44,17 +46,19 @@ import PhysicsControls from './PhysicsControls';
 //     ]
 //   }
 const GAME_ID = 28;  // Replace with actual game ID
+
 interface Point {
     x: number;
     y: number;
-  }
+}
 
-  interface Trajectory {
+interface Trajectory {
     position: Point;
     rotation: number;
     velocity: Point;
     rotationSpeed: number;
-  }
+}
+
 interface Card {
     id: string;
     position: Point;
@@ -71,8 +75,7 @@ interface MegaAvatarProps {
 interface Player {
     id: string;
     position: { x: number; y: number };
-    iceCandidates?: any[]; // Optional array for iceCandidates
-  }
+}
 
 
   interface Point {
@@ -80,89 +83,125 @@ interface Player {
     y: number;
   }
 interface GameState {
-  cards: Card[];
-  players: Player[];
+    cards: Card[];
+    players: Player[];
 }
+
 const GameBoard: React.FC = () => {
     const [gameState, setGameState] = useState<GameState | null>(null);
     const [subscription, setSubscription] = useState<any>(null);
+    const [playerPositions, setPlayerPositions] = useState<Record<string, { x: number; y: number }>>({});
+    const [isLongPress, setIsLongPress] = useState(false);
+    const [longPressStart, setLongPressStart] = useState(0);
     const { user, t } = useAppContext();
-  const [playerPositions, setPlayerPositions] = useState<Record<string, { x: number; y: number }>>({});
-  const [targetFrame, setTargetFrame] = useState({
-    x: 400,
-    y: 300,
-    rotation: 0,
-  });
-  const randomizeTargetFrame = () => {
-    setTargetFrame({
-      x: Math.random() * 800 + 100, // Assuming the board width is 1000px
-      y: Math.random() * 400 + 100, // Assuming the board height is 600px
-      rotation: Math.random() * 360,
+
+    const [targetFrame, setTargetFrame] = useState({
+        x: 400,
+        y: 300,
+        rotation: 0,
     });
-  };
-  useEffect(() => {
-    const fetchGameState = async () => {
-      const { data } = await supabase
-        .from('rents')
-        .select('game_state')
-        .eq('id', GAME_ID) // Replace with actual rent ID
-        .single();
 
-      if (data) {
-        setGameState(data.game_state);
-        const playerPos: Record<string, { x: number; y: number }> = {};
-        data.game_state.players?.forEach((player: Player) => {
-          playerPos[player.id] = player.position;
+    const randomizeTargetFrame = () => {
+        setTargetFrame({
+            x: Math.random() * 800 + 100, // Assuming the board width is 1000px
+            y: Math.random() * 400 + 100, // Assuming the board height is 600px
+            rotation: Math.random() * 360,
         });
-        setPlayerPositions(playerPos);
-      }
     };
 
-    fetchGameState();
-  }, []);
+    // Parallax state for the shuffle button
+    const [buttonParallax, setButtonParallax] = useState({ x: 0, y: 0 });
 
-  useEffect(() => {
-    const registerPlayer = async () => {
-        if (!user) return; // Check if user is not null
+    useEffect(() => {
+        const fetchGameState = async () => {
+            const { data } = await supabase
+                .from('rents')
+                .select('game_state')
+                .eq('id', GAME_ID) // Replace with actual rent ID
+                .single();
 
-        const { data, error } = await supabase
-        .from('rents')
-        .select('game_state')
-        .eq('id', GAME_ID) // Replace with actual rent ID
-        .single();
+            if (data) {
+                setGameState(data.game_state);
+                const playerPos: Record<string, { x: number; y: number }> = {};
+                data.game_state.players?.forEach((player: Player) => {
+                    playerPos[player.id] = player.position;
+                });
+                setPlayerPositions(playerPos);
+            }
+        };
 
-      if (data) {
-        const players: Player[] = data.game_state.players || [];
-        if (!players.find((player: Player) => player.id === String(user.id.toString()))) {
-          players.push({ id: String(user.id.toString()), position: { x: 0.1, y: 0.1 }, iceCandidates: [] });
-          await supabase
-            .from('rents')
-            .update({ game_state: { ...data.game_state, players } })
-            .eq('id', GAME_ID);
-        }
-      }
+        fetchGameState();
+    }, []);
+
+    // Handle long press attraction
+    const handleLongPressAttraction = (clientX: number, clientY: number) => {
+        gameState?.cards.forEach((card) => {
+            const rect = document.getElementById(card.id)?.getBoundingClientRect();
+            if (rect) {
+                const cardCenter = { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+                const distance = Math.sqrt(Math.pow(clientX - cardCenter.x, 2) + Math.pow(clientY - cardCenter.y, 2));
+                const pressDuration = Date.now() - longPressStart;
+                const attractionStrength = Math.min(500, pressDuration);
+
+                const newX = card.position.x + (clientX - cardCenter.x) * attractionStrength / 1000;
+                const newY = card.position.y + (clientY - cardCenter.y) * attractionStrength / 1000;
+
+                setGameState((prev) => ({
+                    ...prev!,
+                    cards: prev!.cards.map((c) =>
+                        c.id === card.id ? { ...c, position: { x: newX, y: newY } } : c
+                    ),
+                }));
+
+                // Apply inertia (optional)
+                if (!isLongPress) {
+                    // Apply some inertia logic here, possibly using a physics library
+                }
+            }
+        });
     };
+// useEffect(() => {
+//     const registerPlayer = async () => {
+//         if (!user) return; // Check if user is not null
 
-    registerPlayer();
-  }, [user?.id]);
+//         const { data, error } = await supabase
+//         .from('rents')
+//         .select('game_state')
+//         .eq('id', GAME_ID) // Replace with actual rent ID
+//         .single();
 
-  const handlePositionChange = (playerId: number, newPos: Point) => {
-    setPlayerPositions(prev => ({ ...prev, [playerId]: newPos }));
+//       if (data) {
+//         const players: Player[] = data.game_state.players || [];
+//         if (!players.find((player: Player) => player.id === String(user.id.toString()))) {
+//           players.push({ id: String(user.id.toString()), position: { x: 0.1, y: 0.1 }, iceCandidates: [] });
+//           await supabase
+//             .from('rents')
+//             .update({ game_state: { ...data.game_state, players } })
+//             .eq('id', GAME_ID);
+//         }
+//       }
+//     };
 
-    if (gameState) {
-        supabase
-          .from('rents')
-          .update({
-            game_state: {
-              ...gameState,
-              players: gameState.players.map((player) =>
-                player.id === String(playerId) ? { ...player, position: newPos } : player
-              ),
-            },
-          })
-          .eq('id', GAME_ID);
-      };
-  };
+//     registerPlayer();
+//   }, [user?.id]);
+
+//   const handlePositionChange = (playerId: number, newPos: Point) => {
+//     setPlayerPositions(prev => ({ ...prev, [playerId]: newPos }));
+
+//     if (gameState) {
+//         supabase
+//           .from('rents')
+//           .update({
+//             game_state: {
+//               ...gameState,
+//               players: gameState.players.map((player) =>
+//                 player.id === String(playerId) ? { ...player, position: newPos } : player
+//               ),
+//             },
+//           })
+//           .eq('id', GAME_ID);
+//       };
+//   };
 
   const syncTrajectory = async (trajectoryData: any) => {
     // try {
@@ -187,34 +226,69 @@ const GameBoard: React.FC = () => {
     //   console.error('Unexpected error:', err);
     // }
   };
-  const shuffleCards = async () => {
-    if (!gameState) return;
+    // Gesture handler
+    const bind = useGesture(
+        {
+            // onPress: (event) => {
+            //     setLongPressStart(Date.now());
+            //     setIsLongPress(true);
 
-    // Shuffle the cards array
-    const shuffledCards = gameState.cards
-      .map(card => ({ ...card, position: { x: Math.random(), y: Math.random() } })) // Randomize positions
-      .sort(() => Math.random() - 0.5); // Shuffle array
+            //     const { clientX, clientY } = event;
+            //     setTimeout(() => {
+            //         if (isLongPress) {
+            //             handleLongPressAttraction(clientX, clientY);
+            //         }
+            //     }, 500); // Trigger long press attraction after 500ms
+            // },
+            // onPressEnd: () => {
+            //     setIsLongPress(false);
+            // },
+        },
+        { drag: { delay: true } }
+    );
 
-    // Update the game state with the shuffled cards
-    const updatedGameState = { ...gameState, cards: shuffledCards };
+    const shuffleCards = async () => {
+        if (!gameState) return;
 
-    // Save the updated game state to Supabase
-    const { error } = await supabase
-      .from('rents')
-      .update({ game_state: updatedGameState })
-      .eq('id', GAME_ID);
+        // Shuffle the cards array
+        const shuffledCards = gameState.cards
+            .map((card) => ({ ...card, position: { x: Math.random(), y: Math.random() } })) // Randomize positions
+            .sort(() => Math.random() - 0.5); // Shuffle array
 
-    if (error) {
-      console.error('Error updating game state:', error);
-    } else {
-      setGameState(updatedGameState); // Update local state
-    }
-    randomizeTargetFrame()
-  };
+        // Update the game state with the shuffled cards
+        const updatedGameState = { ...gameState, cards: shuffledCards };
 
-  return (
-    <div className="game-board-container" style={{ position: "relative", width: "1000px", height: "600px" }}>{/*}, backgroundColor: "#ddd"*/}
-      {/* {gameState && Object.keys(playerPositions).map(playerId => (
+        // Save the updated game state to Supabase
+        const { error } = await supabase
+            .from('rents')
+            .update({ game_state: updatedGameState })
+            .eq('id', GAME_ID);
+
+        if (error) {
+            console.error('Error updating game state:', error);
+        } else {
+            setGameState(updatedGameState); // Update local state
+        }
+
+        randomizeTargetFrame();
+    };
+
+    // Apply parallax to the shuffle button based on mouse movement
+    const handleMouseMove = (event: React.MouseEvent) => {
+        const { clientX, clientY } = event;
+        const parallaxX = (clientX / window.innerWidth - 0.5) * 20; // Adjust strength
+        const parallaxY = (clientY / window.innerHeight - 0.5) * 20;
+        setButtonParallax({ x: parallaxX, y: parallaxY });
+    };
+
+    return (
+        <div
+            className="game-board-container"
+            style={{ position: 'relative', width: '1000px', height: '600px' }}
+            onMouseMove={handleMouseMove}
+            {...bind()} // Attach gesture handlers
+        >
+            {/* {gameState && Object.keys(playerPositions).map(playerId => (
         <MegaAvatar
           gameState={gameState}
           key={playerId}
@@ -223,35 +297,38 @@ const GameBoard: React.FC = () => {
           onPositionChange={handlePositionChange}
         />
       ))} */}
+            {/* Render cards */}
+            <div>
+                {gameState &&
+                    gameState.cards.map((card) => (
+                        <MegaCard key={card.id} gameState={gameState} cardId={card.id} syncTrajectory={syncTrajectory} />
+                    ))}
+            </div>
 
-      {/* Render cards */}
-      <div>
-        {gameState && gameState.cards.map((card) => (
-          <MegaCard key={card.id} gameState={gameState} cardId={card.id}
-          syncTrajectory={syncTrajectory} />
-        ))}
-      </div>
+            <Button
+                className="shuffle-button"
+                onClick={shuffleCards}
+                style={{
+                    transform: `translate(${buttonParallax.x}px, ${buttonParallax.y}px)`,
+                }}
+            >
+                {t('shufle')}
+            </Button>
 
-      <Button className="shuffle-button" onClick={shuffleCards}>
-        {t("shufle")}
-      </Button>
-      
-      {/* <PhysicsControls setPhysicsParams={setPhysicsParams} /> */}
-
-      {/* Target frame outline */}
-      <div
-        style={{
-          width: "200px",
-          height: "300px",
-          position: "absolute",
-          top: targetFrame.y,
-          left: targetFrame.x,
-          transform: `rotate(${targetFrame.rotation}deg)`,
-          border: "2px dashed black",
-        }}
-      />
-    </div>
-  );
+            {/* Target frame outline */}
+            <div
+                style={{
+                    width: '200px',
+                    height: '300px',
+                    position: 'absolute',
+                    top: targetFrame.y,
+                    left: targetFrame.x,
+                    transform: `rotate(${targetFrame.rotation}deg)`,
+                    border: '2px dashed black',
+                }}
+            />
+        </div>
+    );
 };
 
 export default GameBoard;

@@ -20,7 +20,7 @@ interface Point {
     surfaceFriction?: number;
     mass?: number;
     liftCoefficient?: number;
-    minRotationSpeedForLift?: number;
+    minRotationSpeedForLift: number;
   }
   
   // Default physics parameters
@@ -30,7 +30,7 @@ interface Point {
     surfaceFriction: 0.92,
     mass: 5,
     liftCoefficient: 0.03,
-    minRotationSpeedForLift: 3,
+    minRotationSpeedForLift: 0,//3,
   };
   
   export class CardPhysics {
@@ -39,7 +39,7 @@ interface Point {
     rotation: RotationState;
     params: PhysicsParams;
   
-    constructor(initialPosition: Point, params: PhysicsParams = {}) {
+    constructor(initialPosition: Point, params: PhysicsParams = {minRotationSpeedForLift: 3}) {
       this.position = initialPosition;
       this.velocity = { x: 0, y: 0 };
       this.rotation = { angle: 0, speed: 0 };
@@ -63,14 +63,22 @@ interface Point {
       this.rotation.angle += this.rotation.speed;
     }
   
-    calculateRotationSpeed(grabX: number, grabY: number, velocityX: number, velocityY: number) {
-      const torque = grabX * velocityY - grabY * velocityX;
-      this.rotation.speed = torque * 0.001;
-    }
+    calculateRotationSpeed(deltaX: number, deltaY: number, velocityX: number, velocityY: number) {
+        const speed = Math.sqrt(velocityX ** 2 + velocityY ** 2); // Calculate total velocity magnitude
+        const direction = Math.atan2(deltaY, deltaX); // Get movement direction angle
+      
+        if (speed > this.params.minRotationSpeedForLift) {
+          // If the speed is high enough, force rotation based on the velocity and movement delta
+          this.rotation.speed = direction * (speed * 1000); // Factor velocity and direction for rotation speed
+        } else {
+          this.rotation.speed = 0; // Otherwise, no significant rotation
+        }
+      }
   
     step() {
       this.applyFriction();
-      this.applyGravity();
+      //this.applyGravity();
       this.update();
     }
   }
+  
