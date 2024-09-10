@@ -114,7 +114,7 @@ const MegaCard: React.FC<MegacardProps> = ({ gameState, cardId, syncTrajectory }
 
     const animate = (currentTime: number) => {
       const elapsed = currentTime - startTime;
-      if (elapsed >= flightDuration * 10000) {
+      if (elapsed >= flightDuration * 5000) {
         updateCardPosition(finalPosition, physicsRef.current!.rotation.angle);
         updateGameState(finalPosition, physicsRef.current!.velocity, physicsRef.current!.rotation);
         return;
@@ -223,8 +223,10 @@ const MegaCard: React.FC<MegacardProps> = ({ gameState, cardId, syncTrajectory }
       if (!card || !lastPositionRef.current) return;
 
       if (down && !isDragging) {
-        memo = { x: lastPositionRef.current.x, y: lastPositionRef.current.y }; setIsDragging(true); }
-        lastPositionRef.current = { x: memo.x + mx, y: memo.y + my };
+        memo = { x: lastPositionRef.current.x, y: lastPositionRef.current.y }; setIsDragging(true); 
+      }
+      lastPositionRef.current = { x: memo.x + mx, y: memo.y + my };
+      updateCardPosition(lastPositionRef.current, physicsRef.current!.rotation.angle)
       handleDrag(mx, my, velocityX, velocityY);
 
       if (!down) {
@@ -239,8 +241,8 @@ const Crosshair = ({ position }: { position: { x: number; y: number } }) => {
       <div
         style={{
           position: 'absolute',
-          top: `${position.y}px`,
-          left: `${position.x}px`,
+          top: `${crosshairPosition?.y || 0}px`,
+          left: `${crosshairPosition?.x || 0}px`,
           width: '10px',
           height: '10px',
           backgroundColor: 'red',
