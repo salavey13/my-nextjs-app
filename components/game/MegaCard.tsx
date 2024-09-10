@@ -5,7 +5,7 @@ import { useGesture } from '@use-gesture/react';
 import { supabase } from '../../lib/supabaseClient';
 import { cardsImages } from './CardsImgs';
 import { CardPhysics } from './CardPhysics';
-import PhysicsControls from './PhysicsControls'; // Import the new physics control component
+import PhysicsControls from './PhysicsControls'; 
 import {
   calculateVelocity,
   calculateDirection,
@@ -47,6 +47,7 @@ interface GameState {
 }
 
 type CardId = keyof typeof cardsImages;
+
 interface MegacardProps {
   gameState: GameState;
   cardId: string;
@@ -78,33 +79,83 @@ const MegaCard: React.FC<MegacardProps> = ({ gameState, cardId, syncTrajectory }
     minRotationSpeedForLift: 3,
   });
 
-  // Initialize the physics for the card when the component mounts or gameState changes
+  // Frame limiter for smoother 24 FPS or 16 FPS
+  const fps = 24; // Or 16 for slower animation
+  const frameInterval = 1000 / fps;
+  let lastFrameTime = 0;
+
+  // lastPositionRef.current?.x || lastPositionRef.current?.y || Initialize physics for the card when the component mounts or gameState changes
   useEffect(() => {
     const card = gameState.cards.find((c) => c.id === cardId);
-    if (card && cardRef.current) {
-      const posX = lastPositionRef.current?.x || card.position.x * window.innerWidth;
-      const posY = lastPositionRef.current?.y || card.position.y * window.innerHeight;
+    if (card) {
+      const posX = card.position.x * window.innerWidth;
+      const posY = card.position.y * window.innerHeight;
 
       lastPositionRef.current = { x: posX, y: posY };
       physicsRef.current = new CardPhysics({ x: posX, y: posY }, physicsParams);
     }
   }, [gameState, cardId]);
 
-  // Sync the physics params to the physics engine whenever they change
+  // Sync physics parameters
   useEffect(() => {
     if (physicsRef.current) {
       physicsRef.current.params = { ...physicsParams };
     }
   }, [physicsParams]);
 
-  // Handle card release and update the game state
+  // Function to animate flight with frame limiting
+  const animateFlight = (finalPosition: Point, flightDuration: number) => {
+    const startTime = performance.now();
+    const airborneTime = (2 / 3) * flightDuration;
+    const dragTime = (1 / 3) * flightDuration;
+
+    const animate = (currentTime: number) => {
+      const elapsed = currentTime - startTime;
+      if (elapsed >= flightDuration * 10000) {
+        updateCardPosition(finalPosition, physicsRef.current!.rotation.angle);
+        updateGameState(finalPosition, physicsRef.current!.velocity, physicsRef.current!.rotation);
+        return;
+      }
+
+      if (currentTime - lastFrameTime > frameInterval) {
+        lastFrameTime = currentTime;
+        const timeProgress = elapsed / (flightDuration * 500);
+
+        // Airborne phase
+        if (timeProgress < 2 / 3) {
+          physicsRef.current!.velocity = applyAirFriction(physicsRef.current!.velocity, physicsParams.airFriction);
+          physicsRef.current!.rotation.angle += physicsRef.current!.rotation.speed;
+        }
+        // Surface drag phase
+        else {
+          physicsRef.current!.velocity = applySurfaceFriction(physicsRef.current!.velocity, physicsParams.surfaceFriction);
+          physicsRef.current!.rotation.angle += physicsRef.current!.rotation.speed;
+        }
+
+        // Parallax and shadow effect
+        applyShadowAndParallax(timeProgress, flightDuration, cardRef, cloneRef);
+
+        // Update card position and rotation
+        const newPos = {
+          x: lastPositionRef.current!.x + physicsRef.current!.velocity.x * timeProgress,
+          y: lastPositionRef.current!.y + physicsRef.current!.velocity.y * timeProgress,
+        };
+        updateCardPosition(newPos, physicsRef.current!.rotation.angle);
+      }
+
+      requestAnimationFrame(animate);
+    };
+
+    requestAnimationFrame(animate);
+  };
+
+  // Handle release (yeet) event
   const handleRelease = async (deltaX: number, deltaY: number, velocityX: number, velocityY: number) => {
     setIsDragging(false);
-
     if (!lastPositionRef.current || !physicsRef.current) return;
 
     const velocity = calculateVelocity(deltaX, deltaY, velocityX, velocityY);
-    const flightDuration = calculateFlightDuration(velocity, 100, 3); // Adjust maxVelocity and maxTime as needed
+    const flightDuration = calculateFlightDuration(velocity, 50, 3);
     const finalPosition = calculateFinalPosition(
       lastPositionRef.current.x,
       lastPositionRef.current.y,
@@ -116,40 +167,32 @@ const MegaCard: React.FC<MegacardProps> = ({ gameState, cardId, syncTrajectory }
     physicsRef.current.velocity = { x: velocityX * 100, y: velocityY * 100 };
     physicsRef.current.rotation.speed = calcRotationSpeed(deltaX, deltaY, velocityX, velocityY, physicsParams.minRotationSpeedForLift);
 
-    const airborneTime = (2 / 3) * flightDuration;
-    const dragTime = (1 / 3) * flightDuration;
-
-    const animateFlight = () => {
-      let currentTime = 0;
-      const animation = setInterval(() => {
-        currentTime += 1 / 60;
-
-        if (currentTime < airborneTime) {
-          physicsRef.current!.velocity = applyAirFriction(physicsRef.current!.velocity, physicsParams.airFriction);
-          physicsRef.current!.rotation.angle += physicsRef.current!.rotation.speed;
-          applyShadowAndParallax(currentTime, flightDuration, cardRef, cloneRef);
-          if (currentTime > airborneTime / 2) {
-            physicsRef.current!.rotation.angle += 180;
-            gameState.cards.find((c) => c.id === cardId)!.flipped = !gameState.cards.find((c) => c.id === cardId)!.flipped;
-          }
-        } else if (currentTime >= airborneTime && currentTime < flightDuration) {
-          physicsRef.current!.velocity = applySurfaceFriction(physicsRef.current!.velocity, physicsParams.surfaceFriction);
-          physicsRef.current!.rotation.angle += physicsRef.current!.rotation.speed;
-        }
-
-        if (currentTime >= flightDuration) {
-          clearInterval(animation);
-          lastPositionRef.current = finalPosition;
-          updateGameState(finalPosition, physicsRef.current!.velocity, physicsRef.current!.rotation);
-        }
-
-        updateCardPosition(finalPosition, physicsRef.current!.rotation.angle);
-      }, 1000 / 60);
-    };
-
-    animateFlight();
+    animateFlight(finalPosition, flightDuration);
   };
 
+  // Handle card drag movement
+  const handleDrag = (deltaX: number, deltaY: number, velocityX: number, velocityY: number) => {
+    const velocity = calculateVelocity(deltaX, deltaY, velocityX, velocityY);
+    const flightDuration = calculateFlightDuration(velocity, 50, 3);
+    const predictedPosition = calculateFinalPosition(
+      lastPositionRef.current?.x || 0,
+      lastPositionRef.current?.y || 0,
+      velocityX,
+      velocityY,
+      flightDuration
+    );
+    setCrosshairPosition(predictedPosition);
+  };
+
+  // Update card position and rotation on screen
+  const updateCardPosition = (position: Point, rotation: number) => {
+    if (cardRef.current && cloneRef.current) {
+      cardRef.current.style.transform = `translate(${position.x}px, ${position.y}px) rotate(${rotation}deg)`;
+      cloneRef.current.style.transform = `translate(${position.x}px, ${position.y}px) rotate(${rotation}deg)`;
+    }
+  };
+
+  // Update game state in Supabase
   const updateGameState = async (position: Point, velocity: Point, rotation: any) => {
     const updatedGameState = {
       ...gameState,
@@ -170,57 +213,25 @@ const MegaCard: React.FC<MegacardProps> = ({ gameState, cardId, syncTrajectory }
     }
   };
 
-  const updateCardPosition = (position: Point, rotation: number) => {
-    if (cardRef.current && cloneRef.current) {
-      cardRef.current.style.transform = `translate(${position.x}px, ${position.y}px) rotate(${rotation}deg)`;
-      cloneRef.current.style.transform = `translate(${position.x}px, ${position.y}px) rotate(${rotation}deg)`;
-    }
-  };
-
-  const handleDrag = (deltaX: number, deltaY: number, velocityX: number, velocityY: number) => {
-    const velocity = calculateVelocity(deltaX, deltaY, velocityX, velocityY);
-    const flightDuration = calculateFlightDuration(velocity, 100, 3); // Adjust maxVelocity and maxTime as needed
-    const predictedPosition = calculateFinalPosition(
-      lastPositionRef.current?.x || 0,
-      lastPositionRef.current?.y || 0,
-      velocityX,
-      velocityY,
-      flightDuration
-    );
-
-    setCrosshairPosition(predictedPosition);
-  };
-
+  // Gesture handling for drag and release
   const bind = useGesture({
     onDrag: ({ down, movement: [mx, my], velocity: [velocityX, velocityY], memo = { x: 0, y: 0 } }) => {
       const card = gameState.cards.find((c) => c.id === cardId);
       if (!card || !lastPositionRef.current) return;
 
       if (down && !isDragging) {
-        memo = { x: lastPositionRef.current.x, y: lastPositionRef.current.y };
-        setIsDragging(true);
-      }
-
-      const newX = memo.x + mx;
-      const newY = memo.y + my;
-
-      if (physicsRef.current) {
-        physicsRef.current.velocity = { x: velocityX * 100, y: velocityY * 100 };
-        physicsRef.current.rotation.speed = calcRotationSpeed(mx, my, velocityX, velocityY, physicsParams.minRotationSpeedForLift);
-        physicsRef.current.step();
-      }
-
-      updateCardPosition({ x: newX, y: newY }, physicsRef.current!.rotation.angle);
+        memo = { x: lastPositionRef.current.x, y: lastPositionRef.current.y }; setIsDragging(true); }
+        lastPositionRef.current = { x: memo.x + mx, y: memo.y + my };
+      handleDrag(mx, my, velocityX, velocityY);
 
       if (!down) {
         handleRelease(mx, my, velocityX, velocityY);
-        setIsDragging(false);
       }
 
       return memo;
     },
-  });
-  const Crosshair = ({ position }: { position: { x: number; y: number } }) => {
+});
+const Crosshair = ({ position }: { position: { x: number; y: number } }) => {
     return (
       <div
         style={{
@@ -237,45 +248,45 @@ const MegaCard: React.FC<MegacardProps> = ({ gameState, cardId, syncTrajectory }
       />
     );
   };
-  return (
-    <>
-      <div
-        ref={cardRef}
-        {...bind()}
-        style={{
-          width: '100px',
-          height: '150px',
-          backgroundImage: `url(${cardsImages[cardId as CardId]})`,
-          backgroundColor: '#131313',
-          borderRadius: '8px',
-          backgroundSize: 'cover',
-          position: 'absolute',
-          cursor: 'grab',
-          zIndex: 1,
-          touchAction: 'none',
-        }}
-      />
-      {isDragging && crosshairPosition && <Crosshair position={crosshairPosition} />
+return ( 
+<>
+    <div
+      ref={cardRef}
+      {...bind()}
+      style={{
+        width: '100px',
+        height: '150px',
+        backgroundImage: `url(${cardsImages[cardId as CardId]})`,
+        backgroundColor: '#131313',
+        borderRadius: '8px',
+        backgroundSize: 'cover',
+        position: 'absolute',
+        cursor: 'grab',
+        zIndex: 1,
+        touchAction: 'none',
+      }}
+    />
+    {isDragging && crosshairPosition && <Crosshair position={crosshairPosition} />
 }
-      {/* Clone of the card without shadow, for parallax effect */}
-      <div
-        ref={cloneRef}
-        style={{
-          width: '100px',
-          height: '150px',
-          backgroundImage: `url(${cardsImages[cardId as CardId]})`,
-          borderRadius: '8px',
-          backgroundSize: 'cover',
-          position: 'absolute',
-          zIndex: 0, // Make sure it's below the main card
-        }}
-      />
-  
-      {/* Physics Controls to adjust parameters dynamically */}
-      <PhysicsControls physicsParams={physicsParams} setPhysicsParams={setPhysicsParams} />
-    </>
-  );
-};
+    {/* Clone of the card without shadow, for parallax effect */}
+    <div
+      ref={cloneRef}
+      style={{
+        width: '100px',
+        height: '150px',
+        backgroundImage: `url(${cardsImages[cardId as CardId]})`,
+        borderRadius: '8px',
+        backgroundSize: 'cover',
+        position: 'absolute',
+        zIndex: 0, // Make sure it's below the main card
+      }}
+    />
+
+    {/* Physics Controls to adjust parameters dynamically */}
+    <PhysicsControls physicsParams={physicsParams} setPhysicsParams={setPhysicsParams} />
+  </>
+   );
+ };
 
 export default MegaCard;
 

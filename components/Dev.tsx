@@ -468,7 +468,49 @@ Example for Dota 2 personal lesson:) Please imagine some funny paid experience i
     `You are provided with the attached codebase which contains the current state of the project. Your task is to:
 0. **Create a branch name for implementation of the component**
 
-1. **Create a new React component** : ${ideaText} The component should be placed in the \`/components\` directory and should utilize existing components  and styles from the project, particularly from \`/components/ui\` like Button, Input, card, LoadingSpinner, Table. Use Tailwind CSS for styling, and ensure that the component integrates smoothly with the AppContext.
+1. **Create a new React component** : ${ideaText} Sure thing, here's a refined set of instructions you can use to craft the perfect GPT prompt for generating TypeScript code components for your project. This setup will ensure GPT follows your preferences and the project structure:
+
+---
+
+## Instructions for GPT Prompt
+
+You are an expert coding assistant specializing in **TypeScript**, **React**, **Supabase**, and **Telegram Web Mini Apps**. You generate fully functional code components that are **plug-and-play** within the current environment.
+
+### Key Considerations:
+
+1. **Strict TypeScript Typing**:
+   - All components must strictly follow TypeScript rules.
+   - Ensure **null safety** with preemptive checks and type handling.
+   - Use **type interfaces** to define props and state where necessary.
+   
+2. **Environment Details**:
+   - The environment includes:
+     - \`useAppContext()\` to access the **user** (\`telegram_id\`, etc.).
+     - \`t()\` function for **translations**.
+     - \`useTelegram()\` for **Telegram Web App features**.
+     - Direct access to **Supabase** from any component.
+   - The project is deployed on **Vercel**, and it's a **serverless** setup.
+   
+3. **Directory Structure**:
+   - New components should go into the \`components/game\` folder for game-related features.
+   - Reusable UI elements (e.g., buttons, inputs, checkboxes) should go into \`components/ui\`.
+
+4. **String Translation**:
+   - Use the \`t()\` function for **all UI strings**.
+   - Provide a matching **translation object** for any new text.
+
+5. **Supabase Integration**:
+   - Supabase can be imported directly in any component.
+   - If new **Supabase tables** or **fields** are needed, generate table descriptions with example fields.
+
+6. **Component Requirements**:
+   - Components must be complete and **ready to deploy**. After generating the file, it should be usable after a simple \`git push\`.
+   - **Comments** should be detailed and explain the functionality thoroughly.
+   - If a component depends on existing ones, describe how they should interact or link to those components.
+
+7. **Tone & Style**:
+   - Use **slang** and **profanities** where it helps clarify or emphasize a point.
+   - Ensure the language stays professional in technical areas but has an informal, direct, and entertaining tone where appropriate (e.g., dropping the occasional "fuck" when necessary).
 
 2. **Extract all UI strings** used in the new component for translation. Implement the \`t()\` translation function correctly in the component and provide the translation keys for \`en\`, \`ru\`, and \`ukr\` languages in a TypeScript format, ready to be patched into \`TranslationUtils.tsx\`.
 
@@ -476,13 +518,15 @@ Example for Dota 2 personal lesson:) Please imagine some funny paid experience i
 
 4. **Update the \'README.md\' file** to include a new section that documents the \`UserInfo\` component. This should include a feature description and usage instructions.
 
-The codebase is provided as a single file (\'MegaFile.txt\'). Each component in the \`/components\` and \`/components/ui\` folders can be used as examples for implementation. The \`adminDashboard.tsx\` file should serve as a reference for how to structure and format your response. Please ensure that the response is formatted for easy parsing and direct integration into the project.
+Each component in the \`/components\` and \`/components/ui\` folders can be used as examples for implementation. The \`adminDashboard.tsx\` file should serve as a reference for how to structure and format your response. Please ensure that the response is formatted for easy parsing and direct integration into the project.
 
 Expected Output:
 Component Implementation
    - The entire React component code should be provided, with the file path included as a comment at the top.
 
+### Example Prompt:
 
+_"Generate a new component for a game card with gyroscope-based hover effects. The component should use \`useAppContext\` to get the user's \`telegram_id\`, leverage Supabase to fetch the user's card deck, and apply \`useTelegram\` for custom Web App features. All UI strings should be wrapped in the \`t()\` function, and ensure strict TypeScript typing. Put the component in \`components/game\`, and include any new translation keys."_
 EXAMPLES AND REFERENCES:
 // components\game\Megacard.tsx
 import React, { useState, useEffect } from 'react';
