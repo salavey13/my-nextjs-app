@@ -30,7 +30,7 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 import { Button } from '@/components/ui/button';
-import Megacard_1 from './Megacard_0.1'; // Import the Megacard component
+import MegaOrigCard from './MegaOrigCard'; // Import the Megacard component
 import { useAppContext } from '@/context/AppContext';
 
 const GAME_ID = 28;  // Replace with actual game ID
@@ -125,7 +125,7 @@ useEffect(() => {
       {/* Render cards */}
       <div>
         {gameState && gameState.cards.map((card) => (
-          <Megacard_1 key={card.id} gameState={gameState} cardId={card.id} />
+          <MegaOrigCard key={card.id} gameState={gameState} cardId={card.id} />
         ))}
       </div>
 

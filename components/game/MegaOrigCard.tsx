@@ -28,7 +28,7 @@ interface MegacardProps {
   cardId: string;
 }
 
-const Megacard: React.FC<MegacardProps> = ({ gameState, cardId }) => {
+const MegaOrigCard: React.FC<MegacardProps> = ({ gameState, cardId }) => {
   const [cardState, setCardState] = useState<Card | null>(null);
   const [initialPosition, setInitialPosition] = useState<Point>({ x: 0, y: 0 });
   const [isFlipped, setFlipped] = useState(false);
@@ -131,4 +131,4 @@ const Megacard: React.FC<MegacardProps> = ({ gameState, cardId }) => {
   );
 };
 
-export default Megacard_1;
+export default MegaOrigCard;
