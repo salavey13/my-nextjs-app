@@ -52,7 +52,7 @@ interface PhysicsParams {
   minRotationSpeedForLift: number;
 }
 
-const Megacard: React.FC<MegacardProps> = ({ gameState, cardId, syncTrajectory }) => {
+const MegaCard: React.FC<MegacardProps> = ({ gameState, cardId, syncTrajectory }) => {
   const cardRef = useRef<HTMLDivElement | null>(null);
   const cloneRef = useRef<HTMLDivElement | null>(null);
   const physicsRef = useRef<CardPhysics | null>(null);
@@ -230,7 +230,7 @@ if (lastPositionRef.current) {
   );
 };
 
-export default Megacard;
+export default MegaCard;
 
 
 function calculateRotationSpeed(deltaX: number, deltaY: number, velocityX: number, velocityY: number): number {
