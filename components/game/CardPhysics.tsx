@@ -39,7 +39,7 @@ interface Point {
     rotation: RotationState;
     params: PhysicsParams;
   
-    constructor(initialPosition: Point, params: PhysicsParams = {minRotationSpeedForLift: 3}) {
+    constructor(initialPosition: Point, params: PhysicsParams = defaultParams) {
       this.position = initialPosition;
       this.velocity = { x: 0, y: 0 };
       this.rotation = { angle: 0, speed: 0 };

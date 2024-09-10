@@ -90,9 +90,12 @@ const MegaCard: React.FC<MegacardProps> = ({ gameState, cardId, syncTrajectory }
     if (card) {
       const posX = card.position.x * window.innerWidth;
       const posY = card.position.y * window.innerHeight;
+      const rotation = card.trajectory.rotation
 
       lastPositionRef.current = { x: posX, y: posY };
       physicsRef.current = new CardPhysics({ x: posX, y: posY }, physicsParams);
+      physicsRef.current!.rotation.angle = rotation
+      updateCardPosition({ x: posX, y: posY }, rotation)
     }
   }, [gameState, cardId]);
 
@@ -119,7 +122,7 @@ const MegaCard: React.FC<MegacardProps> = ({ gameState, cardId, syncTrajectory }
 
       if (currentTime - lastFrameTime > frameInterval) {
         lastFrameTime = currentTime;
-        const timeProgress = elapsed / (flightDuration * 500);
+        const timeProgress = elapsed / (flightDuration * 1000);
 
         // Airborne phase
         if (timeProgress < 2 / 3) {
