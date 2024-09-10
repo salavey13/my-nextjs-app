@@ -131,4 +131,4 @@ const Megacard: React.FC<MegacardProps> = ({ gameState, cardId }) => {
   );
 };
 
-export default Megacard;
+export default Megacard_1;
