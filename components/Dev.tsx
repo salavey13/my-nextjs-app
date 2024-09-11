@@ -528,141 +528,192 @@ Component Implementation
 
 _"Generate a new component for a game card with gyroscope-based hover effects. The component should use \`useAppContext\` to get the user's \`telegram_id\`, leverage Supabase to fetch the user's card deck, and apply \`useTelegram\` for custom Web App features. All UI strings should be wrapped in the \`t()\` function, and ensure strict TypeScript typing. Put the component in \`components/game\`, and include any new translation keys."_
 EXAMPLES AND REFERENCES:
-// components\game\Megacard.tsx
-import React, { useState, useEffect } from 'react';
-import { useSpring, animated } from 'react-spring';
+import { animated, useSpring } from 'react-spring';
+import { useRef, useEffect, useState } from 'react';
 import { useGesture } from '@use-gesture/react';
 import { supabase } from '../../lib/supabaseClient';
 import { cardsImages } from './CardsImgs';
+import { useAppContext } from '@/context/AppContext';
+
+// Types for the game state, card, and props
+interface Card {
+  id: CardId;
+  position: { x: number; y: number };
+  trajectory: { rotation: number };
+  flipped: boolean;
+}
 
 interface Point {
-  x: number;
-  y: number;
-}
+    x: number;
+    y: number;
+    }
+    
+    
+    interface Player {
+    id: string;
+    position: Point;
+    }
+    
+    interface GameState {
+    cards: Card[];
+    players: Player[];
+    }
+    
+export type CardId = keyof typeof cardsImages;
 
-interface Card {
-  id: string;
-  position: Point; // Relative position (0 to 1)
-  flipped: boolean;
-  last_trajectory?: Point[];
-}
-
-interface GameState {
-  cards: Card[];
-}
-
-type CardId = keyof typeof cardsImages;
-
-interface MegacardProps {
+interface MegaCardProps {
   gameState: GameState;
-  cardId: string;
+  cardId: CardId;
+  syncTrajectory: (cardId: CardId, trajectory: { x: number; y: number; rotation: number }) => void;
 }
 
-const Megacard: React.FC<MegacardProps> = ({ gameState, cardId }) => {
-  const [cardState, setCardState] = useState<Card | null>(null);
-  const [initialPosition, setInitialPosition] = useState<Point>({ x: 0, y: 0 });
-  const [isFlipped, setFlipped] = useState(false);
+const GAME_ID = 28;
 
-  const [{ x, y, shadow }, set] = useSpring(() => ({
+export const MegaCard: React.FC<MegaCardProps> = ({ gameState, cardId, syncTrajectory }) => {
+  const cardRef = useRef<HTMLDivElement | null>(null);
+  const lastPositionRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState<boolean>(false);
+  const [isYeeted, setIsYeeted] = useState<boolean>(false);
+  const [currentFlipAngle, setCurrentFlipAngle] = useState<number>(0);
+  const { user } = useAppContext();
+
+  // Determine the correct card image to show based on whether it's flipped
+  const cardImage = gameState.cards.find((c) => c.id === cardId)?.flipped
+    ? 'shirt'
+    : cardId; // Convert cardId to the card string like '10_of_clubs'
+
+  // Handle spring animations for position and shadow
+  const [{ x, y, shadow, flipAngle }, setSpring] = useSpring(() => ({
     x: 0,
     y: 0,
     shadow: 5,
+    flipAngle: 0,
     config: { mass: 1, tension: 200, friction: 13 },
   }));
 
   useEffect(() => {
-    if (gameState) {
-      const card = gameState.cards.find((c) => c.id === cardId);
-      if (card) {
-        setCardState(card);
-        const posX = card.position.x * window.innerWidth;
-        const posY = card.position.y * window.innerHeight;
-        setInitialPosition({ x: posX, y: posY });
-        set({ x: posX, y: posY });
-        setFlipped(card.flipped);
-      }
+    const card = gameState.cards.find((c) => c.id === cardId);
+    if (card) {
+      const posX = card.position.x * window.innerWidth;
+      const posY = card.position.y * window.innerHeight;
+      lastPositionRef.current = { x: posX, y: posY };
+      updateCardPosition(posX, posY, card.trajectory.rotation);
+      setCurrentFlipAngle(card.flipped ? 180 : 0);
     }
-  }, [gameState, cardId, set]);
+  }, [gameState, cardId]);
 
-  const isNearTrashPlace = (x: number, y: number) => {
-    const trashPlace = { x: 200, y: 200 };
-    const radius = 50;
-    const distance = Math.sqrt((x - trashPlace.x) ** 2 + (y - trashPlace.y) ** 2);
-    return distance < radius;
+  const updateGameState = (update: { x: number; y: number; flipped: boolean }) => {
+    syncTrajectory(cardId, { x: update.x, y: update.y, rotation: currentFlipAngle });
   };
 
-  const moveToTrashPlace = async () => {
-    set({ x: 200, y: 200, shadow: 5 });
-    const updatedGameState = {
-      ...gameState,
-      cards: gameState.cards.map((card) =>
-        card.id === cardId ? { ...card, position: { x: 200 / window.innerWidth, y: 200 / window.innerHeight } } : card
-      ),
-    };
-    const { error } = await supabase.from('rents').update({ game_state: updatedGameState }).eq('id', '28');
-    if (error) console.error('Error updating game state:', error);
+  const updateCardPosition = (x: number, y: number, rotation: number) => {
+    setSpring({ x, y });
+  };
+
+  const handleYeet = (velocityX: number, velocityY: number, deltaX: number, deltaY: number) => {
+    if (!lastPositionRef.current || !cardRef.current) return;
+
+    setIsYeeted(true);
+    setSpring({
+      flipAngle: 180, // Flip the card when yeeted
+    });
+
+    const signedDistanceX = deltaX > 0 ? Math.abs(velocityX) : -Math.abs(velocityX);
+    const signedDistanceY = deltaY > 0 ? Math.abs(velocityY) : -Math.abs(velocityY);
+
+    setSpring({
+      x: lastPositionRef.current.x + signedDistanceX * 100,
+      y: lastPositionRef.current.y + signedDistanceY * 100,
+      shadow: 15,
+      config: { tension: 400, friction: 10 },
+    });
+
+    // Simulate card position update after the yeet
+    setTimeout(() => setIsYeeted(false), 500);
+
+    updateGameState({
+      x: (lastPositionRef.current.x + signedDistanceX * 100) / window.innerWidth,
+      y: (lastPositionRef.current.y + signedDistanceY * 100) / window.innerHeight,
+      flipped: true,
+    });
+  };
+
+  const glideGently = (avgVelocity: number, deltaX: number, deltaY: number) => {
+    if (!lastPositionRef.current) return;
+
+    setSpring({
+      x: lastPositionRef.current.x + deltaX * 10,
+      y: lastPositionRef.current.y + deltaY * 10,
+      shadow: 5,
+      config: { tension: 120, friction: 26 },
+    });
+
+    updateGameState({
+      x: (lastPositionRef.current.x + deltaX * 10) / window.innerWidth,
+      y: (lastPositionRef.current.y + deltaY * 10) / window.innerHeight,
+      flipped: false,
+    });
   };
 
   const bind = useGesture({
-    onDrag: ({ down, movement: [mx, my], offset: [ox, oy] }) => {
-      if (down) {
-        set({
-          x: initialPosition.x + ox,
-          y: initialPosition.y + oy,
-          shadow: Math.min(30, Math.abs(ox + oy) / 10),
-        });
-      }
-    },
-    onDragEnd: async ({ movement: [mx, my], velocity }) => {
-      const newX = initialPosition.x + mx;
-      const newY = initialPosition.y + my;
-      
-      if (isNearTrashPlace(newX, newY)) {
-        await moveToTrashPlace();
-      } else {
-        set({
-          x: newX,
-          y: newY,
-          shadow: 5,
-          config: { mass: 1, tension: 200, friction: 30 },
-        });
+    onDrag: ({ down, movement: [mx, my], velocity: [vx, vy] }) => {
+      const avgVelocity = (Math.abs(vx) + Math.abs(vy)) / 2;
 
-        const updatedGameState = {
-          ...gameState,
-          cards: gameState.cards.map((card) =>
-            card.id === cardId ? { ...card, position: { x: newX / window.innerWidth, y: newY / window.innerHeight } } : card
-          ),
-        };
-        const { error } = await supabase.from('rents').update({ game_state: updatedGameState }).eq('id', '28');
-        if (error) console.error('Error updating game state:', error);
+      if (down) {
+        setIsDragging(true);
+        setSpring({
+          x: lastPositionRef.current.x + mx,
+          y: lastPositionRef.current.y + my,
+          shadow: 10,
+          config: { tension: 300, friction: 20 },
+        });
+      } else {
+        setIsDragging(false);
+
+        if (avgVelocity > 1.5) {
+          handleYeet(vx, vy, mx, my);
+        } else {
+          glideGently(avgVelocity, mx, my);
+        }
       }
     },
   });
 
   return (
     <animated.div
+      ref={cardRef}
       {...bind()}
       style={{
-        transform: x.interpolate((x) => \`translate(\${x}px, \${y.get()}px)\`),
-        boxShadow: shadow.to((s) => \`0px \${s}px \${2 * s}px rgba(0,0,0,0.2)\`),
-        width: '100px',
-        height: '150px',
-        backgroundImage: isFlipped ? \`url(\${cardsImages[cardId as CardId]})\` : \`url(\${cardsImages["shirt"]})\`,
-        backgroundColor: isFlipped ? 'darkblue' : 'lightblue',
+        width: '69px',
+        height: '100px',
+        backgroundImage: \`url(\${cardsImages[cardImage]})\`, // Use the cardImage based on flip state
         borderRadius: '8px',
-        cursor: 'grab',
         backgroundSize: 'cover',
         position: 'absolute',
+        cursor: 'grab',
+        zIndex: 1,
         touchAction: 'none',
+        transform: x.to((xVal) => \`translate(\${xVal}px, \${y.get()}px) rotateY(\${flipAngle.get()}deg)\`),
+        boxShadow: shadow.to((s) => \`0px \${s}px \${s * 2}px rgba(0, 0, 0, 0.3)\`),
       }}
-    >
-      <div>{/* Additional card content if needed */}</div>
-    </animated.div>
+    />
   );
 };
 
-export default Megacard;
-// components/GameBoard.tsx
+// Helper function to convert cardId to the appropriate string (like '10_of_clubs')
+const cardIdToCardString = (id: number) => {
+  const cards = [
+    '10_of_clubs',
+    '10_of_diamonds',
+    '10_of_hearts',
+    '10_of_spades',
+    // ...add other cards here
+  ];
+  return cards[id] || 'shirt';
+};
+
+export default MegaCard;
+
 "use client";
 // game_id,game_state
 // test_game_1,"{
@@ -672,144 +723,21 @@ export default Megacard;
 //       ""position"": { ""x"": 100, ""y"": 200 },
 //       ""last_trajectory"": [
 //         { ""x"": 100, ""y"": 200 },
-//         { ""x"": 120, ""y"": 220 },
-//         { ""x"": 140, ""y"": 240 }
+//       ""rotation"": 0
 //       ],
-//       ""is_flipped"": false
+//       ""flipped"": false
 //     },
 //     {
 //       ""id"": ""card2"",
 //       ""position"": { ""x"": 300, ""y"": 100 },
 //       ""last_trajectory"": [
 //         { ""x"": 300, ""y"": 100 },
-//         { ""x"": 320, ""y"": 80 },
-//         { ""x"": 340, ""y"": 60 }
 //       ],
-//       ""is_flipped"": true
-//     },
-//     {
-//       ""id"": ""trash_card"",
-//       ""position"": { ""x"": 600, ""y"": 400 },
-//       ""last_trajectory"": [
-//         { ""x"": 600, ""y"": 400 },
-//         { ""x"": 580, ""y"": 380 },
-//         { ""x"": 560, ""y"": 360 }
-//       ],
-//       ""is_flipped"": false
+//       ""flipped"": true
 //     }
 //   ]
 // }"
 
-import React, { useEffect, useState } from 'react';
-import { supabase } from '../../lib/supabaseClient';
-import { Button } from '@/components/ui/button';
-import Megacard from './Megacard'; // Import the Megacard component
-import { useAppContext } from '@/context/AppContext';
-
-const GAME_ID = 28;  // Replace with actual game ID
-
-interface Card {
-  id: string;
-  position: { x: number; y: number };
-  flipped: boolean;
-}
-
-interface GameState {
-  cards: Card[];
-}
-
-const GameBoard: React.FC = () => {
-  const [gameState, setGameState] = useState<GameState | null>(null);
-  const [subscription, setSubscription] = useState<any>(null);
-  const { user, t } = useAppContext();
-
-  useEffect(() => {
-    // Subscribe to changes in the \`rents\` table for the current game
-    const handleSubscription = async () => {
-      // Initial fetch for game state
-      const { data, error } = await supabase
-        .from('rents')
-        .select('game_state')
-        .eq('id', GAME_ID)
-        .single();
-
-      if (error) {
-        console.error('Error fetching game state:', error);
-      } else {
-        setGameState(data.game_state);
-      }
-
-      // Set up the real-time subscription using a Supabase Channel
-      const channel = supabase
-        .channel('game-updates')
-        .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'rents', filter: \`id=eq.\${GAME_ID}\` }, (payload) => {
-          setGameState(payload.new.game_state);
-        })
-        .subscribe();
-
-      // Clean up the subscription on unmount
-      setSubscription(channel);
-      return () => {
-        supabase.removeChannel(channel);
-      };
-    };
-
-    handleSubscription();
-  }, [GAME_ID]);
-
-   // Fetch game state from Supabase
-useEffect(() => {
-    const fetchGameState = async () => {
-      const { data, error } = await supabase
-        .from('rents')
-        .select('game_state')
-        .eq('id', GAME_ID)
-        .single();
-      if (!error) setGameState(data.game_state);
-    };
-    fetchGameState();
-  }, []);                              
-  const shuffleCards = async () => {
-    if (!gameState) return;
-
-    // Shuffle the cards array
-    const shuffledCards = gameState.cards
-      .map(card => ({ ...card, position: { x: Math.random(), y: Math.random() } })) // Randomize positions
-      .sort(() => Math.random() - 0.5); // Shuffle array
-
-    // Update the game state with the shuffled cards
-    const updatedGameState = { ...gameState, cards: shuffledCards };
-
-    // Save the updated game state to Supabase
-    const { error } = await supabase
-      .from('rents')
-      .update({ game_state: updatedGameState })
-      .eq('id', GAME_ID);
-
-    if (error) {
-      console.error('Error updating game state:', error);
-    } else {
-      setGameState(updatedGameState); // Update local state
-    }
-  };
-
-  return (
-    <div className="game-board">
-      {/* Render cards */}
-      <div>
-        {gameState && gameState.cards.map((card) => (
-          <Megacard key={card.id} gameState={gameState} cardId={card.id} />
-        ))}
-      </div>
-
-      <Button className="shuffle-button" onClick={shuffleCards}>
-        {t("shuffle")}
-      </Button>
-    </div>
-  );
-};
-
-export default GameBoard;
 You can use/modify existing tables and components as you wish:
   public.users
   public.bets (
@@ -840,12 +768,12 @@ You can use/modify existing tables and components as you wish:
     "game_id": "",
     "game_type": ""
   },
-  "game_state": {},
-  "player_info": {
+  "game_state": {
+  "players": {
     "player1_name": "",
     "player2_name": ""
   },
-  "card_settings": {
+  "cards": {
     "owner_card_positions": "",
     "opponent_card_positions": ""
   },
@@ -863,7 +791,9 @@ You can use/modify existing tables and components as you wish:
     "card_on_click_bitmask": "",
     "card_on_drag_end_bitmask": ""
   }
-}EXAMPLEOFF
+}
+
+
     created_at timestamp with time zone not null default now(),
     game_type text null default 'FOOL'::text,
     constraint items_pkey primary key (id)
@@ -883,11 +813,12 @@ You can use/modify existing tables and components as you wish:
         "x": 0.018670388180612,
         "y": 0.043583865879121664
       },
-      "is_flipped": true,
+      "flipped": true,
       "last_trajectory": [
         {
           "x": 0.513767244829,
-          "y": 0.0578535623573
+          "y": 0.0578535623573,
+          "rotation": 0
         }
       ]
     },...
@@ -1250,19 +1181,20 @@ return (
           onChange={(e) => setIdeaText(e.target.value)}
           placeholder={t("describeYourIdeaPlaceholder")}
         />
-        <div className="grid grid-cols-1 gap-4"><Button 
+        <div className="grid grid-cols-1 gap-4">
+            <Button 
           onClick={handleZeroStageRequest} 
-          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+          className="bg-blue-500 px-4 mt-4 rounded-lg py-2 rounded-lg hover:bg-blue-600 hover:text-lime-950"
           variant="outline"
         >
           {t('generateRequestButton')}
         </Button>
         <Button 
           onClick={handleZeroStageRequestType} 
-          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+          className="bg-blue-500 text-black rounded-lg px-4 py-2 rounded-lg hover:bg-blue-600 hover:text-lime-950"
           variant="outline"
         >
-          {t('generateRequestButton')}4TYPE
+          {t('generateRequestButton')} (type)
         </Button>
         </div>
       </div>

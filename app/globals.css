@@ -194,6 +194,7 @@
 
   .button-hover:hover {
     background-color: var(--accent-color);
+    color: "#000000";
     box-shadow: 0 0 10px var(--accent-color);
   }
 

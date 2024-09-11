@@ -18,19 +18,21 @@ const BottomShelf: React.FC = () => {
   const { t } = useAppContext();
 
   const navigationLinks: NavigationLink[] = [    //{ href: '/paymentnotification', icon: faLightbulb, label: t('paymentnotification') },
-    { href: '/dynamicitemform', icon: faList, label: t('') },
+    //{ href: '/dynamicitemform', icon: faList, label: t('') },
     //{ href: '/qrcodeform', icon: faLightbulb, label: t('qrcodeform') },
     //{ href: '/cryptopayment', icon: faLightbulb, label: t('cryptopayment') },
+    { href: '/dev', icon: faLightbulb, label: t('dev') },
     { href: '/rent', icon: faStar, label: t('rent') },
     { href: '/', icon: faHome, label: t('home') },
     { href: '/admin', icon: faCrown, label: t('admin') },
     { href: '/referral', icon: faLightbulb, label: t('referral') },
-    { href: '/createEvent', icon: faCalendarPlus, label: '' },
+    
     //{ href: '/notifications', icon: faBell, label: t('notifications') },
     //{ href: '/profile', icon: faUser, label: t('profile') },
-    { href: '/dev', icon: faLightbulb, label: t('dev') },
+    
     { href: '/questsforcoins', icon: faStar, label: '' },
     { href: '/hackbutton', icon: faKeyboard, label: '' },
+    { href: '/createEvent', icon: faCalendarPlus, label: '' },
     //{ href: '/conflictawareness', icon: faGlobe, label: '' },
     //{ href: '/emotionmirror', icon: faLightbulb, label: t('emotionmirror') },
   ];
