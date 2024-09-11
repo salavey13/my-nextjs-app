@@ -1,4 +1,3 @@
-// components\game\MegaCard.tsx
 import { animated, useSpring } from 'react-spring';
 import { useRef, useEffect, useState } from 'react';
 import { useGesture } from '@use-gesture/react';
@@ -8,261 +7,97 @@ import { useAppContext } from '@/context/AppContext';
 
 const GAME_ID = 28;
 
-interface Point {
-  x: number;
-  y: number;
-}
-
-interface Card {
-  id: string;
-  position: Point;
-  flipped: boolean;
-  trajectory: {
-    position: Point;
-    rotation: number;
-    velocity: Point;
-    rotationSpeed: number;
-  };
-}
-
-interface Player {
-  id: string;
-  position: Point;
-}
-
-interface GameState {
-  cards: Card[];
-  players: Player[];
-}
-
-type CardId = keyof typeof cardsImages;
-
-interface MegacardProps {
-  gameState: GameState;
-  cardId: string;
-  syncTrajectory: (cardId: string, trajectoryData: any) => void;
-}
-
-const MegaCard: React.FC<MegacardProps> = ({ gameState, cardId, syncTrajectory }) => {
-  const cardRef = useRef<HTMLDivElement | null>(null);
-  const lastPositionRef = useRef<Point | null>(null);
+const MegaCard = ({ gameState, cardId, syncTrajectory }) => {
+  const cardRef = useRef(null);
+  const lastPositionRef = useRef({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const [isYeeted, setIsYeeted] = useState(false);
-  const [currentFlipAngle, setCurrentFlipAngle] = useState<number>(0);
+  const [currentFlipAngle, setCurrentFlipAngle] = useState(0);
   const { user } = useAppContext();
-  
-  const [{ x, y, shadow }, set] = useSpring(() => ({
+
+  const [{ x, y, shadow }, setSpring] = useSpring(() => ({
     x: 0,
     y: 0,
     shadow: 5,
     config: { mass: 1, tension: 200, friction: 13 },
   }));
-  // Initialize card position when the component mounts or gameState changes
-  useEffect(() => {
-    const card = gameState.cards.find((c) => c.id === cardId);
-    if (card) {
-      const posX = lastPositionRef.current?.x || card.position.x * window.innerWidth;
-      const posY = lastPositionRef.current?.y || card.position.y * window.innerHeight;
 
+  useEffect(() => {
+    const card = gameState.cards.find(c => c.id === cardId);
+    if (card) {
+      const posX = card.position.x * window.innerWidth;
+      const posY = card.position.y * window.innerHeight;
       lastPositionRef.current = { x: posX, y: posY };
       updateCardPosition(posX, posY, card.trajectory.rotation);
-      // Assuming gameState contains the card info
-      setCurrentFlipAngle(card?.flipped ? 180 : 0)
+      setCurrentFlipAngle(card.flipped ? 180 : 0);
     }
   }, [gameState, cardId]);
-  
-  const easeOut = (t: number) => 1 - Math.pow(1 - t, 3); // Cubic easing-out
 
-  // Animate the card with easing
-  const animateMovement = (startX: number, startY: number, endX: number, endY: number, duration: number) => {
-    const startTime = performance.now();
-  
-    const animate = (currentTime: number) => {
-      const elapsed = (currentTime - startTime) / duration; // Progress from 0 to 1
-      const t = Math.min(1, elapsed); // Clamp to 1 for end of animation
-  
-      const easedT = easeOut(t); // Apply easing
-  
-      const newX = startX + (endX - startX) * easedT;
-      const newY = startY + (endY - startY) * easedT;
-  
-      updateCardPosition(newX, newY, 0);
-  
-      if (t < 1) {
-        requestAnimationFrame(animate);
-      } 
-    };
-  
-    requestAnimationFrame(animate);
-  };
-  
-  // Handle yeet logic with signed deltas
-const handleYeet = (velocityX: number, velocityY: number, deltaX: number, deltaY: number) => {
+  const handleYeet = (velocityX, velocityY, deltaX, deltaY) => {
     if (!lastPositionRef.current || !cardRef.current) return;
-  
+
     setIsYeeted(true);
-  
-    // Set flip angle to 180 for the yeet
-    setCurrentFlipAngle(180);
-  
-    const startX = lastPositionRef.current.x + deltaX;
-    const startY = lastPositionRef.current.y + deltaY;
-  
-    // Get distance with sign applied based on delta direction
+    setCurrentFlipAngle(180); // Flip the card when yeeted
+
     const signedDistanceX = deltaX > 0 ? Math.abs(velocityX) : -Math.abs(velocityX);
     const signedDistanceY = deltaY > 0 ? Math.abs(velocityY) : -Math.abs(velocityY);
-  
-    const finalX = startX + signedDistanceX * 69; // Distance for yeet
-    const finalY = startY + signedDistanceY * 69;
-  
-    // Yeet with ease-out animation
-    animateMovement(startX, startY, finalX, finalY, 500);
-  
+
+    // Yeet with increased velocity by applying tension to the spring
+    setSpring({
+      x: lastPositionRef.current.x + signedDistanceX * 100,
+      y: lastPositionRef.current.y + signedDistanceY * 100,
+      shadow: 15, // Increase shadow during yeet
+      config: { tension: 400, friction: 10 }, // Stronger tension, lower friction
+    });
+
+    // Simulate card position update after the yeet
     setTimeout(() => setIsYeeted(false), 500);
 
     updateGameState({
-        x: finalX / window.innerWidth,
-        y: finalY / window.innerHeight,
-        flipped: true,
-      });
+      x: (lastPositionRef.current.x + signedDistanceX * 100) / window.innerWidth,
+      y: (lastPositionRef.current.y + signedDistanceY * 100) / window.innerHeight,
+      flipped: true,
+    });
   };
-  
-  // Handle gentle movement when swipe velocity is low
-  const glideGently = (avgVelocity: number, deltaX: number, deltaY: number) => {
+
+  const glideGently = (avgVelocity, deltaX, deltaY) => {
     if (!lastPositionRef.current) return;
-  
-    const startX = lastPositionRef.current.x + deltaX;
-    const startY = lastPositionRef.current.y + deltaX;
-  
-    // Get gentle glide distance with sign
-    const signedDistanceX = deltaX > 0 ? Math.abs(avgVelocity) : -Math.abs(avgVelocity);
-    const signedDistanceY = deltaY > 0 ? Math.abs(avgVelocity) : -Math.abs(avgVelocity);
-  
-    const finalX = startX + signedDistanceX * 13;
-    const finalY = startY + signedDistanceY * 13;
-  
-    // Glide with ease-out animation
-    animateMovement(startX, startY, finalX, finalY, 300);
+
+    setSpring({
+      x: lastPositionRef.current.x + deltaX * 10,
+      y: lastPositionRef.current.y + deltaY * 10,
+      shadow: 5, // Lower shadow for gentle glide
+      config: { tension: 120, friction: 26 }, // Smooth, gentle glide
+    });
 
     updateGameState({
-        x: finalX / window.innerWidth,
-        y: finalY / window.innerHeight,
-        flipped: false,
-      });
-      // const updatedGameState = {
-    //     ...gameState,
-    //     cards: gameState.cards.map((card) =>
-    //       card.id === cardId
-    //         ? {
-    //             ...card,
-    //             position: { x: x, y: y },
-    //             flipped: flipAngle === 180,
-    //           }
-    //         : card
-    //     ),
-    //   };
-    // syncTrajectory(cardId, updatedGameState )
-  };
-  
-
-  // Update game state in Supabase
-  const updateGameState = async (position: Point & { flipped: boolean }) => {
-    const updatedGameState = {
-      ...gameState,
-      cards: gameState.cards.map((card) =>
-        card.id === cardId
-          ? {
-              ...card,
-              position: { x: position.x, y: position.y },
-              flipped: position.flipped,
-            }
-          : card
-      ),
-    };
-
-    const { error } = await supabase
-      .from('rents')
-      .update({ game_state: updatedGameState })
-      .eq('id', user?.currentGameId);
-
-    if (error) {
-      console.error('Error updating game state:', error);
-    }
+      x: (lastPositionRef.current.x + deltaX * 10) / window.innerWidth,
+      y: (lastPositionRef.current.y + deltaY * 10) / window.innerHeight,
+      flipped: false,
+    });
   };
 
-  // Update card position and rotation on screen
-  const updateCardPosition = (x: number, y: number, flipAngle: number) => {
-    if (!cardRef.current) return;
-
-    // Save the position into the ref after dragging ends
-    lastPositionRef.current = { x: x, y: y };
-  
-    cardRef.current.style.transform = `translate(${x}px, ${y}px) rotate(${flipAngle}deg)`;
-  
-    // // Apply flip class if needed
-    // if (flipAngle === 180) {
-    //   cardRef.current.classList.add('flipped');
-    // } else {
-    //   cardRef.current.classList.remove('flipped');
-    // }
-    
-  };
-  
-
-  const handleDragEnd = () => {
-    if (!cardRef.current || !lastPositionRef.current) return;
-
-        const finalX = lastPositionRef.current.x;
-        const finalY = lastPositionRef.current.y;
-
-        // Save card's final position and flipped state to the game state
-        updateCardPosition(finalX, finalY, currentFlipAngle); // Use currentFlipAngle
-
-        // Save the position into the ref after dragging ends
-        lastPositionRef.current = { x: finalX, y: finalY };
-        updateGameState({
-            x: finalX / window.innerWidth,
-            y: finalY / window.innerHeight,
-            flipped: false,
-          });
-  
-  };
-  
-  
-
-  // Gesture handling for drag and swipe (yeet)
   const bind = useGesture({
-    onDrag: ({ down, movement: [mx, my], velocity: [vx, vy], memo = { x: 0, y: 0 } }) => {
-      const card = gameState.cards.find((c) => c.id === cardId);
-      if (!card || !lastPositionRef.current) return;
-
-      if (down && !isDragging) {
-        memo = { x: lastPositionRef.current.x + mx, y: lastPositionRef.current.y + my };
-        setIsDragging(true);
-      }
-
+    onDrag: ({ down, movement: [mx, my], velocity: [vx, vy] }) => {
       const avgVelocity = (Math.abs(vx) + Math.abs(vy)) / 2;
 
-      // If the swipe velocity is high enough, yeet the card
-      if (!down && avgVelocity > 1.5) {
-        handleYeet(vx, vy, mx, my);
-      } else if (!down && avgVelocity < 1.5) {
-        // Otherwise, glide gently
-        glideGently(avgVelocity, mx, my);
+      if (down) {
+        setIsDragging(true);
+        setSpring({
+          x: lastPositionRef.current.x + mx,
+          y: lastPositionRef.current.y + my,
+          shadow: 10,
+          config: { tension: 300, friction: 20 }, // Simulate tension during drag
+        });
       } else {
-        // Otherwise, it's just a normal drag
-        const newX = memo.x + mx//lastPositionRef.current.x;
-        const newY = memo.y + my//lastPositionRef.current.y;
-        updateCardPosition(newX, newY, 0);
-        
-      }
-
-      if (!down) {
         setIsDragging(false);
-        handleDragEnd();
-      }
 
-      return memo;
+        if (avgVelocity > 1.5) {
+          handleYeet(vx, vy, mx, my); // Yeet with increased velocity
+        } else {
+          glideGently(avgVelocity, mx, my); // Glide gently if velocity is low
+        }
+      }
     },
   });
 
@@ -273,15 +108,15 @@ const handleYeet = (velocityX: number, velocityY: number, deltaX: number, deltaY
       style={{
         width: '69px',
         height: '100px',
-        backgroundImage: `url(${cardsImages[cardId as CardId]})`,
-        backgroundColor: '#131313',
+        backgroundImage: `url(${cardsImages[cardId]})`,
         borderRadius: '8px',
         backgroundSize: 'cover',
         position: 'absolute',
         cursor: 'grab',
         zIndex: 1,
         touchAction: 'none',
-        //transform:  `translate(${x}px, ${y.get()}px)`,
+        transform: x.to((x) => `translate(${x}px, ${y.get()}px)`),
+        boxShadow: shadow.to((s) => `0px ${s}px ${s * 2}px rgba(0, 0, 0, 0.3)`),
       }}
     />
   );
