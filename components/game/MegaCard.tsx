@@ -5,14 +5,32 @@ import { supabase } from '../../lib/supabaseClient';
 import { cardsImages } from './CardsImgs';
 import { useAppContext } from '@/context/AppContext';
 
+// Types for the game state, card, and props
+interface Card {
+  id: number;
+  position: { x: number; y: number };
+  trajectory: { rotation: number };
+  flipped: boolean;
+}
+
+interface GameState {
+  cards: Card[];
+}
+
+interface MegaCardProps {
+  gameState: GameState;
+  cardId: number;
+  syncTrajectory: (trajectory: { x: number; y: number; rotation: number }) => void;
+}
+
 const GAME_ID = 28;
 
-const MegaCard = ({ gameState, cardId, syncTrajectory }) => {
-  const cardRef = useRef(null);
-  const lastPositionRef = useRef({ x: 0, y: 0 });
-  const [isDragging, setIsDragging] = useState(false);
-  const [isYeeted, setIsYeeted] = useState(false);
-  const [currentFlipAngle, setCurrentFlipAngle] = useState(0);
+const MegaCard: React.FC<MegaCardProps> = ({ gameState, cardId, syncTrajectory }) => {
+  const cardRef = useRef<HTMLDivElement | null>(null);
+  const lastPositionRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState<boolean>(false);
+  const [isYeeted, setIsYeeted] = useState<boolean>(false);
+  const [currentFlipAngle, setCurrentFlipAngle] = useState<number>(0);
   const { user } = useAppContext();
 
   const [{ x, y, shadow }, setSpring] = useSpring(() => ({
@@ -23,7 +41,7 @@ const MegaCard = ({ gameState, cardId, syncTrajectory }) => {
   }));
 
   useEffect(() => {
-    const card = gameState.cards.find(c => c.id === cardId);
+    const card = gameState.cards.find((c) => c.id === cardId);
     if (card) {
       const posX = card.position.x * window.innerWidth;
       const posY = card.position.y * window.innerHeight;
@@ -33,7 +51,17 @@ const MegaCard = ({ gameState, cardId, syncTrajectory }) => {
     }
   }, [gameState, cardId]);
 
-  const handleYeet = (velocityX, velocityY, deltaX, deltaY) => {
+  const updateGameState = (update: { x: number; y: number; flipped: boolean }) => {
+    // Example function to sync state with Supabase or local state management
+    syncTrajectory({ x: update.x, y: update.y, rotation: currentFlipAngle });
+  };
+
+  const updateCardPosition = (x: number, y: number, rotation: number) => {
+    // Handle card position update logic
+    setSpring({ x, y });
+  };
+
+  const handleYeet = (velocityX: number, velocityY: number, deltaX: number, deltaY: number) => {
     if (!lastPositionRef.current || !cardRef.current) return;
 
     setIsYeeted(true);
@@ -60,7 +88,7 @@ const MegaCard = ({ gameState, cardId, syncTrajectory }) => {
     });
   };
 
-  const glideGently = (avgVelocity, deltaX, deltaY) => {
+  const glideGently = (avgVelocity: number, deltaX: number, deltaY: number) => {
     if (!lastPositionRef.current) return;
 
     setSpring({
@@ -115,7 +143,7 @@ const MegaCard = ({ gameState, cardId, syncTrajectory }) => {
         cursor: 'grab',
         zIndex: 1,
         touchAction: 'none',
-        transform: x.to((x) => `translate(${x}px, ${y.get()}px)`),
+        transform: x.to((xVal) => `translate(${xVal}px, ${y.get()}px)`),
         boxShadow: shadow.to((s) => `0px ${s}px ${s * 2}px rgba(0, 0, 0, 0.3)`),
       }}
     />
