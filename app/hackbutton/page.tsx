@@ -1,6 +1,6 @@
 // app/hackbutton/page.tsx
-import HackButton from "../../components/HackButton"
+import Dashboard from "../../components/Dashboard"
 
 export default function HackButtonPage() {
-  return <HackButton />;
+  return <Dashboard />;
 }

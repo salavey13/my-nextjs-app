@@ -1,3 +1,4 @@
+// components\game\MergedGameBoard.tsx
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabaseClient'; // Supabase for state management
 import MegaAvatar from './MegaAvatar'; // Import the updated MegaAvatar component
@@ -15,7 +16,7 @@ import { useGesture } from '@use-gesture/react'; // Ensure you import this for g
 //           "x": 0.13347488956238615,
 //           "y": 0.596567085140635
 //         },
-//         "is_flipped": false,
+//         "flipped": false,
 //         "trajectory": {
 //           "position": {
 //             "x": 0.1,
@@ -103,9 +104,9 @@ const GameBoard: React.FC = () => {
 
     const randomizeTargetFrame = () => {
         setTargetFrame({
-            x: Math.random() * 800 + 100, // Assuming the board width is 1000px
-            y: Math.random() * 400 + 100, // Assuming the board height is 600px
-            rotation: Math.random() * 360,
+            x: Math.random() * 320 + 100, // Assuming the board width is 1000px
+            y: Math.random() * 320 + 100, // Assuming the board height is 600px
+            rotation: 0//Math.random() * 360,
         });
     };
 
@@ -113,61 +114,100 @@ const GameBoard: React.FC = () => {
     const [buttonParallax, setButtonParallax] = useState({ x: 0, y: 0 });
 
     useEffect(() => {
-        const fetchGameState = async () => {
-            const { data } = await supabase
-                .from('rents')
-                .select('game_state')
-                .eq('id', GAME_ID) // Replace with actual rent ID
-                .single();
-
-            if (data) {
-                setGameState(data.game_state);
-                const playerPos: Record<string, { x: number; y: number }> = {};
-                data.game_state.players?.forEach((player: Player) => {
-                    playerPos[player.id] = player.position;
-                });
-                setPlayerPositions(playerPos);
-            }
+        // Subscribe to changes in the `rents` table for the current game
+        const handleSubscription = async () => {
+          // Initial fetch for game state
+          const { data, error } = await supabase
+            .from('rents')
+            .select('game_state')
+            .eq('id', user?.currentGameId) // Assuming user has currentGameId
+            .single();
+    
+          if (error) {
+            console.error('Error fetching game state:', error);
+          } else {
+            setGameState(data.game_state);
+          }
+    
+          // Set up the real-time subscription using a Supabase Channel
+          const channel = supabase
+            .channel('notify_game_updates')
+            .on(
+              'postgres_changes',
+              { event: 'UPDATE', schema: 'public', table: 'rents', filter: `id=eq.${GAME_ID}` },
+              (payload) => {
+                setGameState(payload.new.game_state); // Update game state when change occurs
+              }
+            )
+            .subscribe();
+    
+          // Clean up the subscription on unmount
+          setSubscription(channel);
+    
+          return () => {
+            supabase.removeChannel(channel);
+          };
         };
+    
+        handleSubscription();
+      }, [user]);
+    
+      
+    
+    // Gesture handling for drag and swipe (yeet)
+    const bind = useGesture({
+    // onPress: (event) => {
+    //     setLongPressStart(Date.now());
+    //     setIsLongPress(true);
 
-        fetchGameState();
-    }, []);
+    //     const { clientX, clientY } = event;
+    //     setTimeout(() => {
+    //         if (isLongPress) {
+    //             handleLongPressAttraction(clientX, clientY);
+    //         }
+    //     }, 500); // Trigger long press attraction after 500ms
+    // },
+    // onPressEnd: () => {
+    //     setIsLongPress(false);
+    // },
+    });
 
     // Handle long press attraction
-    const handleLongPressAttraction = (clientX: number, clientY: number) => {
-        gameState?.cards.forEach((card) => {
-            const rect = document.getElementById(card.id)?.getBoundingClientRect();
-            if (rect) {
-                const cardCenter = { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
-                const distance = Math.sqrt(Math.pow(clientX - cardCenter.x, 2) + Math.pow(clientY - cardCenter.y, 2));
-                const pressDuration = Date.now() - longPressStart;
-                const attractionStrength = Math.min(500, pressDuration);
+    // const handleLongPressAttraction = (clientX: number, clientY: number) => {
+    //     gameState?.cards.forEach((card) => {
+    //         const rect = document.getElementById(card.id)?.getBoundingClientRect();
+    //         if (rect) {
+    //             const cardCenter = { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+    //             const distance = Math.sqrt(Math.pow(clientX - cardCenter.x, 2) + Math.pow(clientY - cardCenter.y, 2));
+    //             const pressDuration = Date.now() - longPressStart;
+    //             const attractionStrength = Math.min(500, pressDuration);
 
-                const newX = card.position.x + (clientX - cardCenter.x) * attractionStrength / 1000;
-                const newY = card.position.y + (clientY - cardCenter.y) * attractionStrength / 1000;
+    //             const newX = card.position.x + (clientX - cardCenter.x) * attractionStrength / 1000;
+    //             const newY = card.position.y + (clientY - cardCenter.y) * attractionStrength / 1000;
 
-                setGameState((prev) => ({
-                    ...prev!,
-                    cards: prev!.cards.map((c) =>
-                        c.id === card.id ? { ...c, position: { x: newX, y: newY } } : c
-                    ),
-                }));
+    //             setGameState((prev) => ({
+    //                 ...prev!,
+    //                 cards: prev!.cards.map((c) =>
+    //                     c.id === card.id ? { ...c, position: { x: newX, y: newY } } : c
+    //                 ),
+    //             }));
 
-                // Apply inertia (optional)
-                if (!isLongPress) {
-                    // Apply some inertia logic here, possibly using a physics library
-                }
-            }
-        });
-    };
-// useEffect(() => {
+    //             // Apply inertia (optional)
+    //             if (!isLongPress) {
+    //                 // Apply some inertia logic here, possibly using a physics library
+    //             }
+    //         }
+    //     });
+    // };
+
+//     useEffect(() => {
 //     const registerPlayer = async () => {
 //         if (!user) return; // Check if user is not null
 
 //         const { data, error } = await supabase
 //         .from('rents')
 //         .select('game_state')
-//         .eq('id', GAME_ID) // Replace with actual rent ID
+//         .eq('id', user?.currentGameId) // Replace with actual rent ID
 //         .single();
 
 //       if (data) {
@@ -177,7 +217,7 @@ const GameBoard: React.FC = () => {
 //           await supabase
 //             .from('rents')
 //             .update({ game_state: { ...data.game_state, players } })
-//             .eq('id', GAME_ID);
+//             .eq('id', user?.currentGameId);
 //         }
 //       }
 //     };
@@ -185,67 +225,36 @@ const GameBoard: React.FC = () => {
 //     registerPlayer();
 //   }, [user?.id]);
 
-//   const handlePositionChange = (playerId: number, newPos: Point) => {
-//     setPlayerPositions(prev => ({ ...prev, [playerId]: newPos }));
+  const handlePositionChange = (playerId: number, newPos: Point) => {
+    setPlayerPositions(prev => ({ ...prev, [playerId]: newPos }));
 
-//     if (gameState) {
-//         supabase
-//           .from('rents')
-//           .update({
-//             game_state: {
-//               ...gameState,
-//               players: gameState.players.map((player) =>
-//                 player.id === String(playerId) ? { ...player, position: newPos } : player
-//               ),
-//             },
-//           })
-//           .eq('id', GAME_ID);
-//       };
-//   };
-
-  const syncTrajectory = async (trajectoryData: any) => {
-    // try {
-    //     if (gameState) {
-    //         const { data, error } = await supabase
-    //         .from('rents')
-    //         .update({ game_state: { 
-    //             ...gameState,
-    //             cards: gameState.cards.map((card:Card) =>
-    //             { ...card, trajectory: trajectoryData }
-    //         ),
-    //     },
-    // })
-    //         .eq('id', GAME_ID); // Replace with actual rent ID
-    //         if (error) {
-    //             console.error('Error syncing card trajectory:', error);
-    //         } else {
-    //             console.log('Card trajectory synced:', data);
-    //         }
-    //     }      
-    // } catch (err) {
-    //   console.error('Unexpected error:', err);
-    // }
+    if (gameState) {
+        supabase
+          .from('rents')
+          .update({
+            game_state: {
+              ...gameState,
+              players: gameState.players.map((player) =>
+                player.id === String(playerId) ? { ...player, position: newPos } : player
+              ),
+            },
+          })
+          .eq('id', user?.currentGameId);
+      };
   };
-    // Gesture handler
-    const bind = useGesture(
-        {
-            // onPress: (event) => {
-            //     setLongPressStart(Date.now());
-            //     setIsLongPress(true);
 
-            //     const { clientX, clientY } = event;
-            //     setTimeout(() => {
-            //         if (isLongPress) {
-            //             handleLongPressAttraction(clientX, clientY);
-            //         }
-            //     }, 500); // Trigger long press attraction after 500ms
-            // },
-            // onPressEnd: () => {
-            //     setIsLongPress(false);
-            // },
-        },
-        { drag: { delay: true } }
+  const syncTrajectory = async (cardId: string, trajectoryData: any) => {
+    if (!gameState) return;
+
+    const updatedCards = gameState.cards.map(card =>
+      card.id === cardId ? { ...card, trajectory: trajectoryData } : card
     );
+
+    // Save updated game state 
+    setGameState({ ...gameState, cards: updatedCards }) 
+    }      
+
+
 
     const shuffleCards = async () => {
         if (!gameState) return;
@@ -262,7 +271,7 @@ const GameBoard: React.FC = () => {
         const { error } = await supabase
             .from('rents')
             .update({ game_state: updatedGameState })
-            .eq('id', GAME_ID);
+            .eq('id', user?.currentGameId);
 
         if (error) {
             console.error('Error updating game state:', error);
@@ -283,8 +292,8 @@ const GameBoard: React.FC = () => {
 
     return (
         <div
-            className="game-board-container"
-            style={{ position: 'relative', width: '1000px', height: '600px' }}
+            className="game-board-container min-h-[calc(100vh-128px)] overflow-y-auto overflow-x-auto"
+            style={{ position: 'relative', width: '100vw', height: '600px' }}
             onMouseMove={handleMouseMove}
             {...bind()} // Attach gesture handlers
         >
@@ -318,13 +327,15 @@ const GameBoard: React.FC = () => {
             {/* Target frame outline */}
             <div
                 style={{
-                    width: '200px',
-                    height: '300px',
+                    width: '100px',
+                    height: '150px',
                     position: 'absolute',
+                    borderColor: "#E1FF01",
                     top: targetFrame.y,
                     left: targetFrame.x,
                     transform: `rotate(${targetFrame.rotation}deg)`,
-                    border: '2px dashed black',
+                    border: '2px dashed #E1FF01',
+                    borderRadius: '8px',
                 }}
             />
         </div>

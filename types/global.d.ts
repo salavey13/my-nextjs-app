@@ -80,6 +80,7 @@ interface TelegramThemeParams {
     enableVerticalSwipes(): void;
     disableVerticalSwipes(): void;
     setHeaderColor(color: string): void;
+    setBottomBarColor(color: string): void;
     setBackgroundColor(color: string): void;
     onEvent(eventType: TelegramWebAppEventType, callback: (event: any) => void): void; // Add onEvent method
     showProgress(lweaveActive: boolean): void;

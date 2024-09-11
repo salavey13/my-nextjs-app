@@ -229,11 +229,7 @@
 }
 
 .card {
-  position: absolute;
-  width: 100px;
-  height: 150px;
-  transition: transform 0.5s ease, opacity 0.3s ease;
-  cursor: grab;
+  transition: transform 0.5s ease-out;
 }
 
 .card.flipped {

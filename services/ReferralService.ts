@@ -26,7 +26,7 @@ export const increaseReferrerX = async (referrerId: number) => {
       const newXValue = parseInt(referrer.X, 10) + 1;
       await supabase
         .from('users')
-        .update({ X: newXValue.toString() })
+        .update({ X: newXValue })
         .eq('id', referrerId);
     }
   } catch (error) {

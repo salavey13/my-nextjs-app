@@ -7,20 +7,34 @@ export const calculateVelocity = (deltaX: number, deltaY: number, velocityX: num
     return Math.atan2(deltaY, deltaX);
   };
   
-  export const calculateFlightDuration = (velocity: number, maxVelocity: number, maxTime: number) => {
-    return Math.min((velocity / maxVelocity) * maxTime, maxTime);
+  export const calculateFlightDuration = (
+    velocity: number, 
+    maxVelocity: number, 
+    maxTime: number
+  ): number => {
+    const duration = Math.min((velocity / maxVelocity) * maxTime, maxTime);
+    console.log(`Calculated flight duration: ${duration}`);
+    return duration;
   };
   
   export const calculateFinalPosition = (
-    startX: number,
-    startY: number,
-    velocityX: number,
-    velocityY: number,
+    startX: number, 
+    startY: number, 
+    velocityX: number, 
+    velocityY: number, 
     flightDuration: number
-  ) => {
+  ): { x: number, y: number } => {
+    const finalX = startX + velocityX * flightDuration;
+    const finalY = startY + velocityY * flightDuration;
+  
+    console.log(`StartX: ${startX}, StartY: ${startY}`);
+    console.log(`VelocityX: ${velocityX}, VelocityY: ${velocityY}`);
+    console.log(`Flight duration: ${flightDuration}`);
+    console.log(`Calculated Final Position: (${finalX}, ${finalY})`);
+  
     return {
-      x: startX + velocityX * flightDuration,
-      y: startY + velocityY * flightDuration
+      x: finalX,
+      y: finalY,
     };
   };
   

@@ -34,7 +34,7 @@ interface UserData {
   cheers_count: number;
   referer?: number | null;
   tasksTodo?: string | null;
-  currentgameId?: string | null;
+  currentGameId?: number | null;
   game_state?: string | null;
   ton_wallet?: string | null;
   initial_readings?: Record<string, any> | null;
@@ -71,6 +71,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     setTheme,
     setHeaderColor,
     setBackgroundColor,
+    setBottomBarColor,
     disableVerticalSwipes,
   } = useTelegram();
   const pathname = usePathname();
@@ -258,10 +259,12 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       if (user && !user.dark_theme) {
         setHeaderColor("#FFFFFF"); // Set the header color to black
         setBackgroundColor("#FFFFFF"); // Set the background color to black
+        setBottomBarColor("#FFFFFF");
       }
       else {
         setHeaderColor("#282c33"); // Set the header color to black
         setBackgroundColor("#282c33"); // Set the background color to black
+        setBottomBarColor("#282c33");
       }
       disableVerticalSwipes(); // Disable vertical swipes in the Telegram WebApp
     }

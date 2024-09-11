@@ -103,6 +103,10 @@ const useTelegram = () => {
     tg?.setHeaderColor(color);
   };
 
+  const setBottomBarColor = (color: string) => {
+    tg?.setBottomBarColor(color);
+  };
+
   const setBackgroundColor = (color: string) => {
     tg?.setBackgroundColor(color);
   };
@@ -142,6 +146,7 @@ const useTelegram = () => {
     disableVerticalSwipes,
     setHeaderColor,
     setBackgroundColor,
+    setBottomBarColor,
     showProgress,
     toggleThemeSettings,
   };
