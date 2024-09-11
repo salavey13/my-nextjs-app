@@ -7,19 +7,33 @@ import { useAppContext } from '@/context/AppContext';
 
 // Types for the game state, card, and props
 interface Card {
-  id: number;
+  id: CardId;
   position: { x: number; y: number };
   trajectory: { rotation: number };
   flipped: boolean;
 }
 
-interface GameState {
-  cards: Card[];
-}
+interface Point {
+    x: number;
+    y: number;
+    }
+    
+    
+    interface Player {
+    id: string;
+    position: Point;
+    }
+    
+    interface GameState {
+    cards: Card[];
+    players: Player[];
+    }
+    
+export type CardId = keyof typeof cardsImages;
 
 interface MegaCardProps {
   gameState: GameState;
-  cardId: number;
+  cardId: CardId;
   syncTrajectory: (trajectory: { x: number; y: number; rotation: number }) => void;
 }
 
@@ -36,7 +50,7 @@ const MegaCard: React.FC<MegaCardProps> = ({ gameState, cardId, syncTrajectory }
   // Determine the correct card image to show based on whether it's flipped
   const cardImage = gameState.cards.find((c) => c.id === cardId)?.flipped
     ? 'shirt'
-    : (cardId as string); // Convert cardId to the card string like '10_of_clubs'
+    : cardId; // Convert cardId to the card string like '10_of_clubs'
 
   // Handle spring animations for position and shadow
   const [{ x, y, shadow, flipAngle }, setSpring] = useSpring(() => ({

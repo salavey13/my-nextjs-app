@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabaseClient'; // Supabase for state management
 import MegaAvatar from './MegaAvatar'; // Import the updated MegaAvatar component
-import MegaCard from "@/components/game/MegaCard"; // Import MegaCard component
+import { MegaCard, CardId } from "@/components/game/MegaCard"; // Import MegaCard component
 import { Button } from '@/components/ui/button';
 import { useAppContext } from '@/context/AppContext';
 import PhysicsControls from './PhysicsControls';
@@ -53,20 +53,13 @@ interface Point {
     y: number;
 }
 
-interface Trajectory {
-    position: Point;
-    rotation: number;
-    velocity: Point;
-    rotationSpeed: number;
-}
+
 
 interface Card {
-    id: string;
-    position: Point;
-    flipped: boolean;
-    trajectory: Trajectory;
-    target_position: Point;
-    target_rotation: number;
+    id: CardId;
+  position: { x: number; y: number };
+  trajectory: { rotation: number };
+  flipped: boolean;
 }
 interface MegaAvatarProps {
     playerId: number;
@@ -243,11 +236,11 @@ const GameBoard: React.FC = () => {
       };
   };
 
-  const syncTrajectory = async (cardId: string, trajectoryData: any) => {
+  const syncTrajectory = async (cardId: CardId, trajectory: { x: number; y: number; rotation: number }) => {
     if (!gameState) return;
 
     const updatedCards = gameState.cards.map(card =>
-      card.id === cardId ? { ...card, trajectory: trajectoryData } : card
+      card.id === cardId ? { ...card, trajectory: trajectory } : card
     );
 
     // Save updated game state 
