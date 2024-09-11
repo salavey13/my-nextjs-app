@@ -25,7 +25,7 @@ interface MegaCardProps {
 
 const GAME_ID = 28;
 
-const MegaCard: React.FC<MegaCardProps> = ({ gameState, cardId: string, syncTrajectory }) => {
+const MegaCard: React.FC<MegaCardProps> = ({ gameState, cardId, syncTrajectory }) => {
   const cardRef = useRef<HTMLDivElement | null>(null);
   const lastPositionRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState<boolean>(false);
@@ -36,7 +36,7 @@ const MegaCard: React.FC<MegaCardProps> = ({ gameState, cardId: string, syncTraj
   // Determine the correct card image to show based on whether it's flipped
   const cardImage = gameState.cards.find((c) => c.id === cardId)?.flipped
     ? 'shirt'
-    : (cardId); // Convert cardId to the card string like '10_of_clubs'
+    : (cardId as string); // Convert cardId to the card string like '10_of_clubs'
 
   // Handle spring animations for position and shadow
   const [{ x, y, shadow, flipAngle }, setSpring] = useSpring(() => ({
