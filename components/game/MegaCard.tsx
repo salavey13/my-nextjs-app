@@ -271,8 +271,8 @@ const handleYeet = (velocityX: number, velocityY: number, deltaX: number, deltaY
       ref={cardRef}
       {...bind()}
       style={{
-        width: '100px',
-        height: '150px',
+        width: '69px',
+        height: '100px',
         backgroundImage: `url(${cardsImages[cardId as CardId]})`,
         backgroundColor: '#131313',
         borderRadius: '8px',
