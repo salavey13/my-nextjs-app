@@ -57,7 +57,7 @@ const GameBoard: React.FC = () => {
       const { data, error } = await supabase
         .from('rents')
         .select('game_state')
-        .eq('id', GAME_ID)
+        .eq('id', user?.currentGameId)
         .single();
 
       if (error) {
@@ -82,7 +82,7 @@ const GameBoard: React.FC = () => {
     };
 
     handleSubscription();
-  }, [GAME_ID]);
+  }, [user]);
 
    // Fetch game state from Supabase
 useEffect(() => {

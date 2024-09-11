@@ -34,12 +34,12 @@ export type CardId = keyof typeof cardsImages;
 interface MegaCardProps {
   gameState: GameState;
   cardId: CardId;
-  syncTrajectory: (trajectory: { x: number; y: number; rotation: number }) => void;
+  syncTrajectory: (cardId: CardId, trajectory: { x: number; y: number; rotation: number }) => void;
 }
 
 const GAME_ID = 28;
 
-const MegaCard: React.FC<MegaCardProps> = ({ gameState, cardId, syncTrajectory }) => {
+export const MegaCard: React.FC<MegaCardProps> = ({ gameState, cardId, syncTrajectory }) => {
   const cardRef = useRef<HTMLDivElement | null>(null);
   const lastPositionRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState<boolean>(false);
@@ -73,7 +73,7 @@ const MegaCard: React.FC<MegaCardProps> = ({ gameState, cardId, syncTrajectory }
   }, [gameState, cardId]);
 
   const updateGameState = (update: { x: number; y: number; flipped: boolean }) => {
-    syncTrajectory({ x: update.x, y: update.y, rotation: currentFlipAngle });
+    syncTrajectory(cardId, { x: update.x, y: update.y, rotation: currentFlipAngle });
   };
 
   const updateCardPosition = (x: number, y: number, rotation: number) => {
