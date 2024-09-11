@@ -25,7 +25,7 @@ interface MegaCardProps {
 
 const GAME_ID = 28;
 
-const MegaCard: React.FC<MegaCardProps> = ({ gameState, cardId, syncTrajectory }) => {
+const MegaCard: React.FC<MegaCardProps> = ({ gameState, cardId: string, syncTrajectory }) => {
   const cardRef = useRef<HTMLDivElement | null>(null);
   const lastPositionRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState<boolean>(false);
@@ -33,10 +33,17 @@ const MegaCard: React.FC<MegaCardProps> = ({ gameState, cardId, syncTrajectory }
   const [currentFlipAngle, setCurrentFlipAngle] = useState<number>(0);
   const { user } = useAppContext();
 
-  const [{ x, y, shadow }, setSpring] = useSpring(() => ({
+  // Determine the correct card image to show based on whether it's flipped
+  const cardImage = gameState.cards.find((c) => c.id === cardId)?.flipped
+    ? 'shirt'
+    : (cardId); // Convert cardId to the card string like '10_of_clubs'
+
+  // Handle spring animations for position and shadow
+  const [{ x, y, shadow, flipAngle }, setSpring] = useSpring(() => ({
     x: 0,
     y: 0,
     shadow: 5,
+    flipAngle: 0,
     config: { mass: 1, tension: 200, friction: 13 },
   }));
 
@@ -52,12 +59,10 @@ const MegaCard: React.FC<MegaCardProps> = ({ gameState, cardId, syncTrajectory }
   }, [gameState, cardId]);
 
   const updateGameState = (update: { x: number; y: number; flipped: boolean }) => {
-    // Example function to sync state with Supabase or local state management
     syncTrajectory({ x: update.x, y: update.y, rotation: currentFlipAngle });
   };
 
   const updateCardPosition = (x: number, y: number, rotation: number) => {
-    // Handle card position update logic
     setSpring({ x, y });
   };
 
@@ -65,17 +70,18 @@ const MegaCard: React.FC<MegaCardProps> = ({ gameState, cardId, syncTrajectory }
     if (!lastPositionRef.current || !cardRef.current) return;
 
     setIsYeeted(true);
-    setCurrentFlipAngle(180); // Flip the card when yeeted
+    setSpring({
+      flipAngle: 180, // Flip the card when yeeted
+    });
 
     const signedDistanceX = deltaX > 0 ? Math.abs(velocityX) : -Math.abs(velocityX);
     const signedDistanceY = deltaY > 0 ? Math.abs(velocityY) : -Math.abs(velocityY);
 
-    // Yeet with increased velocity by applying tension to the spring
     setSpring({
       x: lastPositionRef.current.x + signedDistanceX * 100,
       y: lastPositionRef.current.y + signedDistanceY * 100,
-      shadow: 15, // Increase shadow during yeet
-      config: { tension: 400, friction: 10 }, // Stronger tension, lower friction
+      shadow: 15,
+      config: { tension: 400, friction: 10 },
     });
 
     // Simulate card position update after the yeet
@@ -94,8 +100,8 @@ const MegaCard: React.FC<MegaCardProps> = ({ gameState, cardId, syncTrajectory }
     setSpring({
       x: lastPositionRef.current.x + deltaX * 10,
       y: lastPositionRef.current.y + deltaY * 10,
-      shadow: 5, // Lower shadow for gentle glide
-      config: { tension: 120, friction: 26 }, // Smooth, gentle glide
+      shadow: 5,
+      config: { tension: 120, friction: 26 },
     });
 
     updateGameState({
@@ -115,15 +121,15 @@ const MegaCard: React.FC<MegaCardProps> = ({ gameState, cardId, syncTrajectory }
           x: lastPositionRef.current.x + mx,
           y: lastPositionRef.current.y + my,
           shadow: 10,
-          config: { tension: 300, friction: 20 }, // Simulate tension during drag
+          config: { tension: 300, friction: 20 },
         });
       } else {
         setIsDragging(false);
 
         if (avgVelocity > 1.5) {
-          handleYeet(vx, vy, mx, my); // Yeet with increased velocity
+          handleYeet(vx, vy, mx, my);
         } else {
-          glideGently(avgVelocity, mx, my); // Glide gently if velocity is low
+          glideGently(avgVelocity, mx, my);
         }
       }
     },
@@ -136,18 +142,30 @@ const MegaCard: React.FC<MegaCardProps> = ({ gameState, cardId, syncTrajectory }
       style={{
         width: '69px',
         height: '100px',
-        backgroundImage: `url(${cardsImages[cardId]})`,
+        backgroundImage: `url(${cardsImages[cardImage]})`, // Use the cardImage based on flip state
         borderRadius: '8px',
         backgroundSize: 'cover',
         position: 'absolute',
         cursor: 'grab',
         zIndex: 1,
         touchAction: 'none',
-        transform: x.to((xVal) => `translate(${xVal}px, ${y.get()}px)`),
+        transform: x.to((xVal) => `translate(${xVal}px, ${y.get()}px) rotateY(${flipAngle.get()}deg)`),
         boxShadow: shadow.to((s) => `0px ${s}px ${s * 2}px rgba(0, 0, 0, 0.3)`),
       }}
     />
   );
+};
+
+// Helper function to convert cardId to the appropriate string (like '10_of_clubs')
+const cardIdToCardString = (id: number) => {
+  const cards = [
+    '10_of_clubs',
+    '10_of_diamonds',
+    '10_of_hearts',
+    '10_of_spades',
+    // ...add other cards here
+  ];
+  return cards[id] || 'shirt';
 };
 
 export default MegaCard;
