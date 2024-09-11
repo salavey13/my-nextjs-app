@@ -1194,7 +1194,7 @@ return (
           className="bg-blue-500 text-black rounded-lg px-4 py-2 rounded-lg hover:bg-blue-600 hover:text-lime-950"
           variant="outline"
         >
-          {t('generateRequestButton')} (type)
+          {t('generateRequestButton4type')}
         </Button>
         </div>
       </div>

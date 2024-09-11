@@ -22,7 +22,7 @@ const ClipboardManager: React.FC<ClipboardManagerProps> = ({ requestText }) => {
 
   return (
     <div className="clipboard-manager grid grid-cols-1 mt-4 gap-4">
-      <h2 className="text-xl font-semibold">Clipboard Manager</h2>
+      {/* <h2 className="text-xl font-semibold">{t("Clipboard Manager")}</h2> */}
 
       <Button 
         onClick={() => writeToClipboard(requestText)}
