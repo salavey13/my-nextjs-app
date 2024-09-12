@@ -99,7 +99,7 @@ const AboutApp: React.FC = () => {
                 transform: 'translateX(-50%)',
                 fontSize: '13px',
                 color: 'gray',
-                pad
+                
               }}
             >
               {t('about.version')}
