@@ -23,7 +23,7 @@ export const ru: LanguageDictionary = {
   enterYourIdeaTitle: "Введите свою идею",
   describeYourIdeaPlaceholder: "Опишите свою идею...",
   generateRequestButton: "Сгенерировать запрос",
-  generateRequestButton4type: "Сгенерировать запрос создания нового типа обьявления",
+  generateRequestButton4type: "Сгенерировать тип обьявы",
   zeroStageRequestTitle: "Запрос боту",
   getResponseButton: "Получить ответ из буфера обмена",
   parsedResponseDataTitle: "Проанализированные данные ответа",
