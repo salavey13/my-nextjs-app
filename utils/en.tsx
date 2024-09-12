@@ -19,6 +19,13 @@ export const en: LanguageDictionary = {
     endGame: "End Game",
     yourScore: "Your Score",
     topScores: "Top Scores",
+    about: {
+      info: 'Info',
+      title: 'About the App',
+      motto: 'The app is designed to create web3 environments freely, and commercial use is supported out of the box by crypto.',
+      github: 'View on GitHub',
+      version: 'App v. 0.13',
+    },
     quests: "Quests",
     open: "Open",
     create: "Create a game",
