@@ -93,3 +93,30 @@ The `MegaCard` component represents an interactive game card that supports compl
 
 ### Usage
 The component expects `gameState` and `cardId` props along with a `syncTrajectory` function for updating the card's state during gameplay.
+## AboutApp Component
+
+This component provides an "About the App" modal with the following features:
+- A small circular info button that opens the modal when clicked.
+- The modal contains:
+  - App title
+  - Motto: *"The app is designed to create web3 environments freely, and commercial use is supported out of the box by crypto."*
+  - A button that links to the app's GitHub project.
+  - A version label displaying "App v. 0.13".
+- The modal can be closed by clicking outside of it.
+
+### Usage
+
+Import the component and use it in your app:
+
+```tsx
+import AboutApp from '@/components/ui/AboutApp';
+
+function App() {
+  return (
+    <div>
+      <AboutApp />
+      {/* Other components */}
+    </div>
+  );
+}
+
