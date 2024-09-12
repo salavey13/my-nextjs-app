@@ -4,7 +4,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faKeyboard, faStar, faGlobe, faHome, faList, faPlus, faBell, faUser, faCalendarPlus, faLightbulb, faCrown } from '@fortawesome/free-solid-svg-icons';
+import { faKeyboard, faStar, faGlobe, faHome, faList, faPlus, faBell, faUser, faCalendarPlus, faLightbulb, faCrown, faPeopleRobbery, faFaceDizzy, faGamepad, faRestroom, faCarOn, faCartShopping, faShoppingCart, faCar, faHandHoldingHand, faDiceD20, faRepublican, faExternalLinkAlt, faUpRightFromSquare, faTh, faCommentDollar } from '@fortawesome/free-solid-svg-icons';
 import { useAppContext } from "@/context/AppContext";
 
 export interface NavigationLink {
@@ -21,21 +21,22 @@ const BottomShelf: React.FC = () => {
     //{ href: '/dynamicitemform', icon: faList, label: t('') },
     //{ href: '/qrcodeform', icon: faLightbulb, label: t('qrcodeform') },
     //{ href: '/cryptopayment', icon: faLightbulb, label: t('cryptopayment') },
-    { href: '/dev', icon: faLightbulb, label: t('dev') },
-    { href: '/rent', icon: faStar, label: t('rent') },
-    { href: '/', icon: faHome, label: t('home') },
-    { href: '/admin', icon: faCrown, label: t('admin') },
-    { href: '/referral', icon: faLightbulb, label: t('referral') },
+    
+    { href: '/', icon: faGamepad, label: t('') },
+    { href: '/rent', icon: faDiceD20, label: t('') },
+    { href: '/referral', icon: faPeopleRobbery, label: t('') },
     
     //{ href: '/notifications', icon: faBell, label: t('notifications') },
     //{ href: '/profile', icon: faUser, label: t('profile') },
     
-    { href: '/questsforcoins', icon: faStar, label: '' },
-    { href: '/hackbutton', icon: faKeyboard, label: '' },
+    { href: '/questsforcoins', icon: faCommentDollar, label: '' },
+    { href: '/hackbutton', icon: faFaceDizzy, label: '' },
     { href: '/createEvent', icon: faCalendarPlus, label: '' },
     //{ href: '/conflictawareness', icon: faGlobe, label: '' },
     //{ href: '/emotionmirror', icon: faLightbulb, label: t('emotionmirror') },
-  ];
+    { href: '/admin', icon: faCrown, label: t('') },
+    { href: '/dev', icon: faLightbulb, label: t('dev') },
+];
 
   return (
     <footer className="fixed bottom-0 left-0 w-full h-16 bg-gray-900 text-white flex justify-around items-center z-1 backdrop-blur-lg shadow-lg">

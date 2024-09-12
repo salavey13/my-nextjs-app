@@ -93,21 +93,21 @@ const AdminDashboard: React.FC = () => {
       </h1>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <div className="p-4 border rounded shadow">
+        <div className="p-4 border rounded-lg shadow ">
           <h2 className="text-lg font-semibold">{t('totalReferrals')}</h2>
           <p className="text-2xl">{summary.total}</p>
         </div>
-        <div className="p-4 border rounded shadow">
+        <div className="p-4 border rounded-lg shadow">
           <h2 className="text-lg font-semibold">{t('referralsLastMonth')}</h2>
           <p className="text-2xl">{summary.lastMonth}</p>
         </div>
-        <div className="p-4 border rounded shadow">
+        <div className="p-4 border rounded-lg shadow">
           <h2 className="text-lg font-semibold">{t('referralsLastYear')}</h2>
           <p className="text-2xl">{summary.lastYear}</p>
         </div>
       </div>
 
-      <table className="table-auto w-full border">
+      <table className="table-auto w-full border rounded-lg">
         <thead>
           <tr>
             <th className="border p-2">{t('referrer')}</th>
