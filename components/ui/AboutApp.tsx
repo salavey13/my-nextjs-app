@@ -3,12 +3,10 @@
 import React, { useState } from 'react';
 import { animated, useSpring } from 'react-spring';
 import { useAppContext } from '@/context/AppContext'; // for accessing user or other app context if needed
-import { useTelegram } from '@/hooks/useTelegram'; // in case Telegram integration is needed
-import { t } from '@/utils/TranslationUtils'; // translation helper
-
+i
 const AboutApp: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  
+  const { t } = useAppContext()
   // Spring animation for sliding the modal from the left
   const slideIn = useSpring({
     transform: isModalOpen ? 'translateX(0%)' : 'translateX(-100%)',
