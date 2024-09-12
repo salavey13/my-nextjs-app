@@ -83,3 +83,13 @@ The `QuestsForCoins` component allows users to earn coins by completing various 
 ## Deployment
 
 Deploy to Vercel by connecting your GitHub repository or manually uploading the project.
+## MegaCard Component
+
+### Features
+The `MegaCard` component represents an interactive game card that supports complex gesture-based interactions:
+- **Drag Gestures**: Regular card dragging is smooth with responsive movement.
+- **Yeet Movement**: When the card is dragged downward and released quickly, it performs an exaggerated "yeet" with a flip and overshoots the release point.
+- **Double-Tap Flip**: Tapping the card twice flips it over.
+
+### Usage
+The component expects `gameState` and `cardId` props along with a `syncTrajectory` function for updating the card's state during gameplay.
