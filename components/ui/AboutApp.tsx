@@ -34,7 +34,7 @@ const AboutApp: React.FC = () => {
           width: '30px',
           height: '30px',
           backgroundColor: 'rgba(255, 255, 255, 0.3)',
-          color: 'transparent',
+          color: 'white',
           border: 'none',
           fontSize: '16px',
           cursor: 'pointer',
@@ -55,7 +55,7 @@ const AboutApp: React.FC = () => {
             left: 0,
             width: '100vw',
             height: '100vh',
-            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            
             zIndex: 1000,
           }}
         >
@@ -85,7 +85,7 @@ const AboutApp: React.FC = () => {
                 backgroundColor: 'white',
                 color: 'black',
                 textAlign: 'center',
-                borderRadius: '5px',
+                borderRadius: '13px',
                 textDecoration: 'none',
               }}
             >
@@ -94,11 +94,12 @@ const AboutApp: React.FC = () => {
             <p
               style={{
                 position: 'absolute',
-                bottom: '10px',
+                bottom: '3px',
                 left: '50%',
                 transform: 'translateX(-50%)',
-                fontSize: '12px',
+                fontSize: '13px',
                 color: 'gray',
+                pad
               }}
             >
               {t('about.version')}
