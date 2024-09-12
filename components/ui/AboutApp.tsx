@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { animated, useSpring } from 'react-spring';
 import { useAppContext } from '@/context/AppContext'; // for accessing user or other app context if needed
-i
+
 const AboutApp: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { t } = useAppContext()
