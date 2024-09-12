@@ -231,6 +231,7 @@ export const en: LanguageDictionary = {
   enterYourIdeaTitle: "Enter Your Idea",
   describeYourIdeaPlaceholder: "Describe your idea...",
   generateRequestButton: "Generate Request",
+   generateRequestButton4type: "Generate Request for New Type", 
   zeroStageRequestTitle: "Zero Stage Request",
   getResponseButton: "Get Response from Clipboard",
   parsedResponseDataTitle: "Parsed Response Data",
