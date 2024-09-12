@@ -75,7 +75,7 @@ const AboutApp: React.FC = () => {
             <h2>{t('about.title')}</h2>
             <p>{t('about.motto')}</p>
             <a
-              href="https://github.com/your-repo"
+              href="https://github.com/salavey13/my-nextjs-app"
               target="_blank"
               rel="noopener noreferrer"
               style={{
