@@ -164,7 +164,7 @@ export const MegaCard: React.FC<MegaCardProps> = ({ gameState, cardId, syncTraje
         height: '100px',
         backgroundImage: `url(${cardsImages[cardImage]})`,
         borderRadius: '10px',
-        transform: flipAngle.to((angle) => `rotateY(${angle}deg)`),
+        transform: x.to((xVal) => `translate(${xVal}px, ${y.get()}px) rotateY(${flipAngle.get()}deg)`),
         boxShadow: shadow.to((s) => `0px ${s}px ${s * 2}px rgba(0, 0, 0, 0.3)`),
       }}
     />
