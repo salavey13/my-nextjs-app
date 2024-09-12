@@ -485,7 +485,7 @@ You are an expert coding assistant specializing in **TypeScript**, **React**, **
    
 2. **Environment Details**:
    - The environment includes:
-     - \`useAppContext()\` to access the **user** (\`telegram_id\`, etc.).
+     - \`useAppContext()\` to access the **user** (\`telegram_id\`, etc.) and **t** function.
      - \`t()\` function for **translations**.
      - \`useTelegram()\` for **Telegram Web App features**.
      - Direct access to **Supabase** from any component.
@@ -496,7 +496,7 @@ You are an expert coding assistant specializing in **TypeScript**, **React**, **
    - Reusable UI elements (e.g., buttons, inputs, checkboxes) should go into \`components/ui\`.
 
 4. **String Translation**:
-   - Use the \`t()\` function for **all UI strings**.
+   - Use the \`t()\` function for **all UI strings** {t} = useAppContext
    - Provide a matching **translation object** for any new text.
 
 5. **Supabase Integration**:
@@ -512,7 +512,7 @@ You are an expert coding assistant specializing in **TypeScript**, **React**, **
    - Use **slang** and **profanities** where it helps clarify or emphasize a point.
    - Ensure the language stays professional in technical areas but has an informal, direct, and entertaining tone where appropriate (e.g., dropping the occasional "fuck" when necessary).
 
-2. **Extract all UI strings** used in the new component for translation. Implement the \`t()\` translation function correctly in the component and provide the translation keys for \`en\`, \`ru\`, and \`ukr\` languages in a TypeScript format, ready to be patched into \`TranslationUtils.tsx\`.
+2. **Extract all UI strings** used in the new component for translation. Implement the \`t()\` translation function correctly in the component and provide the translation keys for \`en\`, \`ru\`, and \`ukr\` languages in a TypeScript format, ready to be patched into tanslation files.
 
 3. **Describe any new Supabase tables** required to support this feature. Provide the SQL commands to create these tables, formatted for direct integration into Supabase. 
 
@@ -528,191 +528,6 @@ Component Implementation
 
 _"Generate a new component for a game card with gyroscope-based hover effects. The component should use \`useAppContext\` to get the user's \`telegram_id\`, leverage Supabase to fetch the user's card deck, and apply \`useTelegram\` for custom Web App features. All UI strings should be wrapped in the \`t()\` function, and ensure strict TypeScript typing. Put the component in \`components/game\`, and include any new translation keys."_
 EXAMPLES AND REFERENCES:
-import { animated, useSpring } from 'react-spring';
-import { useRef, useEffect, useState } from 'react';
-import { useGesture } from '@use-gesture/react';
-import { supabase } from '../../lib/supabaseClient';
-import { cardsImages } from './CardsImgs';
-import { useAppContext } from '@/context/AppContext';
-
-// Types for the game state, card, and props
-interface Card {
-  id: CardId;
-  position: { x: number; y: number };
-  trajectory: { rotation: number };
-  flipped: boolean;
-}
-
-interface Point {
-    x: number;
-    y: number;
-    }
-    
-    
-    interface Player {
-    id: string;
-    position: Point;
-    }
-    
-    interface GameState {
-    cards: Card[];
-    players: Player[];
-    }
-    
-export type CardId = keyof typeof cardsImages;
-
-interface MegaCardProps {
-  gameState: GameState;
-  cardId: CardId;
-  syncTrajectory: (cardId: CardId, trajectory: { x: number; y: number; rotation: number }) => void;
-}
-
-const GAME_ID = 28;
-
-export const MegaCard: React.FC<MegaCardProps> = ({ gameState, cardId, syncTrajectory }) => {
-  const cardRef = useRef<HTMLDivElement | null>(null);
-  const lastPositionRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
-  const [isDragging, setIsDragging] = useState<boolean>(false);
-  const [isYeeted, setIsYeeted] = useState<boolean>(false);
-  const [currentFlipAngle, setCurrentFlipAngle] = useState<number>(0);
-  const { user } = useAppContext();
-
-  // Determine the correct card image to show based on whether it's flipped
-  const cardImage = gameState.cards.find((c) => c.id === cardId)?.flipped
-    ? 'shirt'
-    : cardId; // Convert cardId to the card string like '10_of_clubs'
-
-  // Handle spring animations for position and shadow
-  const [{ x, y, shadow, flipAngle }, setSpring] = useSpring(() => ({
-    x: 0,
-    y: 0,
-    shadow: 5,
-    flipAngle: 0,
-    config: { mass: 1, tension: 200, friction: 13 },
-  }));
-
-  useEffect(() => {
-    const card = gameState.cards.find((c) => c.id === cardId);
-    if (card) {
-      const posX = card.position.x * window.innerWidth;
-      const posY = card.position.y * window.innerHeight;
-      lastPositionRef.current = { x: posX, y: posY };
-      updateCardPosition(posX, posY, card.trajectory.rotation);
-      setCurrentFlipAngle(card.flipped ? 180 : 0);
-    }
-  }, [gameState, cardId]);
-
-  const updateGameState = (update: { x: number; y: number; flipped: boolean }) => {
-    syncTrajectory(cardId, { x: update.x, y: update.y, rotation: currentFlipAngle });
-  };
-
-  const updateCardPosition = (x: number, y: number, rotation: number) => {
-    setSpring({ x, y });
-  };
-
-  const handleYeet = (velocityX: number, velocityY: number, deltaX: number, deltaY: number) => {
-    if (!lastPositionRef.current || !cardRef.current) return;
-
-    setIsYeeted(true);
-    setSpring({
-      flipAngle: 180, // Flip the card when yeeted
-    });
-
-    const signedDistanceX = deltaX > 0 ? Math.abs(velocityX) : -Math.abs(velocityX);
-    const signedDistanceY = deltaY > 0 ? Math.abs(velocityY) : -Math.abs(velocityY);
-
-    setSpring({
-      x: lastPositionRef.current.x + signedDistanceX * 100,
-      y: lastPositionRef.current.y + signedDistanceY * 100,
-      shadow: 15,
-      config: { tension: 400, friction: 10 },
-    });
-
-    // Simulate card position update after the yeet
-    setTimeout(() => setIsYeeted(false), 500);
-
-    updateGameState({
-      x: (lastPositionRef.current.x + signedDistanceX * 100) / window.innerWidth,
-      y: (lastPositionRef.current.y + signedDistanceY * 100) / window.innerHeight,
-      flipped: true,
-    });
-  };
-
-  const glideGently = (avgVelocity: number, deltaX: number, deltaY: number) => {
-    if (!lastPositionRef.current) return;
-
-    setSpring({
-      x: lastPositionRef.current.x + deltaX * 10,
-      y: lastPositionRef.current.y + deltaY * 10,
-      shadow: 5,
-      config: { tension: 120, friction: 26 },
-    });
-
-    updateGameState({
-      x: (lastPositionRef.current.x + deltaX * 10) / window.innerWidth,
-      y: (lastPositionRef.current.y + deltaY * 10) / window.innerHeight,
-      flipped: false,
-    });
-  };
-
-  const bind = useGesture({
-    onDrag: ({ down, movement: [mx, my], velocity: [vx, vy] }) => {
-      const avgVelocity = (Math.abs(vx) + Math.abs(vy)) / 2;
-
-      if (down) {
-        setIsDragging(true);
-        setSpring({
-          x: lastPositionRef.current.x + mx,
-          y: lastPositionRef.current.y + my,
-          shadow: 10,
-          config: { tension: 300, friction: 20 },
-        });
-      } else {
-        setIsDragging(false);
-
-        if (avgVelocity > 1.5) {
-          handleYeet(vx, vy, mx, my);
-        } else {
-          glideGently(avgVelocity, mx, my);
-        }
-      }
-    },
-  });
-
-  return (
-    <animated.div
-      ref={cardRef}
-      {...bind()}
-      style={{
-        width: '69px',
-        height: '100px',
-        backgroundImage: \`url(\${cardsImages[cardImage]})\`, // Use the cardImage based on flip state
-        borderRadius: '8px',
-        backgroundSize: 'cover',
-        position: 'absolute',
-        cursor: 'grab',
-        zIndex: 1,
-        touchAction: 'none',
-        transform: x.to((xVal) => \`translate(\${xVal}px, \${y.get()}px) rotateY(\${flipAngle.get()}deg)\`),
-        boxShadow: shadow.to((s) => \`0px \${s}px \${s * 2}px rgba(0, 0, 0, 0.3)\`),
-      }}
-    />
-  );
-};
-
-// Helper function to convert cardId to the appropriate string (like '10_of_clubs')
-const cardIdToCardString = (id: number) => {
-  const cards = [
-    '10_of_clubs',
-    '10_of_diamonds',
-    '10_of_hearts',
-    '10_of_spades',
-    // ...add other cards here
-  ];
-  return cards[id] || 'shirt';
-};
-
-export default MegaCard;
 
 "use client";
 // game_id,game_state
@@ -848,7 +663,7 @@ import LoadingSpinner from "../components/ui/LoadingSpinner";
 import { Button } from "@/components/ui/button";
 
 const Referral: React.FC = () => {
-  const { user, updateUserReferrals, t  } = useAppContext();
+  const { user, t, updateUserReferrals  } = useAppContext();
   const [referralName, setReferralName] = useState('');
   const [referralCode, setReferralCode] = useState<string | null>(null);
   const [inviteCount, setInviteCount] = useState(0);
