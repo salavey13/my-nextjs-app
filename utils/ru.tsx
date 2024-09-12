@@ -17,6 +17,13 @@ export const ru: LanguageDictionary = {
     generateQrCode: "Создать QR-код",
     emotionMirror: "Зеркало эмоций",
     typeMessage: "Введите ваше сообщение...",
+    about: {
+      info: 'Информация',
+      title: 'О приложении',
+      motto: 'Приложение создано для свободного создания web3-сред и поддерживает коммерческое использование через криптовалюты.',
+      github: 'Посмотреть на GitHub',
+      version: 'Приложение v. 0.13',
+    },
     clear: "Очистить",
     developerToolTitle: "Инструмент разработчика",
   currentIdeasTitle: "Текущие идеи",
