@@ -14,6 +14,13 @@ export const ukr: LanguageDictionary = {
     emotionMirror: "Дзеркало емоцій",
     typeMessage: "Введіть ваше повідомлення...",
     clear: "Очистити",
+    about: {
+      info: 'Інформація',
+      title: 'Про додаток',
+      motto: 'Додаток створений для вільного створення web3-середовищ і підтримує комерційне використання через криптовалюти.',
+      github: 'Подивитися на GitHub',
+      version: 'Додаток v. 0.13',
+    },
   developerToolTitle: "Інструмент розробника",
   currentIdeasTitle: "Поточні ідеї",
   enterYourIdeaTitle: "Введіть свою ідею",
