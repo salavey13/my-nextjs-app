@@ -12,7 +12,7 @@ import TopShelf from "@/components/ui/topShelf";
 import BottomShelf from "../components/ui/bottomShelf";
 import LoadingSpinner from "../components/ui/LoadingSpinner"; 
 //import ThemeHandler from "../components/ThemeHandler";
-
+import AboutApp from '@/components/ui/AboutApp';
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -57,6 +57,7 @@ export default function RootLayout({
         {/* <ThemeHandler /> */}
         <Suspense fallback={<LoadingSpinner />}>  {/* Use the custom loading component */}
           <AppProvider>
+            <AboutApp />
             <TopShelf />
             <main className="flex-grow pt-[64px] pb-[64px] min-h-[calc(100vh-128px)] overflow-y-auto backdrop-blur-lg bg-gradient-to-b from-black via-gray-900 to-black">
               {children}
