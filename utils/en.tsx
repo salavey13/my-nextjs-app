@@ -1,5 +1,12 @@
 import { LanguageDictionary } from "../utils/TranslationUtils";
 export const en: LanguageDictionary = {
+  "yeetCoefficient": "Yeet Coefficient",
+  "mass": "Mass",
+  "tension": "Tension",
+  "rotationDistance": "Rotation Distance",
+  "friction": "Friction",
+  "yeetVelocityThreshold": "Yeet Velocity Threshold",
+  "minMovementThreshold": "Min Movement Threshold",
     saveAndContinueInTelegram: "Save And Continue In Telegram",
     copy: "Copy Request to Clipboard",
     saveRefCode: "Save",
