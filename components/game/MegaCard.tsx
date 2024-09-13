@@ -28,7 +28,7 @@ export const MegaCard: React.FC<MegaCardProps> = ({ card, onCardUpdate }) => {
   const yeetLocked = useRef(false); // Yeet locked state
   const [isDragging, setIsDragging] = useState(false);
   const [isYeeted, setIsYeeted] = useState(false);
-  const { user } = useAppContext();
+  const { user, t } = useAppContext(); // Access t for translations
   const [rotations, setRotations] = useState(card.rotations);
 
   // Physics parameters (session-persistent via local storage)
@@ -211,98 +211,67 @@ export const MegaCard: React.FC<MegaCardProps> = ({ card, onCardUpdate }) => {
           y,
           touchAction: 'none',
           position: 'absolute',
-          zIndex: 1000,
         }}
       />
-
-      {/* Slider Controls */}
-      <div style={{
-        position: 'fixed',
-        top: 69,
-        left: 10,
-        backgroundColor: '#000000',
-        borderRadius: '10px',
-        boxShadow: '0 0 10px rgba(0,0,0,0.5)',
-        padding: '10px',
-        zIndex: 1000
-      }}>
-        <div>
-          <label>Yeet Coefficient: {yeetCoefficient}</label>
-          <input
-            type="range"
-            min="1"
-            max="10"
-            step="0.1"
-            value={yeetCoefficient}
-            onChange={(e) => handleSliderChange('yeetCoefficient', parseFloat(e.target.value))}
-          />
-        </div>
-        <div>
-          <label>Mass: {mass}</label>
-          <input
-            type="range"
-            min="0.1"
-            max="10"
-            step="0.1"
-            value={mass}
-            onChange={(e) => handleSliderChange('mass', parseFloat(e.target.value))}
-          />
-        </div>
-        <div>
-          <label>Tension: {tension}</label>
-          <input
-            type="range"
-            min="10"
-            max="500"
-            step="10"
-            value={tension}
-            onChange={(e) => handleSliderChange('tension', parseFloat(e.target.value))}
-          />
-        </div>
-        <div>
-          <label>Rotation Distance: {rotationDistance}</label>
-          <input
-            type="range"
-            min="10"
-            max="200"
-            step="10"
-            value={rotationDistance}
-            onChange={(e) => handleSliderChange('rotationDistance', parseFloat(e.target.value))}
-          />
-        </div>
-        <div>
-          <label>Friction: {friction}</label>
-          <input
-            type="range"
-            min="1"
-            max="50"
-            step="1"
-            value={friction}
-            onChange={(e) => handleSliderChange('friction', parseFloat(e.target.value))}
-          />
-        </div>
-        <div>
-          <label>Yeet Velocity Threshold: {yeetVelocityThreshold}</label>
-          <input
-            type="range"
-            min="1"
-            max="10"
-            step="0.1"
-            value={yeetVelocityThreshold}
-            onChange={(e) => handleSliderChange('yeetVelocityThreshold', parseFloat(e.target.value))}
-          />
-        </div>
-        <div>
-          <label>Min Movement Threshold: {minMovementThreshold}</label>
-          <input
-            type="range"
-            min="10"
-            max="100"
-            step="10"
-            value={minMovementThreshold}
-            onChange={(e) => handleSliderChange('minMovementThreshold', parseFloat(e.target.value))}
-          />
-        </div>
+      <div style={{ position: 'fixed', top: 69, width: '100%', padding: '0 13px', display: 'flex', justifyContent: 'space-between', bacgroundColor: "#131313" }}>
+        <label>{t('yeetCoefficient')}:</label>
+        <input
+          type="range"
+          min="0"
+          max="10"
+          value={yeetCoefficient}
+          onChange={(e) => handleSliderChange('yeetCoefficient', parseFloat(e.target.value))}
+        />
+        <label>{t('mass')}:</label>
+        <input
+          type="range"
+          min="0.1"
+          max="10"
+          step="0.1"
+          value={mass}
+          onChange={(e) => handleSliderChange('mass', parseFloat(e.target.value))}
+        />
+        <label>{t('tension')}:</label>
+        <input
+          type="range"
+          min="0"
+          max="500"
+          value={tension}
+          onChange={(e) => handleSliderChange('tension', parseFloat(e.target.value))}
+        />
+        <label>{t('rotationDistance')}:</label>
+        <input
+          type="range"
+          min="0"
+          max="200"
+          value={rotationDistance}
+          onChange={(e) => handleSliderChange('rotationDistance', parseFloat(e.target.value))}
+        />
+        <label>{t('friction')}:</label>
+        <input
+          type="range"
+          min="0"
+          max="100"
+          value={friction}
+          onChange={(e) => handleSliderChange('friction', parseFloat(e.target.value))}
+        />
+        <label>{t('yeetVelocityThreshold')}:</label>
+        <input
+          type="range"
+          min="0"
+          max="10"
+          step="0.1"
+          value={yeetVelocityThreshold}
+          onChange={(e) => handleSliderChange('yeetVelocityThreshold', parseFloat(e.target.value))}
+        />
+        <label>{t('minMovementThreshold')}:</label>
+        <input
+          type="range"
+          min="0"
+          max="100"
+          value={minMovementThreshold}
+          onChange={(e) => handleSliderChange('minMovementThreshold', parseFloat(e.target.value))}
+        />
       </div>
     </>
   );
