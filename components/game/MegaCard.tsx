@@ -216,75 +216,96 @@ export const MegaCard: React.FC<MegaCardProps> = ({ card, onCardUpdate }) => {
       <div style={{
   position: 'fixed',
   top: 69,
-  width: '100vw',
+  width: '90%',
   padding: '0 13px',
   display: 'grid',
-  gridTemplateColumns: 'repeat(3, 1fr)', // Define 3 columns
+  gridTemplateColumns: 'repeat(3, 1fr) 1fr', // Define 3 columns for labels, inputs, and values
   gap: '10px', // Optional: add space between items
   justifyContent: 'space-between',
   backgroundColor: "#13131313",
   borderRadius: '13px', // Apply border radius
   boxShadow: '0 0 10px rgba(0,0,0,0.5)' // Optional: add shadow
 }}>
-<label>{t('yeetCoefficient')}:</label>
-        <input
-          type="range"
-          min="0"
-          max="10"
-          value={yeetCoefficient}
-          onChange={(e) => handleSliderChange('yeetCoefficient', parseFloat(e.target.value))}
-        />
-        <label>{t('mass')}:</label>
-        <input
-          type="range"
-          min="0.1"
-          max="10"
-          step="0.1"
-          value={mass}
-          onChange={(e) => handleSliderChange('mass', parseFloat(e.target.value))}
-        />
-        <label>{t('tension')}:</label>
-        <input
-          type="range"
-          min="0"
-          max="500"
-          value={tension}
-          onChange={(e) => handleSliderChange('tension', parseFloat(e.target.value))}
-        />
-        <label>{t('rotationDistance')}:</label>
-        <input
-          type="range"
-          min="0"
-          max="200"
-          value={rotationDistance}
-          onChange={(e) => handleSliderChange('rotationDistance', parseFloat(e.target.value))}
-        />
-        <label>{t('friction')}:</label>
-        <input
-          type="range"
-          min="0"
-          max="100"
-          value={friction}
-          onChange={(e) => handleSliderChange('friction', parseFloat(e.target.value))}
-        />
-        <label>{t('yeetVelocityThreshold')}:</label>
-        <input
-          type="range"
-          min="0"
-          max="10"
-          step="0.1"
-          value={yeetVelocityThreshold}
-          onChange={(e) => handleSliderChange('yeetVelocityThreshold', parseFloat(e.target.value))}
-        />
-        <label>{t('minMovementThreshold')}:</label>
-        <input
-          type="range"
-          min="0"
-          max="100"
-          value={minMovementThreshold}
-          onChange={(e) => handleSliderChange('minMovementThreshold', parseFloat(e.target.value))}
-        />
-      </div>
+  <label style={{ fontSize: '0.75rem' }}>{t('yeetCoefficient')}:</label>
+  <input
+    type="range"
+    min="0"
+    max="10"
+    value={yeetCoefficient}
+    onChange={(e) => handleSliderChange('yeetCoefficient', parseFloat(e.target.value))}
+    style={{ fontSize: '0.75rem' }} // Ensure the font size is consistent
+  />
+  <span style={{ fontSize: '0.75rem' }}>{yeetCoefficient}</span> {/* Display current value */}
+  
+  <label style={{ fontSize: '0.75rem' }}>{t('mass')}:</label>
+  <input
+    type="range"
+    min="0.1"
+    max="10"
+    step="0.1"
+    value={mass}
+    onChange={(e) => handleSliderChange('mass', parseFloat(e.target.value))}
+    style={{ fontSize: '0.75rem' }} // Ensure the font size is consistent
+  />
+  <span style={{ fontSize: '0.75rem' }}>{mass}</span> {/* Display current value */}
+  
+  <label style={{ fontSize: '0.75rem' }}>{t('tension')}:</label>
+  <input
+    type="range"
+    min="0"
+    max="500"
+    value={tension}
+    onChange={(e) => handleSliderChange('tension', parseFloat(e.target.value))}
+    style={{ fontSize: '0.75rem' }} // Ensure the font size is consistent
+  />
+  <span style={{ fontSize: '0.75rem' }}>{tension}</span> {/* Display current value */}
+  
+  <label style={{ fontSize: '0.75rem' }}>{t('rotationDistance')}:</label>
+  <input
+    type="range"
+    min="0"
+    max="200"
+    value={rotationDistance}
+    onChange={(e) => handleSliderChange('rotationDistance', parseFloat(e.target.value))}
+    style={{ fontSize: '0.75rem' }} // Ensure the font size is consistent
+  />
+  <span style={{ fontSize: '0.75rem' }}>{rotationDistance}</span> {/* Display current value */}
+  
+  <label style={{ fontSize: '0.75rem' }}>{t('friction')}:</label>
+  <input
+    type="range"
+    min="0"
+    max="100"
+    value={friction}
+    onChange={(e) => handleSliderChange('friction', parseFloat(e.target.value))}
+    style={{ fontSize: '0.75rem' }} // Ensure the font size is consistent
+  />
+  <span style={{ fontSize: '0.75rem' }}>{friction}</span> {/* Display current value */}
+  
+  <label style={{ fontSize: '0.75rem' }}>{t('yeetVelocityThreshold')}:</label>
+  <input
+    type="range"
+    min="0"
+    max="10"
+    step="0.1"
+    value={yeetVelocityThreshold}
+    onChange={(e) => handleSliderChange('yeetVelocityThreshold', parseFloat(e.target.value))}
+    style={{ fontSize: '0.75rem' }} // Ensure the font size is consistent
+  />
+  <span style={{ fontSize: '0.75rem' }}>{yeetVelocityThreshold}</span> {/* Display current value */}
+  
+  <label style={{ fontSize: '0.75rem' }}>{t('minMovementThreshold')}:</label>
+  <input
+    type="range"
+    min="0"
+    max="100"
+    value={minMovementThreshold}
+    onChange={(e) => handleSliderChange('minMovementThreshold', parseFloat(e.target.value))}
+    style={{ fontSize: '0.75rem' }} // Ensure the font size is consistent
+  />
+  <span style={{ fontSize: '0.75rem' }}>{minMovementThreshold}</span> {/* Display current value */}
+</div>
+
     </>
   );
 };
