@@ -1,7 +1,6 @@
 import { LanguageDictionary } from "../utils/TranslationUtils";
 export const ru: LanguageDictionary = {
   "yeetCoefficient": "Коэффициент выброса",
-  "mass": "Масса",
   "tension": "Натяжение",
   "rotationDistance": "Расстояние вращения",
   "friction": "Трение",
