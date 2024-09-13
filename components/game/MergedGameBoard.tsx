@@ -304,7 +304,7 @@ const GameBoard: React.FC = () => {
     return (
         <div
             className="game-board-container min-h-[calc(100vh-128px)] overflow-y-auto overflow-x-auto"
-            style={{ position: 'relative', width: '100vw' }}
+            style={{ position: 'relative', width: '100%' }}
             onMouseMove={handleMouseMove}
             {...bind()} // Attach gesture handlers
         >
