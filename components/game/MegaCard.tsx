@@ -28,7 +28,6 @@ export const MegaCard: React.FC<MegaCardProps> = ({ card, onCardUpdate }) => {
   const yeetLocked = useRef(false); // Yeet locked state
   const [isDragging, setIsDragging] = useState(false);
   const [isYeeted, setIsYeeted] = useState(false);
-  const [currentFlipAngle, setCurrentFlipAngle] = useState(0);
   const { user } = useAppContext();
   const [rotations, setRotations] = useState(card.rotations);
 
@@ -64,8 +63,8 @@ export const MegaCard: React.FC<MegaCardProps> = ({ card, onCardUpdate }) => {
   });
 
   const flipCard = () => {
-    const newFlipAngle = currentFlipAngle === 0 ? 180 : 0;
-    setCurrentFlipAngle(newFlipAngle);
+    const newFlipAngle = rotX.get() % 180 === 0 ? 180 : 0;
+    setRotations(rotX.get() / 180);
     onCardUpdate({ ...card, flipped: newFlipAngle === 180 });
   };
 
@@ -122,6 +121,10 @@ export const MegaCard: React.FC<MegaCardProps> = ({ card, onCardUpdate }) => {
         });
         setIsYeeted(false);
       }
+
+      // Update flip status based on rotationX modulo 180
+      const flippedStatus = rotX.get() % 180 === 0;
+      onCardUpdate({ ...card, flipped: flippedStatus });
     },
     onDoubleClick: flipCard,
   });
@@ -152,6 +155,9 @@ export const MegaCard: React.FC<MegaCardProps> = ({ card, onCardUpdate }) => {
       default:
         break;
     }
+
+    // Immediately apply changes
+    setSpring.config = { mass, tension, friction };
   };
 
   return (
@@ -173,17 +179,29 @@ export const MegaCard: React.FC<MegaCardProps> = ({ card, onCardUpdate }) => {
         }}
       />
       <div style={{ position: 'absolute', top: 0, right: 0, zIndex: 999 }}>
-        <label>Yeet Coefficient: {yeetCoefficient}</label>
-        <input type="range" min="1" max="10" step="0.1" value={yeetCoefficient} onChange={(e) => handleSliderChange('yeetCoefficient', Number(e.target.value))} />
-        <label>Mass: {mass}</label>
-        <input type="range" min="0.1" max="10" step="0.1" value={mass} onChange={(e) => handleSliderChange('mass', Number(e.target.value))} />
-        <label>Tension: {tension}</label>
-        <input type="range" min="100" max="500" step="10" value={tension} onChange={(e) => handleSliderChange('tension', Number(e.target.value))} />
-        <label>Rotation Distance: {rotationDistance}</label>
-        <input type="range" min="50" max="200" step="1" value={rotationDistance} onChange={(e) => handleSliderChange('rotationDistance', Number(e.target.value))} />
-        <label>Friction: {friction}</label>
-        <input type="range" min="1" max="50" step="1" value={friction} onChange={(e) => handleSliderChange('friction', Number(e.target.value))} />
-      </div> 
-    </> 
-  ); 
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          <label>
+            Yeet Coefficient: {yeetCoefficient}
+            <input type="range" min="1" max="10" step="0.1" value={yeetCoefficient} onChange={(e) => handleSliderChange('yeetCoefficient', Number(e.target.value))} />
+          </label>
+          <label>
+            Mass: {mass}
+            <input type="range" min="0.1" max="10" step="0.1" value={mass} onChange={(e) => handleSliderChange('mass', Number(e.target.value))} />
+          </label>
+          <label>
+            Tension: {tension}
+            <input type="range" min="100" max="500" step="10" value={tension} onChange={(e) => handleSliderChange('tension', Number(e.target.value))} />
+          </label>
+          <label>
+            Rotation Distance: {rotationDistance}
+            <input type="range" min="10" max="100" step="1" value={rotationDistance} onChange={(e) => handleSliderChange('rotationDistance', Number(e.target.value))} />
+          </label>
+          <label>
+            Friction: {friction}
+            <input type="range" min="1" max="50" step="1" value={friction} onChange={(e) => handleSliderChange('friction', Number(e.target.value))} />
+          </label>
+        </div>
+      </div>
+    </>
+  );
 };
