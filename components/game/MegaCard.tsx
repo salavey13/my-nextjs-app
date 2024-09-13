@@ -218,7 +218,7 @@ export const MegaCard: React.FC<MegaCardProps> = ({ card, onCardUpdate }) => {
       {/* Slider Controls */}
       <div style={{
         position: 'fixed',
-        top: 10,
+        top: 69,
         left: 10,
         backgroundColor: '#000000',
         borderRadius: '10px',
