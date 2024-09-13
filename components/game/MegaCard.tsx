@@ -213,8 +213,20 @@ export const MegaCard: React.FC<MegaCardProps> = ({ card, onCardUpdate }) => {
           position: 'absolute',
         }}
       />
-      <div style={{ position: 'fixed', height: 'fit', top: 69, width: '100%', padding: '0 13px', display: 'grid', col: '3', justifyContent: 'space-between', backgroundColor: "#13131313" }}>
-        <label>{t('yeetCoefficient')}:</label>
+      <div style={{
+  position: 'fixed',
+  top: 69,
+  width: '100vw',
+  padding: '0 13px',
+  display: 'grid',
+  gridTemplateColumns: 'repeat(3, 1fr)', // Define 3 columns
+  gap: '10px', // Optional: add space between items
+  justifyContent: 'space-between',
+  backgroundColor: "#13131313",
+  borderRadius: '13px', // Apply border radius
+  boxShadow: '0 0 10px rgba(0,0,0,0.5)' // Optional: add shadow
+}}>
+<label>{t('yeetCoefficient')}:</label>
         <input
           type="range"
           min="0"
