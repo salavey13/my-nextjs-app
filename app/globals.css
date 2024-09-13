@@ -225,22 +225,8 @@
 .game-board {
   position: relative;
   width: 100vw;
-  height: 80vh;
+  height: 100vh - 128px;
   overflow: hidden;
-}
-
-.card {
-  transition: transform 0.5s ease-out;
-}
-
-.card.flipped {
-  transform: rotateY(180deg);
-}
-
-.card::after {
-  content: '';
-  display: block;
-  padding-top: 150%;
 }
 
 .shuffle-button {
