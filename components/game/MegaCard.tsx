@@ -41,11 +41,9 @@ export const MegaCard: React.FC<MegaCardProps> = ({ card, onCardUpdate }) => {
     const channel = supabase
       .channel('notify_game_update')
       .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'rents' }, (payload) => {
-        console.log('Supabase event received:', payload);
         const updatedCard = payload.new.game_state.cards.find((c: Card) => c.id === card.id);
         if (updatedCard) {
           const preDragPosition = updatedCard.last_position;
-          console.log('Card updated from Supabase:', updatedCard);
 
           setSpring.start({
             x: preDragPosition.x * window.innerWidth,
@@ -73,12 +71,10 @@ export const MegaCard: React.FC<MegaCardProps> = ({ card, onCardUpdate }) => {
   }, [card, onCardUpdate, user]);
 
   const flipCard = () => {
-    console.log('FLIP DETECTED');
     const newFlipAngle = currentFlipAngle === 0 ? 180 : 0;
     setCurrentFlipAngle(newFlipAngle);
 
     const flipped = newFlipAngle === 180;
-    console.log(`Card flipped: ${flipped}`);
     onCardUpdate({ ...card, flipped });
   };
 
@@ -92,13 +88,12 @@ export const MegaCard: React.FC<MegaCardProps> = ({ card, onCardUpdate }) => {
   }));
 
   useEffect(() => {
-    const { position, rotations } = card;
-    console.log('Card state updated from props:', { position, rotations });
     setSpring.start({
-      x: position.x * window.innerWidth,
-      y: position.y * window.innerHeight,
+      x: card.position.x * window.innerWidth,
+      y: card.position.y * window.innerHeight,
+      rotZ: card.rotations * 180,
     });
-    setRotations(rotations);
+    setRotations(card.rotations);
   }, [card, setSpring]);
 
   const normalizePosition = (x: number, y: number) => ({
@@ -106,60 +101,69 @@ export const MegaCard: React.FC<MegaCardProps> = ({ card, onCardUpdate }) => {
     y: y / window.innerHeight,
   });
 
+  const YEET_VELOCITY_THRESHOLD = 1.5;
+  const MIN_MOVEMENT_THRESHOLD = 20;
+  let yeetLocked = false;
+
   const bind = useGesture({
-    onDrag: ({ movement: [mx, my], velocity: [vx, vy], direction: [dx, dy], intentional }) => {
-      if (!isDragging) {
-        setIsDragging(true);
-        console.log('Dragging started', { mx, my });
-        preDragPositionRef.current = { x: card.position.x, y: card.position.y }; // Store pre-drag position
+    onDragStart: () => {
+      setIsDragging(true);
+      preDragPositionRef.current = { x: card.position.x, y: card.position.y };
+      yeetLocked = false;
+    },
+
+    onDrag: ({ movement: [mx, my], velocity: [vx, vy], direction: [dx, dy] }) => {
+      const currentX = preDragPositionRef.current.x * window.innerWidth + mx;
+      const currentY = preDragPositionRef.current.y * window.innerHeight + my;
+
+      const isYeetPrep = vy > YEET_VELOCITY_THRESHOLD && Math.abs(my) > MIN_MOVEMENT_THRESHOLD && dy > 0;
+
+      if (isYeetPrep && !yeetLocked) {
+        setIsYeeted(true);
+        yeetLocked = true;
       }
 
-      console.log('Drag event', { mx, my, vx, vy, dx, dy, intentional });
-      const slowDrag = Math.abs(vx) < 0.3 && Math.abs(vy) < 0.3;
-
-      if (!slowDrag) {
-        console.log('Fast movement detected, preparing yeet.');
-        setIsYeeted(true);
+      if (isDragging && !isYeeted && cardRef.current) {
+        setSpring.start({ x: currentX, y: currentY });
+      } else if (isYeeted && cardRef.current) {
+        cardRef.current.style.border = "3px solid #e1ff01";
       }
     },
-    onDragEnd: ({ movement: [mx, my], velocity: [vx, vy], direction: [dx, dy], memo }) => {
-      setIsDragging(false);
-      console.log('Drag ended:', { mx, my, vx, vy });
 
-      if (isYeeted) {
-        console.log('Yeet initiated:', { mx, my });
-        const yeetDistanceX = mx * 3 * (-1);
-        const yeetDistanceY = my * 3 * (-1);
-        const rotationCount = Math.floor(Math.sqrt(yeetDistanceX ** 2 + yeetDistanceY ** 2) / 13);
+    onDragEnd: ({ movement: [mx, my], velocity: [vx, vy], direction: [dx, dy] }) => {
+      setIsDragging(false);
+      setIsYeeted(false);
+      if (cardRef.current) cardRef.current.style.border = "none";
+
+      if (!isYeeted) {
+        onCardUpdate({
+          ...card,
+          position: normalizePosition(preDragPositionRef.current.x * window.innerWidth + mx, preDragPositionRef.current.y * window.innerHeight + my),
+          last_position: preDragPositionRef.current,
+        });
+      } else {
+        const yeetDistanceX = mx * 3;
+        const yeetDistanceY = my * 3;
+        const newRotations = Math.floor(Math.sqrt(yeetDistanceX ** 2 + yeetDistanceY ** 2) / 69);
 
         setSpring.start({
           x: preDragPositionRef.current.x * window.innerWidth + yeetDistanceX,
           y: preDragPositionRef.current.y * window.innerHeight + yeetDistanceY,
-          rotZ: rotationCount * 180,
-          config: { tension: 300, friction: 30 },
-        });
-
-        console.log('Updated card position after yeet:', {
-          newX: preDragPositionRef.current.x * window.innerWidth + yeetDistanceX,
-          newY: preDragPositionRef.current.y * window.innerHeight + yeetDistanceY,
+          rotZ: newRotations * 180,
         });
 
         onCardUpdate({
           ...card,
-          position: normalizePosition(
-            preDragPositionRef.current.x * window.innerWidth + yeetDistanceX,
-            preDragPositionRef.current.y * window.innerHeight + yeetDistanceY
-          ),
-          last_position: preDragPositionRef.current,
-          rotations: rotations + rotationCount,
+          position: normalizePosition(preDragPositionRef.current.x * window.innerWidth + yeetDistanceX, preDragPositionRef.current.y * window.innerHeight + yeetDistanceY),
+          rotations: newRotations,
           velocity: { x: vx, y: vy },
           direction: { x: dx, y: dy },
+          last_position: preDragPositionRef.current,
         });
-        setIsYeeted(false);
       }
     },
+
     onDoubleClick: () => {
-      console.log('Double click detected');
       flipCard();
     },
   });
@@ -170,7 +174,7 @@ export const MegaCard: React.FC<MegaCardProps> = ({ card, onCardUpdate }) => {
       {...bind()}
       style={{
         width: '69px',
-        height: '103px',
+        height: '102px',
         backgroundImage: `url(${cardsImages[card.flipped ? card.id : "shirt"]})`,
         borderRadius: '10px',
         backgroundSize: 'cover',
@@ -178,7 +182,7 @@ export const MegaCard: React.FC<MegaCardProps> = ({ card, onCardUpdate }) => {
         cursor: 'grab',
         zIndex: 1,
         touchAction: 'none',
-        transform: x.to((x, y) => `translate(${x}px, ${y}px) rotateX(${rotX.get()}deg) rotateZ(${rotZ.get()}deg)`),
+        transform: x.to((xVal, yVal) => `translate(${xVal}px, ${yVal}px) rotateX(${rotX.get()}deg) rotateZ(${rotZ.get()}deg)`),
       }}
     />
   );
