@@ -49,6 +49,28 @@ export const MegaCard: React.FC<MegaCardProps> = ({ card, onCardUpdate }) => {
     config: { mass, tension, friction },
   }));
 
+  // Subscribe to real-time updates for card position and rotation
+  useEffect(() => {
+    const subscription = supabase
+      .from('cards')
+      .on('UPDATE', (payload) => {
+        const updatedCard = payload.new as Card;
+        if (updatedCard.id === card.id) {
+          onCardUpdate(updatedCard);
+          setSpring.start({
+            x: updatedCard.position.x * window.innerWidth,
+            y: updatedCard.position.y * window.innerHeight,
+            rotZ: updatedCard.rotations * 180,
+          });
+        }
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeSubscription(subscription);
+    };
+  }, [card.id, onCardUpdate, setSpring]);
+
   useEffect(() => {
     setSpring.start({
       x: card.position.x * window.innerWidth,
@@ -156,8 +178,10 @@ export const MegaCard: React.FC<MegaCardProps> = ({ card, onCardUpdate }) => {
         break;
     }
 
-    // Immediately apply changes
-    setSpring.config = { mass, tension, friction };
+    // Immediately apply changes to spring with updated config
+    setSpring.start({
+      config: { mass, tension, friction }
+    });
   };
 
   return (
@@ -171,36 +195,52 @@ export const MegaCard: React.FC<MegaCardProps> = ({ card, onCardUpdate }) => {
           backgroundImage: `url(${cardsImages[card.flipped ? card.id : "shirt"]})`,
           borderRadius: '10px',
           backgroundSize: 'cover',
-          position: 'absolute',
-          cursor: 'grab',
-          zIndex: 1,
-          touchAction: 'none',
-          transform: x.to(xVal => `translate(${xVal}px, ${y.get()}px) rotateX(${rotX.get()}deg) rotateZ(${rotZ.get()}deg)`),
+          transform: `rotateX(${rotX.get()}deg) rotateZ(${rotZ.get()}deg)`,
+          x,
+          y,
         }}
       />
-      <div style={{ position: 'absolute', top: 0, right: 0, zIndex: 999 }}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-          <label>
-            Yeet Coefficient: {yeetCoefficient}
-            <input type="range" min="1" max="10" step="0.1" value={yeetCoefficient} onChange={(e) => handleSliderChange('yeetCoefficient', Number(e.target.value))} />
-          </label>
-          <label>
-            Mass: {mass}
-            <input type="range" min="0.1" max="10" step="0.1" value={mass} onChange={(e) => handleSliderChange('mass', Number(e.target.value))} />
-          </label>
-          <label>
-            Tension: {tension}
-            <input type="range" min="100" max="500" step="10" value={tension} onChange={(e) => handleSliderChange('tension', Number(e.target.value))} />
-          </label>
-          <label>
-            Rotation Distance: {rotationDistance}
-            <input type="range" min="10" max="100" step="1" value={rotationDistance} onChange={(e) => handleSliderChange('rotationDistance', Number(e.target.value))} />
-          </label>
-          <label>
-            Friction: {friction}
-            <input type="range" min="1" max="50" step="1" value={friction} onChange={(e) => handleSliderChange('friction', Number(e.target.value))} />
-          </label>
-        </div>
+      <div className="controls">
+        <label>Yeet Coefficient</label>
+        <input
+          type="range"
+          min={1}
+          max={10}
+          value={yeetCoefficient}
+          onChange={(e) => handleSliderChange('yeetCoefficient', Number(e.target.value))}
+        />
+        <label>Mass</label>
+        <input
+          type="range"
+          min={1}
+          max={10}
+          value={mass}
+          onChange={(e) => handleSliderChange('mass', Number(e.target.value))}
+        />
+        <label>Tension</label>
+        <input
+          type="range"
+          min={1}
+          max={300}
+          value={tension}
+          onChange={(e) => handleSliderChange('tension', Number(e.target.value))}
+        />
+        <label>Rotation Distance</label>
+        <input
+          type="range"
+          min={10}
+          max={100}
+          value={rotationDistance}
+          onChange={(e) => handleSliderChange('rotationDistance', Number(e.target.value))}
+        />
+        <label>Friction</label>
+        <input
+          type="range"
+          min={1}
+          max={100}
+          value={friction}
+          onChange={(e) => handleSliderChange('friction', Number(e.target.value))}
+        />
       </div>
     </>
   );
