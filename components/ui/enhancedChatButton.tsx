@@ -35,6 +35,10 @@ const EnhancedChatButton = () => {
   };
 
   const handleOpenVPN = () => {
+    openLink('https://s3.amazonaws.com/psiphon/web/mjr4-p23r-puwl/download.html#direct');//https://s3.amazonaws.com/psiphon/web/mjr4-p23r-puwl/download.html#direct');
+  };
+
+  const handleOpenVPN2 = () => {
     openLink('https://play.google.com/store/apps/details?id=org.bepass.oblivion&pli=1');//https://s3.amazonaws.com/psiphon/web/mjr4-p23r-puwl/download.html#direct');
   };
 
@@ -50,6 +54,23 @@ const EnhancedChatButton = () => {
     <div className={`flex items-center justify-center ${theme === 'dark' ? 'bg-black' : 'bg-white'} p-4 gap-8`}>
       <Button
         onClick={handleOpenVPN}
+        className="group flex flex-col items-center justify-center text-gray-400 w-36 h-18 gap-2 hover:text-blue-500 transition-all duration-300 rounded-lg transform hover:scale-110"
+      >
+        <svg className="w-10 h-10 text-gray-400 group-hover:text-blue-500 transition-all duration-300" version="1.0" xmlns="http://www.w3.org/2000/svg"
+ viewBox="0 0 80.000000 80.000000"
+ preserveAspectRatio="xMidYMid meet">
+
+<g transform="scale(2.00000,2.00000)"
+
+fill="none" stroke="white" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M20.5912,32.866l13.68-.065,3.6968-3.483L40.4885,9.2663,37.3,5.8991,10.9677,5.5784A10.5863,10.5863,0,0,0,7.5114,9.7473l10.0562.0977L13.6045,40.8538a13.3063,13.3063,0,0,0,5.8435,1.5678Z"/>
+    <path d="M23.7951,11.7427,21.6216,26.3873l9.9768-.1069,2.1379-14.5377Z"/>
+    </g>
+    </svg>
+     <span className="text-xs mb-1 transition-all duration-300 group-hover:text-blue-500">VPN</span>
+      </Button>
+      <Button
+        onClick={handleOpenVPN2}
         className="group flex flex-col items-center justify-center text-gray-400 w-36 h-18 gap-2 hover:text-blue-500 transition-all duration-300 rounded-lg transform hover:scale-110"
       >
         <svg className="w-10 h-10 text-gray-400 group-hover:text-blue-500 transition-all duration-300" version="1.0" xmlns="http://www.w3.org/2000/svg"
@@ -106,7 +127,7 @@ fill="#FFFFFF" stroke="none">
 <path d="M928 83 c17 -2 47 -2 65 0 17 2 3 4 -33 4 -36 0 -50 -2 -32 -4z"/>
 </g>
 </svg>
-     <span className="text-xs mb-1 transition-all duration-300 group-hover:text-blue-500">VPN</span>
+     <span className="text-xs mb-1 transition-all duration-300 group-hover:text-blue-500">VPN2</span>
         
       </Button>
       <Button

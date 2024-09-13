@@ -17,6 +17,7 @@ const defaultStore = {
   lang: 'ru',
   X: '69',
   dark_theme: true,
+  currentGameId: 28
 };
 
 interface UserData {

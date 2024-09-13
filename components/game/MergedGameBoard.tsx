@@ -12,30 +12,21 @@ import { useGesture } from '@use-gesture/react'; // Ensure you import this for g
 //     "cards": [
 //       {
 //         "id": "ace_of_spades",
-//         "position": {
-//           "x": 0.13347488956238615,
-//           "y": 0.596567085140635
-//         },
+//         "position": { 
+//           "x": 0.5, 
+//           "y": 0.5 
+//           },
+//         "last_position": {
+//            "x": 0.4, 
+//            "y": 0.4 
+//            },
 //         "flipped": false,
-//         "trajectory": {
-//           "position": {
-//             "x": 0.1,
-//             "y": 0.1
-//           },
-//           "rotation": 15,
-//           "velocity": {
-//             "x": 0.5,
-//             "y": 0.5
-//           },
-//           "rotationSpeed": 0.02
-//         },
-//         "target_position": {
-//           "x": 0.6,
-//           "y": 0.5
-//         },
-//         "target_rotation": 90
+//         "rotations": 0,
+//         "velocity": { "x": 0, "y": 0 },
+//         "direction": { "x": 1, "y": -1 },
 //       }
 //     ],
+//
 //     "players": [
 //       {
 //         "id": "43",
@@ -57,25 +48,35 @@ interface Point {
 
 interface Card {
     id: CardId;
-  position: { x: number; y: number };
-  trajectory: { rotation: number };
-  flipped: boolean;
-}
+    position: { x: number; y: number };
+    last_position: { x: number; y: number };
+    flipped: boolean;
+    rotations: number;
+    velocity: { x: number; y: number };
+    direction: { x: number; y: number };
+  }
+
 interface MegaAvatarProps {
     playerId: number;
     initialPosition: Point;
     onPositionChange: (playerId: number, position: Point) => void;
   }
+
 interface Player {
     id: string;
     position: { x: number; y: number };
 }
 
-
-  interface Point {
-    x: number;
-    y: number;
+interface MegaCardProps {
+    card: Card;
+    onCardUpdate: (card: Card) => void;
   }
+
+interface Point {
+x: number;
+y: number;
+}
+
 interface GameState {
     cards: Card[];
     players: Player[];
@@ -102,6 +103,23 @@ const GameBoard: React.FC = () => {
             rotation: 0//Math.random() * 360,
         });
     };
+    
+
+  const onCardUpdate = (updatedCard: Card) => {
+    // Update card in Supabase
+    if (!gameState) return;
+
+    const updatedCards = gameState.cards.map(card =>
+      card.id === updatedCard.id ? updatedCard  : card
+    ); 
+    supabase
+      .from('rents')
+      .update({ game_state: { cards: updatedCards } })
+      .eq('id', user?.currentGameId)
+      .then(() => {
+        console.log('Card updated successfully in Supabase');
+      })
+  };
 
     // Parallax state for the shuffle button
     const [buttonParallax, setButtonParallax] = useState({ x: 0, y: 0 });
@@ -124,10 +142,10 @@ const GameBoard: React.FC = () => {
     
           // Set up the real-time subscription using a Supabase Channel
           const channel = supabase
-            .channel('notify_game_updates')
+            .channel('notify_game_update')
             .on(
               'postgres_changes',
-              { event: 'UPDATE', schema: 'public', table: 'rents', filter: `id=eq.${GAME_ID}` },
+              { event: 'UPDATE', schema: 'public', table: 'rents', filter: `id=eq.${user?.currentGameId}` },
               (payload) => {
                 setGameState(payload.new.game_state); // Update game state when change occurs
               }
@@ -286,7 +304,7 @@ const GameBoard: React.FC = () => {
     return (
         <div
             className="game-board-container min-h-[calc(100vh-128px)] overflow-y-auto overflow-x-auto"
-            style={{ position: 'relative', width: '100vw', height: '600px' }}
+            style={{ position: 'relative', width: '100vw' }}
             onMouseMove={handleMouseMove}
             {...bind()} // Attach gesture handlers
         >
@@ -303,7 +321,7 @@ const GameBoard: React.FC = () => {
             <div>
                 {gameState &&
                     gameState.cards.map((card) => (
-                        <MegaCard key={card.id} gameState={gameState} cardId={card.id} syncTrajectory={syncTrajectory} />
+                        <MegaCard key={card.id} onCardUpdate={onCardUpdate} card={card as Card} />
                     ))}
             </div>
 

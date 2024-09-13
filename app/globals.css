@@ -244,14 +244,14 @@
 }
 
 .shuffle-button {
-  position: absolute;
-  bottom: 20px;
-  right: 20px;
+  position: fixed;
+  bottom: 69px;
+  left: 20px;
   background-color: #007bff;
   color: white;
   border: none;
   padding: 10px 20px;
-  border-radius: 5px;
+  border-radius: 50%;
   cursor: pointer;
   transition: background-color 0.3s ease;
 }
