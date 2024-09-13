@@ -213,7 +213,7 @@ export const MegaCard: React.FC<MegaCardProps> = ({ card, onCardUpdate }) => {
           position: 'absolute',
         }}
       />
-      <div style={{ position: 'fixed', top: 69, width: '100%', padding: '0 13px', display: 'flex', justifyContent: 'space-between', backgroundColor: "#131313" }}>
+      <div style={{ position: 'fixed', height: 'fit', top: 69, width: '100%', padding: '0 13px', display: 'grid', col: '3', justifyContent: 'space-between', backgroundColor: "#13131313" }}>
         <label>{t('yeetCoefficient')}:</label>
         <input
           type="range"
