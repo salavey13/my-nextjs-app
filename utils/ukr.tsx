@@ -1,5 +1,12 @@
 import { LanguageDictionary } from "../utils/TranslationUtils";
 export const ukr: LanguageDictionary = {
+  "yeetCoefficient": "Коефіцієнт викиду",
+  "mass": "Маса",
+  "tension": "Напруга",
+  "rotationDistance": "Відстань обертання",
+  "friction": "Тертя",
+  "yeetVelocityThreshold": "Поріг швидкості викиду",
+  "minMovementThreshold": "Мінімальний поріг руху",
     defaultLabel: "ХЗ",
     conflictAwarenessTitle: "Усвідомлення конфлікту та гуманітарна підтримка",
     realTimeUpdates: "Оновлення в режимі реального часу",
