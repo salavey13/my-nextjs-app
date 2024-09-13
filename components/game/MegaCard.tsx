@@ -24,7 +24,8 @@ interface MegaCardProps {
 
 export const MegaCard: React.FC<MegaCardProps> = ({ card, onCardUpdate }) => {
   const cardRef = useRef<HTMLDivElement | null>(null);
-  const preDragPositionRef = useRef({ x: card.position.x, y: card.position.y });
+  const [cardPosition, setCardPosition] = useState(card.position);
+  const preDragPositionRef = useRef({ x: card.last_position.x, y: card.last_position.y });
   const yeetLocked = useRef(false); // Yeet locked state
   const [isDragging, setIsDragging] = useState(false);
   const [isYeeted, setIsYeeted] = useState(false);
@@ -72,8 +73,8 @@ export const MegaCard: React.FC<MegaCardProps> = ({ card, onCardUpdate }) => {
 
   useEffect(() => {
     setSpring.start({
-      x: card.position.x * window.innerWidth,
-      y: card.position.y * window.innerHeight,
+      x: cardPosition.x * window.innerWidth,
+      y: cardPosition.y * window.innerHeight,
     });
     setRotations(card.rotations);
   }, [card, setSpring, mass, tension, friction]);
@@ -92,51 +93,71 @@ export const MegaCard: React.FC<MegaCardProps> = ({ card, onCardUpdate }) => {
   const bind = useGesture({
     onDragStart: () => {
       setIsDragging(true);
-      preDragPositionRef.current = { x: card.position.x, y: card.position.y };
-      yeetLocked.current = false;
+      preDragPositionRef.current = { x: cardPosition.x, y: cardPosition.y }; // Store the initial position
+      yeetLocked.current = false; // Reset yeet lock
     },
     onDrag: ({ movement: [mx, my], velocity: [vx, vy] }) => {
       const currentX = preDragPositionRef.current.x * window.innerWidth + mx;
       const currentY = preDragPositionRef.current.y * window.innerHeight + my;
-
+  
+      // Check if the velocity exceeds the yeet threshold
       const isYeetPrep = Math.abs(vx) > yeetVelocityThreshold && Math.abs(my) > minMovementThreshold;
-
+  
       if (isYeetPrep && !yeetLocked.current) {
-        setIsYeeted(true);
-        yeetLocked.current = true;
+        setIsYeeted(true); // Enable yeet mode
+        yeetLocked.current = true; // Lock yeet to avoid multiple triggers
       }
-
+  
       if (isDragging && !isYeeted && cardRef.current) {
+        // If dragging, update the spring animation for card movement
         setSpring.start({ x: currentX, y: currentY });
       } else if (isYeeted && cardRef.current) {
+        // Change the card's border when yeet is triggered
         cardRef.current.style.border = "3px solid #e1ff01";
       }
+      // Finally, update the local card position state
+      setCardPosition(normalizePosition(
+        currentX,
+        currentY
+    ));
     },
     onDragEnd: ({ movement: [mx, my], velocity: [vx, vy] }) => {
-      setIsDragging(false);
-      if (cardRef.current) cardRef.current.style.border = "none";
-
+      setIsDragging(false); // Stop dragging
+      if (cardRef.current) cardRef.current.style.border = "none"; // Reset card border
+  
       if (!isYeeted) {
+        // Normal drag, update the card position in Supabase
         onCardUpdate({
           ...card,
-          position: normalizePosition(preDragPositionRef.current.x * window.innerWidth + mx, preDragPositionRef.current.y * window.innerHeight + my),
+          position: normalizePosition(
+            preDragPositionRef.current.x * window.innerWidth + mx,
+            preDragPositionRef.current.y * window.innerHeight + my
+          ),
           last_position: preDragPositionRef.current,
         });
+        // Finally, update the local card position state
+        setCardPosition(normalizePosition(
+            preDragPositionRef.current.x * window.innerWidth + mx,
+            preDragPositionRef.current.y * window.innerHeight + my
+        ));
       } else {
+        // Yeet logic
         const yeetDistanceX = mx * yeetCoefficient;
         const yeetDistanceY = my * yeetCoefficient;
         const newRotations = Math.floor(Math.sqrt(yeetDistanceX ** 2 + yeetDistanceY ** 2) / rotationDistance);
-
-        // Calculate new position with screen wrapping
+  
+        // Screen wrapping logic for new position after yeet
         const newX = (preDragPositionRef.current.x * window.innerWidth + yeetDistanceX) % window.innerWidth;
         const newY = (preDragPositionRef.current.y * window.innerHeight + yeetDistanceY) % window.innerHeight;
-
+  
+        // Update card's spring with new position and rotation
         setSpring.start({
           x: newX,
           y: newY,
           rotZ: newRotations * 180,
         });
-
+  
+        // Update card data in Supabase with new position, rotation, and velocity
         onCardUpdate({
           ...card,
           position: normalizePosition(newX, newY),
@@ -144,15 +165,89 @@ export const MegaCard: React.FC<MegaCardProps> = ({ card, onCardUpdate }) => {
           velocity: { x: vx, y: vy },
           last_position: preDragPositionRef.current,
         });
-        setIsYeeted(false);
-      }
 
-      // Update flip status based on rotationX modulo 180
+        // Finally, update the local card position state
+        setCardPosition(normalizePosition(
+            newX,
+            newY
+        ));
+  
+        setIsYeeted(false); // Reset yeet status
+      }
+  
+      // Handle flip logic based on rotation angle
       const flippedStatus = rotX.get() % 180 === 0;
       onCardUpdate({ ...card, flipped: flippedStatus });
+  
+      
     },
-    onDoubleClick: flipCard,
+    onDoubleClick: flipCard, // Handle card flipping on double-click
   });
+
+//   const bind = useGesture({
+//     onDragStart: () => {
+//       setIsDragging(true);
+//       preDragPositionRef.current = { x: card.position.x, y: card.position.y };
+//       yeetLocked.current = false;
+//     },
+//     onDrag: ({ movement: [mx, my], velocity: [vx, vy] }) => {
+//       const currentX = preDragPositionRef.current.x * window.innerWidth + mx;
+//       const currentY = preDragPositionRef.current.y * window.innerHeight + my;
+
+//       const isYeetPrep = Math.abs(vx) > yeetVelocityThreshold && Math.abs(my) > minMovementThreshold;
+
+//       if (isYeetPrep && !yeetLocked.current) {
+//         setIsYeeted(true);
+//         yeetLocked.current = true;
+//       }
+
+//       if (isDragging && !isYeeted && cardRef.current) {
+//         setSpring.start({ x: currentX, y: currentY });
+//       } else if (isYeeted && cardRef.current) {
+//         cardRef.current.style.border = "3px solid #e1ff01";
+//       }
+//     },
+//     onDragEnd: ({ movement: [mx, my], velocity: [vx, vy] }) => {
+//       setIsDragging(false);
+//       if (cardRef.current) cardRef.current.style.border = "none";
+
+//       if (!isYeeted) {
+//         onCardUpdate({
+//           ...card,
+//           position: normalizePosition(preDragPositionRef.current.x * window.innerWidth + mx, preDragPositionRef.current.y * window.innerHeight + my),
+//           last_position: preDragPositionRef.current,
+//         });
+//       } else {
+//         const yeetDistanceX = mx * yeetCoefficient;
+//         const yeetDistanceY = my * yeetCoefficient;
+//         const newRotations = Math.floor(Math.sqrt(yeetDistanceX ** 2 + yeetDistanceY ** 2) / rotationDistance);
+
+//         // Calculate new position with screen wrapping
+//         const newX = (preDragPositionRef.current.x * window.innerWidth + yeetDistanceX) % window.innerWidth;
+//         const newY = (preDragPositionRef.current.y * window.innerHeight + yeetDistanceY) % window.innerHeight;
+
+//         setSpring.start({
+//           x: newX,
+//           y: newY,
+//           rotZ: newRotations * 180,
+//         });
+
+//         onCardUpdate({
+//           ...card,
+//           position: normalizePosition(newX, newY),
+//           rotations: newRotations,
+//           velocity: { x: vx, y: vy },
+//           last_position: preDragPositionRef.current,
+//         });
+//         setIsYeeted(false);
+//       }
+
+//       // Update flip status based on rotationX modulo 180
+//       const flippedStatus = rotX.get() % 180 === 0;
+//       onCardUpdate({ ...card, flipped: flippedStatus });
+//     },
+//     onDoubleClick: flipCard,
+//   });
 
   // Visual controls for yeet coefficient, mass, tension, rotation distance, and friction
   const handleSliderChange = (param: string, value: number) => {
@@ -207,8 +302,8 @@ export const MegaCard: React.FC<MegaCardProps> = ({ card, onCardUpdate }) => {
       borderRadius: '2px',
       backgroundSize: 'cover',
       transform: `rotateX(${rotX.get()}deg) rotateZ(${rotZ.get()}deg)`,
-      x,
-      y,
+      x,//: cardPosition.x, // Updated to use local state
+      y,//: cardPosition.y, // Updated to use local state
       touchAction: 'none',
       position: 'absolute',
     }}
@@ -217,15 +312,14 @@ export const MegaCard: React.FC<MegaCardProps> = ({ card, onCardUpdate }) => {
   <div style={{
     position: 'fixed',
     top: 69,
-    width: '90%',
+    width: '100%',
     padding: '0 13px',
     display: 'grid',
     gridTemplateColumns: '1fr 2fr 1fr', // Define 3 columns: labels, inputs, and values
     gap: '10px', // Space between items
     alignItems: 'center', // Center items vertically
-    backgroundColor: "#13131313",
+    backgroundColor: "#131313",
     borderRadius: '13px', // Apply border radius
-    boxShadow: '0 0 10px rgba(0,0,0,0.5)' // Optional: add shadow
   }}>
     <label style={{ fontSize: '0.75rem', textAlign: 'right' }}>{t('yeetCoefficient')}:</label>
     <input
