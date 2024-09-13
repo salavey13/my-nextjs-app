@@ -51,9 +51,9 @@ export const MegaCard: React.FC<MegaCardProps> = ({ card, onCardUpdate }) => {
 
   // Subscribe to real-time updates for card position and rotation
   useEffect(() => {
-    const subscription = supabase
-      .from('cards')
-      .on('UPDATE', (payload) => {
+    const channel = supabase
+      .channel('realtime-cards')
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'cards', filter: `id=eq.${card.id}` }, (payload) => {
         const updatedCard = payload.new as Card;
         if (updatedCard.id === card.id) {
           onCardUpdate(updatedCard);
@@ -67,7 +67,7 @@ export const MegaCard: React.FC<MegaCardProps> = ({ card, onCardUpdate }) => {
       .subscribe();
 
     return () => {
-      supabase.removeSubscription(subscription);
+      supabase.removeChannel(channel);
     };
   }, [card.id, onCardUpdate, setSpring]);
 
@@ -228,7 +228,7 @@ export const MegaCard: React.FC<MegaCardProps> = ({ card, onCardUpdate }) => {
         <label>Rotation Distance</label>
         <input
           type="range"
-          min={10}
+          min={1}
           max={100}
           value={rotationDistance}
           onChange={(e) => handleSliderChange('rotationDistance', Number(e.target.value))}
@@ -237,7 +237,7 @@ export const MegaCard: React.FC<MegaCardProps> = ({ card, onCardUpdate }) => {
         <input
           type="range"
           min={1}
-          max={100}
+          max={50}
           value={friction}
           onChange={(e) => handleSliderChange('friction', Number(e.target.value))}
         />
