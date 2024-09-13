@@ -1,5 +1,12 @@
 import { LanguageDictionary } from "../utils/TranslationUtils";
 export const ru: LanguageDictionary = {
+  "yeetCoefficient": "Коэффициент выброса",
+  "mass": "Масса",
+  "tension": "Натяжение",
+  "rotationDistance": "Расстояние вращения",
+  "friction": "Трение",
+  "yeetVelocityThreshold": "Порог скорости выброса",
+  "minMovementThreshold": "Минимальный порог движения",
     newItemTypeNameRequest: "Введите имя для нового типа элемента:",
     saveRefCode: "Сохранить",
     newRentNotification: "Кто-то пытался арендовать ваш предмет",
