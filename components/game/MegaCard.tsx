@@ -220,7 +220,7 @@ export const MegaCard: React.FC<MegaCardProps> = ({ card, onCardUpdate }) => {
         position: 'fixed',
         top: 10,
         left: 10,
-        backgroundColor: 'white',
+        backgroundColor: '#000000',
         borderRadius: '10px',
         boxShadow: '0 0 10px rgba(0,0,0,0.5)',
         padding: '10px',
