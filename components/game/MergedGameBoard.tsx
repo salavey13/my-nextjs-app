@@ -4,7 +4,7 @@ import MegaAvatar from './MegaAvatar';
 import { MegaCard, CardId } from '@/components/game/MegaCard';
 import { Button } from '@/components/ui/button';
 import { useAppContext } from '@/context/AppContext';
-import PhysicsControls from './PhysicsControls';
+import { Settings, PhysicsSettings } from './Settings'; // Adjust the path as needed
 import { useGesture } from '@use-gesture/react';
 
 const GAME_ID = 28;
@@ -41,8 +41,15 @@ const GameBoard: React.FC = () => {
   const { user, t } = useAppContext();
   const [targetFrame, setTargetFrame] = useState({ x: 400, y: 300, rotation: 0 });
   const [settingsOpen, setSettingsOpen] = useState(false); // Settings button toggle
-const [physicsParams, setPhysicsParams] = useState<YourParamsType>(initialParams);
-
+const [physicsParams, setPhysicsParams] = useState<PhysicsSettings>({
+    yeetCoefficient: 2,
+    mass: 1,
+    tension: 210,
+    friction: 20,
+    rotationDistance: 69,
+    yeetVelocityThreshold: 3.1,
+    minMovementThreshold: 20,
+  });
 
   const randomizeTargetFrame = () => {
     setTargetFrame({
@@ -143,24 +150,14 @@ const [physicsParams, setPhysicsParams] = useState<YourParamsType>(initialParams
         .eq('id', user?.currentGameId);
     }
   };
-
+// Handler to update settings
+  const handleUpdateSettings = (settings: PhysicsSettings) => {
+    setPhysicsParams(settings);
+  };
   return (
     <div className="game-board">
       {/* Settings Button */}
-      <Button
-        className="settings-button"
-        onClick={() => setSettingsOpen(!settingsOpen)}
-        style={{
-          position: 'absolute',
-          top: '10px',
-          left: '10px',
-        }}
-      >
-        {settingsOpen ? 'Close Settings' : 'Settings'}
-      </Button>
-
-      {settingsOpen && <PhysicsControls physicsParams={physicsParams}
-    setPhysicsParams={setPhysicsParams}/>}
+      <Settings onUpdateSettings={handleUpdateSettings}
 
       {/* Game Cards */}
       {gameState?.cards.map((card) => (
