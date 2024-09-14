@@ -41,6 +41,8 @@ const GameBoard: React.FC = () => {
   const { user, t } = useAppContext();
   const [targetFrame, setTargetFrame] = useState({ x: 400, y: 300, rotation: 0 });
   const [settingsOpen, setSettingsOpen] = useState(false); // Settings button toggle
+const [physicsParams, setPhysicsParams] = useState<YourParamsType>(initialParams);
+
 
   const randomizeTargetFrame = () => {
     setTargetFrame({
@@ -157,7 +159,8 @@ const GameBoard: React.FC = () => {
         {settingsOpen ? 'Close Settings' : 'Settings'}
       </Button>
 
-      {settingsOpen && <PhysicsControls />}
+      {settingsOpen && <PhysicsControls physicsParams={physicsParams}
+    setPhysicsParams={setPhysicsParams}/>}
 
       {/* Game Cards */}
       {gameState?.cards.map((card) => (
