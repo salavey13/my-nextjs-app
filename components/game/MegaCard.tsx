@@ -1,5 +1,5 @@
-import { animated, useSpring } from 'react-spring';
-import { useRef, useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
+import { useSpring, animated } from 'react-spring';
 import { useGesture } from '@use-gesture/react';
 import { cardsImages } from './CardsImgs';
 import { useAppContext } from '@/context/AppContext';
@@ -26,13 +26,13 @@ export const MegaCard: React.FC<MegaCardProps> = ({ card, onCardUpdate }) => {
   const cardRef = useRef<HTMLDivElement | null>(null);
   const [cardPosition, setCardPosition] = useState(card.position);
   const preDragPositionRef = useRef({ x: card.last_position.x, y: card.last_position.y });
-  const yeetLocked = useRef(false); // Yeet locked state
+  const yeetLocked = useRef(false); // Lock for "yeet" state
   const [isDragging, setIsDragging] = useState(false);
   const [isYeeted, setIsYeeted] = useState(false);
-  const { user, t } = useAppContext(); // Access t for translations
+  const { user, t } = useAppContext(); // Accessing context for user and translation
   const [rotations, setRotations] = useState(card.rotations);
 
-  // Physics parameters (session-persistent via local storage)
+  // Physics settings from local storage or defaults
   const [yeetCoefficient, setYeetCoefficient] = useState(() => Number(localStorage.getItem('yeetCoefficient')) || 2);
   const [mass, setMass] = useState(() => Number(localStorage.getItem('mass')) || 1);
   const [tension, setTension] = useState(() => Number(localStorage.getItem('tension')) || 210);
@@ -41,6 +41,7 @@ export const MegaCard: React.FC<MegaCardProps> = ({ card, onCardUpdate }) => {
   const [yeetVelocityThreshold, setYeetVelocityThreshold] = useState(() => Number(localStorage.getItem('yeetVelocityThreshold')) || 3.1);
   const [minMovementThreshold, setMinMovementThreshold] = useState(() => Number(localStorage.getItem('minMovementThreshold')) || 20);
 
+  // Spring for animated movement
   const [{ x, y, rotX, rotZ }, setSpring] = useSpring(() => ({
     x: card.position.x * window.innerWidth,
     y: card.position.y * window.innerHeight,
@@ -49,7 +50,7 @@ export const MegaCard: React.FC<MegaCardProps> = ({ card, onCardUpdate }) => {
     config: { mass, tension, friction },
   }));
 
-  // Subscribe to real-time updates for card position and rotation
+  // Subscribe to real-time updates from Supabase
   useEffect(() => {
     const channel = supabase
       .channel('realtime-cards')
@@ -71,6 +72,7 @@ export const MegaCard: React.FC<MegaCardProps> = ({ card, onCardUpdate }) => {
     };
   }, [card.id, onCardUpdate, setSpring]);
 
+  // Update spring on card position change
   useEffect(() => {
     setSpring.start({
       x: cardPosition.x * window.innerWidth,
@@ -108,299 +110,52 @@ export const MegaCard: React.FC<MegaCardProps> = ({ card, onCardUpdate }) => {
         yeetLocked.current = true; // Lock yeet to avoid multiple triggers
       }
   
-      if (isDragging && !isYeeted && cardRef.current) {
-        // If dragging, update the spring animation for card movement
-        setSpring.start({ x: currentX, y: currentY });
-      } else if (isYeeted && cardRef.current) {
-        // Change the card's border when yeet is triggered
-        cardRef.current.style.border = "3px solid #e1ff01";
-      }
-      // Finally, update the local card position state
-      setCardPosition(normalizePosition(
-        currentX,
-        currentY
-    ));
-    },
-    onDragEnd: ({ movement: [mx, my], velocity: [vx, vy] }) => {
-      setIsDragging(false); // Stop dragging
-      if (cardRef.current) cardRef.current.style.border = "none"; // Reset card border
-  
-      if (!isYeeted) {
-        // Normal drag, update the card position in Supabase
-        onCardUpdate({
-          ...card,
-          position: normalizePosition(
-            preDragPositionRef.current.x * window.innerWidth + mx,
-            preDragPositionRef.current.y * window.innerHeight + my
-          ),
-          last_position: preDragPositionRef.current,
-        });
-        // Finally, update the local card position state
-        setCardPosition(normalizePosition(
-            preDragPositionRef.current.x * window.innerWidth + mx,
-            preDragPositionRef.current.y * window.innerHeight + my
-        ));
-      } else {
-        // Yeet logic
-        const yeetDistanceX = mx * yeetCoefficient;
-        const yeetDistanceY = my * yeetCoefficient;
-        const newRotations = Math.floor(Math.sqrt(yeetDistanceX ** 2 + yeetDistanceY ** 2) / rotationDistance);
-  
-        // Screen wrapping logic for new position after yeet
-        const newX = (preDragPositionRef.current.x * window.innerWidth + yeetDistanceX) % window.innerWidth;
-        const newY = (preDragPositionRef.current.y * window.innerHeight + yeetDistanceY) % window.innerHeight;
-  
-        // Update card's spring with new position and rotation
-        setSpring.start({
-          x: newX,
-          y: newY,
-          rotZ: newRotations * 180,
-        });
-  
-        // Update card data in Supabase with new position, rotation, and velocity
-        onCardUpdate({
-          ...card,
-          position: normalizePosition(newX, newY),
-          rotations: newRotations,
-          velocity: { x: vx, y: vy },
-          last_position: preDragPositionRef.current,
-        });
+      if (!isDragging || yeetLocked.current) return;
 
-        // Finally, update the local card position state
-        setCardPosition(normalizePosition(
-            newX,
-            newY
-        ));
-  
-        setIsYeeted(false); // Reset yeet status
-      }
-  
-      // Handle flip logic based on rotation angle
-      const flippedStatus = rotX.get() % 180 === 0;
-      onCardUpdate({ ...card, flipped: flippedStatus });
-  
-      
+      setCardPosition(normalizePosition(currentX, currentY));
+      setSpring.start({ x: currentX, y: currentY });
     },
-    onDoubleClick: flipCard, // Handle card flipping on double-click
+    onDragEnd: ({ velocity: [vx, vy] }) => {
+      setIsDragging(false);
+      if (isYeeted) {
+        // Apply yeet logic based on the final velocity
+        const newVelocityX = vx * yeetCoefficient;
+        const newVelocityY = vy * yeetCoefficient;
+
+        const newCard = {
+          ...card,
+          velocity: { x: newVelocityX, y: newVelocityY },
+        };
+
+        onCardUpdate(newCard);
+        setSpring.start({
+          x: newCard.position.x * window.innerWidth,
+          y: newCard.position.y * window.innerHeight,
+          rotZ: newCard.rotations * 180,
+        });
+      } else {
+        // Reset the yeet state
+        setIsYeeted(false);
+        yeetLocked.current = false;
+      }
+    },
   });
 
-//   const bind = useGesture({
-//     onDragStart: () => {
-//       setIsDragging(true);
-//       preDragPositionRef.current = { x: card.position.x, y: card.position.y };
-//       yeetLocked.current = false;
-//     },
-//     onDrag: ({ movement: [mx, my], velocity: [vx, vy] }) => {
-//       const currentX = preDragPositionRef.current.x * window.innerWidth + mx;
-//       const currentY = preDragPositionRef.current.y * window.innerHeight + my;
-
-//       const isYeetPrep = Math.abs(vx) > yeetVelocityThreshold && Math.abs(my) > minMovementThreshold;
-
-//       if (isYeetPrep && !yeetLocked.current) {
-//         setIsYeeted(true);
-//         yeetLocked.current = true;
-//       }
-
-//       if (isDragging && !isYeeted && cardRef.current) {
-//         setSpring.start({ x: currentX, y: currentY });
-//       } else if (isYeeted && cardRef.current) {
-//         cardRef.current.style.border = "3px solid #e1ff01";
-//       }
-//     },
-//     onDragEnd: ({ movement: [mx, my], velocity: [vx, vy] }) => {
-//       setIsDragging(false);
-//       if (cardRef.current) cardRef.current.style.border = "none";
-
-//       if (!isYeeted) {
-//         onCardUpdate({
-//           ...card,
-//           position: normalizePosition(preDragPositionRef.current.x * window.innerWidth + mx, preDragPositionRef.current.y * window.innerHeight + my),
-//           last_position: preDragPositionRef.current,
-//         });
-//       } else {
-//         const yeetDistanceX = mx * yeetCoefficient;
-//         const yeetDistanceY = my * yeetCoefficient;
-//         const newRotations = Math.floor(Math.sqrt(yeetDistanceX ** 2 + yeetDistanceY ** 2) / rotationDistance);
-
-//         // Calculate new position with screen wrapping
-//         const newX = (preDragPositionRef.current.x * window.innerWidth + yeetDistanceX) % window.innerWidth;
-//         const newY = (preDragPositionRef.current.y * window.innerHeight + yeetDistanceY) % window.innerHeight;
-
-//         setSpring.start({
-//           x: newX,
-//           y: newY,
-//           rotZ: newRotations * 180,
-//         });
-
-//         onCardUpdate({
-//           ...card,
-//           position: normalizePosition(newX, newY),
-//           rotations: newRotations,
-//           velocity: { x: vx, y: vy },
-//           last_position: preDragPositionRef.current,
-//         });
-//         setIsYeeted(false);
-//       }
-
-//       // Update flip status based on rotationX modulo 180
-//       const flippedStatus = rotX.get() % 180 === 0;
-//       onCardUpdate({ ...card, flipped: flippedStatus });
-//     },
-//     onDoubleClick: flipCard,
-//   });
-
-  // Visual controls for yeet coefficient, mass, tension, rotation distance, and friction
-  const handleSliderChange = (param: string, value: number) => {
-    switch (param) {
-      case 'yeetCoefficient':
-        setYeetCoefficient(value);
-        localStorage.setItem('yeetCoefficient', value.toString());
-        break;
-      case 'mass':
-        setMass(value);
-        localStorage.setItem('mass', value.toString());
-        break;
-      case 'tension':
-        setTension(value);
-        localStorage.setItem('tension', value.toString());
-        break;
-      case 'rotationDistance':
-        setRotationDistance(value);
-        localStorage.setItem('rotationDistance', value.toString());
-        break;
-      case 'friction':
-        setFriction(value);
-        localStorage.setItem('friction', value.toString());
-        break;
-      case 'yeetVelocityThreshold':
-        setYeetVelocityThreshold(value);
-        localStorage.setItem('yeetVelocityThreshold', value.toString());
-        break;
-      case 'minMovementThreshold':
-        setMinMovementThreshold(value);
-        localStorage.setItem('minMovementThreshold', value.toString());
-        break;
-      default:
-        break;
-    }
-
-    // Immediately apply changes to spring with updated config
-    setSpring.start({
-      config: { mass, tension, friction }
-    });
-  };
-
   return (
-    <>
-  <animated.div
-    ref={cardRef}
-    {...bind()}
-    style={{
-      width: '30px',  // Adjusted card width
-      height: '45px', // Adjusted card height
-      backgroundImage: `url(${cardsImages[card.flipped ? card.id : "shirt"]})`,
-      borderRadius: '2px',
-      backgroundSize: 'cover',
-      transform: `rotateX(${rotX.get()}deg) rotateZ(${rotZ.get()}deg)`,
-      x,//: cardPosition.x, // Updated to use local state
-      y,//: cardPosition.y, // Updated to use local state
-      touchAction: 'none',
-      position: 'absolute',
-    }}
-  />
-  
-  <div style={{
-    position: 'fixed',
-    top: 69,
-    width: '100%',
-    padding: '0 13px',
-    display: 'grid',
-    gridTemplateColumns: '1fr 2fr 1fr', // Define 3 columns: labels, inputs, and values
-    gap: '10px', // Space between items
-    alignItems: 'center', // Center items vertically
-    backgroundColor: "#131313",
-    borderRadius: '13px', // Apply border radius
-  }}>
-    <label style={{ fontSize: '0.75rem', textAlign: 'right' }}>{t('yeetCoefficient')}:</label>
-    <input
-      type="range"
-      min="0"
-      max="10"
-      value={yeetCoefficient}
-      onChange={(e) => handleSliderChange('yeetCoefficient', parseFloat(e.target.value))}
-      style={{ fontSize: '0.75rem' }} // Ensure the font size is consistent
-    />
-    <span style={{ fontSize: '0.75rem', textAlign: 'center' }}>{yeetCoefficient}</span> {/* Display current value */}
-    
-    <label style={{ fontSize: '0.75rem', textAlign: 'right' }}>{t('mass')}:</label>
-    <input
-      type="range"
-      min="0.1"
-      max="10"
-      step="0.1"
-      value={mass}
-      onChange={(e) => handleSliderChange('mass', parseFloat(e.target.value))}
-      style={{ fontSize: '0.75rem' }} // Ensure the font size is consistent
-    />
-    <span style={{ fontSize: '0.75rem', textAlign: 'center' }}>{mass}</span> {/* Display current value */}
-    
-    <label style={{ fontSize: '0.75rem', textAlign: 'right' }}>{t('tension')}:</label>
-    <input
-      type="range"
-      min="0"
-      max="500"
-      value={tension}
-      onChange={(e) => handleSliderChange('tension', parseFloat(e.target.value))}
-      style={{ fontSize: '0.75rem' }} // Ensure the font size is consistent
-    />
-    <span style={{ fontSize: '0.75rem', textAlign: 'center' }}>{tension}</span> {/* Display current value */}
-    
-    <label style={{ fontSize: '0.75rem', textAlign: 'right' }}>{t('rotationDistance')}:</label>
-    <input
-      type="range"
-      min="0"
-      max="200"
-      value={rotationDistance}
-      onChange={(e) => handleSliderChange('rotationDistance', parseFloat(e.target.value))}
-      style={{ fontSize: '0.75rem' }} // Ensure the font size is consistent
-    />
-    <span style={{ fontSize: '0.75rem', textAlign: 'center' }}>{rotationDistance}</span> {/* Display current value */}
-    
-    <label style={{ fontSize: '0.75rem', textAlign: 'right' }}>{t('friction')}:</label>
-    <input
-      type="range"
-      min="0"
-      max="100"
-      value={friction}
-      onChange={(e) => handleSliderChange('friction', parseFloat(e.target.value))}
-      style={{ fontSize: '0.75rem' }} // Ensure the font size is consistent
-    />
-    <span style={{ fontSize: '0.75rem', textAlign: 'center' }}>{friction}</span> {/* Display current value */}
-    
-    <label style={{ fontSize: '0.75rem', textAlign: 'right' }}>{t('yeetVelocityThreshold')}:</label>
-    <input
-      type="range"
-      min="0"
-      max="10"
-      step="0.1"
-      value={yeetVelocityThreshold}
-      onChange={(e) => handleSliderChange('yeetVelocityThreshold', parseFloat(e.target.value))}
-      style={{ fontSize: '0.75rem' }} // Ensure the font size is consistent
-    />
-    <span style={{ fontSize: '0.75rem', textAlign: 'center' }}>{yeetVelocityThreshold}</span> {/* Display current value */}
-    
-    <label style={{ fontSize: '0.75rem', textAlign: 'right' }}>{t('minMovementThreshold')}:</label>
-    <input
-      type="range"
-      min="0"
-      max="100"
-      value={minMovementThreshold}
-      onChange={(e) => handleSliderChange('minMovementThreshold', parseFloat(e.target.value))}
-      style={{ fontSize: '0.75rem' }} // Ensure the font size is consistent
-    />
-    <span style={{ fontSize: '0.75rem', textAlign: 'center' }}>{minMovementThreshold}</span> {/* Display current value */}
-  </div>
-</>
-
+    <animated.div
+      {...bind()}
+      ref={cardRef}
+      className="absolute"
+      style={{
+        transform: x.to((xVal) => `translateX(${xVal}px)`) + y.to((yVal) => `translateY(${yVal}px)`) +
+          rotZ.to((rZ) => `rotateZ(${rZ}deg)`),
+      }}
+    >
+      <div className="bg-white rounded-lg shadow-lg p-4 text-center">
+        <p>{t('card')}: {card.id}</p>
+      </div>
+    </animated.div>
   );
 };
+
+export default MegaCard;
