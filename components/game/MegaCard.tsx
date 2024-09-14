@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { useSpring, animated } from 'react-spring';
+import { useSpring, animated, interpolate } from 'react-spring';
 import { useGesture } from '@use-gesture/react';
 import { cardsImages } from './CardsImgs';
 import { useAppContext } from '@/context/AppContext';
@@ -147,7 +147,7 @@ export const MegaCard: React.FC<MegaCardProps> = ({ card, onCardUpdate }) => {
       ref={cardRef}
       className="absolute"
       style={{
-  transform: to([x, y, rotZ], (xVal, yVal, rZ) => 
+  transform: interpolate([x, y, rotZ], (xVal, yVal, rZ) => 
     `translateX(${xVal}px) translateY(${yVal}px) rotateZ(${rZ}deg)`
   ),
       }}
