@@ -1,5 +1,18 @@
 import { LanguageDictionary } from "../utils/TranslationUtils";
 export const ukr: LanguageDictionary = {
+  "settings": {
+    "title": "Налаштування",
+    "restoreDefaults": "Включити чарівність (або повернути заводські налаштування)",
+    "yeetCoefficient": "Коефіцієнт 'Йіт' (Потужність твоїх викидів)",
+    "mass": "Маса (Скільки важить твій кумедний 'йіт')",
+    "tension": "Напруження (Як перед іспитом)",
+    "friction": "Стискання (Якщо спробуєш бути гладким)",
+    "rotationDistance": "Відстань обертання (Не для спіральних танців)",
+    "yeetVelocityThreshold": "Поріг 'Йіта' (Щоб не злетіти до зірок)",
+    "minMovementThreshold": "Мінімальний поріг руху (Не для лінивих)',
+    "github": "Переглянути на GitHub (Місце, де код грає в хованки)",
+    "version": "Версія 0.13 (Близько до 0.14, але без сюрпризів)"
+  },
   "yeetCoefficient": "Коефіцієнт викиду",
   "tension": "Напруга",
   "rotationDistance": "Відстань обертання",
