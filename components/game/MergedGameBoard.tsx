@@ -181,7 +181,7 @@ const [physicsParams, setPhysicsParams] = useState<PhysicsSettings>({
         aria-label={t('shufle')}
       >
         👯
-                                        </Button>
+              </button>
 
     </div>
   );
