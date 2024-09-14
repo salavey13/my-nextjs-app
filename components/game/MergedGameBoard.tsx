@@ -157,7 +157,7 @@ const [physicsParams, setPhysicsParams] = useState<PhysicsSettings>({
   return (
     <div className="game-board">
       {/* Settings Button */}
-      <Settings onUpdateSettings={handleUpdateSettings}
+      <Settings onUpdateSettings={handleUpdateSettings}/>
 
       {/* Game Cards */}
       {gameState?.cards.map((card) => (
