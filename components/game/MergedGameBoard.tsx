@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabaseClient';
-import MegaAvatar from './MegaAvatar';
+//import MegaAvatar from './MegaAvatar';
 import { MegaCard, CardId } from '@/components/game/MegaCard';
 import { Button } from '@/components/ui/button';
 import { useAppContext } from '@/context/AppContext';
@@ -164,7 +164,7 @@ const [physicsParams, setPhysicsParams] = useState<PhysicsSettings>({
         <MegaCard key={card.id} card={card} onCardUpdate={onCardUpdate} />
       ))}
 
-      {/* Game Avatars */}
+      {/* Game Avatars 
       {gameState?.players.map((player) => (
         <MegaAvatar
           key={player.id}
@@ -172,7 +172,7 @@ const [physicsParams, setPhysicsParams] = useState<PhysicsSettings>({
           initialPosition={player.position}
           onPositionChange={handlePositionChange}
         />
-      ))}
+      ))}*/}
 
       {/* Shuffle Cards Button */}
       <Button onClick={shuffleCards}>Shuffle Cards</Button>
