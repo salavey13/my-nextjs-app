@@ -175,13 +175,13 @@ const [physicsParams, setPhysicsParams] = useState<PhysicsSettings>({
       ))}*/}
 
       {/* Shuffle Cards Button */}
-      <Button
+      <button
         onClick={shuffleCards}
         className="bg-gray-800 text-white rounded-full p-2 w-10 h-10 flex items-center justify-center"
         aria-label={t('shufle')}
       >
         👯
-      </Button>
+                                        </Button>
 
     </div>
   );
