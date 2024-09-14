@@ -1,0 +1,328 @@
+{
+  "cards": [
+    {
+      "id": "6_of_spades",
+      "flipped": true,
+      "position": { "x": 0.843, "y": 0.058 },
+      "velocity": { "x": 0.1875, "y": 0.0625 },
+      "direction": { "x": -1, "y": 1 },
+      "rotations": 2,
+      "last_position": { "x": 0.589, "y": 0.643 }
+    },
+    {
+      "id": "7_of_spades",
+      "flipped": true,
+      "position": { "x": 0.843, "y": 0.058 },
+      "velocity": { "x": 0.1875, "y": 0.0625 },
+      "direction": { "x": -1, "y": 1 },
+      "rotations": 2,
+      "last_position": { "x": 0.589, "y": 0.643 }
+    },
+    {
+      "id": "8_of_spades",
+      "flipped": true,
+      "position": { "x": 0.005, "y": 0.457 },
+      "velocity": { "x": 0.481, "y": 0.402 },
+      "direction": { "x": 1, "y": -1 },
+      "rotations": 4,
+      "last_position": { "x": 0.512, "y": 0.521 }
+    },
+    {
+      "id": "9_of_spades",
+      "flipped": true,
+      "position": { "x": 0.730, "y": 0.411 },
+      "velocity": { "x": 0, "y": 0 },
+      "direction": { "x": -1, "y": 1 },
+      "rotations": 6,
+      "last_position": { "x": 0.629, "y": 0.634 }
+    },
+    {
+      "id": "10_of_spades",
+      "flipped": true,
+      "position": { "x": 0.843, "y": 0.058 },
+      "velocity": { "x": 0.481, "y": 0.0625 },
+      "direction": { "x": 1, "y": -1 },
+      "rotations": 3,
+      "last_position": { "x": 0.600, "y": 0.643 }
+    },
+    {
+      "id": "jack_of_spades",
+      "flipped": true,
+      "position": { "x": 0.777, "y": 0.412 },
+      "velocity": { "x": 0.291, "y": 0.594 },
+      "direction": { "x": -1, "y": 1 },
+      "rotations": 4,
+      "last_position": { "x": 0.529, "y": 0.472 }
+    },
+    {
+      "id": "queen_of_spades",
+      "flipped": true,
+      "position": { "x": 0.323, "y": 0.150 },
+      "velocity": { "x": 0.319, "y": 0.391 },
+      "direction": { "x": 1, "y": -1 },
+      "rotations": 2,
+      "last_position": { "x": 0.731, "y": 0.503 }
+    },
+    {
+      "id": "king_of_spades",
+      "flipped": true,
+      "position": { "x": 0.065, "y": 0.004 },
+      "velocity": { "x": 0.316, "y": 0.063 },
+      "direction": { "x": -1, "y": 1 },
+      "rotations": 16,
+      "last_position": { "x": 0.689, "y": 0.451 }
+    },
+    {
+      "id": "ace_of_spades",
+      "flipped": true,
+      "position": { "x": 0.516, "y": 0.427 },
+      "velocity": { "x": 0.301, "y": 0.844 },
+      "direction": { "x": -1, "y": -1 },
+      "rotations": 4,
+      "last_position": { "x": 0.207, "y": 0.589 }
+    },
+    {
+      "id": "6_of_hearts",
+      "flipped": true,
+      "position": { "x": 0.340, "y": 0.671 },
+      "velocity": { "x": 0.121, "y": 0.298 },
+      "direction": { "x": 1, "y": -1 },
+      "rotations": 3,
+      "last_position": { "x": 0.584, "y": 0.467 }
+    },
+    {
+      "id": "7_of_hearts",
+      "flipped": true,
+      "position": { "x": 0.340, "y": 0.671 },
+      "velocity": { "x": 0.121, "y": 0.298 },
+      "direction": { "x": 1, "y": -1 },
+      "rotations": 3,
+      "last_position": { "x": 0.584, "y": 0.467 }
+    },
+    {
+      "id": "8_of_hearts",
+      "flipped": true,
+      "position": { "x": 0.121, "y": 0.312 },
+      "velocity": { "x": 0.2, "y": 0 },
+      "direction": { "x": 1, "y": -1 },
+      "rotations": 4,
+      "last_position": { "x": 0.528, "y": 0.227 }
+    },
+    {
+      "id": "9_of_hearts",
+      "flipped": true,
+      "position": { "x": 0.678, "y": 0.241 },
+      "velocity": { "x": 0.421, "y": 0.117 },
+      "direction": { "x": -1, "y": 1 },
+      "rotations": 5,
+      "last_position": { "x": 0.372, "y": 0.891 }
+    },
+    {
+      "id": "10_of_hearts",
+      "flipped": true,
+      "position": { "x": 0.548, "y": 0.416 },
+      "velocity": { "x": 0.298, "y": 0.256 },
+      "direction": { "x": 1, "y": -1 },
+      "rotations": 3,
+      "last_position": { "x": 0.821, "y": 0.569 }
+    },
+    {
+      "id": "jack_of_hearts",
+      "flipped": true,
+      "position": { "x": 0.943, "y": 0.239 },
+      "velocity": { "x": 0.129, "y": 0.321 },
+      "direction": { "x": 1, "y": -1 },
+      "rotations": 2,
+      "last_position": { "x": 0.521, "y": 0.473 }
+    },
+    {
+      "id": "queen_of_hearts",
+      "flipped": true,
+      "position": { "x": 0.314, "y": 0.121 },
+      "velocity": { "x": 0.182, "y": 0.372 },
+      "direction": { "x": -1, "y": 1 },
+      "rotations": 4,
+      "last_position": { "x": 0.671, "y": 0.612 }
+    },
+    {
+      "id": "king_of_hearts",
+      "flipped": true,
+      "position": { "x": 0.091, "y": 0.734 },
+      "velocity": { "x": 0.274, "y": 0.191 },
+      "direction": { "x": 1, "y": -1 },
+      "rotations": 3,
+      "last_position": { "x": 0.531, "y": 0.242 }
+    },
+    {
+      "id": "ace_of_hearts",
+      "flipped": true,
+      "position": { "x": 0.514, "y": 0.193 },
+      "velocity": { "x": 0.392, "y": 0.612 },
+      "direction": { "x": -1, "y": 1 },
+      "rotations": 4,
+      "last_position": { "x": 0.742, "y": 0.493 }
+    },
+    {
+      "id": "6_of_diamonds",
+      "flipped": true,
+      "position": { "x": 0.821, "y": 0.781 },
+      "velocity": { "x": 0.301, "y": 0.174 },
+      "direction": { "x": -1, "y": -1 },
+      "rotations": 5,
+      "last_position": { "x": 0.511, "y": 0.451 }
+    },
+    {
+      "id": "7_of_diamonds",
+      "flipped": true,
+      "position": { "x": 0.821, "y": 0.781 },
+      "velocity": { "x": 0.301, "y": 0.174 },
+      "direction": { "x": -1, "y": -1 },
+      "rotations": 5,
+      "last_position": { "x": 0.511, "y": 0.451 }
+    },
+    {
+      "id": "8_of_diamonds",
+      "flipped": true,
+      "position": { "x": 0.329, "y": 0.231 },
+      "velocity": { "x": 0.198, "y": 0.319 },
+      "direction": { "x": 1, "y": -1 },
+      "rotations": 3,
+      "last_position": { "x": 0.671, "y": 0.629 }
+    },
+    {
+      "id": "9_of_diamonds",
+      "flipped": true,
+      "position": { "x": 0.611, "y": 0.294 },
+      "velocity": { "x": 0.241, "y": 0.362 },
+      "direction": { "x": -1, "y": 1 },
+      "rotations": 2,
+      "last_position": { "x": 0.528, "y": 0.811 }
+    },
+    {
+      "id": "10_of_diamonds",
+      "flipped": true,
+      "position": { "x": 0.743, "y": 0.531 },
+      "velocity": { "x": 0.138, "y": 0.291 },
+      "direction": { "x": 1, "y": -1 },
+      "rotations": 3,
+      "last_position": { "x": 0.291, "y": 0.541 }
+    },
+    {
+      "id": "jack_of_diamonds",
+      "flipped": true,
+      "position": { "x": 0.253, "y": 0.713 },
+      "velocity": { "x": 0.394, "y": 0.273 },
+      "direction": { "x": -1, "y": 1 },
+      "rotations": 4,
+      "last_position": { "x": 0.593, "y": 0.121 }
+    },
+    {
+      "id": "queen_of_diamonds",
+      "flipped": true,
+      "position": { "x": 0.534, "y": 0.839 },
+      "velocity": { "x": 0.134, "y": 0.284 },
+      "direction": { "x": 1, "y": -1 },
+      "rotations": 2,
+      "last_position": { "x": 0.312, "y": 0.127 }
+    },
+    {
+      "id": "king_of_diamonds",
+      "flipped": true,
+      "position": { "x": 0.871, "y": 0.593 },
+      "velocity": { "x": 0.371, "y": 0.281 },
+      "direction": { "x": -1, "y": -1 },
+      "rotations": 6,
+      "last_position": { "x": 0.521, "y": 0.471 }
+    },
+    {
+      "id": "ace_of_diamonds",
+      "flipped": true,
+      "position": { "x": 0.113, "y": 0.267 },
+      "velocity": { "x": 0.214, "y": 0.371 },
+      "direction": { "x": 1, "y": 1 },
+      "rotations": 5,
+      "last_position": { "x": 0.634, "y": 0.143 }
+    },
+    {
+      "id": "6_of_clubs",
+      "flipped": true,
+      "position": { "x": 0.414, "y": 0.357 },
+      "velocity": { "x": 0.198, "y": 0.276 },
+      "direction": { "x": 1, "y": -1 },
+      "rotations": 2,
+      "last_position": { "x": 0.271, "y": 0.594 }
+    },
+    {
+      "id": "7_of_clubs",
+      "flipped": true,
+      "position": { "x": 0.414, "y": 0.357 },
+      "velocity": { "x": 0.198, "y": 0.276 },
+      "direction": { "x": 1, "y": -1 },
+      "rotations": 2,
+      "last_position": { "x": 0.271, "y": 0.594 }
+    },
+    {
+      "id": "8_of_clubs",
+      "flipped": true,
+      "position": { "x": 0.291, "y": 0.394 },
+      "velocity": { "x": 0.264, "y": 0.189 },
+      "direction": { "x": -1, "y": 1 },
+      "rotations": 3,
+      "last_position": { "x": 0.647, "y": 0.463 }
+    },
+    {
+      "id": "9_of_clubs",
+      "flipped": true,
+      "position": { "x": 0.839, "y": 0.274 },
+      "velocity": { "x": 0.238, "y": 0.312 },
+      "direction": { "x": 1, "y": -1 },
+      "rotations": 5,
+      "last_position": { "x": 0.281, "y": 0.637 }
+    },
+    {
+      "id": "10_of_clubs",
+      "flipped": true,
+      "position": { "x": 0.127, "y": 0.251 },
+      "velocity": { "x": 0.198, "y": 0.291 },
+      "direction": { "x": -1, "y": 1 },
+      "rotations": 3,
+      "last_position": { "x": 0.219, "y": 0.674 }
+    },
+    {
+      "id": "jack_of_clubs",
+      "flipped": true,
+      "position": { "x": 0.712, "y": 0.361 },
+      "velocity": { "x": 0.317, "y": 0.184 },
+      "direction": { "x": -1, "y": 1 },
+      "rotations": 4,
+      "last_position": { "x": 0.419, "y": 0.581 }
+    },
+    {
+      "id": "queen_of_clubs",
+      "flipped": true,
+      "position": { "x": 0.398, "y": 0.187 },
+      "velocity": { "x": 0.276, "y": 0.294 },
+      "direction": { "x": 1, "y": -1 },
+      "rotations": 2,
+      "last_position": { "x": 0.181, "y": 0.601 }
+    },
+    {
+      "id": "king_of_clubs",
+      "flipped": true,
+      "position": { "x": 0.531, "y": 0.621 },
+      "velocity": { "x": 0.394, "y": 0.281 },
+      "direction": { "x": -1, "y": 1 },
+      "rotations": 5,
+      "last_position": { "x": 0.473, "y": 0.523 }
+    },
+    {
+      "id": "ace_of_clubs",
+      "flipped": true,
+      "position": { "x": 0.171, "y": 0.471 },
+      "velocity": { "x": 0.201, "y": 0.197 },
+      "direction": { "x": 1, "y": -1 },
+      "rotations": 3,
+      "last_position": { "x": 0.329, "y": 0.632 }
+    }
+  ]
+}

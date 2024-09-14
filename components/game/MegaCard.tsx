@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { useSpring, animated, interpolate } from 'react-spring';
+import { useSpring, animated, to } from 'react-spring';
 import { useGesture } from '@use-gesture/react';
 import { cardsImages } from './CardsImgs';
 import { useAppContext } from '@/context/AppContext';
@@ -115,47 +115,90 @@ export const MegaCard: React.FC<MegaCardProps> = ({ card, onCardUpdate }) => {
       setCardPosition(normalizePosition(currentX, currentY));
       setSpring.start({ x: currentX, y: currentY });
     },
-    onDragEnd: ({ velocity: [vx, vy] }) => {
-      setIsDragging(false);
-      if (isYeeted) {
-        // Apply yeet logic based on the final velocity
-        const newVelocityX = vx * yeetCoefficient;
-        const newVelocityY = vy * yeetCoefficient;
+    onDragEnd: ({ movement: [mx, my], velocity: [vx, vy] }) => {
+        setIsDragging(false); // Stop dragging
+        if (cardRef.current) cardRef.current.style.border = "none"; // Reset card border
+  
+        if (!isYeeted) {
+          // Normal drag, update the card position in Supabase
+          onCardUpdate({
+            ...card,
+            position: normalizePosition(
+              preDragPositionRef.current.x * window.innerWidth + mx,
+              preDragPositionRef.current.y * window.innerHeight + my
+            ),
+            last_position: preDragPositionRef.current,
+          });
+          // Finally, update the local card position state
+          setCardPosition(normalizePosition(
+              preDragPositionRef.current.x * window.innerWidth + mx,
+              preDragPositionRef.current.y * window.innerHeight + my
+          ));
+        } else {
+          // Yeet logic
+          const yeetDistanceX = mx * yeetCoefficient;
+          const yeetDistanceY = my * yeetCoefficient;
+          const newRotations = Math.floor(Math.sqrt(yeetDistanceX ** 2 + yeetDistanceY ** 2) / rotationDistance);
+  
+          // Screen wrapping logic for new position after yeet
+          const newX = (preDragPositionRef.current.x * window.innerWidth + yeetDistanceX) % window.innerWidth;
+          const newY = (preDragPositionRef.current.y * window.innerHeight + yeetDistanceY) % window.innerHeight;
+  
+          // Update card's spring with new position and rotation
+          setSpring.start({
+            x: newX,
+            y: newY,
+            rotZ: newRotations * 180,
+          });
+  
+          // Update card data in Supabase with new position, rotation, and velocity
+          onCardUpdate({
+            ...card,
+            position: normalizePosition(newX, newY),
+            rotations: newRotations,
+            velocity: { x: vx, y: vy },
+            last_position: preDragPositionRef.current,
+          });
+  
+          // Finally, update the local card position state
+          setCardPosition(normalizePosition(
+              newX,
+              newY
+          ));
+  
+          setIsYeeted(false); // Reset yeet status
+        }
+  
+        // Handle flip logic based on rotation angle
+        const flippedStatus = rotX.get() % 180 === 0;
+        onCardUpdate({ ...card, flipped: flippedStatus });
+  
+  
+      },
+      onDoubleClick: flipCard, // Handle card flipping on double-click
 
-        const newCard = {
-          ...card,
-          velocity: { x: newVelocityX, y: newVelocityY },
-        };
-
-        onCardUpdate(newCard);
-        setSpring.start({
-          x: newCard.position.x * window.innerWidth,
-          y: newCard.position.y * window.innerHeight,
-          rotZ: newCard.rotations * 180,
-        });
-      } else {
-        // Reset the yeet state
-        setIsYeeted(false);
-        yeetLocked.current = false;
-      }
-    },
   });
 
   return (
     <animated.div
-      {...bind()}
-      ref={cardRef}
-      className="absolute"
-      style={{
-  transform: interpolate([x, y, rotZ], (xVal, yVal, rZ) => 
+    ref={cardRef}
+    {...bind()}
+    style={{
+      width: '30px',  // Adjusted card width
+      height: '45px', // Adjusted card height
+      backgroundImage: `url(${cardsImages[card.flipped ? card.id : "shirt"]})`,
+      borderRadius: '2px',
+      backgroundSize: 'cover',
+      transform: to([x, y, rotZ], (xVal, yVal, rZ) => 
     `translateX(${xVal}px) translateY(${yVal}px) rotateZ(${rZ}deg)`
   ),
-      }}
-    >
-      <div className="bg-white rounded-lg shadow-lg p-4 text-center">
-        <p>{t('card')}: {card.id}</p>
-      </div>
-    </animated.div>
+      //transform: `rotateX(${rotX.get()}deg) rotateZ(${rotZ.get()}deg)`,
+      x,//: cardPosition.x, // Updated to use local state
+      y,//: cardPosition.y, // Updated to use local state
+      touchAction: 'none',
+      position: 'absolute',
+    }}
+/>
   );
 };
 

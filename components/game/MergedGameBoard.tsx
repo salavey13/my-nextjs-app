@@ -114,7 +114,7 @@ const [physicsParams, setPhysicsParams] = useState<PhysicsSettings>({
     if (!gameState) return;
 
     const shuffledCards = gameState.cards
-      .map((card) => ({ ...card, position: { x: Math.random(), y: Math.random() } }))
+      .map((card) => ({ ...card, position: { x: Math.random(), y: Math.random() },last_position: card.position }))
       .sort(() => Math.random() - 0.5);
 
     const updatedGameState = { ...gameState, cards: shuffledCards };
@@ -155,7 +155,7 @@ const [physicsParams, setPhysicsParams] = useState<PhysicsSettings>({
     setPhysicsParams(settings);
   };
   return (
-    <div className="game-board-container min-h-[calc(100vh-128px)] overflow-y-auto overflow-x-auto">
+    <div className="game-board min-h-[calc(100vh-128px)]">
       {/* Settings Button */}
       <Settings onUpdateSettings={handleUpdateSettings}/>
 
@@ -181,8 +181,21 @@ const [physicsParams, setPhysicsParams] = useState<PhysicsSettings>({
         aria-label={t('shufle')}
       >
         👯
-              </button>
-
+      </button>
+        {/* Target frame outline */}
+        <div
+            style={{
+                width: '100px',
+                height: '150px',
+                position: 'absolute',
+                borderColor: "#E1FF01",
+                top: targetFrame.y,
+                left: targetFrame.x,
+                transform: `rotate(${targetFrame.rotation}deg)`,
+                border: '2px dashed #E1FF01',
+                borderRadius: '8px',
+            }}
+        />
     </div>
   );
 };
