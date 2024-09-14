@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { animated, useSpring } from 'react-spring';
 import { useAppContext } from '@/context/AppContext'; // For translations and app context
+import { Button } from '../ui/button';
 
 interface SettingsProps {
   onUpdateSettings: (settings: PhysicsSettings) => void;
@@ -92,66 +93,76 @@ export const Settings: React.FC<SettingsProps> = ({ onUpdateSettings }) => {
         <div
           id="modal-background"
           onClick={() => setIsModalOpen(false)}
-          className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 z-50"
+          
+          className="fixed top-13 left-10 h-full bg-black bg-opacity-50 z-50"
         >
           <animated.div
             style={slideIn}
-            className="absolute top-10 left-1 bg-black p-5 w-64 rounded-lg text-white"
+
+            className="absolute top-13 left-10 bg-black p-5 rounded-lg text-white"
             onClick={(e) => e.stopPropagation()} // Prevent modal close on inner click
           >
-            <h2 className="text-xl mb-4">{t('settings.title')}</h2>
-
-            <button onClick={restoreDefaults} className="bg-white text-black p-2 rounded mb-4">
-              {t('settings.restoreDefaults')}
-            </button>
+            
+            
 
             <div style={{
       position: 'fixed',
   
-      padding: '0 13px',
+      padding: '13px 13px',
       display: 'grid',
-      gridTemplateColumns: '1fr', // Adjust grid to accommodate labels and sliders neatly
+      gridTemplateColumns: '2fr 1fr 0.5fr', // Adjust grid to accommodate labels and sliders neatly
       gap: '10px',
       justifyContent: 'space-between',
-      backgroundColor: "#13131313",
+      backgroundColor: "#131313",
       borderRadius: '13px',
       boxShadow: '0 0 10px rgba(0,0,0,0.5)'
     }}>
               {/* Physics Settings */}
+              <div/><h2 className="text-xl mb-4 bg-black">{t('settings.title')}</h2>
+<Button onClick={restoreDefaults} variant="outline" className="bg-white text-black p-2 rounded-lg mb-4">
+                OK
+              {/* {t('settings.restoreDefaults')} */}
+            </Button>
               <label>
-                {t('settings.yeetCoefficient')}: {yeetCoefficient}
-                <input type="range" min="0.1" max="10" step="0.1" value={yeetCoefficient} onChange={(e) => setYeetCoefficient(Number(e.target.value))} />
+                {t('settings.yeetCoefficient')}: 
               </label>
-
+              <input type="range" min="0.1" max="10" step="0.1" value={yeetCoefficient} onChange={(e) => setYeetCoefficient(Number(e.target.value))} />
+{yeetCoefficient}
               <label>
-                {t('settings.mass')}: {mass}
+                {t('settings.mass')}: 
+                </label>
                 <input type="range" min="0.1" max="5" step="0.1" value={mass} onChange={(e) => setMass(Number(e.target.value))} />
-              </label>
+              {mass}
 
               <label>
-                {t('settings.tension')}: {tension}
+                {t('settings.tension')}: 
+                </label>
                 <input type="range" min="50" max="500" step="10" value={tension} onChange={(e) => setTension(Number(e.target.value))} />
-              </label>
+              {tension}
 
               <label>
-                {t('settings.friction')}: {friction}
+                {t('settings.friction')}: 
+                </label>
                 <input type="range" min="1" max="100" step="1" value={friction} onChange={(e) => setFriction(Number(e.target.value))} />
-              </label>
+              {friction}
 
               <label>
-                {t('settings.rotationDistance')}: {rotationDistance}
+                {t('settings.rotationDistance')}: 
+                </label>
                 <input type="range" min="10" max="100" step="1" value={rotationDistance} onChange={(e) => setRotationDistance(Number(e.target.value))} />
-              </label>
+              {rotationDistance}
 
               <label>
-                {t('settings.yeetVelocityThreshold')}: {yeetVelocityThreshold}
+                {t('settings.yeetVelocityThreshold')}: 
+                </label>
                 <input type="range" min="0.1" max="10" step="0.1" value={yeetVelocityThreshold} onChange={(e) => setYeetVelocityThreshold(Number(e.target.value))} />
-              </label>
+              {yeetVelocityThreshold}
 
               <label>
-                {t('settings.minMovementThreshold')}: {minMovementThreshold}
+                {t('settings.minMovementThreshold')}: 
+                </label>
                 <input type="range" min="1" max="100" step="1" value={minMovementThreshold} onChange={(e) => setMinMovementThreshold(Number(e.target.value))} />
-              </label>
+              {minMovementThreshold}
             </div>
 
             <a

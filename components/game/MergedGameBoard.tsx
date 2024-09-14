@@ -185,16 +185,15 @@ const [physicsParams, setPhysicsParams] = useState<PhysicsSettings>({
         {/* Target frame outline */}
         <div
             style={{
-                width: '100px',
-                height: '150px',
+                width: '42px',
+                height: '63px',
                 position: 'absolute',
                 borderColor: "#E1FF01",
                 top: targetFrame.y,
                 left: targetFrame.x,
                 transform: `rotate(${targetFrame.rotation}deg)`,
                 border: '2px dashed #E1FF01',
-                borderRadius: '8px',
-                zIndex:1000,
+                borderRadius: '5px',
             }}
         />
     </div>
