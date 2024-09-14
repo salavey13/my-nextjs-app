@@ -147,10 +147,8 @@ export const MegaCard: React.FC<MegaCardProps> = ({ card, onCardUpdate }) => {
       ref={cardRef}
       className="absolute"
       style={{
-  transform: x.to((xVal) => 
-    y.to((yVal) =>
-      rotZ.to((rZ) => `translateX(${xVal}px) translateY(${yVal}px) rotateZ(${rZ}deg)`)
-    )
+  transform: to([x, y, rotZ], (xVal, yVal, rZ) => 
+    `translateX(${xVal}px) translateY(${yVal}px) rotateZ(${rZ}deg)`
   ),
       }}
     >
