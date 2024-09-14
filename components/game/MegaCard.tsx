@@ -147,10 +147,12 @@ export const MegaCard: React.FC<MegaCardProps> = ({ card, onCardUpdate }) => {
       ref={cardRef}
       className="absolute"
       style={{
-  transform: x.to((xVal) => `translateX(${xVal}px)`)
-    .concat(y.to((yVal) => `translateY(${yVal}px)`))
-    .concat(rotZ.to((rZ) => `rotateZ(${rZ}deg)`)),
-}}
+  transform: x.to((xVal) => 
+    y.to((yVal) =>
+      rotZ.to((rZ) => `translateX(${xVal}px) translateY(${yVal}px) rotateZ(${rZ}deg)`)
+    )
+  ),
+      }}
     >
       <div className="bg-white rounded-lg shadow-lg p-4 text-center">
         <p>{t('card')}: {card.id}</p>
