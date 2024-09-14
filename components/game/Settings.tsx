@@ -96,7 +96,7 @@ export const Settings: React.FC<SettingsProps> = ({ onUpdateSettings }) => {
         >
           <animated.div
             style={slideIn}
-            className="absolute top-10 left-0 bg-black p-5 w-64 rounded-lg text-white"
+            className="absolute top-10 left-1 bg-black p-5 w-64 rounded-lg text-white"
             onClick={(e) => e.stopPropagation()} // Prevent modal close on inner click
           >
             <h2 className="text-xl mb-4">{t('settings.title')}</h2>
@@ -105,7 +105,18 @@ export const Settings: React.FC<SettingsProps> = ({ onUpdateSettings }) => {
               {t('settings.restoreDefaults')}
             </button>
 
-            <div>
+            <div style={{
+      position: 'fixed',
+  
+      padding: '0 13px',
+      display: 'grid',
+      gridTemplateColumns: '1fr', // Adjust grid to accommodate labels and sliders neatly
+      gap: '10px',
+      justifyContent: 'space-between',
+      backgroundColor: "#13131313",
+      borderRadius: '13px',
+      boxShadow: '0 0 10px rgba(0,0,0,0.5)'
+    }}>
               {/* Physics Settings */}
               <label>
                 {t('settings.yeetCoefficient')}: {yeetCoefficient}

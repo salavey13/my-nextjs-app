@@ -108,7 +108,7 @@ const [physicsParams, setPhysicsParams] = useState<PhysicsSettings>({
     };
 
     handleSubscription();
-  }, [user]);
+  }, [user, gameState]);
 
   const shuffleCards = async () => {
     if (!gameState) return;
@@ -194,6 +194,7 @@ const [physicsParams, setPhysicsParams] = useState<PhysicsSettings>({
                 transform: `rotate(${targetFrame.rotation}deg)`,
                 border: '2px dashed #E1FF01',
                 borderRadius: '8px',
+                zIndex:1000,
             }}
         />
     </div>

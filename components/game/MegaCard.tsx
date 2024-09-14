@@ -43,8 +43,8 @@ export const MegaCard: React.FC<MegaCardProps> = ({ card, onCardUpdate }) => {
 
   // Spring for animated movement
   const [{ x, y, rotX, rotZ }, setSpring] = useSpring(() => ({
-    x: card.position.x * window.innerWidth,
-    y: card.position.y * window.innerHeight,
+    x: cardPosition.x * window.innerWidth,
+    y: cardPosition.y * window.innerHeight,
     rotX: 0,
     rotZ: card.rotations * 180,
     config: { mass, tension, friction },
@@ -54,14 +54,18 @@ export const MegaCard: React.FC<MegaCardProps> = ({ card, onCardUpdate }) => {
   useEffect(() => {
     const channel = supabase
       .channel('realtime-cards')
-      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'cards', filter: `id=eq.${card.id}` }, (payload) => {
-        const updatedCard = payload.new as Card;
-        if (updatedCard.id === card.id) {
-          onCardUpdate(updatedCard);
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'rents', filter: `id=eq.${user?.currentGameId}` }, (payload) => {
+        const updatedCards = payload.new.cards as Card[];
+;
+        // Find the updated card that matches the current card id
+        const matchingCard = updatedCards.find(c => c.id === card.id);
+
+        if (matchingCard) {
+            console.log("GOT CARD UPDATE!")
           setSpring.start({
-            x: updatedCard.position.x * window.innerWidth,
-            y: updatedCard.position.y * window.innerHeight,
-            rotZ: updatedCard.rotations * 180,
+            x: matchingCard.position.x * window.innerWidth,
+            y: matchingCard.position.y * window.innerHeight,
+            rotZ: matchingCard.rotations * 180,
           });
         }
       })
@@ -193,8 +197,8 @@ export const MegaCard: React.FC<MegaCardProps> = ({ card, onCardUpdate }) => {
     `translateX(${xVal}px) translateY(${yVal}px) rotateZ(${rZ}deg)`
   ),
       //transform: `rotateX(${rotX.get()}deg) rotateZ(${rotZ.get()}deg)`,
-      x,//: cardPosition.x, // Updated to use local state
-      y,//: cardPosition.y, // Updated to use local state
+      x: cardPosition.x, // Updated to use local state
+      y: cardPosition.y, // Updated to use local state
       touchAction: 'none',
       position: 'absolute',
     }}
