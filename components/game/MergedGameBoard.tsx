@@ -155,7 +155,7 @@ const [physicsParams, setPhysicsParams] = useState<PhysicsSettings>({
     setPhysicsParams(settings);
   };
   return (
-    <div className="game-board">
+    <div className="game-board-container min-h-[calc(100vh-128px)] overflow-y-auto overflow-x-auto">
       {/* Settings Button */}
       <Settings onUpdateSettings={handleUpdateSettings}/>
 
