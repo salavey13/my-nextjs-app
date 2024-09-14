@@ -1,5 +1,18 @@
 import { LanguageDictionary } from "../utils/TranslationUtils";
 export const ru: LanguageDictionary = {
+  "settings": {
+    "title": "Настройки",
+    "restoreDefaults": "Включить магию (или сбросить до заводских)",
+    "yeetCoefficient": "Коэффициент 'Йит' (Секретный ингредиент)",
+    "mass": "Масса (Сколько весит твой неудачный 'йит')",
+    "tension": "Напряжение (Как при встрече с бывшим)",
+    "friction": "Сопротивление (Как твои попытки проскользнуть мимо мамы)",
+    "rotationDistance": "Расстояние поворота (Не для оборота в 360°)",
+    "yeetVelocityThreshold": "Порог 'Йита' (Чтобы не улететь за пределы экрана)",
+    "minMovementThreshold": "Минимальный порог движения (Не для вялых попыток)",
+    "github": "Посмотреть на GitHub (Где код живет и радуется)",
+    "version": "Версия 0.13 (Почти как 0.14, но без фокусов)"
+  },
   "yeetCoefficient": "Коэффициент выброса",
   "tension": "Натяжение",
   "rotationDistance": "Расстояние вращения",
