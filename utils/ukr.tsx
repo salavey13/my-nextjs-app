@@ -9,7 +9,7 @@ export const ukr: LanguageDictionary = {
     "friction": "Стискання (Якщо спробуєш бути гладким)",
     "rotationDistance": "Відстань обертання (Не для спіральних танців)",
     "yeetVelocityThreshold": "Поріг 'Йіта' (Щоб не злетіти до зірок)",
-    "minMovementThreshold": "Мінімальний поріг руху (Не для лінивих)',
+    "minMovementThreshold": "Мінімальний поріг руху (Не для лінивих)",
     "github": "Переглянути на GitHub (Місце, де код грає в хованки)",
     "version": "Версія 0.13 (Близько до 0.14, але без сюрпризів)"
   },
