@@ -17,7 +17,6 @@ export const en: LanguageDictionary = {
     complete: "Complete",
     delete: "Delete",
     // UI
-    settings: "Settings",
     referrals: "Referrals",
     top13: "Leaderboard",
     menu: "Menu",
