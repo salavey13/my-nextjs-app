@@ -175,7 +175,14 @@ const [physicsParams, setPhysicsParams] = useState<PhysicsSettings>({
       ))}*/}
 
       {/* Shuffle Cards Button */}
-      <Button onClick={shuffleCards}>Shuffle Cards</Button>
+      <Button
+        onClick={shuffleCards}
+        className="bg-gray-800 text-white rounded-full p-2 w-10 h-10 flex items-center justify-center"
+        aria-label={t('shufle')}
+      >
+        👯
+      </Button>
+
     </div>
   );
 };
