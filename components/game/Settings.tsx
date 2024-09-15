@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { animated, useSpring } from 'react-spring';
 import { useAppContext } from '@/context/AppContext'; // For translations and app context
 import { Button } from '../ui/button';
+import { supabase } from '../../lib/supabaseClient'; // Assuming you use Supabase to manage game_state
 
 interface SettingsProps {
   onUpdateSettings: (settings: PhysicsSettings) => void;
@@ -28,17 +29,11 @@ const defaultSettings: PhysicsSettings = {
 };
 
 export const Settings: React.FC<SettingsProps> = ({ onUpdateSettings }) => {
-  const { t } = useAppContext(); // Translation function
+  const { user, t } = useAppContext(); // Translation function
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   // State for all physics settings
-  const [yeetCoefficient, setYeetCoefficient] = useState(() => Number(localStorage.getItem('yeetCoefficient')) || defaultSettings.yeetCoefficient);
-  const [mass, setMass] = useState(() => Number(localStorage.getItem('mass')) || defaultSettings.mass);
-  const [tension, setTension] = useState(() => Number(localStorage.getItem('tension')) || defaultSettings.tension);
-  const [friction, setFriction] = useState(() => Number(localStorage.getItem('friction')) || defaultSettings.friction);
-  const [rotationDistance, setRotationDistance] = useState(() => Number(localStorage.getItem('rotationDistance')) || defaultSettings.rotationDistance);
-  const [yeetVelocityThreshold, setYeetVelocityThreshold] = useState(() => Number(localStorage.getItem('yeetVelocityThreshold')) || defaultSettings.yeetVelocityThreshold);
-  const [minMovementThreshold, setMinMovementThreshold] = useState(() => Number(localStorage.getItem('minMovementThreshold')) || defaultSettings.minMovementThreshold);
+  const [settings, setSettings] = useState<PhysicsSettings>(defaultSettings);
 
   // Spring animation for sliding the settings panel
   const slideIn = useSpring({
@@ -47,35 +42,51 @@ export const Settings: React.FC<SettingsProps> = ({ onUpdateSettings }) => {
 
   const toggleModal = () => setIsModalOpen(!isModalOpen);
 
-  const restoreDefaults = () => {
-    Object.keys(defaultSettings).forEach((key) => {
-      localStorage.setItem(key, String(defaultSettings[key as keyof PhysicsSettings]));
-    });
-    window.location.reload(); // Reload to apply default settings
+  const restoreDefaults = async () => {
+    setSettings(defaultSettings);
+    await supabase
+      .from('game_state')
+      .update({ physicsSettings: defaultSettings })
+      .eq('id', user?.currentGameId); 
+    onUpdateSettings(defaultSettings);
   };
 
-  // Save settings to localStorage and update parent component
+  // Fetch the settings from game_state on component mount
   useEffect(() => {
-    const settings: PhysicsSettings = {
-      yeetCoefficient,
-      mass,
-      tension,
-      friction,
-      rotationDistance,
-      yeetVelocityThreshold,
-      minMovementThreshold,
+    const fetchSettings = async () => {
+      const { data, error } = await supabase
+        .from('game_state')
+        .select('physicsSettings')
+        .eq('id', user?.currentGameId) 
+        .single();
+
+      if (data && !error) {
+        setSettings(data.physicsSettings || defaultSettings);
+      }
     };
 
-    localStorage.setItem('yeetCoefficient', String(yeetCoefficient));
-    localStorage.setItem('mass', String(mass));
-    localStorage.setItem('tension', String(tension));
-    localStorage.setItem('friction', String(friction));
-    localStorage.setItem('rotationDistance', String(rotationDistance));
-    localStorage.setItem('yeetVelocityThreshold', String(yeetVelocityThreshold));
-    localStorage.setItem('minMovementThreshold', String(minMovementThreshold));
+    fetchSettings();
+  }, [supabase]);
 
+  // Update game_state whenever settings change
+  useEffect(() => {
+    const saveSettings = async () => {
+      await supabase
+        .from('game_state')
+        .update({ physicsSettings: settings })
+        .eq('id', user?.currentGameId); // Replace with actual game state id
+    };
+
+    saveSettings();
     onUpdateSettings(settings);
-  }, [yeetCoefficient, mass, tension, friction, rotationDistance, yeetVelocityThreshold, minMovementThreshold, onUpdateSettings]);
+  }, [settings, supabase, onUpdateSettings]);
+
+  const handleChange = (key: keyof PhysicsSettings, value: number) => {
+    setSettings((prevSettings) => ({
+      ...prevSettings,
+      [key]: value,
+    }));
+  };
 
   return (
     <div>
@@ -85,7 +96,7 @@ export const Settings: React.FC<SettingsProps> = ({ onUpdateSettings }) => {
         className="bg-gray-800 text-white rounded-full p-2 w-10 h-10 flex items-center justify-center"
         aria-label={t('settings.gear')}
       >
-        ⚙️
+        ⛭
       </button>
 
       {/* Modal with sliding settings panel */}
@@ -93,90 +104,57 @@ export const Settings: React.FC<SettingsProps> = ({ onUpdateSettings }) => {
         <div
           id="modal-background"
           onClick={() => setIsModalOpen(false)}
-          
-          className="fixed top-13 left-10 h-full bg-black bg-opacity-50 z-50"
+          className="fixed w-full h-full bg-black bg-opacity-50 z-50 overflow-x-scroll"
         >
           <animated.div
             style={slideIn}
-
-            className="absolute top-13 left-10 bg-black p-5 rounded-lg text-white"
+            className="absolute top-13 left-0 h-1/2 bg-black p-5 rounded-lg text-white"
             onClick={(e) => e.stopPropagation()} // Prevent modal close on inner click
           >
-            
-            
-
             <div style={{
-      position: 'fixed',
-  
-      padding: '13px 13px',
-      display: 'grid',
-      gridTemplateColumns: '2fr 1fr 0.5fr', // Adjust grid to accommodate labels and sliders neatly
-      gap: '10px',
-      justifyContent: 'space-between',
-      backgroundColor: "#131313",
-      borderRadius: '13px',
-      boxShadow: '0 0 10px rgba(0,0,0,0.5)'
-    }}>
-              {/* Physics Settings */}
+              position: 'fixed',
+              padding: '13px 13px',
+              display: 'grid',
+              gridTemplateColumns: '2fr 1fr 0.5fr', // Adjust grid to accommodate labels and sliders neatly
+              gap: '10px',
+              justifyContent: 'space-between',
+              backgroundColor: "#131313",
+              borderRadius: '13px',
+              boxShadow: '0 0 10px rgba(0,0,0,0.5)',
+            }}>
               <div/><h2 className="text-xl mb-4 bg-black">{t('settings.title')}</h2>
-<Button onClick={restoreDefaults} variant="outline" className="bg-white text-black p-2 rounded-lg mb-4">
-                OK
-              {/* {t('settings.restoreDefaults')} */}
-            </Button>
-              <label>
-                {t('settings.yeetCoefficient')}: 
-              </label>
-              <input type="range" min="0.1" max="10" step="0.1" value={yeetCoefficient} onChange={(e) => setYeetCoefficient(Number(e.target.value))} />
-{yeetCoefficient}
-              <label>
-                {t('settings.mass')}: 
-                </label>
-                <input type="range" min="0.1" max="5" step="0.1" value={mass} onChange={(e) => setMass(Number(e.target.value))} />
-              {mass}
+              <Button onClick={restoreDefaults} variant="outline" className="bg-white text-black p-2 rounded-lg mb-4">
+                😭
+              </Button>
 
-              <label>
-                {t('settings.tension')}: 
-                </label>
-                <input type="range" min="50" max="500" step="10" value={tension} onChange={(e) => setTension(Number(e.target.value))} />
-              {tension}
+              <label className="text-xs">{t('settings.yeetCoefficient')}:</label>
+              <input type="range" min="0.1" max="10" step="0.1" value={settings.yeetCoefficient} onChange={(e) => handleChange('yeetCoefficient', Number(e.target.value))} />
+              {settings.yeetCoefficient}
 
-              <label>
-                {t('settings.friction')}: 
-                </label>
-                <input type="range" min="1" max="100" step="1" value={friction} onChange={(e) => setFriction(Number(e.target.value))} />
-              {friction}
+              <label className="text-xs">{t('settings.mass')}:</label>
+              <input type="range" min="0.1" max="5" step="0.1" value={settings.mass} onChange={(e) => handleChange('mass', Number(e.target.value))} />
+              {settings.mass}
 
-              <label>
-                {t('settings.rotationDistance')}: 
-                </label>
-                <input type="range" min="10" max="100" step="1" value={rotationDistance} onChange={(e) => setRotationDistance(Number(e.target.value))} />
-              {rotationDistance}
+              <label className="text-xs">{t('settings.tension')}:</label>
+              <input type="range" min="50" max="500" step="10" value={settings.tension} onChange={(e) => handleChange('tension', Number(e.target.value))} />
+              {settings.tension}
 
-              <label>
-                {t('settings.yeetVelocityThreshold')}: 
-                </label>
-                <input type="range" min="0.1" max="10" step="0.1" value={yeetVelocityThreshold} onChange={(e) => setYeetVelocityThreshold(Number(e.target.value))} />
-              {yeetVelocityThreshold}
+              <label className="text-xs">{t('settings.friction')}:</label>
+              <input type="range" min="1" max="100" step="1" value={settings.friction} onChange={(e) => handleChange('friction', Number(e.target.value))} />
+              {settings.friction}
 
-              <label>
-                {t('settings.minMovementThreshold')}: 
-                </label>
-                <input type="range" min="1" max="100" step="1" value={minMovementThreshold} onChange={(e) => setMinMovementThreshold(Number(e.target.value))} />
-              {minMovementThreshold}
+              <label className="text-xs">{t('settings.rotationDistance')}:</label>
+              <input type="range" min="10" max="100" step="1" value={settings.rotationDistance} onChange={(e) => handleChange('rotationDistance', Number(e.target.value))} />
+              {settings.rotationDistance}
+
+              <label className="text-xs">{t('settings.yeetVelocityThreshold')}:</label>
+              <input type="range" min="0.1" max="10" step="0.1" value={settings.yeetVelocityThreshold} onChange={(e) => handleChange('yeetVelocityThreshold', Number(e.target.value))} />
+              {settings.yeetVelocityThreshold}
+
+              <label className="text-xs">{t('settings.minMovementThreshold')}:</label>
+              <input type="range" min="1" max="100" step="1" value={settings.minMovementThreshold} onChange={(e) => handleChange('minMovementThreshold', Number(e.target.value))} />
+              {settings.minMovementThreshold}
             </div>
-
-            <a
-              href="https://github.com/salavey13/my-nextjs-app"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block mt-2 p-2 bg-white text-black text-center rounded"
-            >
-              {t('settings.github')}
-            </a>
-
-            <p className="text-gray-500 text-center text-sm mt-6">
-              {t('settings.version')}
-            </p>
           </animated.div>
         </div>
       )}

@@ -21,6 +21,7 @@ interface Card {
   rotations: number;
   velocity: { x: number; y: number };
   direction: { x: number; y: number };
+  zIndex: number;
 }
 
 interface Player {
@@ -123,8 +124,9 @@ const GameBoard: React.FC = () => {
     const shuffledCards = gameState.cards
       .map((card, idx) => ({
         ...card,
-        position: { x: 0, y: idx * 10 }, // Stack cards vertically
+        position: { x: 13/window.innerHeight, y: 0.5 }, // Stack cards vertically
         last_position: card.position,
+        zIndex: Math.floor(Math.random() * 36), // Random z-index
         flipped: idx === 0 ? true : false, // Only the top card (trump) is flipped
       }))
       .sort(() => Math.random() - 0.5);
@@ -144,6 +146,43 @@ const GameBoard: React.FC = () => {
 
     randomizeTargetFrame();
   };
+
+
+// Add player automatically if not present
+useEffect(() => {
+  const addPlayerIfNeeded = async () => {
+    if (!gameState || !user) return;
+
+    const playerExists = gameState.players?.some((player) => player.id === user.id.toString());
+
+    if (!playerExists || !gameState.players) {
+      const newPlayer = {
+        id: user.id.toString(),
+        username: user.telegram_username,
+        position: { x: Math.random() * 320/window.innerWidth, y: Math.random() * 320 / window.innerHeight },
+      };
+      
+      const updatedPlayers = [...gameState.players?gameState.players:[], newPlayer];
+      const updatedGameState = { ...gameState, players: updatedPlayers };
+
+      const { error } = await supabase
+        .from('rents')
+        .update({ game_state: updatedGameState })
+        .eq('id', user?.currentGameId);
+
+      if (error) {
+        console.error('Error adding player:', error);
+      } else {
+        setGameState(updatedGameState);
+      }
+    }
+  };
+
+  if (gameState) {
+    addPlayerIfNeeded();
+  }
+}, [gameState, user]);
+
 
   const handlePositionChange = (playerId: number, newPos: Point) => {
     setPlayerPositions((prev) => ({ ...prev, [playerId]: newPos }));
@@ -167,6 +206,44 @@ const GameBoard: React.FC = () => {
     setPhysicsParams(settings);
   };
 
+  const addPlayer = async (newPlayerId:string) => {
+    if (!gameState) return;
+  
+    const newPlayer = { id: newPlayerId, position: { x: 200, y: 300 } }; // Initial position
+  
+    const updatedGameState = { ...gameState, players: [...gameState.players, newPlayer] };
+  
+    const { error } = await supabase
+      .from('rents')
+      .update({ game_state: updatedGameState })
+      .eq('id', user?.currentGameId);
+  
+    if (error) {
+      console.error('Error adding player:', error);
+    } else {
+      setGameState(updatedGameState);
+    }
+  };
+
+  const kickPlayer = async (playerId:string) => {
+    if (!gameState) return;
+  
+    const updatedPlayers = gameState.players.filter(player => player.id !== playerId);
+  
+    const updatedGameState = { ...gameState, players: updatedPlayers };
+  
+    const { error } = await supabase
+      .from('rents')
+      .update({ game_state: updatedGameState })
+      .eq('id', user?.currentGameId);
+  
+    if (error) {
+      console.error('Error kicking player:', error);
+    } else {
+      setGameState(updatedGameState);
+    }
+  };
+
   return (
     <div className="game-board min-h-[calc(100vh-128px)]">
       {/* Settings Button */}
@@ -174,7 +251,7 @@ const GameBoard: React.FC = () => {
 
       {/* Game Cards */}
       {gameState?.cards.map((card) => (
-        <MegaCard key={card.id} card={card} onCardUpdate={onCardUpdate} />
+        <MegaCard  key={card.id} card={card} onCardUpdate={onCardUpdate} />
       ))}
 
       {/* Shuffle Cards Button */}
@@ -200,6 +277,22 @@ const GameBoard: React.FC = () => {
           borderRadius: '5px',
         }}
       />
+      {gameState?.players?.map((player) => (
+        <div
+          key={player.id}
+          style={{
+            width: '13px',
+            height: '13px',
+            borderRadius: '50%',
+            backgroundColor: '#e1ff01',
+            border: '2',
+            borderColor: 'white',
+            position: 'absolute',
+            left: `${player.position.x * window.innerWidth}px`,
+            top: `${player.position.y * window.innerHeight}px`,
+          }}
+        />
+      ))}
     </div>
   );
 };

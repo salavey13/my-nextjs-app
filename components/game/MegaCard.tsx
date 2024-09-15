@@ -3,7 +3,7 @@ import { useSpring, animated, to } from 'react-spring';
 import { useGesture } from '@use-gesture/react';
 import { cardsImages } from './CardsImgs';
 import { useAppContext } from '@/context/AppContext';
-
+interface Point { x: number; y: number };
 interface Card {
   id: CardId;
   position: { x: number; y: number };
@@ -12,6 +12,7 @@ interface Card {
   rotations: number;
   velocity: { x: number; y: number };
   direction: { x: number; y: number };
+  zIndex: number;
 }
 
 export type CardId = keyof typeof cardsImages;
@@ -20,7 +21,11 @@ interface MegaCardProps {
   card: Card;
   onCardUpdate: (card: Card) => void;
 }
-
+const isInPersonalRadius = (cardPos:Point, playerPos:Point) => {
+  const dx = cardPos.x - playerPos.x;
+  const dy = cardPos.y - playerPos.y;
+  return Math.sqrt(dx * dx + dy * dy) <= 113;
+};
 export const MegaCard: React.FC<MegaCardProps> = ({ card, onCardUpdate }) => {
   const cardRef = useRef<HTMLDivElement | null>(null);
   const [cardPosition, setCardPosition] = useState(card.position);
@@ -31,14 +36,17 @@ export const MegaCard: React.FC<MegaCardProps> = ({ card, onCardUpdate }) => {
   const { t } = useAppContext(); // Accessing context for user and translation
   const [rotations, setRotations] = useState(card.rotations);
 
+  // Example player's position (replace this with actual data)
+  const [playerPosition, setPlayerPosition] = useState<Point>({ x: window.innerWidth/2, y: window.innerHeight });
+
   // Physics settings from local storage or defaults
-  const [yeetCoefficient, setYeetCoefficient] = useState(() => Number(localStorage.getItem('yeetCoefficient')) || 2);
-  const [mass, setMass] = useState(() => Number(localStorage.getItem('mass')) || 1);
-  const [tension, setTension] = useState(() => Number(localStorage.getItem('tension')) || 210);
-  const [rotationDistance, setRotationDistance] = useState(() => Number(localStorage.getItem('rotationDistance')) || 69);
-  const [friction, setFriction] = useState(() => Number(localStorage.getItem('friction')) || 20);
-  const [yeetVelocityThreshold, setYeetVelocityThreshold] = useState(() => Number(localStorage.getItem('yeetVelocityThreshold')) || 3.1);
-  const [minMovementThreshold, setMinMovementThreshold] = useState(() => Number(localStorage.getItem('minMovementThreshold')) || 20);
+  const [yeetCoefficient, setYeetCoefficient] = useState(2);
+  const [mass, setMass] = useState(1);
+  const [tension, setTension] = useState(210);
+  const [rotationDistance, setRotationDistance] = useState(69);
+  const [friction, setFriction] = useState(20);
+  const [yeetVelocityThreshold, setYeetVelocityThreshold] = useState(3.1);
+  const [minMovementThreshold, setMinMovementThreshold] = useState(20);
 
   // Spring for animated movement
   const [{ x, y, rotX, rotZ }, setSpring] = useSpring(() => ({
@@ -154,7 +162,7 @@ export const MegaCard: React.FC<MegaCardProps> = ({ card, onCardUpdate }) => {
       style={{
         width: '30px',  // Adjusted card width
         height: '45px', // Adjusted card height
-        backgroundImage: `url(${cardsImages[card.flipped ? card.id : "shirt"]})`,
+        backgroundImage: `url(${cardsImages[(card.flipped || isInPersonalRadius(card.position, playerPosition)) ? card.id : "shirt"]})`,
         borderRadius: '2px',
         backgroundSize: 'cover',
         transform: to([x, y, rotZ], (xVal, yVal, rZ) =>
@@ -162,6 +170,7 @@ export const MegaCard: React.FC<MegaCardProps> = ({ card, onCardUpdate }) => {
         ),
         touchAction: 'none',
         position: 'absolute',
+        zIndex: card.zIndex
       }}
     />
   );
