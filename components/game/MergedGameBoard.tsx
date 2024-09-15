@@ -76,39 +76,42 @@ const [physicsParams, setPhysicsParams] = useState<PhysicsSettings>({
   };
 
   useEffect(() => {
-    const handleSubscription = async () => {
-      const { data, error } = await supabase
-        .from('rents')
-        .select('game_state')
-        .eq('id', user?.currentGameId)
-        .single();
+  const handleSubscription = async () => {
+    if (!user?.currentGameId) return; // Ensure gameId is available
 
-      if (error) {
-        console.error('Error fetching game state:', error);
-      } else {
-        setGameState(data.game_state);
-      }
+    const { data, error } = await supabase
+      .from('rents')
+      .select('game_state')
+      .eq('id', user?.currentGameId)
+      .single();
 
-      const channel = supabase
-        .channel('notify_game_update')
-        .on(
-          'postgres_changes',
-          { event: 'UPDATE', schema: 'public', table: 'rents', filter: `id=eq.${user?.currentGameId}` },
-          (payload) => {
-            setGameState(payload.new.game_state);
-          }
-        )
-        .subscribe();
+    if (error) {
+      console.error('Error fetching game state:', error);
+    } else {
+      setGameState(data.game_state); // Set the initial game state
+    }
 
-      setSubscription(channel);
+    const channel = supabase
+      .channel('notify_game_update')
+      .on(
+        'postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'rents', filter: `id=eq.${user?.currentGameId}` },
+        (payload) => {
+          setGameState(payload.new.game_state); // Update game state with new data
+        }
+      )
+      .subscribe();
 
-      return () => {
-        supabase.removeChannel(channel);
-      };
+    setSubscription(channel);
+
+    return () => {
+      supabase.removeChannel(channel); // Clean up subscription on unmount
     };
+  };
 
-    handleSubscription();
-  }, [user, gameState]);
+  handleSubscription();
+}, [user?.currentGameId]); // Only depend on the gameId, not the gameState
+
 
   const shuffleCards = async () => {
     if (!gameState) return;
