@@ -50,32 +50,6 @@ export const MegaCard: React.FC<MegaCardProps> = ({ card, onCardUpdate }) => {
     config: { mass, tension, friction },
   }));
 
-  // Subscribe to real-time updates from Supabase
-  useEffect(() => {
-    const channel = supabase
-      .channel('realtime-cards')
-      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'rents', filter: `id=eq.${user?.currentGameId}` }, (payload) => {
-        const updatedCards = payload.new.cards as Card[];
-;
-        // Find the updated card that matches the current card id
-        const matchingCard = updatedCards.find(c => c.id === card.id);
-
-        if (matchingCard) {
-            console.log("GOT CARD UPDATE!")
-          setSpring.start({
-            x: matchingCard.position.x * window.innerWidth,
-            y: matchingCard.position.y * window.innerHeight,
-            rotZ: matchingCard.rotations * 180,
-          });
-        }
-      })
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [card.id, onCardUpdate, setSpring]);
-
   // Update spring on card position change
   useEffect(() => {
     setSpring.start({
@@ -125,19 +99,28 @@ export const MegaCard: React.FC<MegaCardProps> = ({ card, onCardUpdate }) => {
   
         if (!isYeeted) {
           // Normal drag, update the card position in Supabase
+          const newPos = normalizePosition(
+              preDragPositionRef.current.x * window.innerWidth + mx,
+              preDragPositionRef.current.y * window.innerHeight + my
+          );
+
           onCardUpdate({
             ...card,
-            position: normalizePosition(
-              preDragPositionRef.current.x * window.innerWidth + mx,
-              preDragPositionRef.current.y * window.innerHeight + my
-            ),
+            position: newPos,
             last_position: preDragPositionRef.current,
           });
-          // Finally, update the local card position state
-          setCardPosition(normalizePosition(
-              preDragPositionRef.current.x * window.innerWidth + mx,
-              preDragPositionRef.current.y * window.innerHeight + my
-          ));
+          
+          // Update the local card position state
+          setCardPosition(newPos);
+          
+          // Update Supabase with the new position
+          supabase
+            .from('rents')
+            .update({ cards: [{ ...card, position: newPos }] })
+            .eq('id', user?.currentGameId)
+            .then(({ error }) => {
+              if (error) console.error("Error updating card position:", error);
+            });
         } else {
           // Yeet logic
           const yeetDistanceX = mx * yeetCoefficient;
@@ -156,31 +139,35 @@ export const MegaCard: React.FC<MegaCardProps> = ({ card, onCardUpdate }) => {
           });
   
           // Update card data in Supabase with new position, rotation, and velocity
+          const newPos = normalizePosition(newX, newY);
           onCardUpdate({
             ...card,
-            position: normalizePosition(newX, newY),
+            position: newPos,
             rotations: newRotations,
             velocity: { x: vx, y: vy },
             last_position: preDragPositionRef.current,
           });
   
-          // Finally, update the local card position state
-          setCardPosition(normalizePosition(
-              newX,
-              newY
-          ));
-  
+          // Update the local card position state
+          setCardPosition(newPos);
+
+          // Update Supabase with the new position and rotation after yeet
+          supabase
+            .from('rents')
+            .update({ cards: [{ ...card, position: newPos, rotations: newRotations }] })
+            .eq('id', user?.currentGameId)
+            .then(({ error }) => {
+              if (error) console.error("Error updating card after yeet:", error);
+            });
+
           setIsYeeted(false); // Reset yeet status
         }
   
         // Handle flip logic based on rotation angle
         const flippedStatus = rotX.get() % 180 === 0;
         onCardUpdate({ ...card, flipped: flippedStatus });
-  
-  
       },
       onDoubleClick: flipCard, // Handle card flipping on double-click
-
   });
 
   return (
@@ -196,13 +183,10 @@ export const MegaCard: React.FC<MegaCardProps> = ({ card, onCardUpdate }) => {
       transform: to([x, y, rotZ], (xVal, yVal, rZ) => 
     `translateX(${xVal}px) translateY(${yVal}px) rotateZ(${rZ}deg)`
   ),
-      //transform: `rotateX(${rotX.get()}deg) rotateZ(${rotZ.get()}deg)`,
-      x: cardPosition.x, // Updated to use local state
-      y: cardPosition.y, // Updated to use local state
       touchAction: 'none',
       position: 'absolute',
     }}
-/>
+  />
   );
 };
 
