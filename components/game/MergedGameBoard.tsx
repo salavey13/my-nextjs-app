@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabaseClient';
-//import MegaAvatar from './MegaAvatar';
 import { MegaCard, CardId } from '@/components/game/MegaCard';
 import { Button } from '@/components/ui/button';
 import { useAppContext } from '@/context/AppContext';
@@ -41,7 +40,7 @@ const GameBoard: React.FC = () => {
   const { user, t } = useAppContext();
   const [targetFrame, setTargetFrame] = useState({ x: 400, y: 300, rotation: 0 });
   const [settingsOpen, setSettingsOpen] = useState(false); // Settings button toggle
-const [physicsParams, setPhysicsParams] = useState<PhysicsSettings>({
+  const [physicsParams, setPhysicsParams] = useState<PhysicsSettings>({
     yeetCoefficient: 2,
     mass: 1,
     tension: 210,
@@ -66,9 +65,14 @@ const [physicsParams, setPhysicsParams] = useState<PhysicsSettings>({
       card.id === updatedCard.id ? updatedCard : card
     );
 
+    // Update the state locally
+    const updatedGameState = { ...gameState, cards: updatedCards };
+    setGameState(updatedGameState);
+
+    // Save updated state to Supabase
     supabase
       .from('rents')
-      .update({ game_state: { cards: updatedCards } })
+      .update({ game_state: updatedGameState })
       .eq('id', user?.currentGameId)
       .then(() => {
         console.log('Card updated successfully in Supabase');
@@ -76,48 +80,53 @@ const [physicsParams, setPhysicsParams] = useState<PhysicsSettings>({
   };
 
   useEffect(() => {
-  const handleSubscription = async () => {
-    if (!user?.currentGameId) return; // Ensure gameId is available
+    const handleSubscription = async () => {
+      if (!user?.currentGameId) return; // Ensure gameId is available
 
-    const { data, error } = await supabase
-      .from('rents')
-      .select('game_state')
-      .eq('id', user?.currentGameId)
-      .single();
+      const { data, error } = await supabase
+        .from('rents')
+        .select('game_state')
+        .eq('id', user?.currentGameId)
+        .single();
 
-    if (error) {
-      console.error('Error fetching game state:', error);
-    } else {
-      setGameState(data.game_state); // Set the initial game state
-    }
+      if (error) {
+        console.error('Error fetching game state:', error);
+      } else {
+        setGameState(data.game_state); // Set the initial game state
+      }
 
-    const channel = supabase
-      .channel('notify_game_update')
-      .on(
-        'postgres_changes',
-        { event: 'UPDATE', schema: 'public', table: 'rents', filter: `id=eq.${user?.currentGameId}` },
-        (payload) => {
-          setGameState(payload.new.game_state); // Update game state with new data
-        }
-      )
-      .subscribe();
+      const channel = supabase
+        .channel('notify_game_update')
+        .on(
+          'postgres_changes',
+          { event: 'UPDATE', schema: 'public', table: 'rents', filter: `id=eq.${user?.currentGameId}` },
+          (payload) => {
+            setGameState(payload.new.game_state); // Update game state with new data
+          }
+        )
+        .subscribe();
 
-    setSubscription(channel);
+      setSubscription(channel);
 
-    return () => {
-      supabase.removeChannel(channel); // Clean up subscription on unmount
+      return () => {
+        supabase.removeChannel(channel); // Clean up subscription on unmount
+      };
     };
-  };
 
-  handleSubscription();
-}, [user?.currentGameId]); // Only depend on the gameId, not the gameState
+    handleSubscription();
+  }, [user?.currentGameId]); // Only depend on the gameId, not the gameState
 
 
   const shuffleCards = async () => {
     if (!gameState) return;
 
     const shuffledCards = gameState.cards
-      .map((card) => ({ ...card, position: { x: Math.random(), y: Math.random() },last_position: card.position }))
+      .map((card, idx) => ({
+        ...card,
+        position: { x: 0, y: idx * 10 }, // Stack cards vertically
+        last_position: card.position,
+        flipped: idx === 0 ? true : false, // Only the top card (trump) is flipped
+      }))
       .sort(() => Math.random() - 0.5);
 
     const updatedGameState = { ...gameState, cards: shuffledCards };
@@ -153,52 +162,44 @@ const [physicsParams, setPhysicsParams] = useState<PhysicsSettings>({
         .eq('id', user?.currentGameId);
     }
   };
-// Handler to update settings
+  
   const handleUpdateSettings = (settings: PhysicsSettings) => {
     setPhysicsParams(settings);
   };
+
   return (
     <div className="game-board min-h-[calc(100vh-128px)]">
       {/* Settings Button */}
-      <Settings onUpdateSettings={handleUpdateSettings}/>
+      <Settings onUpdateSettings={handleUpdateSettings} />
 
       {/* Game Cards */}
       {gameState?.cards.map((card) => (
         <MegaCard key={card.id} card={card} onCardUpdate={onCardUpdate} />
       ))}
 
-      {/* Game Avatars 
-      {gameState?.players.map((player) => (
-        <MegaAvatar
-          key={player.id}
-          playerId={parseInt(player.id)}
-          initialPosition={player.position}
-          onPositionChange={handlePositionChange}
-        />
-      ))}*/}
-
       {/* Shuffle Cards Button */}
       <button
         onClick={shuffleCards}
         className="bg-gray-800 text-white rounded-full p-2 w-10 h-10 flex items-center justify-center"
-        aria-label={t('shufle')}
+        aria-label={t('shuffle')}
       >
-        👯
+        ↺
       </button>
-        {/* Target frame outline */}
-        <div
-            style={{
-                width: '42px',
-                height: '63px',
-                position: 'absolute',
-                borderColor: "#E1FF01",
-                top: targetFrame.y,
-                left: targetFrame.x,
-                transform: `rotate(${targetFrame.rotation}deg)`,
-                border: '2px dashed #E1FF01',
-                borderRadius: '5px',
-            }}
-        />
+
+      {/* Target frame outline */}
+      <div
+        style={{
+          width: '42px',
+          height: '63px',
+          position: 'absolute',
+          borderColor: "#E1FF01",
+          top: targetFrame.y,
+          left: targetFrame.x,
+          transform: `rotate(${targetFrame.rotation}deg)`,
+          border: '2px dashed #E1FF01',
+          borderRadius: '5px',
+        }}
+      />
     </div>
   );
 };
