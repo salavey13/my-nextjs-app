@@ -49,9 +49,9 @@ const HackButton: React.FC = () => {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-[calc(100vh-128px)]">
+    <div className="flex ">
       {/* <Button
-        onClick={handleClick}
+        onClick={handleClick}justify-center items-center min-h-[calc(100vh-128px)]
         className="bg-blue-500 text-white text-xl px-6 py-3 rounded-lg shadow-lg hover:bg-blue-600 transition-all"
       >
         {t('hackButton')}
