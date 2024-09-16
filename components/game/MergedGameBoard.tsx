@@ -60,7 +60,7 @@ const GameBoard: React.FC = () => {
   const [isShuffling, setIsShuffling] = useState(false);
   const [hasWebcamAccess, setHasWebcamAccess] = useState(false);
   const [hasVoiceAccess, setHasVoiceAccess] = useState(false);
-  const { showMainButton, hideMainButton, showAlert, setBottomBarColor, tg } = useTelegram();
+  const { showMainButton, setHeaderColor, showAlert, setBottomBarColor, tg } = useTelegram();
 
   const checkMediaAccess = useCallback(async () => {
     try {
@@ -147,7 +147,6 @@ const GameBoard: React.FC = () => {
     if (!gameState) return;
 
     setIsShuffling(true)
-    hideMainButton()
 
     const shuffledCards = gameState.cards
       .map((card, idx) => ({
@@ -179,6 +178,7 @@ const GameBoard: React.FC = () => {
       setIsShuffling(false);
       showMainButton(t('shufle'));
       setBottomBarColor("#282c33")
+      setHeaderColor("#282c33")
     }, 1000);
   };
 
@@ -258,6 +258,7 @@ const GameBoard: React.FC = () => {
     showMainButton(t('shufle'));
     tg?.MainButton?.setParams({color: "#e1ff01", text_color: "#000000"})
     setBottomBarColor("#282c33")
+    setHeaderColkr("#282c33")
   }, [showMainButton]);
 
   useEffect(() => {
