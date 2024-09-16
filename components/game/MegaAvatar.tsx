@@ -1,3 +1,5 @@
+// components/game/MegaAvatar.tsx
+
 import React, { useEffect, useRef, useState } from 'react';
 import { supabase } from "../../lib/supabaseClient";
 import { useSpring, animated, to } from 'react-spring';
