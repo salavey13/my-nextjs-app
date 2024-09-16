@@ -146,8 +146,7 @@ const GameBoard: React.FC = () => {
   const shuffleCards = async () => {
     if (!gameState) return;
 
-    setIsShuffling(true);
-    hideMainButton();
+    setIsShuffling(true)
 
     const shuffledCards = gameState.cards
       .map((card, idx) => ({
@@ -174,12 +173,7 @@ const GameBoard: React.FC = () => {
     }
 
     randomizeTargetFrame();
-
-    // Allow time for the shuffle animation to complete
-    setTimeout(() => {
-      setIsShuffling(false);
-      showMainButton(t('shuffle'));
-    }, 1000);
+    setIsShuffling(false)
   };
 
   useEffect(() => {
@@ -277,8 +271,8 @@ const GameBoard: React.FC = () => {
   if (!hasWebcamAccess || !hasVoiceAccess) {
     return (
       <div className="flex flex-col items-center justify-center h-screen">
-        <p className="text-xl mb-4">Please grant access to your camera and microphone to play the game.</p>
-        <Button onClick={checkMediaAccess}>Check Permissions</Button>
+        <p className="text-xl mb-4">{t("pleaseGrantAccess")}</p>
+        <Button onClick={checkMediaAccess}>{t("checkPermissions")}</Button>
       </div>
     );
   }
