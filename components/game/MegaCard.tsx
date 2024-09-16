@@ -72,6 +72,10 @@ export const MegaCard: React.FC<MegaCardProps> = ({ card, onCardUpdate, forceFli
         rotY: 0,
         rotZ: targetRotZ,
         config: { tension: 170, friction: 26 },
+        onRest: () => {
+        // After shuffle completes, reset card position properly.
+        setCardPosition(card.position);
+      },
       });
     }
   }, [isShuffling, card.position, card.rotations, setSpring]);
