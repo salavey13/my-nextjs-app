@@ -253,7 +253,6 @@ const GameBoard: React.FC = () => {
   };
   const {
     tg,
-    user,
     theme,
     openLink,
     showMainButton,
