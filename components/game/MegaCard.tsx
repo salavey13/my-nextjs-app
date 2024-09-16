@@ -60,8 +60,9 @@ export const MegaCard: React.FC<MegaCardProps> = ({ card, onCardUpdate, forceFli
 
   useEffect(() => {
     if (isShuffling) {
-      const targetX = card.position.x * window.innerWidth;
-      const targetY = card.position.y * window.innerHeight;
+      // Target stack position
+      const targetX = 13; // Fixed stack position for all cards
+      const targetY = 0.5 * window.innerHeight; // Midpoint of the screen, assuming you want them stacked vertically
       const targetRotZ = card.rotations * 360;
 
       setSpring.start({
