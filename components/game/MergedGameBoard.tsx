@@ -60,7 +60,7 @@ const GameBoard: React.FC = () => {
   const [isShuffling, setIsShuffling] = useState(false);
   const [hasWebcamAccess, setHasWebcamAccess] = useState(false);
   const [hasVoiceAccess, setHasVoiceAccess] = useState(false);
-  const { showMainButton, hideMainButton, showAlert, toggleThemeSettings } = useTelegram();
+  const { showMainButton, hideMainButton, showAlert, setBottomBarColor, tg } = useTelegram();
 
   const checkMediaAccess = useCallback(async () => {
     try {
@@ -178,6 +178,7 @@ const GameBoard: React.FC = () => {
     setTimeout(() => {
       setIsShuffling(false);
       showMainButton(t('shufle'));
+      setBottomBarColor("#282c33")
     }, 1000);
   };
 
@@ -251,18 +252,7 @@ const GameBoard: React.FC = () => {
     const dy = (card.position.y - player.position.y) * window.innerHeight;
     return Math.sqrt(dx * dx + dy * dy) <= CARD_PROXIMITY_THRESHOLD;
   };
-  const {
-    tg,
-    theme,
-    openLink,
-    showMainButton,
-    hideMainButton,
-    showBackButton,
-    closeWebApp,
-    setBottomBarColor,
-    setHeaderColor,
-    setBackgroundColor
-  } = useTelegram();
+  
 
   useEffect(() => {
     showMainButton(t('shufle'));
