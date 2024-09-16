@@ -3,6 +3,7 @@ import { useSpring, animated, to, config } from 'react-spring';
 import { useGesture } from '@use-gesture/react';
 import { cardsImages } from './CardsImgs';
 import { useAppContext } from '@/context/AppContext';
+import { PhysicsSettings } from './Settings';
 
 interface Card {
   id: CardId;
@@ -22,9 +23,10 @@ interface MegaCardProps {
   onCardUpdate: (card: Card) => void;
   forceFlipped: boolean;
   isShuffling: boolean;
+  physicsParams: PhysicsSettings;
 }
 
-export const MegaCard: React.FC<MegaCardProps> = ({ card, onCardUpdate, forceFlipped, isShuffling }) => {
+export const MegaCard: React.FC<MegaCardProps> = ({ card, onCardUpdate, forceFlipped, isShuffling, physicsParams }) => {
   const cardRef = useRef<HTMLDivElement | null>(null);
   const [cardPosition, setCardPosition] = useState(card.position);
   const preDragPositionRef = useRef({ x: card.last_position.x, y: card.last_position.y });
@@ -35,22 +37,15 @@ export const MegaCard: React.FC<MegaCardProps> = ({ card, onCardUpdate, forceFli
   const [rotations, setRotations] = useState(card.rotations);
   const [isFlipped, setIsFlipped] = useState(card.flipped);
 
-  const [yeetCoefficient, setYeetCoefficient] = useState(2);
-  const [mass, setMass] = useState(1);
-  const [tension, setTension] = useState(210);
-  const [rotationDistance, setRotationDistance] = useState(69);
-  const [friction, setFriction] = useState(20);
-  const [yeetVelocityThreshold, setYeetVelocityThreshold] = useState(3.1);
-  const [minMovementThreshold, setMinMovementThreshold] = useState(20);
-
-  const [{ x, y, rotX, rotY, rotZ, shadowBlur, shadowY }, setSpring] = useSpring(() => ({
+  const [{ x, y, rotX, rotY, rotZ, scale, shadowBlur, shadowY }, setSpring] = useSpring(() => ({
     x: cardPosition.x * window.innerWidth,
     y: cardPosition.y * window.innerHeight,
     rotX: 0,
     rotY: isFlipped ? 180 : 0,
     rotZ: card.rotations * 180,
-    shadowBlur: 10,
-    shadowY: 5,
+    scale: 1,
+    shadowBlur: 0,
+    shadowY: 0,
     config: { ...config.wobbly, clamp: true },
   }));
 
@@ -80,6 +75,13 @@ export const MegaCard: React.FC<MegaCardProps> = ({ card, onCardUpdate, forceFli
     }
   }, [isShuffling, card.position, card.rotations, setSpring]);
 
+  useEffect(() => {
+    if (forceFlipped && forceFlipped !== isFlipped) {
+      setIsFlipped(forceFlipped);
+      setSpring.start({ rotY: forceFlipped ? 0 : 180 });
+    }
+  }, [forceFlipped, isFlipped, setSpring]);
+
   const normalizePosition = (x: number, y: number) => ({
     x: x / window.innerWidth,
     y: y / window.innerHeight,
@@ -96,13 +98,14 @@ export const MegaCard: React.FC<MegaCardProps> = ({ card, onCardUpdate, forceFli
       setIsDragging(true);
       preDragPositionRef.current = { x: cardPosition.x, y: cardPosition.y };
       yeetLocked.current = false;
+      setSpring.start({ shadowBlur: 10, shadowY: 5, scale: 1.05 });
     },
     onDrag: ({ movement: [mx, my], velocity: [vx, vy] }) => {
       const currentX = preDragPositionRef.current.x * window.innerWidth + mx;
       const currentY = preDragPositionRef.current.y * window.innerHeight + my;
 
-      const isYeetPrep = Math.sqrt(vx * vx + vy * vy) > yeetVelocityThreshold && 
-                         Math.sqrt(mx * mx + my * my) > minMovementThreshold;
+      const isYeetPrep = Math.sqrt(vx * vx + vy * vy) > physicsParams.yeetVelocityThreshold && 
+                         Math.sqrt(mx * mx + my * my) > physicsParams.minMovementThreshold;
 
       if (isYeetPrep && !yeetLocked.current) {
         setIsYeeted(true);
@@ -118,43 +121,46 @@ export const MegaCard: React.FC<MegaCardProps> = ({ card, onCardUpdate, forceFli
       setIsDragging(false);
 
       if (isYeeted) {
-        const yeetDistanceX = vx * yeetCoefficient * mx;
-        const yeetDistanceY = vy * yeetCoefficient * my;
+        const yeetDistanceX = Math.max(1, Math.abs(vx)) * physicsParams.yeetCoefficient * Math.max(1, Math.abs(mx));
+        const yeetDistanceY = Math.max(1, Math.abs(vy)) * physicsParams.yeetCoefficient * Math.max(1, Math.abs(my));
         const yeetDistance = Math.sqrt(yeetDistanceX * yeetDistanceX + yeetDistanceY * yeetDistanceY);
-        const newRotations = Math.floor(yeetDistance / rotationDistance);
+        const newRotations = Math.floor(yeetDistance / (physicsParams.rotationDistance * 2)) % 42; // Limit to 0-13 rotations
 
         const newX = (preDragPositionRef.current.x * window.innerWidth + yeetDistanceX + window.innerWidth) % window.innerWidth;
         const newY = (preDragPositionRef.current.y * window.innerHeight + yeetDistanceY + window.innerHeight) % window.innerHeight;
 
-        const yeetDuration = 1000 + yeetDistance;
+        const yeetDuration = 500 + yeetDistance / 2; // Adjusted for faster animation
 
         setSpring.start({
           x: newX,
           y: newY,
-          rotX: Math.random() * 720 - 360, // Random rotation between -360 and 360 degrees
-          rotY: 720, // Two full flips
+          rotX: Math.random() * 360 - 180,
+          rotY: 360,
           rotZ: newRotations * 360,
-          shadowBlur: 30,
-          shadowY: 20,
+          shadowBlur: 20,
+          shadowY: 10,
+          scale: 1.1,
           config: { 
-            ...config.wobbly,
+            mass: physicsParams.mass,
+            tension: physicsParams.tension,
+            friction: physicsParams.friction,
             duration: yeetDuration,
           },
           onRest: () => {
-            // Reset shadow and flip state after yeet
             setSpring.start({ 
-              shadowBlur: 10, 
-              shadowY: 5, 
+              shadowBlur: 0, 
+              shadowY: 0, 
               rotX: 0,
               rotY: isFlipped ? 180 : 0,
               rotZ: newRotations * 360,
+              scale: 1,
               config: { duration: 300 },
             });
           },
         });
 
         const newPos = normalizePosition(newX, newY);
-        const newFlipped = !isFlipped; // Always flip on yeet
+        const newFlipped = !isFlipped;
         
         onCardUpdate({
           ...card,
@@ -180,6 +186,7 @@ export const MegaCard: React.FC<MegaCardProps> = ({ card, onCardUpdate, forceFli
         });
         
         setCardPosition(newPos);
+        setSpring.start({ shadowBlur: 0, shadowY: 0, scale: 1 });
       }
     },
     onDoubleClick: flipCard,
@@ -194,8 +201,8 @@ export const MegaCard: React.FC<MegaCardProps> = ({ card, onCardUpdate, forceFli
         height: '45px',
         borderRadius: '2px',
         backgroundSize: 'cover',
-        transform: to([x, y, rotX, rotY, rotZ], (xVal, yVal, rX, rY, rZ) =>
-          `translateX(${xVal}px) translateY(${yVal}px) rotateX(${rX}deg) rotateY(${rY}deg) rotateZ(${rZ}deg)`
+        transform: to([x, y, rotX, rotY, rotZ, scale], (x, y, rX, rY, rZ, s) =>
+          `translate3d(${x}px, ${y}px, 0) rotateX(${rX}deg) rotateY(${rY}deg) rotateZ(${rZ}deg) scale(${s})`
         ),
         boxShadow: to([shadowBlur, shadowY], (blur, y) => 
           `0px ${y}px ${blur}px rgba(0, 0, 0, 0.3)`
@@ -203,6 +210,7 @@ export const MegaCard: React.FC<MegaCardProps> = ({ card, onCardUpdate, forceFli
         touchAction: 'none',
         position: 'absolute',
         zIndex: card.zIndex,
+        willChange: 'transform, box-shadow',
       }}
     >
       <animated.div

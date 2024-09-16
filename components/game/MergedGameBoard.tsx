@@ -1,10 +1,11 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 import { MegaCard, CardId } from '@/components/game/MegaCard';
 import { Button } from '@/components/ui/button';
 import { useAppContext } from '@/context/AppContext';
 import { Settings, PhysicsSettings } from './Settings';
 import MegaAvatar from './MegaAvatar';
+import useTelegram from '@/hooks/useTelegram';
 
 const GAME_ID = 28;
 const CARD_PROXIMITY_THRESHOLD = 69; // in pixels
@@ -57,6 +58,26 @@ const GameBoard: React.FC = () => {
     minMovementThreshold: 20,
   });
   const [isShuffling, setIsShuffling] = useState(false);
+  const [hasWebcamAccess, setHasWebcamAccess] = useState(false);
+  const [hasVoiceAccess, setHasVoiceAccess] = useState(false);
+  const { showMainButton, hideMainButton, showAlert, toggleThemeSettings } = useTelegram();
+
+  const checkMediaAccess = useCallback(async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+      setHasWebcamAccess(true);
+      setHasVoiceAccess(true);
+      stream.getTracks().forEach(track => track.stop());
+    } catch (error) {
+      console.error('Error checking media access:', error);
+      setHasWebcamAccess(false);
+      setHasVoiceAccess(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    checkMediaAccess();
+  }, [checkMediaAccess]);
 
   const randomizeTargetFrame = () => {
     setTargetFrame({
@@ -126,6 +147,7 @@ const GameBoard: React.FC = () => {
     if (!gameState) return;
 
     setIsShuffling(true);
+    hideMainButton();
 
     const shuffledCards = gameState.cards
       .map((card, idx) => ({
@@ -156,6 +178,7 @@ const GameBoard: React.FC = () => {
     // Allow time for the shuffle animation to complete
     setTimeout(() => {
       setIsShuffling(false);
+      showMainButton(t('shuffle'));
     }, 1000);
   };
 
@@ -230,10 +253,40 @@ const GameBoard: React.FC = () => {
     return Math.sqrt(dx * dx + dy * dy) <= CARD_PROXIMITY_THRESHOLD;
   };
 
+  useEffect(() => {
+    showMainButton(t('shuffle'));
+    toggleThemeSettings(() => setSettingsOpen(true));
+  }, [showMainButton, toggleThemeSettings, t]);
+
+  useEffect(() => {
+    const handleMainButtonClick = () => {
+      shuffleCards();
+    };
+
+    if (window.Telegram?.WebApp) {
+      window.Telegram.WebApp.onEvent('mainButtonClicked', handleMainButtonClick);
+    }
+
+    return () => {
+      if (window.Telegram?.WebApp) {
+        window.Telegram.WebApp.onEvent('mainButtonClicked', handleMainButtonClick);
+      }
+    };
+  }, [shuffleCards]);
+
+  if (!hasWebcamAccess || !hasVoiceAccess) {
+    return (
+      <div className="flex flex-col items-center justify-center h-screen">
+        <p className="text-xl mb-4">Please grant access to your camera and microphone to play the game.</p>
+        <Button onClick={checkMediaAccess}>Check Permissions</Button>
+      </div>
+    );
+  }
+
   return (
     <div className="game-board min-h-[calc(100vh-128px)] relative">
       <Settings onUpdateSettings={handleUpdateSettings} />
-
+{/* open={settingsOpen} onClose={() => setSettingsOpen(false)}  */}
       {gameState?.cards.map((card) => (
         <MegaCard
           key={card.id}
@@ -243,12 +296,9 @@ const GameBoard: React.FC = () => {
             player.id === user?.id.toString() && isCardNearPlayer(card, player)
           )}
           isShuffling={isShuffling}
+          physicsParams={physicsParams}
         />
       ))}
-
-      <Button onClick={shuffleCards} className="absolute top-4 right-4" disabled={isShuffling}>
-        {isShuffling ? t('shuffling') : t('shuffle')}
-      </Button>
 
       <div
         style={{
