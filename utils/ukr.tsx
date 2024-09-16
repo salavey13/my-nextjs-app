@@ -1,5 +1,7 @@
 import { LanguageDictionary } from "../utils/TranslationUtils";
 export const ukr: LanguageDictionary = {
+  pleaseGrantAccess: "Будь ласка, надайте доступ до своєї камери та мікрофона для гри.",
+  checkPermissions: "Перевірка дозволів",
   "settings": {
     "title": "Налаштування",
     "restoreDefaults": "Включити чарівність (або повернути заводські налаштування)",
