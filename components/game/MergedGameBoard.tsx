@@ -1,12 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 import { MegaCard, CardId } from '@/components/game/MegaCard';
 import { Button } from '@/components/ui/button';
 import { useAppContext } from '@/context/AppContext';
-import { Settings, PhysicsSettings } from './Settings'; // Adjust the path as needed
-import { useGesture } from '@use-gesture/react';
+import { Settings, PhysicsSettings } from './Settings';
+import MegaAvatar from './MegaAvatar';
 
 const GAME_ID = 28;
+const CARD_PROXIMITY_THRESHOLD = 69; // in pixels
 
 interface Point {
   x: number;
@@ -27,6 +28,12 @@ interface Card {
 interface Player {
   id: string;
   position: { x: number; y: number };
+  videoEnabled: boolean;
+  videoSettings: {
+    width: number;
+    height: number;
+    frameRate: number;
+  };
 }
 
 interface GameState {
@@ -37,10 +44,9 @@ interface GameState {
 const GameBoard: React.FC = () => {
   const [gameState, setGameState] = useState<GameState | null>(null);
   const [subscription, setSubscription] = useState<any>(null);
-  const [playerPositions, setPlayerPositions] = useState<Record<string, { x: number; y: number }>>({});
   const { user, t } = useAppContext();
   const [targetFrame, setTargetFrame] = useState({ x: 400, y: 300, rotation: 0 });
-  const [settingsOpen, setSettingsOpen] = useState(false); // Settings button toggle
+  const [settingsOpen, setSettingsOpen] = useState(false);
   const [physicsParams, setPhysicsParams] = useState<PhysicsSettings>({
     yeetCoefficient: 2,
     mass: 1,
@@ -50,6 +56,7 @@ const GameBoard: React.FC = () => {
     yeetVelocityThreshold: 3.1,
     minMovementThreshold: 20,
   });
+  const [isShuffling, setIsShuffling] = useState(false);
 
   const randomizeTargetFrame = () => {
     setTargetFrame({
@@ -66,11 +73,9 @@ const GameBoard: React.FC = () => {
       card.id === updatedCard.id ? updatedCard : card
     );
 
-    // Update the state locally
     const updatedGameState = { ...gameState, cards: updatedCards };
     setGameState(updatedGameState);
 
-    // Save updated state to Supabase
     supabase
       .from('rents')
       .update({ game_state: updatedGameState })
@@ -82,7 +87,7 @@ const GameBoard: React.FC = () => {
 
   useEffect(() => {
     const handleSubscription = async () => {
-      if (!user?.currentGameId) return; // Ensure gameId is available
+      if (!user?.currentGameId) return;
 
       const { data, error } = await supabase
         .from('rents')
@@ -93,7 +98,7 @@ const GameBoard: React.FC = () => {
       if (error) {
         console.error('Error fetching game state:', error);
       } else {
-        setGameState(data.game_state); // Set the initial game state
+        setGameState(data.game_state);
       }
 
       const channel = supabase
@@ -102,7 +107,7 @@ const GameBoard: React.FC = () => {
           'postgres_changes',
           { event: 'UPDATE', schema: 'public', table: 'rents', filter: `id=eq.${user?.currentGameId}` },
           (payload) => {
-            setGameState(payload.new.game_state); // Update game state with new data
+            setGameState(payload.new.game_state);
           }
         )
         .subscribe();
@@ -110,24 +115,26 @@ const GameBoard: React.FC = () => {
       setSubscription(channel);
 
       return () => {
-        supabase.removeChannel(channel); // Clean up subscription on unmount
+        supabase.removeChannel(channel);
       };
     };
 
     handleSubscription();
-  }, [user?.currentGameId]); // Only depend on the gameId, not the gameState
-
+  }, [user?.currentGameId]);
 
   const shuffleCards = async () => {
     if (!gameState) return;
 
+    setIsShuffling(true);
+
     const shuffledCards = gameState.cards
       .map((card, idx) => ({
         ...card,
-        position: { x: 13/window.innerHeight, y: 0.5 }, // Stack cards vertically
+        position: { x: 13/window.innerWidth, y: 0.5 },
         last_position: card.position,
-        zIndex: Math.floor(Math.random() * 36), // Random z-index
-        flipped: idx === 0 ? true : false, // Only the top card (trump) is flipped
+        zIndex: Math.floor(Math.random() * 36),
+        flipped: false,
+        rotations: Math.floor(Math.random() * 2) * 2, // 0 or 2 rotations (360 degrees)
       }))
       .sort(() => Math.random() - 0.5);
 
@@ -145,125 +152,104 @@ const GameBoard: React.FC = () => {
     }
 
     randomizeTargetFrame();
+
+    // Allow time for the shuffle animation to complete
+    setTimeout(() => {
+      setIsShuffling(false);
+    }, 1000);
   };
 
+  useEffect(() => {
+    const addPlayerIfNeeded = async () => {
+      if (!gameState || !user) return;
 
-// Add player automatically if not present
-useEffect(() => {
-  const addPlayerIfNeeded = async () => {
-    if (!gameState || !user) return;
+      const playerExists = gameState.players?.some((player) => player.id === user.id.toString());
 
-    const playerExists = gameState.players?.some((player) => player.id === user.id.toString());
+      if (!playerExists || !gameState.players) {
+        const newPlayer = {
+          id: user.id.toString(),
+          username: user.telegram_username,
+          position: { x: Math.random() * 320/window.innerWidth, y: Math.random() * 320 / window.innerHeight },
+          videoEnabled: false,
+          videoSettings: {
+            width: 320,
+            height: 240,
+            frameRate: 15,
+          },
+        };
+        
+        const updatedPlayers = [...(gameState.players || []), newPlayer];
+        const updatedGameState = { ...gameState, players: updatedPlayers };
 
-    if (!playerExists || !gameState.players) {
-      const newPlayer = {
-        id: user.id.toString(),
-        username: user.telegram_username,
-        position: { x: Math.random() * 320/window.innerWidth, y: Math.random() * 320 / window.innerHeight },
-      };
-      
-      const updatedPlayers = [...gameState.players?gameState.players:[], newPlayer];
-      const updatedGameState = { ...gameState, players: updatedPlayers };
+        const { error } = await supabase
+          .from('rents')
+          .update({ game_state: updatedGameState })
+          .eq('id', user?.currentGameId);
 
-      const { error } = await supabase
-        .from('rents')
-        .update({ game_state: updatedGameState })
-        .eq('id', user?.currentGameId);
-
-      if (error) {
-        console.error('Error adding player:', error);
-      } else {
-        setGameState(updatedGameState);
+        if (error) {
+          console.error('Error adding player:', error);
+        } else {
+          setGameState(updatedGameState);
+        }
       }
-    }
-  };
-
-  if (gameState) {
-    addPlayerIfNeeded();
-  }
-}, [gameState, user]);
-
-
-  const handlePositionChange = (playerId: number, newPos: Point) => {
-    setPlayerPositions((prev) => ({ ...prev, [playerId]: newPos }));
+    };
 
     if (gameState) {
-      supabase
-        .from('rents')
-        .update({
-          game_state: {
-            ...gameState,
-            players: gameState.players.map((player) =>
-              player.id === String(playerId) ? { ...player, position: newPos } : player
-            ),
-          },
-        })
-        .eq('id', user?.currentGameId);
+      addPlayerIfNeeded();
+    }
+  }, [gameState, user]);
+
+  const handlePositionChange = async (playerId: string, newPos: Point) => {
+    if (!gameState) return;
+
+    const updatedPlayers = gameState.players.map((player) =>
+      player.id === playerId ? { ...player, position: newPos } : player
+    );
+
+    const updatedGameState = { ...gameState, players: updatedPlayers };
+
+    const { error } = await supabase
+      .from('rents')
+      .update({ game_state: updatedGameState })
+      .eq('id', user?.currentGameId);
+
+    if (error) {
+      console.error('Error updating player position:', error);
+    } else {
+      setGameState(updatedGameState);
     }
   };
-  
+
   const handleUpdateSettings = (settings: PhysicsSettings) => {
     setPhysicsParams(settings);
   };
 
-  const addPlayer = async (newPlayerId:string) => {
-    if (!gameState) return;
-  
-    const newPlayer = { id: newPlayerId, position: { x: 200, y: 300 } }; // Initial position
-  
-    const updatedGameState = { ...gameState, players: [...gameState.players, newPlayer] };
-  
-    const { error } = await supabase
-      .from('rents')
-      .update({ game_state: updatedGameState })
-      .eq('id', user?.currentGameId);
-  
-    if (error) {
-      console.error('Error adding player:', error);
-    } else {
-      setGameState(updatedGameState);
-    }
-  };
-
-  const kickPlayer = async (playerId:string) => {
-    if (!gameState) return;
-  
-    const updatedPlayers = gameState.players.filter(player => player.id !== playerId);
-  
-    const updatedGameState = { ...gameState, players: updatedPlayers };
-  
-    const { error } = await supabase
-      .from('rents')
-      .update({ game_state: updatedGameState })
-      .eq('id', user?.currentGameId);
-  
-    if (error) {
-      console.error('Error kicking player:', error);
-    } else {
-      setGameState(updatedGameState);
-    }
+  const isCardNearPlayer = (card: Card, player: Player) => {
+    const dx = (card.position.x - player.position.x) * window.innerWidth;
+    const dy = (card.position.y - player.position.y) * window.innerHeight;
+    return Math.sqrt(dx * dx + dy * dy) <= CARD_PROXIMITY_THRESHOLD;
   };
 
   return (
-    <div className="game-board min-h-[calc(100vh-128px)]">
-      {/* Settings Button */}
+    <div className="game-board min-h-[calc(100vh-128px)] relative">
       <Settings onUpdateSettings={handleUpdateSettings} />
 
-      {/* Game Cards */}
       {gameState?.cards.map((card) => (
-        <MegaCard  key={card.id} card={card} onCardUpdate={onCardUpdate} />
+        <MegaCard
+          key={card.id}
+          card={card}
+          onCardUpdate={onCardUpdate}
+          forceFlipped={gameState.players.some(player => 
+            player.id === user?.id.toString() && isCardNearPlayer(card, player)
+          )}
+          isShuffling={isShuffling}
+        />
       ))}
 
-      {/* Shuffle Cards Button */}
-      <button
-        onClick={shuffleCards}
-        className="bg-gray-800 text-white rounded-full p-2 w-10 h-10 flex items-center justify-center"
-        aria-label={t('shuffle')}
-      >
-        ↺
-      </button>
+      <Button onClick={shuffleCards} className="absolute top-4 right-4" disabled={isShuffling}>
+        {isShuffling ? t('shuffling') : t('shuffle')}
+      </Button>
 
-      {/* Target frame outline */}
       <div
         style={{
           width: '42px',
@@ -277,20 +263,14 @@ useEffect(() => {
           borderRadius: '5px',
         }}
       />
+
       {gameState?.players?.map((player) => (
-        <div
+        <MegaAvatar
           key={player.id}
-          style={{
-            width: '13px',
-            height: '13px',
-            borderRadius: '50%',
-            backgroundColor: '#e1ff01',
-            border: '2',
-            borderColor: 'white',
-            position: 'absolute',
-            left: `${player.position.x * window.innerWidth}px`,
-            top: `${player.position.y * window.innerHeight}px`,
-          }}
+          gameState={gameState}
+          playerId={parseInt(player.id)}
+          initialPosition={player.position}
+          onPositionChange={(_, newPos) => handlePositionChange(player.id, newPos)}
         />
       ))}
     </div>

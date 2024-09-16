@@ -1,42 +1,31 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { supabase } from "../../lib/supabaseClient"; // Supabase for state management
-import { useSpring, animated } from 'react-spring';
+import { supabase } from "../../lib/supabaseClient";
+import { useSpring, animated, to } from 'react-spring';
 import { useGesture } from '@use-gesture/react';
 
-const GAME_ID = 28; // Replace with actual game ID
+const GAME_ID = 28;
 
-// WebRTC configuration
 const rtcConfig: RTCConfiguration = {
   iceServers: [
-    { urls: 'stun:stun.l.google.com:19302' } // Public STUN server for connection establishment
+    { urls: 'stun:stun.l.google.com:19302' }
   ]
 };
 
-// Type for the player object
 interface Player {
   id: string;
   iceCandidates?: RTCIceCandidateInit[];
 }
-interface Card {
-  id: string;
-  position: Point; // Relative position (0 to 1)
-  flipped: boolean;
-  last_trajectory?: Point[];
-  trajectory: {
-    position: Point,
-    rotation: number,
-    velocity: Point,
-    rotationSpeed: number,
-  };
-}
+
 interface Point {
   x: number;
   y: number;
 }
+
 interface GameState {
-  cards: Card[];
+  cards: any[];
   players: Player[];
 }
+
 interface MegaAvatarProps {
   gameState: GameState;
   playerId: number;
@@ -49,15 +38,14 @@ const MegaAvatar: React.FC<MegaAvatarProps> = ({ gameState, playerId, initialPos
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [position, setPosition] = useState<Point>(initialPosition);
   const peerConnection = useRef<RTCPeerConnection | null>(null);
-  const [{ x, y, shadow }, set] = useSpring(() => ({
-    x: initialPosition.x,
-    y: initialPosition.y,
+  const [{ x, y, shadow }, api] = useSpring(() => ({
+    x: initialPosition.x * window.innerWidth,
+    y: initialPosition.y * window.innerHeight,
     shadow: 5,
     config: { mass: 1, tension: 200, friction: 13 },
   }));
-  const [isDragging, setIsDragging] = useState(false);
+  const isDragging = useRef(false);
 
-  // Initialize local media stream (camera + microphone)
   useEffect(() => {
     const initializeStream = async () => {
       try {
@@ -65,7 +53,7 @@ const MegaAvatar: React.FC<MegaAvatarProps> = ({ gameState, playerId, initialPos
         setStream(webcamStream);
         if (videoRef.current) {
           videoRef.current.srcObject = webcamStream;
-          videoRef.current.play();
+          await videoRef.current.play();
         }
       } catch (error) {
         console.error("Error accessing webcam:", error);
@@ -79,9 +67,8 @@ const MegaAvatar: React.FC<MegaAvatarProps> = ({ gameState, playerId, initialPos
         stream.getTracks().forEach(track => track.stop());
       }
     };
-  }, [stream]);
+  }, []);
 
-  // Initialize WebRTC connection
   useEffect(() => {
     const initWebRTC = async () => {
       peerConnection.current = new RTCPeerConnection(rtcConfig);
@@ -90,13 +77,13 @@ const MegaAvatar: React.FC<MegaAvatarProps> = ({ gameState, playerId, initialPos
         stream.getTracks().forEach(track => peerConnection.current?.addTrack(track, stream));
       }
 
-      peerConnection.current!.onicecandidate = event => {
+      peerConnection.current.onicecandidate = event => {
         if (event.candidate) {
           sendIceCandidateToPeers(event.candidate);
         }
       };
 
-      peerConnection.current!.ontrack = event => {
+      peerConnection.current.ontrack = event => {
         if (videoRef.current) {
           videoRef.current.srcObject = event.streams[0];
         }
@@ -136,44 +123,23 @@ const MegaAvatar: React.FC<MegaAvatarProps> = ({ gameState, playerId, initialPos
   };
 
   const handleDragEnd = async (newX: number, newY: number) => {
-    setIsDragging(false);
-    set({ x: newX, y: newY, shadow: 5 });
+    isDragging.current = false;
+    api.start({ shadow: 5 });
 
-    const updatedPosition = { x: newX, y: newY };
+    const updatedPosition = { x: newX / window.innerWidth, y: newY / window.innerHeight };
     setPosition(updatedPosition);
     onPositionChange(playerId, updatedPosition);
-
-    const updatedGameState = {
-      ...gameState,
-      players: gameState.players.map(player => 
-        player.id === playerId.toString()
-          ? { ...player, position: updatedPosition }
-          : player
-      )
-    };
-
-    const { error } = await supabase
-      .from('rents')
-      .update({ game_state: updatedGameState })
-      .eq('id', GAME_ID);
-
-    if (error) {
-      console.error('Error updating game state:', error);
-    }
   };
 
   const bind = useGesture({
-    onDrag: ({ down, movement: [mx, my], memo = { x: 0, y: 0 } }) => {
-      if (down) {
-        setIsDragging(true);
-        const newX = memo.x + mx;
-        const newY = memo.y + my;
-        set({ x: newX, y: newY, shadow: Math.min(30, Math.abs(mx + my) / 10) });
-        return memo;
-      } else {
-        handleDragEnd(x.get(), y.get());
-        return memo;
-      }
+    onDragStart: () => {
+      isDragging.current = true;
+    },
+    onDrag: ({ offset: [ox, oy] }) => {
+      api.start({ x: ox, y: oy, shadow: Math.min(30, Math.sqrt(ox * ox + oy * oy) / 10) });
+    },
+    onDragEnd: () => {
+      handleDragEnd(x.get(), y.get());
     },
   });
 
@@ -181,15 +147,15 @@ const MegaAvatar: React.FC<MegaAvatarProps> = ({ gameState, playerId, initialPos
     <animated.div
       {...bind()}
       style={{
-        transform: x.interpolate((x) => `translate(${x}px, ${y.get()}px)`),
+        transform: to([x, y], (x, y) => `translate(${x}px, ${y}px)`),
         boxShadow: shadow.to((s) => `0px ${s}px ${2 * s}px rgba(0,0,0,0.2)`),
-        width: '256px',
-        height: '256px',
+        width: '128px',
+        height: '128px',
         borderRadius: '50%',
-        // backgroundColor: 'transparent',
-        cursor: 'grab',
+        cursor: isDragging.current ? 'grabbing' : 'grab',
         position: 'absolute',
         touchAction: 'none',
+        overflow: 'hidden',
       }}
     >
       <video
@@ -197,10 +163,11 @@ const MegaAvatar: React.FC<MegaAvatarProps> = ({ gameState, playerId, initialPos
         style={{
           width: '100%',
           height: '100%',
-          borderRadius: '50%',
           objectFit: 'cover',
+          transform: 'scaleX(-1)', // Mirror the video
         }}
         muted
+        playsInline
       />
     </animated.div>
   );

@@ -4,7 +4,6 @@ import { useGesture } from '@use-gesture/react';
 import { cardsImages } from './CardsImgs';
 import { useAppContext } from '@/context/AppContext';
 
-interface Point { x: number; y: number };
 interface Card {
   id: CardId;
   position: { x: number; y: number };
@@ -21,15 +20,11 @@ export type CardId = keyof typeof cardsImages;
 interface MegaCardProps {
   card: Card;
   onCardUpdate: (card: Card) => void;
+  forceFlipped: boolean;
+  isShuffling: boolean;
 }
 
-const isInPersonalRadius = (cardPos: Point, playerPos: Point) => {
-  const dx = cardPos.x - playerPos.x;
-  const dy = cardPos.y - playerPos.y;
-  return Math.sqrt(dx * dx + dy * dy) <= 113;
-};
-
-export const MegaCard: React.FC<MegaCardProps> = ({ card, onCardUpdate }) => {
+export const MegaCard: React.FC<MegaCardProps> = ({ card, onCardUpdate, forceFlipped, isShuffling }) => {
   const cardRef = useRef<HTMLDivElement | null>(null);
   const [cardPosition, setCardPosition] = useState(card.position);
   const preDragPositionRef = useRef({ x: card.last_position.x, y: card.last_position.y });
@@ -39,8 +34,6 @@ export const MegaCard: React.FC<MegaCardProps> = ({ card, onCardUpdate }) => {
   const { t } = useAppContext();
   const [rotations, setRotations] = useState(card.rotations);
   const [isFlipped, setIsFlipped] = useState(card.flipped);
-
-  const [playerPosition, setPlayerPosition] = useState<Point>({ x: window.innerWidth/2, y: window.innerHeight });
 
   const [yeetCoefficient, setYeetCoefficient] = useState(2);
   const [mass, setMass] = useState(1);
@@ -69,6 +62,23 @@ export const MegaCard: React.FC<MegaCardProps> = ({ card, onCardUpdate }) => {
     });
     setRotations(card.rotations);
   }, [card, setSpring, isFlipped, cardPosition]);
+
+  useEffect(() => {
+    if (isShuffling) {
+      const targetX = card.position.x * window.innerWidth;
+      const targetY = card.position.y * window.innerHeight;
+      const targetRotZ = card.rotations * 360;
+
+      setSpring.start({
+        x: targetX,
+        y: targetY,
+        rotX: 0,
+        rotY: 0,
+        rotZ: targetRotZ,
+        config: { tension: 170, friction: 26 },
+      });
+    }
+  }, [isShuffling, card.position, card.rotations, setSpring]);
 
   const normalizePosition = (x: number, y: number) => ({
     x: x / window.innerWidth,
