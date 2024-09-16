@@ -1,5 +1,7 @@
 import { LanguageDictionary } from "../utils/TranslationUtils";
 export const ru: LanguageDictionary = {
+  pleaseGrantAccess: "Пожалуйста, предоставьте доступ к вашей камере и микрофону, чтобы играть в игру",
+  checkPermissions: "Проверьте разрешения",
   "settings": {
     "title": "Настройки",
     "restoreDefaults": "Включить магию (или сбросить до заводских)",
