@@ -251,10 +251,24 @@ const GameBoard: React.FC = () => {
     const dy = (card.position.y - player.position.y) * window.innerHeight;
     return Math.sqrt(dx * dx + dy * dy) <= CARD_PROXIMITY_THRESHOLD;
   };
+  const {
+    tg,
+    user,
+    theme,
+    openLink,
+    showMainButton,
+    hideMainButton,
+    showBackButton,
+    closeWebApp,
+    setBottomBarColor,
+    setHeaderColor,
+    setBackgroundColor
+  } = useTelegram();
 
   useEffect(() => {
     showMainButton(t('shufle'));
-    
+    tg.MainButton?.setParams({color: "#e1ff01", text_color: "#000000"})
+    setBottomBarColor("#282c33")
   }, [showMainButton]);
 
   useEffect(() => {
