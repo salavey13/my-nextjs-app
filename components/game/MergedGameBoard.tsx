@@ -254,7 +254,7 @@ const GameBoard: React.FC = () => {
   };
 
   useEffect(() => {
-    showMainButton(t('shuffle'));
+    showMainButton(t('shufle'));
     toggleThemeSettings(() => setSettingsOpen(true));
   }, [showMainButton, toggleThemeSettings, t]);
 
