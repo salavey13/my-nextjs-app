@@ -1,7 +1,7 @@
 import { LanguageDictionary } from "../utils/TranslationUtils";
 export const en: LanguageDictionary = {
   pleaseGrantAccess: "Please grant access to your camera and microphone to play the game.",
-  checkPermissions: "Check Permisdions",
+  checkPermissions: "Check Permissions",
   "yeetCoefficient": "Yeet Coefficient",
   "tension": "Tension",
   "rotationDistance": "Rotation Distance",
