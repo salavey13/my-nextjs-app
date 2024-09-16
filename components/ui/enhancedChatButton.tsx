@@ -19,7 +19,7 @@ const EnhancedChatButton = () => {
 
   useEffect(() => {
     if (tg) {
-      showMainButton('ChatGPT');
+      showMainButton('v0.dev');
       tg.MainButton?.onClick(handleOpenChatGPT)
       tg.MainButton?.setParams({color: "#e1ff01", text_color: "#000000"})
       //showBackButton();
@@ -30,7 +30,7 @@ const EnhancedChatButton = () => {
   }, [tg, showMainButton, showBackButton]);
 
   const handleOpenChatGPT = () => {
-    openLink('https://chatgpt.com/');
+    openLink('https://v0.dev/');
     hideMainButton();
   };
 
