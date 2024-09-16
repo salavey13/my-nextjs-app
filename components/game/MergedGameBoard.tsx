@@ -258,7 +258,7 @@ const GameBoard: React.FC = () => {
     showMainButton(t('shufle'));
     tg?.MainButton?.setParams({color: "#e1ff01", text_color: "#000000"})
     setBottomBarColor("#282c33")
-    setHeaderColkr("#282c33")
+    setHeaderColor("#282c33")
   }, [showMainButton]);
 
   useEffect(() => {
