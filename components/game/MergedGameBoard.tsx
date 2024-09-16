@@ -147,6 +147,7 @@ const GameBoard: React.FC = () => {
     if (!gameState) return;
 
     setIsShuffling(true)
+    hideMainButton()
 
     const shuffledCards = gameState.cards
       .map((card, idx) => ({
@@ -173,7 +174,11 @@ const GameBoard: React.FC = () => {
     }
 
     randomizeTargetFrame();
-    setIsShuffling(false)
+    // Allow time for the shuffle animation to complete
+    setTimeout(() => {
+      setIsShuffling(false);
+      showMainButton(t('shufle'));
+    }, 1000);
   };
 
   useEffect(() => {
