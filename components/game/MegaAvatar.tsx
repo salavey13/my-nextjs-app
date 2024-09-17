@@ -1,21 +1,17 @@
-// components/game/MegaAvatar.tsx
-
 import React, { useEffect, useRef, useState } from 'react';
 import { supabase } from "../../lib/supabaseClient";
 import { useSpring, animated, to } from 'react-spring';
 import { useGesture } from '@use-gesture/react';
-
-const GAME_ID = 28;
-
-const rtcConfig: RTCConfiguration = {
-  iceServers: [
-    { urls: 'stun:stun.l.google.com:19302' }
-  ]
-};
+import { useAppContext } from '@/context/AppContext';
 
 interface Player {
   id: string;
-  iceCandidates?: RTCIceCandidateInit[];
+  position: { x: number; y: number };
+  webrtc: {
+    offer?: RTCSessionDescriptionInit;
+    answer?: RTCSessionDescriptionInit;
+    iceCandidates: RTCIceCandidateInit[];
+  };
 }
 
 interface Point {
@@ -30,16 +26,21 @@ interface GameState {
 
 interface MegaAvatarProps {
   gameState: GameState;
-  playerId: number;
+  playerId: string;
   initialPosition: Point;
-  onPositionChange: (playerId: number, position: Point) => void;
+  onPositionChange: (playerId: string, position: Point) => void;
 }
+
+const rtcConfig: RTCConfiguration = {
+  iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
+};
 
 const MegaAvatar: React.FC<MegaAvatarProps> = ({ gameState, playerId, initialPosition, onPositionChange }) => {
   const [stream, setStream] = useState<MediaStream | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [position, setPosition] = useState<Point>(initialPosition);
   const peerConnection = useRef<RTCPeerConnection | null>(null);
+  const { user } = useAppContext();
   const [{ x, y, shadow }, api] = useSpring(() => ({
     x: initialPosition.x * window.innerWidth,
     y: initialPosition.y * window.innerHeight,
@@ -50,15 +51,19 @@ const MegaAvatar: React.FC<MegaAvatarProps> = ({ gameState, playerId, initialPos
 
   useEffect(() => {
     const initializeStream = async () => {
-      try {
-        const webcamStream = await navigator.mediaDevices.getUserMedia({ video: true });
-        setStream(webcamStream);
-        if (videoRef.current) {
-          videoRef.current.srcObject = webcamStream;
-          await videoRef.current.play();
+      if (user?.id === playerId) {
+        try {
+          const webcamStream = await navigator.mediaDevices.getUserMedia({ video: true });
+          setStream(webcamStream);
+          if (videoRef.current) {
+            videoRef.current.srcObject = webcamStream;
+            await videoRef.current.play();
+          }
+        } catch (error) {
+          console.error("Error accessing webcam:", error);
         }
-      } catch (error) {
-        console.error("Error accessing webcam:", error);
+      } else {
+        setupPeerConnection();
       }
     };
 
@@ -68,59 +73,87 @@ const MegaAvatar: React.FC<MegaAvatarProps> = ({ gameState, playerId, initialPos
       if (stream) {
         stream.getTracks().forEach(track => track.stop());
       }
-    };
-  }, []);
-
-  useEffect(() => {
-    const initWebRTC = async () => {
-      peerConnection.current = new RTCPeerConnection(rtcConfig);
-
-      if (stream) {
-        stream.getTracks().forEach(track => peerConnection.current?.addTrack(track, stream));
+      if (peerConnection.current) {
+        peerConnection.current.close();
       }
+    };
+  }, [user?.id, playerId]);
 
-      peerConnection.current.onicecandidate = event => {
-        if (event.candidate) {
-          sendIceCandidateToPeers(event.candidate);
-        }
-      };
+  const setupPeerConnection = () => {
+    peerConnection.current = new RTCPeerConnection(rtcConfig);
 
-      peerConnection.current.ontrack = event => {
-        if (videoRef.current) {
-          videoRef.current.srcObject = event.streams[0];
-        }
-      };
-
-      const player = gameState.players.find((p) => p.id === String(playerId));
-      if (player && player.iceCandidates) {
-        player.iceCandidates.forEach((candidate: RTCIceCandidateInit) => {
-          peerConnection.current?.addIceCandidate(new RTCIceCandidate(candidate));
-        });
+    peerConnection.current.ontrack = (event) => {
+      if (videoRef.current && event.streams[0]) {
+        videoRef.current.srcObject = event.streams[0];
       }
     };
 
-    initWebRTC();
+    peerConnection.current.onicecandidate = (event) => {
+      if (event.candidate) {
+        updatePlayerWebRTC({ iceCandidates: [event.candidate] });
+      }
+    };
+
+    subscribeToWebRTCUpdates();
+  };
+
+  const subscribeToWebRTCUpdates = () => {
+    const channel = supabase.channel('game_state_updates')
+      .on('postgres_changes', 
+        { event: 'UPDATE', schema: 'public', table: 'rents', filter: `id=eq.${user?.currentGameId}` },
+        async (payload) => {
+          const updatedGameState = payload.new.game_state as GameState;
+          const updatedPlayer = updatedGameState.players.find(p => p.id === playerId);
+          
+          if (updatedPlayer && peerConnection.current) {
+            if (updatedPlayer.webrtc.offer && !peerConnection.current.currentRemoteDescription) {
+              await peerConnection.current.setRemoteDescription(new RTCSessionDescription(updatedPlayer.webrtc.offer));
+              const answer = await peerConnection.current.createAnswer();
+              await peerConnection.current.setLocalDescription(answer);
+              updatePlayerWebRTC({ answer });
+            }
+
+            if (updatedPlayer.webrtc.answer && peerConnection.current.signalingState === 'have-local-offer') {
+              await peerConnection.current.setRemoteDescription(new RTCSessionDescription(updatedPlayer.webrtc.answer));
+            }
+
+            updatedPlayer.webrtc.iceCandidates.forEach(candidate => {
+              peerConnection.current?.addIceCandidate(new RTCIceCandidate(candidate));
+            });
+          }
+        }
+      )
+      .subscribe();
 
     return () => {
-      peerConnection.current?.close();
+      supabase.removeChannel(channel);
     };
-  }, [playerId, gameState, stream]);
+  };
 
-  const sendIceCandidateToPeers = async (candidate: RTCIceCandidateInit) => {
-    const player = gameState.players.find((p) => p.id === String(playerId));
-    if (player) {
-      player.iceCandidates = player.iceCandidates || [];
-      player.iceCandidates.push(candidate);
-      const updatedGameState = { ...gameState };
+  const updatePlayerWebRTC = async (webrtcUpdate: Partial<Player['webrtc']>) => {
+    const { data, error } = await supabase
+      .from('rents')
+      .select('game_state')
+      .eq('id', user?.currentGameId)
+      .single();
 
-      const { error } = await supabase
-        .from('rents')
-        .update({ game_state: updatedGameState })
-        .eq('id', GAME_ID);
+    if (error) {
+      console.error('Error fetching game state:', error);
+      return;
+    }
 
-      if (error) {
-        console.error('Error updating game state:', error);
-      }
+    const currentGameState = data.game_state as GameState;
+    const updatedPlayers = currentGameState.players.map(p => 
+      p.id === playerId ? { ...p, webrtc: { ...p.webrtc, ...webrtcUpdate } } : p
+    );
+
+    const { error: updateError } = await supabase
+      .from('rents')
+      .update({ game_state: { ...currentGameState, players: updatedPlayers } })
+      .eq('id', user?.currentGameId);
+
+    if (updateError) {
+      console.error('Error updating game state:', updateError);
     }
   };
 
