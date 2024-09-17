@@ -424,6 +424,7 @@ export const en: LanguageDictionary = {
     "github": "View on GitHub",
     "version": "Version 0.13"
   },
+  "physicsSettings": "Settings",
     photos: "Photos",
     rentalStartDate: "Rental Start Date",
     rentalEndDate: "Rental End Date",

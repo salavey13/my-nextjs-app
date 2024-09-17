@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { useSpring, animated, to, config } from 'react-spring';
+import { useSpring, animated, to } from 'react-spring';
 import { useGesture } from '@use-gesture/react';
 import { cardsImages } from './CardsImgs';
 import { useAppContext } from '@/context/AppContext';
@@ -37,16 +37,15 @@ export const MegaCard: React.FC<MegaCardProps> = ({ card, onCardUpdate, forceFli
   const [rotations, setRotations] = useState(card.rotations);
   const [isFlipped, setIsFlipped] = useState(card.flipped);
 
-  const [{ x, y, rotX, rotY, rotZ, scale, shadowBlur, shadowY }, setSpring] = useSpring(() => ({
+  const [{ x, y, rotY, rotZ, scale, shadowBlur, shadowY }, setSpring] = useSpring(() => ({
     x: cardPosition.x * window.innerWidth,
     y: cardPosition.y * window.innerHeight,
-    rotX: 0,
     rotY: isFlipped ? 180 : 0,
     rotZ: card.rotations * 180,
     scale: 1,
     shadowBlur: 0,
     shadowY: 0,
-    config: { ...config.wobbly, clamp: true },
+    config: { mass: 1, tension: 210, friction: 20 },
   }));
 
   useEffect(() => {
@@ -58,7 +57,7 @@ export const MegaCard: React.FC<MegaCardProps> = ({ card, onCardUpdate, forceFli
       y: card.position.y * window.innerHeight,
       rotY: card.flipped ? 180 : 0,
       rotZ: card.rotations * 180,
-      immediate: !isShuffling, // Immediately set the new position without animation if not shuffling
+      immediate: !isShuffling,
     });
   }, [card, setSpring, isShuffling]);
 
@@ -67,8 +66,7 @@ export const MegaCard: React.FC<MegaCardProps> = ({ card, onCardUpdate, forceFli
       setSpring.start({
         x: card.position.x * window.innerWidth,
         y: card.position.y * window.innerHeight,
-        rotX: Math.random() * 720 - 360,
-        rotY: Math.random() * 720 - 360,
+        rotY: 0,
         rotZ: Math.random() * 720 - 360,
         config: { tension: 300, friction: 10 },
       });
@@ -134,7 +132,6 @@ export const MegaCard: React.FC<MegaCardProps> = ({ card, onCardUpdate, forceFli
         setSpring.start({
           x: newX,
           y: newY,
-          rotX: Math.random() * 360 - 180,
           rotY: 360,
           rotZ: newRotations * 360,
           shadowBlur: 20,
@@ -150,7 +147,6 @@ export const MegaCard: React.FC<MegaCardProps> = ({ card, onCardUpdate, forceFli
             setSpring.start({ 
               shadowBlur: 0, 
               shadowY: 0, 
-              rotX: 0,
               rotY: isFlipped ? 180 : 0,
               rotZ: newRotations * 360,
               scale: 1,
@@ -201,8 +197,8 @@ export const MegaCard: React.FC<MegaCardProps> = ({ card, onCardUpdate, forceFli
         height: '45px',
         borderRadius: '2px',
         backgroundSize: 'cover',
-        transform: to([x, y, rotX, rotY, rotZ, scale], (x, y, rX, rY, rZ, s) =>
-          `translate3d(${x}px, ${y}px, 0) rotateX(${rX}deg) rotateY(${rY}deg) rotateZ(${rZ}deg) scale(${s})`
+        transform: to([x, y, rotY, rotZ, scale], (x, y, rY, rZ, s) =>
+          `translate3d(${x}px, ${y}px, 0) rotateY(${rY}deg) rotateZ(${rZ}deg) scale(${s})`
         ),
         boxShadow: to([shadowBlur, shadowY], (blur, y) => 
           `0px ${y}px ${blur}px rgba(0, 0, 0, 0.3)`

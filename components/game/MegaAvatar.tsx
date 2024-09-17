@@ -8,6 +8,12 @@ interface Player {
   id: string;
   username: string;
   position: { x: number; y: number };
+  videoEnabled: boolean;
+  videoSettings: {
+    width: number;
+    height: number;
+    frameRate: number;
+  };
   webrtc: {
     offer?: RTCSessionDescriptionInit;
     answer?: RTCSessionDescriptionInit;
@@ -42,10 +48,9 @@ const MegaAvatar: React.FC<MegaAvatarProps> = ({ gameState, playerId, initialPos
   const [position, setPosition] = useState<Point>(initialPosition);
   const peerConnection = useRef<RTCPeerConnection | null>(null);
   const { user } = useAppContext();
-  const [{ x, y, shadow, scale }, api] = useSpring(() => ({
+  const [{ x, y, scale }, api] = useSpring(() => ({
     x: initialPosition.x * window.innerWidth,
     y: initialPosition.y * window.innerHeight,
-    shadow: 5,
     scale: 1,
     config: { mass: 1, tension: 200, friction: 13 },
   }));
@@ -164,7 +169,7 @@ const MegaAvatar: React.FC<MegaAvatarProps> = ({ gameState, playerId, initialPos
 
   const handleDragEnd = async (newX: number, newY: number) => {
     isDragging.current = false;
-    api.start({ shadow: 5, scale: 1 });
+    api.start({ scale: 1 });
 
     const updatedPosition = { x: newX / window.innerWidth, y: newY / window.innerHeight };
     setPosition(updatedPosition);
@@ -180,7 +185,6 @@ const MegaAvatar: React.FC<MegaAvatarProps> = ({ gameState, playerId, initialPos
       api.start({ 
         x: ox, 
         y: oy, 
-        shadow: Math.min(30, Math.sqrt(ox * ox + oy * oy) / 10),
         immediate: true
       });
     },
@@ -194,7 +198,6 @@ const MegaAvatar: React.FC<MegaAvatarProps> = ({ gameState, playerId, initialPos
       {...bind()}
       style={{
         transform: to([x, y, scale], (x, y, s) => `translate(${x}px, ${y}px) scale(${s})`),
-        boxShadow: shadow.to((s) => `0px ${s}px ${2 * s}px rgba(0,0,0,0.2)`),
         width: '128px',
         height: '128px',
         cursor: isDragging.current ? 'grabbing' : 'grab',
@@ -210,8 +213,9 @@ const MegaAvatar: React.FC<MegaAvatarProps> = ({ gameState, playerId, initialPos
           width: '100%',
           height: '100%',
           borderRadius: '50%',
-          overflow: 'hidden',
+          overflow: 'visible',
           border: '2px solid #E1FF01',
+          boxShadow: '0px 5px 15px rgba(0,0,0,0.2)',
         }}
       >
         <video
@@ -220,7 +224,8 @@ const MegaAvatar: React.FC<MegaAvatarProps> = ({ gameState, playerId, initialPos
             width: '100%',
             height: '100%',
             objectFit: 'cover',
-            transform: 'scaleX(-1)', // Mirror the video
+            transform: 'scaleX(-1)',
+            borderRadius: '50%',
           }}
           muted
           playsInline

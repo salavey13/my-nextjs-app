@@ -15,6 +15,7 @@ export const ukr: LanguageDictionary = {
     "github": "Переглянути на GitHub (Місце, де код грає в хованки)",
     "version": "Версія 0.13 (Близько до 0.14, але без сюрпризів)"
   },
+  "physicsSettings":  "Налаштування",
   "yeetCoefficient": "Коефіцієнт викиду",
   "tension": "Напруга",
   "rotationDistance": "Відстань обертання",

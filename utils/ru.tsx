@@ -15,6 +15,7 @@ export const ru: LanguageDictionary = {
     "github": "Посмотреть на GitHub (Где код живет и радуется)",
     "version": "Версия 0.13 (Почти как 0.14, но без фокусов)"
   },
+  "physicsSettings":  "Настройки",
   "yeetCoefficient": "Коэффициент выброса",
   "tension": "Натяжение",
   "rotationDistance": "Расстояние вращения",

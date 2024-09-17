@@ -51,7 +51,6 @@ const MergedGameBoard: React.FC = () => {
   const [gameState, setGameState] = useState<GameState | null>(null);
   const { user, t } = useAppContext();
   const [targetFrame, setTargetFrame] = useState({ x: 400, y: 300, rotation: 0 });
-  const [settingsOpen, setSettingsOpen] = useState(false);
   const [physicsParams, setPhysicsParams] = useState<PhysicsSettings>({
     yeetCoefficient: 2,
     mass: 1,
@@ -133,7 +132,7 @@ const MergedGameBoard: React.FC = () => {
       }
 
       const channel = supabase
-        .channel('game_state_updates')
+        .channel(`game_state_updates_${user.currentGameId}`)
         .on(
           'postgres_changes',
           { event: 'UPDATE', schema: 'public', table: 'rents', filter: `id=eq.${user.currentGameId}` },
@@ -260,6 +259,7 @@ const MergedGameBoard: React.FC = () => {
 
   const handleUpdateSettings = (settings: PhysicsSettings) => {
     setPhysicsParams(settings);
+    localStorage.setItem('physicsSettings', JSON.stringify(settings));
   };
 
   const isCardNearPlayer = (card: Card, player: Player) => {
@@ -280,17 +280,23 @@ const MergedGameBoard: React.FC = () => {
       shuffleCards();
     };
 
-    if (window.Telegram?.WebApp) {
-      window.Telegram.WebApp.onEvent('mainButtonClicked', handleMainButtonClick);
-    }
+    // if (window.Telegram?.WebApp) {
+    //   window.Telegram.WebApp.onEvent('mainButtonClicked', handleMainButtonClick);
+    // }
 
     return () => {
       if (window.Telegram?.WebApp) {
-        // changed offEvent to onEven 
         window.Telegram.WebApp.onEvent('mainButtonClicked', handleMainButtonClick);
       }
     };
   }, [shuffleCards]);
+
+  useEffect(() => {
+    const savedSettings = localStorage.getItem('physicsSettings');
+    if (savedSettings) {
+      setPhysicsParams(JSON.parse(savedSettings));
+    }
+  }, []);
 
   if (!hasWebcamAccess || !hasVoiceAccess) {
     return (
@@ -300,10 +306,10 @@ const MergedGameBoard: React.FC = () => {
       </div>
     );
   }
-// removed "open={settingsOpen} onClose={() => setSettingsOpen(false)}""
+
   return (
     <div className="game-board min-h-[calc(100vh-128px)] relative">
-      <Settings  onUpdateSettings={handleUpdateSettings} />
+      <Settings onUpdateSettings={handleUpdateSettings} initialSettings={physicsParams} />
 
       {gameState?.cards.map((card) => (
         <MegaCard
