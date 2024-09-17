@@ -7,7 +7,6 @@ import { Settings, PhysicsSettings } from './Settings';
 import MegaAvatar from './MegaAvatar';
 import useTelegram from '@/hooks/useTelegram';
 
-const GAME_ID = 28;
 const CARD_PROXIMITY_THRESHOLD = 69; // in pixels
 
 interface Point {
@@ -35,6 +34,11 @@ interface Player {
     height: number;
     frameRate: number;
   };
+  webrtc: {
+    offer?: RTCSessionDescriptionInit;
+    answer?: RTCSessionDescriptionInit;
+    iceCandidates: RTCIceCandidateInit[];
+  };
 }
 
 interface GameState {
@@ -44,7 +48,6 @@ interface GameState {
 
 const GameBoard: React.FC = () => {
   const [gameState, setGameState] = useState<GameState | null>(null);
-  const [subscription, setSubscription] = useState<any>(null);
   const { user, t } = useAppContext();
   const [targetFrame, setTargetFrame] = useState({ x: 400, y: 300, rotation: 0 });
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -88,7 +91,7 @@ const GameBoard: React.FC = () => {
   };
 
   const onCardUpdate = (updatedCard: Card) => {
-    if (!gameState) return;
+    if (!gameState || !user?.currentGameId) return;
 
     const updatedCards = gameState.cards.map((card) =>
       card.id === updatedCard.id ? updatedCard : card
@@ -100,7 +103,7 @@ const GameBoard: React.FC = () => {
     supabase
       .from('rents')
       .update({ game_state: updatedGameState })
-      .eq('id', user?.currentGameId)
+      .eq('id', user.currentGameId)
       .then(() => {
         console.log('Card updated successfully in Supabase');
       });
@@ -108,34 +111,42 @@ const GameBoard: React.FC = () => {
 
   useEffect(() => {
     const handleSubscription = async () => {
-      if (!user?.currentGameId) return;
+      if (!user?.currentGameId) {
+        console.log('No current game ID, skipping subscription');
+        return;
+      }
+
+      console.log('Setting up subscription for game ID:', user.currentGameId);
 
       const { data, error } = await supabase
         .from('rents')
         .select('game_state')
-        .eq('id', user?.currentGameId)
+        .eq('id', user.currentGameId)
         .single();
 
       if (error) {
-        console.error('Error fetching game state:', error);
+        console.error('Error fetching initial game state:', error);
       } else {
+        console.log('Initial game state fetched:', data.game_state);
         setGameState(data.game_state);
       }
 
       const channel = supabase
-        .channel('notify_game_update')
+        .channel('game_state_updates')
         .on(
           'postgres_changes',
-          { event: 'UPDATE', schema: 'public', table: 'rents', filter: `id=eq.${user?.currentGameId}` },
+          { event: 'UPDATE', schema: 'public', table: 'rents', filter: `id=eq.${user.currentGameId}` },
           (payload) => {
+            console.log('Received game state update:', payload.new.game_state);
             setGameState(payload.new.game_state);
           }
         )
-        .subscribe();
-
-      setSubscription(channel);
+        .subscribe((status) => {
+          console.log('Subscription status:', status);
+        });
 
       return () => {
+        console.log('Cleaning up subscription');
         supabase.removeChannel(channel);
       };
     };
@@ -144,9 +155,9 @@ const GameBoard: React.FC = () => {
   }, [user?.currentGameId]);
 
   const shuffleCards = async () => {
-    if (!gameState) return;
+    if (!gameState || !user?.currentGameId) return;
 
-    setIsShuffling(true)
+    setIsShuffling(true);
 
     const shuffledCards = gameState.cards
       .map((card, idx) => ({
@@ -155,7 +166,7 @@ const GameBoard: React.FC = () => {
         last_position: card.position,
         zIndex: Math.floor(Math.random() * 36),
         flipped: false,
-        rotations: Math.floor(Math.random() * 2) * 2, // 0 or 2 rotations (360 degrees)
+        rotations: Math.floor(Math.random() * 2) * 2,
       }))
       .sort(() => Math.random() - 0.5);
 
@@ -164,7 +175,7 @@ const GameBoard: React.FC = () => {
     const { error } = await supabase
       .from('rents')
       .update({ game_state: updatedGameState })
-      .eq('id', user?.currentGameId);
+      .eq('id', user.currentGameId);
 
     if (error) {
       console.error('Error updating game state:', error);
@@ -173,31 +184,34 @@ const GameBoard: React.FC = () => {
     }
 
     randomizeTargetFrame();
-    // Allow time for the shuffle animation to complete
+
     setTimeout(() => {
       setIsShuffling(false);
-      showMainButton(t('shufle'));
-      setBottomBarColor("#282c33")
-      setHeaderColor("#282c33")
+      showMainButton(t('shuffle'));
+      setBottomBarColor("#282c33");
+      setHeaderColor("#282c33");
     }, 1000);
   };
 
   useEffect(() => {
     const addPlayerIfNeeded = async () => {
-      if (!gameState || !user) return;
+      if (!gameState || !user?.currentGameId) return;
 
       const playerExists = gameState.players?.some((player) => player.id === user.id.toString());
 
       if (!playerExists || !gameState.players) {
-        const newPlayer = {
+        const newPlayer: Player = {
           id: user.id.toString(),
-          username: user.telegram_username,
-          position: { x: Math.random() * 320/window.innerWidth, y: Math.random() * 320 / window.innerHeight },
+          position: { x: Math.random() * 320/window.innerWidth,
+          y: Math.random() * 320 / window.innerHeight },
           videoEnabled: false,
           videoSettings: {
             width: 320,
             height: 240,
             frameRate: 15,
+          },
+          webrtc: {
+            iceCandidates: [],
           },
         };
         
@@ -207,7 +221,7 @@ const GameBoard: React.FC = () => {
         const { error } = await supabase
           .from('rents')
           .update({ game_state: updatedGameState })
-          .eq('id', user?.currentGameId);
+          .eq('id', user.currentGameId);
 
         if (error) {
           console.error('Error adding player:', error);
@@ -223,7 +237,7 @@ const GameBoard: React.FC = () => {
   }, [gameState, user]);
 
   const handlePositionChange = async (playerId: string, newPos: Point) => {
-    if (!gameState) return;
+    if (!gameState || !user?.currentGameId) return;
 
     const updatedPlayers = gameState.players.map((player) =>
       player.id === playerId ? { ...player, position: newPos } : player
@@ -234,7 +248,7 @@ const GameBoard: React.FC = () => {
     const { error } = await supabase
       .from('rents')
       .update({ game_state: updatedGameState })
-      .eq('id', user?.currentGameId);
+      .eq('id', user.currentGameId);
 
     if (error) {
       console.error('Error updating player position:', error);
@@ -252,14 +266,13 @@ const GameBoard: React.FC = () => {
     const dy = (card.position.y - player.position.y) * window.innerHeight;
     return Math.sqrt(dx * dx + dy * dy) <= CARD_PROXIMITY_THRESHOLD;
   };
-  
 
   useEffect(() => {
-    showMainButton(t('shufle'));
-    tg?.MainButton?.setParams({color: "#e1ff01", text_color: "#000000"})
-    setBottomBarColor("#282c33")
-    setHeaderColor("#282c33")
-  }, [showMainButton]);
+    showMainButton(t('shuffle'));
+    tg?.MainButton?.setParams({color: "#e1ff01", text_color: "#000000"});
+    setBottomBarColor("#282c33");
+    setHeaderColor("#282c33");
+  }, [showMainButton, t, tg?.MainButton, setBottomBarColor, setHeaderColor]);
 
   useEffect(() => {
     const handleMainButtonClick = () => {
@@ -272,7 +285,7 @@ const GameBoard: React.FC = () => {
 
     return () => {
       if (window.Telegram?.WebApp) {
-        window.Telegram.WebApp.onEvent('mainButtonClicked', handleMainButtonClick);
+        window.Telegram.WebApp.offEvent('mainButtonClicked', handleMainButtonClick);
       }
     };
   }, [shuffleCards]);
@@ -289,7 +302,7 @@ const GameBoard: React.FC = () => {
   return (
     <div className="game-board min-h-[calc(100vh-128px)] relative">
       <Settings onUpdateSettings={handleUpdateSettings} />
-{/* open={settingsOpen} onClose={() => setSettingsOpen(false)}  */}
+
       {gameState?.cards.map((card) => (
         <MegaCard
           key={card.id}
@@ -321,9 +334,9 @@ const GameBoard: React.FC = () => {
         <MegaAvatar
           key={player.id}
           gameState={gameState}
-          playerId={parseInt(player.id)}
+          playerId={player.id}
           initialPosition={player.position}
-          onPositionChange={(_, newPos) => handlePositionChange(player.id, newPos)}
+          onPositionChange={handlePositionChange}
         />
       ))}
     </div>
