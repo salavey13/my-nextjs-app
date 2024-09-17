@@ -202,6 +202,7 @@ const MegaAvatar: React.FC<MegaAvatarProps> = ({ gameState, playerId, initialPos
         height: '128px',
         cursor: isDragging.current ? 'grabbing' : 'grab',
         position: 'absolute',
+        overflow: 'visible',
         touchAction: 'none',
         display: 'flex',
         flexDirection: 'column',
