@@ -1,3 +1,4 @@
+// components\game\MergedGameBoard.tsx
 import React, { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 import { MegaCard, CardId } from '@/components/game/MegaCard';
@@ -64,7 +65,6 @@ const MergedGameBoard: React.FC = () => {
   const [hasWebcamAccess, setHasWebcamAccess] = useState(false);
   const [hasVoiceAccess, setHasVoiceAccess] = useState(false);
   const { showMainButton, setHeaderColor, showAlert, setBottomBarColor, tg } = useTelegram();
-
   const checkMediaAccess = useCallback(async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
@@ -93,7 +93,16 @@ const MergedGameBoard: React.FC = () => {
   const onCardUpdate = (updatedCard: Card) => {
     if (!gameState || !user?.currentGameId) return;
 
-    const updatedCards = gameState.cards.map((card) =>
+    // Find the current card to compare
+    const currentCard = gameState.cards.find((card) => card.id === updatedCard.id);
+
+    // If the card hasn't changed, skip the update
+    if (JSON.stringify(currentCard) === JSON.stringify(updatedCard)) {
+      console.log('Card is identical to the current state, skipping update.');
+      return;
+    }
+
+    const updatedCards = gameState?.cards.map((card) =>
       card.id === updatedCard.id ? updatedCard : card
     );
 
@@ -102,12 +111,26 @@ const MergedGameBoard: React.FC = () => {
 
     supabase
       .from('rents')
-      .update({ game_state: updatedGameState })
+      .update({ game_state: updatedGameState })//{ game_state: updatedGameState })
       .eq('id', user.currentGameId)
       .then(() => {
         console.log('Card updated successfully in Supabase');
       });
   };
+
+  function deepEqual(obj1:any, obj2:any) {
+    const excludeFields = ['isAnimating', 'animationProgress', 'velocity', 'direction', 'last_position', 'rotations']; // Add any fields you want to ignore
+  
+    const cleanObj1 = JSON.parse(JSON.stringify(obj1, (key, value) =>
+      excludeFields.includes(key) ? undefined : value
+    ));
+  
+    const cleanObj2 = JSON.parse(JSON.stringify(obj2, (key, value) =>
+      excludeFields.includes(key) ? undefined : value
+    ));
+  
+    return JSON.stringify(cleanObj1) === JSON.stringify(cleanObj2);
+  }
 
   useEffect(() => {
     const handleSubscription = async () => {
@@ -115,42 +138,48 @@ const MergedGameBoard: React.FC = () => {
         console.log('No current game ID, skipping subscription');
         return;
       }
-
+  
       console.log('Setting up subscription for game ID:', user.currentGameId);
-
+  
       const { data, error } = await supabase
         .from('rents')
         .select('game_state')
         .eq('id', user.currentGameId)
         .single();
-
+  
       if (error) {
         console.error('Error fetching initial game state:', error);
       } else {
         console.log('Initial game state fetched:', data.game_state);
         setGameState(data.game_state);
       }
-
+  
       const channel = supabase
         .channel(`game_state_updates_${user.currentGameId}`)
         .on(
           'postgres_changes',
           { event: 'UPDATE', schema: 'public', table: 'rents', filter: `id=eq.${user.currentGameId}` },
           (payload) => {
-            console.log('Received game state update:', payload.new.game_state);
-            setGameState(payload.new.game_state);
+            const newGameState = payload.new.game_state;
+            console.log('Received game state update:', newGameState);
+  
+            // More reliable comparison
+            if (!deepEqual(newGameState, gameState)) {
+              console.log('Received NEW game state update:', newGameState);
+              setGameState(newGameState);
+            }
           }
         )
         .subscribe((status) => {
           console.log('Subscription status:', status);
         });
-
+  
       return () => {
         console.log('Cleaning up subscription');
         supabase.removeChannel(channel);
       };
     };
-
+  
     handleSubscription();
   }, [user?.currentGameId]);
 
@@ -269,7 +298,7 @@ const MergedGameBoard: React.FC = () => {
   };
 
   useEffect(() => {
-    showMainButton(t('shuffle'));
+    showMainButton(t('shufle'));
     tg?.MainButton?.setParams({color: "#e1ff01", text_color: "#000000"});
     setBottomBarColor("#282c33");
     setHeaderColor("#282c33");

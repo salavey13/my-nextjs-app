@@ -22,6 +22,7 @@ export const ukr: LanguageDictionary = {
   "friction": "Тертя",
   "yeetVelocityThreshold": "Поріг швидкості викиду",
   "minMovementThreshold": "Мінімальний поріг руху",
+  applySettings: "Застосувати",
     defaultLabel: "ХЗ",
     conflictAwarenessTitle: "Усвідомлення конфлікту та гуманітарна підтримка",
     realTimeUpdates: "Оновлення в режимі реального часу",

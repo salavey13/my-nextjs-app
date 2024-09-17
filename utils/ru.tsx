@@ -22,6 +22,7 @@ export const ru: LanguageDictionary = {
   "friction": "Трение",
   "yeetVelocityThreshold": "Порог скорости выброса",
   "minMovementThreshold": "Минимальный порог движения",
+  applySettings: "Применить",
     newItemTypeNameRequest: "Введите имя для нового типа элемента:",
     saveRefCode: "Сохранить",
     newRentNotification: "Кто-то пытался арендовать ваш предмет",

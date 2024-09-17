@@ -113,9 +113,9 @@ const MegaAvatar: React.FC<MegaAvatarProps> = ({ gameState, playerId, initialPos
           const updatedGameState = payload.new.game_state as GameState;
           const updatedPlayer = updatedGameState.players.find(p => p.id === playerId);
           
-          if (updatedPlayer && peerConnection.current) {
-            if (updatedPlayer.webrtc.offer && !peerConnection.current.currentRemoteDescription) {
-              await peerConnection.current.setRemoteDescription(new RTCSessionDescription(updatedPlayer.webrtc.offer));
+          if (updatedPlayer && updatedPlayer.webrtc && peerConnection.current) {
+            if (updatedPlayer.webrtc?.offer && !peerConnection.current.currentRemoteDescription) {
+              await peerConnection.current.setRemoteDescription(new RTCSessionDescription(updatedPlayer.webrtc?.offer));
               const answer = await peerConnection.current.createAnswer();
               await peerConnection.current.setLocalDescription(answer);
               updatePlayerWebRTC({ answer });

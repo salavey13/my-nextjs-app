@@ -94,7 +94,7 @@ export const Settings: React.FC<SettingsProps> = ({ onUpdateSettings, initialSet
               <div className="flex justify-between">
                 <Button type="submit">{t('applySettings')}</Button>
                 <Button onClick={restoreDefaults} variant="outline" className="ml-4">
-                  {t('restoreDefaults')}
+                  {t('settings.restoreDefaults')}
                 </Button>
               </div>
             </form>

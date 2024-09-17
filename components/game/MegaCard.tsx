@@ -36,7 +36,8 @@ export const MegaCard: React.FC<MegaCardProps> = ({ card, onCardUpdate, forceFli
   const { t } = useAppContext();
   const [rotations, setRotations] = useState(card.rotations);
   const [isFlipped, setIsFlipped] = useState(card.flipped);
-
+  const prevFlippedState = useRef(card.flipped);
+  const [isAnimating, setIsAnimating] = useState(false);
   const [{ x, y, rotY, rotZ, scale, shadowBlur, shadowY }, setSpring] = useSpring(() => ({
     x: cardPosition.x * window.innerWidth,
     y: cardPosition.y * window.innerHeight,
@@ -74,61 +75,67 @@ export const MegaCard: React.FC<MegaCardProps> = ({ card, onCardUpdate, forceFli
   }, [isShuffling, card.position, setSpring]);
 
   useEffect(() => {
-    if (forceFlipped !== isFlipped) {
+    if (forceFlipped && forceFlipped !== isFlipped) {
       setIsFlipped(forceFlipped);
       setSpring.start({ rotY: forceFlipped ? 180 : 0 });
     }
-  }, [forceFlipped, isFlipped, setSpring]);
+  }, [forceFlipped, isFlipped]);
 
-  const normalizePosition = (x: number, y: number) => ({
-    x: x / window.innerWidth,
-    y: y / window.innerHeight,
-  });
-
+  
+  
+  // Function to handle card flip
   const flipCard = () => {
-    setIsFlipped(!isFlipped);
-    //setSpring.start({ rotY: isFlipped ? 0 : 180 });
-    onCardUpdate({ ...card, flipped: isFlipped });
+    const newFlipped = !isFlipped;
+    setIsFlipped(newFlipped);
+    setSpring.start({
+      rotY: newFlipped ? 180 : 0,
+      scale: 1.1,
+      config: { tension: 200, friction: 15, duration: 300 },
+    });
+    onCardUpdate({ ...card, flipped: newFlipped });
   };
 
   const bind = useGesture({
     onDragStart: () => {
+      if (isAnimating) return; // Ignore drag start if already animating
+  
       setIsDragging(true);
       preDragPositionRef.current = { x: cardPosition.x, y: cardPosition.y };
       yeetLocked.current = false;
       setSpring.start({ shadowBlur: 10, shadowY: 5, scale: 1.05 });
     },
     onDrag: ({ movement: [mx, my], velocity: [vx, vy] }) => {
+      if (!isDragging || yeetLocked.current) return;
+  
       const currentX = preDragPositionRef.current.x * window.innerWidth + mx;
       const currentY = preDragPositionRef.current.y * window.innerHeight + my;
-
+  
       const isYeetPrep = Math.sqrt(vx * vx + vy * vy) > physicsParams.yeetVelocityThreshold && 
                          Math.sqrt(mx * mx + my * my) > physicsParams.minMovementThreshold;
-
+  
       if (isYeetPrep && !yeetLocked.current) {
         setIsYeeted(true);
         yeetLocked.current = true;
       }
-
-      if (!isDragging || yeetLocked.current) return;
-
+  
       setCardPosition(normalizePosition(currentX, currentY));
       setSpring.start({ x: currentX, y: currentY });
     },
     onDragEnd: ({ movement: [mx, my], velocity: [vx, vy] }) => {
       setIsDragging(false);
-
+  
       if (isYeeted) {
+        setIsAnimating(true); // Lock state during animation
         const yeetDistanceX = Math.max(1, vx) * physicsParams.yeetCoefficient * mx;
         const yeetDistanceY = Math.max(1, vy) * physicsParams.yeetCoefficient * my;
         const yeetDistance = Math.sqrt(yeetDistanceX * yeetDistanceX + yeetDistanceY * yeetDistanceY);
         const newRotations = Math.floor(yeetDistance / (physicsParams.rotationDistance * 2)) % 4;
-
+  
         const newX = (preDragPositionRef.current.x * window.innerWidth + yeetDistanceX + window.innerWidth) % window.innerWidth;
         const newY = (preDragPositionRef.current.y * window.innerHeight + yeetDistanceY + window.innerHeight) % window.innerHeight;
-
+  
         const yeetDuration = 500 + yeetDistance / 2;
-
+  
         setSpring.start({
           x: newX,
           y: newY,
@@ -144,49 +151,55 @@ export const MegaCard: React.FC<MegaCardProps> = ({ card, onCardUpdate, forceFli
             duration: yeetDuration,
           },
           onRest: () => {
-            setSpring.start({ 
-              shadowBlur: 0, 
-              shadowY: 0, 
-              rotY: isFlipped ? 180 : 0,
-              rotZ: newRotations * 360,
-              scale: 1,
-              config: { duration: 300 },
+            // State update after animation completes
+            setIsAnimating(false); // Unlock state after animation
+            onCardUpdate({
+              ...card,
+              position: normalizePosition(newX, newY),
+              rotations: newRotations,
+              velocity: { x: vx, y: vy },
+              last_position: preDragPositionRef.current,
+              flipped: !isFlipped,
             });
-          },
+            setIsFlipped(!isFlipped);
+            setIsYeeted(false);
+          }
         });
-
-        const newPos = normalizePosition(newX, newY);
-        const newFlipped = !isFlipped;
-        
-        onCardUpdate({
-          ...card,
-          position: newPos,
-          rotations: newRotations,
-          velocity: { x: vx, y: vy },
-          last_position: preDragPositionRef.current,
-          flipped: newFlipped,
-        });
-
-        setIsFlipped(newFlipped);
-        setIsYeeted(false);
+  
       } else {
+        // Non-yeet end of drag
         const newPos = normalizePosition(
           preDragPositionRef.current.x * window.innerWidth + mx,
           preDragPositionRef.current.y * window.innerHeight + my
         );
-        
+  
         onCardUpdate({
           ...card,
           position: newPos,
           last_position: preDragPositionRef.current,
         });
-        
+  
         setCardPosition(newPos);
         setSpring.start({ shadowBlur: 0, shadowY: 0, scale: 1 });
       }
     },
     onDoubleClick: flipCard,
   });
+  
+  // Flip only if state changed
+  useEffect(() => {
+    if (prevFlippedState.current !== card.flipped) {
+      flipCard();
+    }
+    prevFlippedState.current = card.flipped;
+  }, [card.flipped]);
+  
+  // Helper function to normalize position
+  const normalizePosition = (x: number, y: number) => ({
+    x: x / window.innerWidth,
+    y: y / window.innerHeight,
+  });
+  
 
   return (
     <animated.div

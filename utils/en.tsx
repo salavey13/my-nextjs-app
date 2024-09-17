@@ -425,6 +425,7 @@ export const en: LanguageDictionary = {
     "version": "Version 0.13"
   },
   "physicsSettings": "Settings",
+  applySettings: "Apply",
     photos: "Photos",
     rentalStartDate: "Rental Start Date",
     rentalEndDate: "Rental End Date",
