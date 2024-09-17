@@ -212,9 +212,8 @@ const MegaAvatar: React.FC<MegaAvatarProps> = ({ gameState, playerId, initialPos
       <animated.div
         style={{
           width: '100%',
-          height: '100%',
+          height: '80%',
           borderRadius: '50%',
-          overflow: 'visible',
           border: '2px solid #E1FF01',
           boxShadow: '0px 5px 15px rgba(0,0,0,0.2)',
         }}
@@ -223,7 +222,7 @@ const MegaAvatar: React.FC<MegaAvatarProps> = ({ gameState, playerId, initialPos
           ref={videoRef}
           style={{
             width: '100%',
-            height: '100%',
+            height: '80%',
             objectFit: 'cover',
             transform: 'scaleX(-1)',
             borderRadius: '50%',
