@@ -50,40 +50,35 @@ export const MegaCard: React.FC<MegaCardProps> = ({ card, onCardUpdate, forceFli
   }));
 
   useEffect(() => {
-    setSpring.start({
-      x: cardPosition.x * window.innerWidth,
-      y: cardPosition.y * window.innerHeight,
-      rotY: isFlipped ? 180 : 0,
-    });
+    setCardPosition(card.position);
+    setIsFlipped(card.flipped);
     setRotations(card.rotations);
-  }, [card, setSpring, isFlipped, cardPosition]);
+    setSpring.start({
+      x: card.position.x * window.innerWidth,
+      y: card.position.y * window.innerHeight,
+      rotY: card.flipped ? 180 : 0,
+      rotZ: card.rotations * 180,
+      immediate: !isShuffling, // Immediately set the new position without animation if not shuffling
+    });
+  }, [card, setSpring, isShuffling]);
 
   useEffect(() => {
     if (isShuffling) {
-      // Target stack position
-      const targetX = 13; // Fixed stack position for all cards
-      const targetY = 0.5 * window.innerHeight; // Midpoint of the screen, assuming you want them stacked vertically
-      const targetRotZ = card.rotations * 360;
-
       setSpring.start({
-        x: targetX,
-        y: targetY,
-        rotX: 0,
-        rotY: 0,
-        rotZ: targetRotZ,
-        config: { tension: 170, friction: 26 },
-        onRest: () => {
-        // After shuffle completes, reset card position properly.
-        setCardPosition(card.position);
-      },
+        x: card.position.x * window.innerWidth,
+        y: card.position.y * window.innerHeight,
+        rotX: Math.random() * 720 - 360,
+        rotY: Math.random() * 720 - 360,
+        rotZ: Math.random() * 720 - 360,
+        config: { tension: 300, friction: 10 },
       });
     }
-  }, [isShuffling, card.position, card.rotations, setSpring]);
+  }, [isShuffling, card.position, setSpring]);
 
   useEffect(() => {
-    if (forceFlipped && forceFlipped !== isFlipped) {
+    if (forceFlipped !== isFlipped) {
       setIsFlipped(forceFlipped);
-      setSpring.start({ rotY: forceFlipped ? 0 : 180 });
+      setSpring.start({ rotY: forceFlipped ? 180 : 0 });
     }
   }, [forceFlipped, isFlipped, setSpring]);
 
@@ -129,12 +124,12 @@ export const MegaCard: React.FC<MegaCardProps> = ({ card, onCardUpdate, forceFli
         const yeetDistanceX = Math.max(1, vx) * physicsParams.yeetCoefficient * mx;
         const yeetDistanceY = Math.max(1, vy) * physicsParams.yeetCoefficient * my;
         const yeetDistance = Math.sqrt(yeetDistanceX * yeetDistanceX + yeetDistanceY * yeetDistanceY);
-        const newRotations = Math.floor(yeetDistance / (physicsParams.rotationDistance * 2)) % 42; // Limit to 0-13 rotations
+        const newRotations = Math.floor(yeetDistance / (physicsParams.rotationDistance * 2)) % 4;
 
         const newX = (preDragPositionRef.current.x * window.innerWidth + yeetDistanceX + window.innerWidth) % window.innerWidth;
         const newY = (preDragPositionRef.current.y * window.innerHeight + yeetDistanceY + window.innerHeight) % window.innerHeight;
 
-        const yeetDuration = 500 + yeetDistance / 2; // Adjusted for faster animation
+        const yeetDuration = 500 + yeetDistance / 2;
 
         setSpring.start({
           x: newX,
