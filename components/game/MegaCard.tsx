@@ -87,8 +87,8 @@ export const MegaCard: React.FC<MegaCardProps> = ({ card, onCardUpdate, forceFli
 
   const flipCard = () => {
     setIsFlipped(!isFlipped);
-    setSpring.start({ rotY: isFlipped ? 0 : 180 });
-    onCardUpdate({ ...card, flipped: !isFlipped });
+    //setSpring.start({ rotY: isFlipped ? 0 : 180 });
+    onCardUpdate({ ...card, flipped: isFlipped });
   };
 
   const bind = useGesture({
