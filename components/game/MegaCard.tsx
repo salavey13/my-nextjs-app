@@ -126,8 +126,8 @@ export const MegaCard: React.FC<MegaCardProps> = ({ card, onCardUpdate, forceFli
       setIsDragging(false);
 
       if (isYeeted) {
-        const yeetDistanceX = Math.max(1, Math.abs(vx)) * physicsParams.yeetCoefficient * Math.max(1, Math.abs(mx));
-        const yeetDistanceY = Math.max(1, Math.abs(vy)) * physicsParams.yeetCoefficient * Math.max(1, Math.abs(my));
+        const yeetDistanceX = Math.max(1, vx) * physicsParams.yeetCoefficient * mx;
+        const yeetDistanceY = Math.max(1, vy) * physicsParams.yeetCoefficient * my;
         const yeetDistance = Math.sqrt(yeetDistanceX * yeetDistanceX + yeetDistanceY * yeetDistanceY);
         const newRotations = Math.floor(yeetDistance / (physicsParams.rotationDistance * 2)) % 42; // Limit to 0-13 rotations
 
