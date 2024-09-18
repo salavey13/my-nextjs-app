@@ -3,7 +3,7 @@ import { supabase } from "../../lib/supabaseClient";
 import { useSpring, animated, to } from 'react-spring';
 import { useGesture } from '@use-gesture/react';
 import { useAppContext } from '@/context/AppContext';
-import ShineBorder from "@/components/ui/shine-border";
+import ShineBorder from "@/components/ui/shineBorder";
 interface Player {
   id: string;
   username: string;
