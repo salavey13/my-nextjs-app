@@ -6,7 +6,7 @@ import { useAppContext } from '@/context/AppContext';
 import { Button } from '@/components/ui/button';
 import { toast } from 'react-toastify';
 import { supabase } from "../lib/supabaseClient";
-import MergedGameBoard from './game/MergedGameBoard';
+import GameBoard from './game/GameBoard';
 
 const HackButton: React.FC = () => {
   const { t, store } = useAppContext();
@@ -56,7 +56,7 @@ const HackButton: React.FC = () => {
       >
         {t('hackButton')}
       </Button> */}
-      <MergedGameBoard/>
+      <GameBoard/>
     </div>
   );
 };
