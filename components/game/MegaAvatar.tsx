@@ -237,12 +237,12 @@ const MegaAvatar: React.FC<MegaAvatarProps> = ({ gameState, playerId, initialPos
       color="#e1ff01">
       <div
           style={{
-            marginTop: '5px',
+            
             backgroundColor: 'rgba(0, 0, 0, 0.5)',
             color: '#E1FF01',
             padding: '2px 6px',
             borderRadius: '10px',
-            fontSize: '0.75rem',
+            
             maxWidth: '100%',
             overflow: 'hidden',
             textOverflow: 'ellipsis',
