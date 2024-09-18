@@ -209,7 +209,7 @@ const MegaAvatar: React.FC<MegaAvatarProps> = ({ gameState, playerId, initialPos
         alignItems: 'center',
       }}
     >
-      <ShineBorder>
+      
       <animated.div
         style={{
           width: '100%',
@@ -231,9 +231,11 @@ const MegaAvatar: React.FC<MegaAvatarProps> = ({ gameState, playerId, initialPos
           playsInline
         />
       </animated.div>
-      </ShineBorder>
+      
       {player && (
-        <div
+        <ShineBorder className="text-center text-sx font-bold"
+      color="#e1ff01">
+      <div
           style={{
             marginTop: '5px',
             backgroundColor: 'rgba(0, 0, 0, 0.5)',
@@ -249,6 +251,7 @@ const MegaAvatar: React.FC<MegaAvatarProps> = ({ gameState, playerId, initialPos
         >
           {player.username}
         </div>
+      </ShineBorder>
       )}
     </animated.div>
   );
