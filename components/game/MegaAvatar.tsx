@@ -231,7 +231,7 @@ const MegaAvatar: React.FC<MegaAvatarProps> = ({ gameState, playerId, initialPos
           playsInline
         />
       </animated.div>
-        <ShineBorder/>
+      </ShineBorder>
       {player && (
         <div
           style={{
