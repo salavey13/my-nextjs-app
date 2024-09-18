@@ -8,6 +8,9 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      animation: {
+        grid: "grid 15s linear infinite",
+      },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
         "gradient-conic":
@@ -55,6 +58,10 @@ const config: Config = {
             "sm": "calc(var(--radius) - 4px)"
           },
       keyframes: {
+        grid: {
+          "0%": { transform: "translateY(-50%)" },
+          "100%": { transform: "translateY(0)" },
+        },
             "accordion-down": {
               "from": {
                 "height": "0"
@@ -70,7 +77,18 @@ const config: Config = {
               "to": {
                 "height": "0"
               }
-            }
+            },
+        "shine-pulse": {
+          "0%": {
+            "background-position": "0% 0%",
+          },
+          "50%": {
+            "background-position": "100% 100%",
+          },
+          to: {
+            "background-position": "0% 0%",
+          },
+        },
           }
 },
   plugins: [require("tailwindcss-animate")],

@@ -209,14 +209,14 @@ const MergedGameBoard: React.FC = () => {
     if (error) {
       console.error('Error updating game state:', error);
     } else {
-      setGameState(updatedGameState);
+      //setGameState(updatedGameState);
     }
 
     randomizeTargetFrame();
 
     setTimeout(() => {
       setIsShuffling(false);
-      showMainButton(t('shuffle'));
+      showMainButton(t('shufle'));
       setBottomBarColor("#282c33");
       setHeaderColor("#282c33");
     }, 1000);

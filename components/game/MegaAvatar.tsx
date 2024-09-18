@@ -3,7 +3,7 @@ import { supabase } from "../../lib/supabaseClient";
 import { useSpring, animated, to } from 'react-spring';
 import { useGesture } from '@use-gesture/react';
 import { useAppContext } from '@/context/AppContext';
-
+import ShineBorder from "@/components/ui/ShineBorder";
 interface Player {
   id: string;
   username: string;
@@ -209,12 +209,12 @@ const MegaAvatar: React.FC<MegaAvatarProps> = ({ gameState, playerId, initialPos
         alignItems: 'center',
       }}
     >
+      
       <animated.div
         style={{
           width: '100%',
           height: '80%',
           borderRadius: '50%',
-          border: '2px solid #E1FF01',
           boxShadow: '0px 5px 15px rgba(0,0,0,0.2)',
         }}
       >
@@ -231,14 +231,17 @@ const MegaAvatar: React.FC<MegaAvatarProps> = ({ gameState, playerId, initialPos
           playsInline
         />
       </animated.div>
+      
       {player && (
-        <div
+        <ShineBorder className="text-center text-sx font-bold"
+      color="#e1ff01">
+      <div
           style={{
-            marginTop: '5px',
+            
             backgroundColor: 'rgba(0, 0, 0, 0.5)',
             color: '#E1FF01',
             padding: '2px 6px',
-            borderRadius: '10px',
+            borderRadius: '13px',
             fontSize: '0.75rem',
             maxWidth: '100%',
             overflow: 'hidden',
@@ -248,6 +251,7 @@ const MegaAvatar: React.FC<MegaAvatarProps> = ({ gameState, playerId, initialPos
         >
           {player.username}
         </div>
+      </ShineBorder>
       )}
     </animated.div>
   );
