@@ -38,7 +38,7 @@ export const MegaCard: React.FC<MegaCardProps> = React.memo(({ card, onCardUpdat
     rotY: card.flipped ? 180 : 0,
     rotZ: card.rotations * 360,
     scale: 1,
-    config: { mass: physicsParams.mass, tension: physicsParams.tension, friction: physicsParams.friction },
+    config: { mass: 1, tension: 170, friction: 26 },
   }));
 
   useEffect(() => {
@@ -66,28 +66,36 @@ export const MegaCard: React.FC<MegaCardProps> = React.memo(({ card, onCardUpdat
         immediate: true,
       });
     } else {
-      const newX = (card.position.x * window.innerWidth + mx + window.innerWidth) % window.innerWidth;
-      const newY = (card.position.y * window.innerHeight + my + window.innerHeight) % window.innerHeight;
+      const yeetCoefficient = physicsParams.yeetCoefficient;
+      const newX = (card.position.x * window.innerWidth + mx * yeetCoefficient + window.innerWidth) % window.innerWidth;
+      const newY = (card.position.y * window.innerHeight + my * yeetCoefficient + window.innerHeight) % window.innerHeight;
+      
+      const velocity = Math.sqrt(vx * vx + vy * vy);
+      const isYeeted = velocity > physicsParams.yeetVelocityThreshold;
       
       setIsAnimating(true);
       api.start({
         x: newX,
         y: newY,
-        rotZ: card.rotations * 360 + Math.sign(vx + vy) * Math.min(Math.abs(vx + vy) * 200, 720),
+        rotZ: card.rotations * 360 + (isYeeted ? Math.sign(vx + vy) * Math.min(velocity * 360, 720) : 0),
         scale: 1,
-        config: { velocity: [vx * 1000, vy * 1000] },
+        config: { velocity: isYeeted ? [vx * yeetCoefficient, vy * yeetCoefficient] : [0, 0] },
         onRest: () => {
           setIsAnimating(false);
           onCardUpdate({
             ...card,
-            position: { x: newX / window.innerWidth, y: newY / window.innerHeight },
+            position: { 
+              x: Math.max(0, Math.min(newX / window.innerWidth, 1 - 30 / window.innerWidth)),
+              y: Math.max(0, Math.min(newY / window.innerHeight, 1 - 45 / window.innerHeight))
+            },
             last_position: card.position,
             rotations: Math.floor(Math.abs(rotZ.get() / 360)) % 4,
+            flipped: isYeeted ? !card.flipped : card.flipped,
           });
         },
       });
     }
-  }, [card, api, onCardUpdate, rotZ]);
+  }, [card, api, onCardUpdate, rotZ, physicsParams]);
 
   const bind = useGesture({
     onDrag: ({ movement: [mx, my], velocity: [vx, vy], down }) => handleDrag(mx, my, vx, vy, down),

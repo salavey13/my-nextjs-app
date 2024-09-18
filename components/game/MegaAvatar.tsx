@@ -50,8 +50,8 @@ const MegaAvatar: React.FC<MegaAvatarProps> = React.memo(({ gameState, playerId,
   const player = gameState.players.find(p => p.id === playerId);
 
   const [{ x, y }, api] = useSpring(() => ({
-    x: initialPosition.x * window.innerWidth,
-    y: initialPosition.y * window.innerHeight,
+    x: initialPosition.x * window.innerWidth + 64, // Adjusted for center positioning
+    y: initialPosition.y * window.innerHeight + 64, // Adjusted for center positioning
     config: { mass: 1, tension: 200, friction: 20 },
   }));
 
@@ -59,9 +59,16 @@ const MegaAvatar: React.FC<MegaAvatarProps> = React.memo(({ gameState, playerId,
     if (!down) {
       const newX = (initialPosition.x * window.innerWidth + mx + window.innerWidth) % window.innerWidth;
       const newY = (initialPosition.y * window.innerHeight + my + window.innerHeight) % window.innerHeight;
-      onPositionChange(playerId, { x: newX / window.innerWidth, y: newY / window.innerHeight });
+      onPositionChange(playerId, { 
+        x: Math.max(64, Math.min(newX, window.innerWidth - 64)) / window.innerWidth,
+        y: Math.max(64, Math.min(newY, window.innerHeight - 64)) / window.innerHeight
+      });
     }
-    api.start({ x: initialPosition.x * window.innerWidth + mx, y: initialPosition.y * window.innerHeight + my, immediate: down });
+    api.start({ 
+      x: initialPosition.x * window.innerWidth + mx + 64,
+      y: initialPosition.y * window.innerHeight + my + 64,
+      immediate: down 
+    });
   }, [initialPosition, playerId, onPositionChange, api]);
 
   const bind = useGesture({
@@ -186,7 +193,7 @@ const MegaAvatar: React.FC<MegaAvatarProps> = React.memo(({ gameState, playerId,
     <animated.div
       {...bind()}
       style={{
-        transform: to([x, y], (x, y) => `translate(${x}px, ${y}px)`),
+        transform: to([x, y], (x, y) => `translate(${x - 64}px, ${y - 64}px)`),
         width: '128px',
         height: '128px',
         position: 'absolute',

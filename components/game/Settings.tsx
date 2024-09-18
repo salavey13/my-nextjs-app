@@ -6,10 +6,6 @@ import { useAppContext } from '@/context/AppContext';
 
 export interface PhysicsSettings {
   yeetCoefficient: number;
-  mass: number;
-  tension: number;
-  friction: number;
-  rotationDistance: number;
   yeetVelocityThreshold: number;
   minMovementThreshold: number;
 }
@@ -40,12 +36,12 @@ export const Settings: React.FC<SettingsProps> = ({ onUpdateSettings, initialSet
   };
 
   return (
-    <div className="fixed bottom-4 right-4 z-50">
+    <div className="fixed bottom-16 right-4 z-50">
       <Button onClick={() => setIsOpen(!isOpen)} className="mb-2">
         {isOpen ? t('closeSettings') : t('openSettings')}
       </Button>
       {isOpen && (
-        <form onSubmit={handleSubmit} className="bg-background p-4 rounded-lg shadow-lg">
+        <form onSubmit={handleSubmit} className="bg-background p-4 rounded-lg shadow-lg max-h-[calc(100vh-200px)] overflow-y-auto">
           {Object.entries(settings).map(([key, value]) => (
             <div key={key} className="mb-2">
               <Label htmlFor={key} className="block mb-1">

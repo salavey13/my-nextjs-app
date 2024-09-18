@@ -52,13 +52,9 @@ const GameBoard: React.FC = () => {
   const { user, t } = useAppContext();
   const [targetFrame, setTargetFrame] = useState({ x: 400, y: 300, rotation: 0 });
   const [physicsParams, setPhysicsParams] = useState<PhysicsSettings>({
-    yeetCoefficient: 3,
-    mass: 1,
-    tension: 170,
-    friction: 26,
-    rotationDistance: 100,
-    yeetVelocityThreshold: 2.5,
-    minMovementThreshold: 15,
+    yeetCoefficient: 1.5,
+    yeetVelocityThreshold: 0.5,
+    minMovementThreshold: 5,
   });
   const [isShuffling, setIsShuffling] = useState(false);
   const [hasWebcamAccess, setHasWebcamAccess] = useState(false);
@@ -285,7 +281,7 @@ const GameBoard: React.FC = () => {
     const dx = (card.position.x - player.position.x) * window.innerWidth;
     const dy = (card.position.y - player.position.y) * window.innerHeight;
     const distance = Math.sqrt(dx * dx + dy * dy);
-    const avatarRadius = 64; // Half of the avatar size
+    const avatarRadius = 64;
     return distance <= CARD_PROXIMITY_THRESHOLD + avatarRadius;
   }, []);
 
@@ -329,7 +325,7 @@ const GameBoard: React.FC = () => {
   }
 
   return (
-    <div className="game-board min-h-[calc(100vh-128px)] relative overflow-hidden">
+    <div className="game-board h-[calc(100vh-128px)] relative overflow-hidden">
       <Settings onUpdateSettings={handleUpdateSettings} initialSettings={physicsParams} />
 
       {gameState?.cards.map((card) => (
