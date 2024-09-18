@@ -1,9 +1,9 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { supabase } from "../../lib/supabaseClient";
 import { useSpring, animated, to } from 'react-spring';
 import { useGesture } from '@use-gesture/react';
 import { useAppContext } from '@/context/AppContext';
-import ShineBorder from "@/components/ui/ShineBorder";
+
 interface Player {
   id: string;
   username: string;
@@ -42,20 +42,35 @@ const rtcConfig: RTCConfiguration = {
   iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
 };
 
-const MegaAvatar: React.FC<MegaAvatarProps> = ({ gameState, playerId, initialPosition, onPositionChange }) => {
+const MegaAvatar: React.FC<MegaAvatarProps> = React.memo(({ gameState, playerId, initialPosition, onPositionChange }) => {
   const [stream, setStream] = useState<MediaStream | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
-  const [position, setPosition] = useState<Point>(initialPosition);
   const peerConnection = useRef<RTCPeerConnection | null>(null);
   const { user } = useAppContext();
-  const [{ x, y, scale }, api] = useSpring(() => ({
+  const player = gameState.players.find(p => p.id === playerId);
+
+  const [{ x, y }, api] = useSpring(() => ({
     x: initialPosition.x * window.innerWidth,
     y: initialPosition.y * window.innerHeight,
-    scale: 1,
-    config: { mass: 1, tension: 200, friction: 13 },
+    config: { mass: 1, tension: 200, friction: 20 },
   }));
-  const isDragging = useRef(false);
-  const player = gameState.players.find(p => p.id === playerId);
+
+  const handleDrag = useCallback((mx: number, my: number, vx: number, vy: number, down: boolean) => {
+    if (!down) {
+      const newX = (initialPosition.x * window.innerWidth + mx + window.innerWidth) % window.innerWidth;
+      const newY = (initialPosition.y * window.innerHeight + my + window.innerHeight) % window.innerHeight;
+      onPositionChange(playerId, { x: newX / window.innerWidth, y: newY / window.innerHeight });
+    }
+    api.start({ x: initialPosition.x * window.innerWidth + mx, y: initialPosition.y * window.innerHeight + my, immediate: down });
+  }, [initialPosition, playerId, onPositionChange, api]);
+
+  const bind = useGesture({
+    onDrag: ({ movement: [mx, my], velocity: [vx, vy], down }) => handleDrag(mx, my, vx, vy, down),
+  });
+
+  useEffect(() => {
+    api.start({ x: initialPosition.x * window.innerWidth, y: initialPosition.y * window.innerHeight });
+  }, [initialPosition, api]);
 
   useEffect(() => {
     const initializeStream = async () => {
@@ -87,7 +102,7 @@ const MegaAvatar: React.FC<MegaAvatarProps> = ({ gameState, playerId, initialPos
     };
   }, [user?.id, playerId]);
 
-  const setupPeerConnection = () => {
+  const setupPeerConnection = useCallback(() => {
     peerConnection.current = new RTCPeerConnection(rtcConfig);
 
     peerConnection.current.ontrack = (event) => {
@@ -103,9 +118,9 @@ const MegaAvatar: React.FC<MegaAvatarProps> = ({ gameState, playerId, initialPos
     };
 
     subscribeToWebRTCUpdates();
-  };
+  }, []);
 
-  const subscribeToWebRTCUpdates = () => {
+  const subscribeToWebRTCUpdates = useCallback(() => {
     const channel = supabase.channel('game_state_updates')
       .on('postgres_changes', 
         { event: 'UPDATE', schema: 'public', table: 'rents', filter: `id=eq.${user?.currentGameId}` },
@@ -113,9 +128,9 @@ const MegaAvatar: React.FC<MegaAvatarProps> = ({ gameState, playerId, initialPos
           const updatedGameState = payload.new.game_state as GameState;
           const updatedPlayer = updatedGameState.players.find(p => p.id === playerId);
           
-          if (updatedPlayer && updatedPlayer.webrtc && peerConnection.current) {
-            if (updatedPlayer.webrtc?.offer && !peerConnection.current.currentRemoteDescription) {
-              await peerConnection.current.setRemoteDescription(new RTCSessionDescription(updatedPlayer.webrtc?.offer));
+          if (updatedPlayer && peerConnection.current) {
+            if (updatedPlayer.webrtc.offer && !peerConnection.current.currentRemoteDescription) {
+              await peerConnection.current.setRemoteDescription(new RTCSessionDescription(updatedPlayer.webrtc.offer));
               const answer = await peerConnection.current.createAnswer();
               await peerConnection.current.setLocalDescription(answer);
               updatePlayerWebRTC({ answer });
@@ -136,9 +151,9 @@ const MegaAvatar: React.FC<MegaAvatarProps> = ({ gameState, playerId, initialPos
     return () => {
       supabase.removeChannel(channel);
     };
-  };
+  }, [playerId, user?.currentGameId]);
 
-  const updatePlayerWebRTC = async (webrtcUpdate: Partial<Player['webrtc']>) => {
+  const updatePlayerWebRTC = useCallback(async (webrtcUpdate: Partial<Player['webrtc']>) => {
     if (!user?.currentGameId) return;
 
     const { data, error } = await supabase
@@ -165,56 +180,29 @@ const MegaAvatar: React.FC<MegaAvatarProps> = ({ gameState, playerId, initialPos
     if (updateError) {
       console.error('Error updating game state:', updateError);
     }
-  };
-
-  const handleDragEnd = async (newX: number, newY: number) => {
-    isDragging.current = false;
-    api.start({ scale: 1 });
-
-    const updatedPosition = { x: newX / window.innerWidth, y: newY / window.innerHeight };
-    setPosition(updatedPosition);
-    onPositionChange(playerId, updatedPosition);
-  };
-
-  const bind = useGesture({
-    onDragStart: () => {
-      isDragging.current = true;
-      api.start({ scale: 1.1 });
-    },
-    onDrag: ({ offset: [ox, oy] }) => {
-      api.start({ 
-        x: ox, 
-        y: oy, 
-        immediate: true
-      });
-    },
-    onDragEnd: () => {
-      handleDragEnd(x.get(), y.get());
-    },
-  });
+  }, [playerId, user?.currentGameId]);
 
   return (
     <animated.div
       {...bind()}
       style={{
-        transform: to([x, y, scale], (x, y, s) => `translate(${x}px, ${y}px) scale(${s})`),
+        transform: to([x, y], (x, y) => `translate(${x}px, ${y}px)`),
         width: '128px',
         height: '128px',
-        cursor: isDragging.current ? 'grabbing' : 'grab',
         position: 'absolute',
-        overflow: 'visible',
         touchAction: 'none',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
       }}
     >
-      
-      <animated.div
+      <div
         style={{
           width: '100%',
-          height: '80%',
+          height: '100%',
           borderRadius: '50%',
+          overflow: 'hidden',
+          border: '2px solid #E1FF01',
           boxShadow: '0px 5px 15px rgba(0,0,0,0.2)',
         }}
       >
@@ -225,23 +213,19 @@ const MegaAvatar: React.FC<MegaAvatarProps> = ({ gameState, playerId, initialPos
             height: '100%',
             objectFit: 'cover',
             transform: 'scaleX(-1)',
-            borderRadius: '50%',
           }}
           muted
           playsInline
         />
-      </animated.div>
-      
+      </div>
       {player && (
-        <ShineBorder className="text-center text-sx font-bold"
-      color="#e1ff01">
-      <div
+        <div
           style={{
-            
+            marginTop: '5px',
             backgroundColor: 'rgba(0, 0, 0, 0.5)',
             color: '#E1FF01',
             padding: '2px 6px',
-            borderRadius: '13px',
+            borderRadius: '10px',
             fontSize: '0.75rem',
             maxWidth: '100%',
             overflow: 'hidden',
@@ -251,10 +235,11 @@ const MegaAvatar: React.FC<MegaAvatarProps> = ({ gameState, playerId, initialPos
         >
           {player.username}
         </div>
-      </ShineBorder>
       )}
     </animated.div>
   );
-};
+});
+
+MegaAvatar.displayName = 'MegaAvatar';
 
 export default MegaAvatar;

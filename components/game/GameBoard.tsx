@@ -1,5 +1,4 @@
-// components\game\MergedGameBoard.tsx
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 import { MegaCard, CardId } from '@/components/game/MegaCard';
 import { Button } from '@/components/ui/button';
@@ -8,7 +7,7 @@ import { Settings, PhysicsSettings } from './Settings';
 import MegaAvatar from './MegaAvatar';
 import useTelegram from '@/hooks/useTelegram';
 
-const CARD_PROXIMITY_THRESHOLD = 113; // in pixels
+const CARD_PROXIMITY_THRESHOLD = 100; // increased from 69 to 100
 
 interface Point {
   x: number;
@@ -48,23 +47,25 @@ interface GameState {
   players: Player[];
 }
 
-const MergedGameBoard: React.FC = () => {
+const GameBoard: React.FC = () => {
   const [gameState, setGameState] = useState<GameState | null>(null);
   const { user, t } = useAppContext();
   const [targetFrame, setTargetFrame] = useState({ x: 400, y: 300, rotation: 0 });
   const [physicsParams, setPhysicsParams] = useState<PhysicsSettings>({
-    yeetCoefficient: 2,
+    yeetCoefficient: 3,
     mass: 1,
-    tension: 210,
-    friction: 20,
-    rotationDistance: 69,
-    yeetVelocityThreshold: 3.1,
-    minMovementThreshold: 20,
+    tension: 170,
+    friction: 26,
+    rotationDistance: 100,
+    yeetVelocityThreshold: 2.5,
+    minMovementThreshold: 15,
   });
   const [isShuffling, setIsShuffling] = useState(false);
   const [hasWebcamAccess, setHasWebcamAccess] = useState(false);
   const [hasVoiceAccess, setHasVoiceAccess] = useState(false);
   const { showMainButton, setHeaderColor, showAlert, setBottomBarColor, tg } = useTelegram();
+  const lastUpdateRef = useRef<{ [key: string]: number }>({});
+
   const checkMediaAccess = useCallback(async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
@@ -82,55 +83,37 @@ const MergedGameBoard: React.FC = () => {
     checkMediaAccess();
   }, [checkMediaAccess]);
 
-  const randomizeTargetFrame = () => {
+  const randomizeTargetFrame = useCallback(() => {
     setTargetFrame({
       x: Math.random() * 320 + 100,
       y: Math.random() * 320 + 100,
-      rotation: 0,
+      rotation: Math.random() * 360,
     });
-  };
+  }, []);
 
-  const onCardUpdate = (updatedCard: Card) => {
+  const onCardUpdate = useCallback((updatedCard: Card) => {
     if (!gameState || !user?.currentGameId) return;
 
-    // Find the current card to compare
-    const currentCard = gameState.cards.find((card) => card.id === updatedCard.id);
+    const now = Date.now();
+    if (now - (lastUpdateRef.current[updatedCard.id] || 0) < 100) return; // Throttle updates
+    lastUpdateRef.current[updatedCard.id] = now;
 
-    // If the card hasn't changed, skip the update
-    if (JSON.stringify(currentCard) === JSON.stringify(updatedCard)) {
-      console.log('Card is identical to the current state, skipping update.');
-      return;
-    }
-
-    const updatedCards = gameState?.cards.map((card) =>
-      card.id === updatedCard.id ? updatedCard : card
-    );
-
-    const updatedGameState = { ...gameState, cards: updatedCards };
-    setGameState(updatedGameState);
+    setGameState(prevState => {
+      if (!prevState) return null;
+      const updatedCards = prevState.cards.map(card =>
+        card.id === updatedCard.id ? updatedCard : card
+      );
+      return { ...prevState, cards: updatedCards };
+    });
 
     supabase
       .from('rents')
-      .update({ game_state: updatedGameState })//{ game_state: updatedGameState })
+      .update({ game_state: { ...gameState, cards: gameState.cards.map(card => card.id === updatedCard.id ? updatedCard : card) } })
       .eq('id', user.currentGameId)
       .then(() => {
         console.log('Card updated successfully in Supabase');
       });
-  };
-
-  function deepEqual(obj1:any, obj2:any) {
-    const excludeFields = ['isAnimating', 'animationProgress', 'velocity', 'direction', 'last_position', 'rotations']; // Add any fields you want to ignore
-  
-    const cleanObj1 = JSON.parse(JSON.stringify(obj1, (key, value) =>
-      excludeFields.includes(key) ? undefined : value
-    ));
-  
-    const cleanObj2 = JSON.parse(JSON.stringify(obj2, (key, value) =>
-      excludeFields.includes(key) ? undefined : value
-    ));
-  
-    return JSON.stringify(cleanObj1) === JSON.stringify(cleanObj2);
-  }
+  }, [gameState, user?.currentGameId]);
 
   useEffect(() => {
     const handleSubscription = async () => {
@@ -138,52 +121,59 @@ const MergedGameBoard: React.FC = () => {
         console.log('No current game ID, skipping subscription');
         return;
       }
-  
+
       console.log('Setting up subscription for game ID:', user.currentGameId);
-  
+
       const { data, error } = await supabase
         .from('rents')
         .select('game_state')
         .eq('id', user.currentGameId)
         .single();
-  
+
       if (error) {
         console.error('Error fetching initial game state:', error);
       } else {
         console.log('Initial game state fetched:', data.game_state);
         setGameState(data.game_state);
       }
-  
+
       const channel = supabase
         .channel(`game_state_updates_${user.currentGameId}`)
         .on(
           'postgres_changes',
           { event: 'UPDATE', schema: 'public', table: 'rents', filter: `id=eq.${user.currentGameId}` },
           (payload) => {
-            const newGameState = payload.new.game_state;
-            console.log('Received game state update:', newGameState);
-  
-            // More reliable comparison
-            if (!deepEqual(newGameState, gameState)) {
-              console.log('Received NEW game state update:', newGameState);
-              setGameState(newGameState);
-            }
+            console.log('Received game state update:', payload.new.game_state);
+            setGameState(prevState => {
+              if (!prevState) return payload.new.game_state;
+              return {
+                ...prevState,
+                cards: payload.new.game_state.cards.map((newCard: Card) => {
+                  const oldCard = prevState.cards.find(c => c.id === newCard.id);
+                  if (oldCard && oldCard.position.x === newCard.position.x && oldCard.position.y === newCard.position.y) {
+                    return oldCard;
+                  }
+                  return newCard;
+                }),
+                players: payload.new.game_state.players,
+              };
+            });
           }
         )
         .subscribe((status) => {
           console.log('Subscription status:', status);
         });
-  
+
       return () => {
         console.log('Cleaning up subscription');
         supabase.removeChannel(channel);
       };
     };
-  
+
     handleSubscription();
   }, [user?.currentGameId]);
 
-  const shuffleCards = async () => {
+  const shuffleCards = useCallback(async () => {
     if (!gameState || !user?.currentGameId) return;
 
     setIsShuffling(true);
@@ -195,7 +185,7 @@ const MergedGameBoard: React.FC = () => {
         last_position: card.position,
         zIndex: Math.floor(Math.random() * 36),
         flipped: false,
-        rotations: Math.floor(Math.random() * 2) * 2,
+        rotations: Math.floor(Math.random() * 4),
       }))
       .sort(() => Math.random() - 0.5);
 
@@ -209,18 +199,18 @@ const MergedGameBoard: React.FC = () => {
     if (error) {
       console.error('Error updating game state:', error);
     } else {
-      //setGameState(updatedGameState);
+      setGameState(updatedGameState);
     }
 
     randomizeTargetFrame();
 
     setTimeout(() => {
       setIsShuffling(false);
-      showMainButton(t('shufle'));
+      showMainButton(t('shuffle'));
       setBottomBarColor("#282c33");
       setHeaderColor("#282c33");
     }, 1000);
-  };
+  }, [gameState, user?.currentGameId, randomizeTargetFrame, showMainButton, setBottomBarColor, setHeaderColor, t]);
 
   useEffect(() => {
     const addPlayerIfNeeded = async () => {
@@ -265,7 +255,7 @@ const MergedGameBoard: React.FC = () => {
     }
   }, [gameState, user]);
 
-  const handlePositionChange = async (playerId: string, newPos: Point) => {
+  const handlePositionChange = useCallback(async (playerId: string, newPos: Point) => {
     if (!gameState || !user?.currentGameId) return;
 
     const updatedPlayers = gameState.players.map((player) =>
@@ -284,21 +274,23 @@ const MergedGameBoard: React.FC = () => {
     } else {
       setGameState(updatedGameState);
     }
-  };
+  }, [gameState, user?.currentGameId]);
 
-  const handleUpdateSettings = (settings: PhysicsSettings) => {
+  const handleUpdateSettings = useCallback((settings: PhysicsSettings) => {
     setPhysicsParams(settings);
     localStorage.setItem('physicsSettings', JSON.stringify(settings));
-  };
+  }, []);
 
-  const isCardNearPlayer = (card: Card, player: Player) => {
+  const isCardNearPlayer = useCallback((card: Card, player: Player) => {
     const dx = (card.position.x - player.position.x) * window.innerWidth;
     const dy = (card.position.y - player.position.y) * window.innerHeight;
-    return Math.sqrt(dx * dx + dy * dy) <= CARD_PROXIMITY_THRESHOLD;
-  };
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    const avatarRadius = 64; // Half of the avatar size
+    return distance <= CARD_PROXIMITY_THRESHOLD + avatarRadius;
+  }, []);
 
   useEffect(() => {
-    showMainButton(t('shufle'));
+    showMainButton(t('shuffle'));
     tg?.MainButton?.setParams({color: "#e1ff01", text_color: "#000000"});
     setBottomBarColor("#282c33");
     setHeaderColor("#282c33");
@@ -309,9 +301,9 @@ const MergedGameBoard: React.FC = () => {
       shuffleCards();
     };
 
-    // if (window.Telegram?.WebApp) {
-    //   window.Telegram.WebApp.onEvent('mainButtonClicked', handleMainButtonClick);
-    // }
+    if (window.Telegram?.WebApp) {
+      window.Telegram.WebApp.onEvent('mainButtonClicked', handleMainButtonClick);
+    }
 
     return () => {
       if (window.Telegram?.WebApp) {
@@ -337,7 +329,7 @@ const MergedGameBoard: React.FC = () => {
   }
 
   return (
-    <div className="game-board min-h-[calc(100vh-128px)] relative">
+    <div className="game-board min-h-[calc(100vh-128px)] relative overflow-hidden">
       <Settings onUpdateSettings={handleUpdateSettings} initialSettings={physicsParams} />
 
       {gameState?.cards.map((card) => (
@@ -380,4 +372,4 @@ const MergedGameBoard: React.FC = () => {
   );
 };
 
-export default MergedGameBoard;
+export default GameBoard;
