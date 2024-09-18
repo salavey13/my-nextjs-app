@@ -29,16 +29,10 @@ interface Player {
   id: string;
   username: string;
   position: { x: number; y: number };
-  videoEnabled: boolean;
-  videoSettings: {
-    width: number;
-    height: number;
-    frameRate: number;
-  };
   webrtc: {
     offer?: RTCSessionDescriptionInit;
     answer?: RTCSessionDescriptionInit;
-    iceCandidates: RTCIceCandidateInit[];
+    iceCandidates: RTCIceCandidate[];
   };
 }
 
@@ -47,6 +41,16 @@ interface GameState {
   players: Player[];
 }
 
+const rtcConfig: RTCConfiguration = {
+  iceServers: [
+    { urls: 'stun:stun.l.google.com:19302' },
+    { urls: 'stun:stun1.l.google.com:19302' },
+    { urls: 'stun:stun2.l.google.com:19302' },
+    { urls: 'stun:stun3.l.google.com:19302' },
+    { urls: 'stun:stun4.l.google.com:19302' },
+  ],
+};
+
 const GameBoard: React.FC = () => {
   const [gameState, setGameState] = useState<GameState | null>(null);
   const { user, t } = useAppContext();
@@ -54,13 +58,13 @@ const GameBoard: React.FC = () => {
   const [physicsParams, setPhysicsParams] = useState<PhysicsSettings>({
     yeetCoefficient: 1.5,
     yeetVelocityThreshold: 0.5,
-    minMovementThreshold: 5,
   });
   const [isShuffling, setIsShuffling] = useState(false);
   const [hasWebcamAccess, setHasWebcamAccess] = useState(false);
   const [hasVoiceAccess, setHasVoiceAccess] = useState(false);
   const { showMainButton, setHeaderColor, showAlert, setBottomBarColor, tg } = useTelegram();
   const lastUpdateRef = useRef<{ [key: string]: number }>({});
+  const [peerConnections, setPeerConnections] = useState<{ [key: string]: RTCPeerConnection }>({});
 
   const checkMediaAccess = useCallback(async () => {
     try {
@@ -219,12 +223,6 @@ const GameBoard: React.FC = () => {
           id: user.id.toString(),
           username: user.telegram_username || 'Anonymous',
           position: { x: Math.random() * 320/window.innerWidth, y: Math.random() * 320 / window.innerHeight },
-          videoEnabled: false,
-          videoSettings: {
-            width: 320,
-            height: 240,
-            frameRate: 15,
-          },
           webrtc: {
             iceCandidates: [],
           },
@@ -297,22 +295,105 @@ const GameBoard: React.FC = () => {
       shuffleCards();
     };
 
-    if (window.Telegram?.WebApp) {
-      window.Telegram.WebApp.onEvent('mainButtonClicked', handleMainButtonClick);
+    if (tg?.MainButton) {
+      tg.MainButton.onClick(handleMainButtonClick);
     }
 
     return () => {
-      if (window.Telegram?.WebApp) {
-        window.Telegram.WebApp.onEvent('mainButtonClicked', handleMainButtonClick);
+      if (tg?.MainButton) {
+        tg.MainButton.offClick(handleMainButtonClick);
       }
     };
-  }, [shuffleCards]);
+  }, [shuffleCards, tg]);
 
   useEffect(() => {
     const savedSettings = localStorage.getItem('physicsSettings');
     if (savedSettings) {
       setPhysicsParams(JSON.parse(savedSettings));
     }
+  }, []);
+
+  useEffect(() => {
+    if (!gameState || !user?.id) return;
+
+    const setupPeerConnections = async () => {
+      const newPeerConnections: { [key: string]: RTCPeerConnection } = {};
+
+      for (const player of gameState.players) {
+        if (player.id !== user.id.toString()) {
+          const peerConnection = new RTCPeerConnection(rtcConfig);
+
+          peerConnection.onicecandidate = (event) => {
+            if (event.candidate) {
+              updatePlayerWebRTC(player.id, { iceCandidates: [event.candidate] });
+            }
+          };
+
+          peerConnection.ontrack = (event) => {
+            const videoElement = document.getElementById(`video-${player.id}`) as HTMLVideoElement;
+            if (videoElement && event.streams[0]) {
+              videoElement.srcObject = event.streams[0];
+            }
+          };
+
+          newPeerConnections[player.id] = peerConnection;
+        }
+      }
+
+      setPeerConnections(newPeerConnections);
+    };
+
+    setupPeerConnections();
+
+    return () => {
+      Object.values(peerConnections).forEach(pc => pc.close());
+    };
+  }, [gameState?.players, user?.id]);
+
+  const updatePlayerWebRTC = useCallback(async (playerI: string, webrtcUpdate: Partial<Player['webrtc']>) => {
+    if (!user?.currentGameId) return;
+
+    const { data, error } = await supabase
+      .from('rents')
+      .select('game_state')
+      .eq('id', user.currentGameId)
+      .single();
+
+    if (error) {
+      console.error('Error fetching game state:', error);
+      return;
+    }
+
+    const currentGameState = data.game_state as GameState;
+    const updatedPlayers = currentGameState.players.map(p => 
+      p.id === playerI ? { ...p, webrtc: { ...p.webrtc, ...webrtcUpdate } } : p
+    );
+
+    const { error: updateError } = await supabase
+      .from('rents')
+      .update({ game_state: { ...currentGameState, players: updatedPlayers } })
+      .eq('id', user.currentGameId);
+
+    if (updateError) {
+      console.error('Error updating game state:', updateError);
+    }
+  }, [user?.currentGameId]);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setTargetFrame({
+        x: window.innerWidth * 0.5 - 21,
+        y: window.innerHeight * 0.5 - 31.5,
+        rotation: Math.random() * 360
+      });
+    };
+
+    handleResize();
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
   }, []);
 
   if (!hasWebcamAccess || !hasVoiceAccess) {

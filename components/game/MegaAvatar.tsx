@@ -8,16 +8,10 @@ interface Player {
   id: string;
   username: string;
   position: { x: number; y: number };
-  videoEnabled: boolean;
-  videoSettings: {
-    width: number;
-    height: number;
-    frameRate: number;
-  };
   webrtc: {
     offer?: RTCSessionDescriptionInit;
     answer?: RTCSessionDescriptionInit;
-    iceCandidates: RTCIceCandidateInit[];
+    iceCandidates: RTCIceCandidate[];
   };
 }
 
@@ -34,12 +28,18 @@ interface GameState {
 interface MegaAvatarProps {
   gameState: GameState;
   playerId: string;
-  initialPosition: Point;
-  onPositionChange: (playerId: string, position: Point) => void;
+  initialPosition: { x: number; y: number };
+  onPositionChange: (playerId: string, newPosition: { x: number; y: number }) => void;
 }
 
 const rtcConfig: RTCConfiguration = {
-  iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
+  iceServers: [
+    { urls: 'stun:stun.l.google.com:19302' },
+    { urls: 'stun:stun1.l.google.com:19302' },
+    { urls: 'stun:stun2.l.google.com:19302' },
+    { urls: 'stun:stun3.l.google.com:19302' },
+    { urls: 'stun:stun4.l.google.com:19302' },
+  ],
 };
 
 const MegaAvatar: React.FC<MegaAvatarProps> = React.memo(({ gameState, playerId, initialPosition, onPositionChange }) => {
@@ -50,8 +50,8 @@ const MegaAvatar: React.FC<MegaAvatarProps> = React.memo(({ gameState, playerId,
   const player = gameState.players.find(p => p.id === playerId);
 
   const [{ x, y }, api] = useSpring(() => ({
-    x: initialPosition.x * window.innerWidth + 64, // Adjusted for center positioning
-    y: initialPosition.y * window.innerHeight + 64, // Adjusted for center positioning
+    x: initialPosition.x * window.innerWidth + 64,
+    y: initialPosition.y * window.innerHeight + 64,
     config: { mass: 1, tension: 200, friction: 20 },
   }));
 
@@ -76,19 +76,17 @@ const MegaAvatar: React.FC<MegaAvatarProps> = React.memo(({ gameState, playerId,
   });
 
   useEffect(() => {
-    api.start({ x: initialPosition.x * window.innerWidth, y: initialPosition.y * window.innerHeight });
-  }, [initialPosition, api]);
-
-  useEffect(() => {
     const initializeStream = async () => {
       if (user?.id && user.id.toString() === playerId) {
         try {
-          const webcamStream = await navigator.mediaDevices.getUserMedia({ video: true });
+          const webcamStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
           setStream(webcamStream);
           if (videoRef.current) {
             videoRef.current.srcObject = webcamStream;
+            videoRef.current.muted = false;
             await videoRef.current.play();
           }
+          setupPeerConnection(webcamStream);
         } catch (error) {
           console.error("Error accessing webcam:", error);
         }
@@ -109,12 +107,19 @@ const MegaAvatar: React.FC<MegaAvatarProps> = React.memo(({ gameState, playerId,
     };
   }, [user?.id, playerId]);
 
-  const setupPeerConnection = useCallback(() => {
+  const setupPeerConnection = useCallback((localStream?: MediaStream) => {
     peerConnection.current = new RTCPeerConnection(rtcConfig);
+
+    if (localStream) {
+      localStream.getTracks().forEach(track => {
+        peerConnection.current!.addTrack(track, localStream);
+      });
+    }
 
     peerConnection.current.ontrack = (event) => {
       if (videoRef.current && event.streams[0]) {
         videoRef.current.srcObject = event.streams[0];
+        videoRef.current.muted = false;
       }
     };
 
@@ -124,8 +129,49 @@ const MegaAvatar: React.FC<MegaAvatarProps> = React.memo(({ gameState, playerId,
       }
     };
 
+    if (user?.id && user.id.toString() === playerId) {
+      createOffer();
+    }
+
     subscribeToWebRTCUpdates();
-  }, []);
+  }, [user?.id, playerId]);
+
+  const createOffer = async () => {
+    if (!peerConnection.current) return;
+
+    const offer = await peerConnection.current.createOffer();
+    await peerConnection.current.setLocalDescription(offer);
+    updatePlayerWebRTC({ offer });
+  };
+
+  const updatePlayerWebRTC = async (webrtcUpdate: Partial<Player['webrtc']>) => {
+    if (!user?.currentGameId) return;
+
+    const { data, error } = await supabase
+      .from('rents')
+      .select('game_state')
+      .eq('id', user.currentGameId)
+      .single();
+
+    if (error) {
+      console.error('Error fetching game state:', error);
+      return;
+    }
+
+    const currentGameState = data.game_state as GameState;
+    const updatedPlayers = currentGameState.players.map(p => 
+      p.id === playerId ? { ...p, webrtc: { ...p.webrtc, ...webrtcUpdate } } : p
+    );
+
+    const { error: updateError } = await supabase
+      .from('rents')
+      .update({ game_state: { ...currentGameState, players: updatedPlayers } })
+      .eq('id', user.currentGameId);
+
+    if (updateError) {
+      console.error('Error updating game state:', updateError);
+    }
+  };
 
   const subscribeToWebRTCUpdates = useCallback(() => {
     const channel = supabase.channel('game_state_updates')
@@ -160,35 +206,6 @@ const MegaAvatar: React.FC<MegaAvatarProps> = React.memo(({ gameState, playerId,
     };
   }, [playerId, user?.currentGameId]);
 
-  const updatePlayerWebRTC = useCallback(async (webrtcUpdate: Partial<Player['webrtc']>) => {
-    if (!user?.currentGameId) return;
-
-    const { data, error } = await supabase
-      .from('rents')
-      .select('game_state')
-      .eq('id', user.currentGameId)
-      .single();
-
-    if (error) {
-      console.error('Error fetching game state:', error);
-      return;
-    }
-
-    const currentGameState = data.game_state as GameState;
-    const updatedPlayers = currentGameState.players.map(p => 
-      p.id === playerId ? { ...p, webrtc: { ...p.webrtc, ...webrtcUpdate } } : p
-    );
-
-    const { error: updateError } = await supabase
-      .from('rents')
-      .update({ game_state: { ...currentGameState, players: updatedPlayers } })
-      .eq('id', user.currentGameId);
-
-    if (updateError) {
-      console.error('Error updating game state:', updateError);
-    }
-  }, [playerId, user?.currentGameId]);
-
   return (
     <animated.div
       {...bind()}
@@ -221,8 +238,8 @@ const MegaAvatar: React.FC<MegaAvatarProps> = React.memo(({ gameState, playerId,
             objectFit: 'cover',
             transform: 'scaleX(-1)',
           }}
-          muted
           playsInline
+          autoPlay
         />
       </div>
       {player && (

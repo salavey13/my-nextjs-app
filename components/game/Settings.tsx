@@ -7,8 +7,12 @@ import { useAppContext } from '@/context/AppContext';
 export interface PhysicsSettings {
   yeetCoefficient: number;
   yeetVelocityThreshold: number;
-  minMovementThreshold: number;
 }
+
+const defaultSettings: PhysicsSettings = {
+  yeetCoefficient: 1.5,
+  yeetVelocityThreshold: 0.5,
+};
 
 interface SettingsProps {
   onUpdateSettings: (settings: PhysicsSettings) => void;
@@ -35,10 +39,15 @@ export const Settings: React.FC<SettingsProps> = ({ onUpdateSettings, initialSet
     setIsOpen(false);
   };
 
+  const handleSetDefault = () => {
+    setSettings(defaultSettings);
+    onUpdateSettings(defaultSettings);
+  };
+
   return (
     <div className="fixed bottom-16 right-4 z-50">
       <Button onClick={() => setIsOpen(!isOpen)} className="mb-2">
-        {isOpen ? t('closeSettings') : t('openSettings')}
+        {isOpen ? t('closeSettings') : t('settings')}
       </Button>
       {isOpen && (
         <form onSubmit={handleSubmit} className="bg-background p-4 rounded-lg shadow-lg max-h-[calc(100vh-200px)] overflow-y-auto">
@@ -58,9 +67,14 @@ export const Settings: React.FC<SettingsProps> = ({ onUpdateSettings, initialSet
               />
             </div>
           ))}
-          <Button type="submit" className="mt-4 w-full">
-            {t('applySettings')}
-          </Button>
+          <div className="flex justify-between mt-4">
+            <Button type="submit" className="w-1/2 mr-2">
+              {t('applySettings')}
+            </Button>
+            <Button type="button" onClick={handleSetDefault} className="w-1/2 ml-2">
+              {t('setDefault')}
+            </Button>
+          </div>
         </form>
       )}
     </div>

@@ -1,3 +1,4 @@
+// components\game\MegaCard.tsx
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useSpring, animated, to } from 'react-spring';
 import { useGesture } from '@use-gesture/react';
@@ -31,6 +32,8 @@ export const MegaCard: React.FC<MegaCardProps> = React.memo(({ card, onCardUpdat
   const [isFlipped, setIsFlipped] = useState(card.flipped);
   const { t } = useAppContext();
   const [isAnimating, setIsAnimating] = useState(false);
+  const lastClickTime = useRef(0);
+  const isDragging = useRef(false);
 
   const [{ x, y, rotY, rotZ, scale }, api] = useSpring(() => ({
     x: card.position.x * window.innerWidth,
@@ -57,8 +60,11 @@ export const MegaCard: React.FC<MegaCardProps> = React.memo(({ card, onCardUpdat
     api.start({ rotY: (card.flipped || forceFlipped) ? 180 : 0 });
   }, [card.flipped, forceFlipped, api]);
 
+
+
   const handleDrag = useCallback((mx: number, my: number, vx: number, vy: number, down: boolean) => {
     if (down) {
+      isDragging.current = true;
       api.start({
         x: card.position.x * window.innerWidth + mx,
         y: card.position.y * window.innerHeight + my,
@@ -66,6 +72,9 @@ export const MegaCard: React.FC<MegaCardProps> = React.memo(({ card, onCardUpdat
         immediate: true,
       });
     } else {
+      if (!isDragging.current) return;
+      isDragging.current = false;
+
       const yeetCoefficient = physicsParams.yeetCoefficient;
       const newX = (card.position.x * window.innerWidth + mx * yeetCoefficient + window.innerWidth) % window.innerWidth;
       const newY = (card.position.y * window.innerHeight + my * yeetCoefficient + window.innerHeight) % window.innerHeight;
@@ -97,12 +106,21 @@ export const MegaCard: React.FC<MegaCardProps> = React.memo(({ card, onCardUpdat
     }
   }, [card, api, onCardUpdate, rotZ, physicsParams]);
 
-  const bind = useGesture({
-    onDrag: ({ movement: [mx, my], velocity: [vx, vy], down }) => handleDrag(mx, my, vx, vy, down),
-    onDoubleClick: () => {
+  const handleDoubleClick = useCallback(() => {
+    const currentTime = new Date().getTime();
+    const timeSinceLastClick = currentTime - lastClickTime.current;
+
+    if (timeSinceLastClick < 300) {
       setIsFlipped(!isFlipped);
       onCardUpdate({ ...card, flipped: !isFlipped });
-    },
+    }
+
+    lastClickTime.current = currentTime;
+  }, [card, isFlipped, onCardUpdate]);
+
+  const bind = useGesture({
+    onDrag: ({ movement: [mx, my], velocity: [vx, vy], down }) => handleDrag(mx, my, vx, vy, down),
+    onClick: handleDoubleClick,
   });
 
   return (
