@@ -161,7 +161,7 @@ export const MegaCard: React.FC<MegaCardProps> = ({ card, onCardUpdate, forceFli
               last_position: preDragPositionRef.current,
               flipped: !isFlipped,
             });
-            setIsFlipped(!isFlipped);
+            setIsFlipped(forceFlipped || !isFlipped);
             setIsYeeted(false);
           }
         });

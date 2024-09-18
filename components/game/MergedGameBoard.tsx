@@ -8,7 +8,7 @@ import { Settings, PhysicsSettings } from './Settings';
 import MegaAvatar from './MegaAvatar';
 import useTelegram from '@/hooks/useTelegram';
 
-const CARD_PROXIMITY_THRESHOLD = 69; // in pixels
+const CARD_PROXIMITY_THRESHOLD = 113; // in pixels
 
 interface Point {
   x: number;
