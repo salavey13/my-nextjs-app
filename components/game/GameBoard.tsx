@@ -251,7 +251,7 @@ const GameBoard: React.FC = () => {
     const distance = Math.sqrt(dx * dx + dy * dy);
     
     const cardRadius = Math.sqrt(21*21 + 31.5*31.5);
-    const playerRadius = 64;
+    const playerRadius = 32;
     
     return distance <= CARD_PROXIMITY_THRESHOLD + cardRadius + playerRadius;
   }, []);
