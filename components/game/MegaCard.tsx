@@ -92,7 +92,7 @@ export const MegaCard: React.FC<MegaCardProps> = React.memo(({ card, onCardUpdat
         mx *= -0.5;
         newX = Math.max(0, Math.min(newX, window.innerWidth - 42));
       }
-      if (newY < topShelfHeight || newY > window.innerHeight - bottomShelfHeight - 63) {
+      if (newY < 0 || newY > window.innerHeight - bottomShelfHeight - 63) {
         my *= -0.5;
         newY = Math.max(topShelfHeight, Math.min(newY, window.innerHeight - bottomShelfHeight - 169));
       }
@@ -109,7 +109,7 @@ export const MegaCard: React.FC<MegaCardProps> = React.memo(({ card, onCardUpdat
           return count + 1;
         }
         return count;
-      }, 0) >= 2;
+      }, 0) >= 1;
       
       setIsAnimating(true);
       api.start({
