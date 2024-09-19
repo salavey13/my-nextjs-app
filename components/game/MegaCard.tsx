@@ -80,20 +80,21 @@ export const MegaCard: React.FC<MegaCardProps> = React.memo(({ card, onCardUpdat
       if (!isDragging.current || Math.abs(mx) < 13) return;
       isDragging.current = false;
 
-      const dragDuration = Date.now() - dragStartTime.current;
       const yeetCoefficient = physicsParams.yeetCoefficient;
       
       let newX = card.position.x * window.innerWidth + mx * yeetCoefficient;
       let newY = card.position.y * window.innerHeight + my * yeetCoefficient;
       
       // Bounce off walls
+      const topShelfHeight = 64; // Adjust this value based on your actual top shelf height
+      const bottomShelfHeight = 64; // Adjust this value based on your actual bottom shelf height
       if (newX < 0 || newX > window.innerWidth - 30) {
         mx *= -0.5;
         newX = Math.max(0, Math.min(newX, window.innerWidth - 30));
       }
-      if (newY < 128 || newY > window.innerHeight - 45) {
+      if (newY < topShelfHeight || newY > window.innerHeight - bottomShelfHeight - 45) {
         my *= -0.5;
-        newY = Math.max(128, Math.min(newY, window.innerHeight - 45));
+        newY = Math.max(topShelfHeight, Math.min(newY, window.innerHeight - bottomShelfHeight - 45));
       }
       
       const avgVelocity = velocityHistory.current.reduce((acc, v) => ({ x: acc.x + v.x, y: acc.y + v.y }), { x: 0, y: 0 });
@@ -114,9 +115,9 @@ export const MegaCard: React.FC<MegaCardProps> = React.memo(({ card, onCardUpdat
       api.start({
         x: newX,
         y: newY,
-        rotZ: card.rotations * 360 + (isYeeted ? Math.sign(mx + my) * Math.min(velocity * 360, 720) : 0),
+        rotZ: card.rotations * 360 + (isYeeted ? Math.sign(mx + my) * 360 : 0),
         scale: 1,
-        config: { velocity: isYeeted ? [avgVelocity.x * yeetCoefficient, avgVelocity.y * yeetCoefficient] : [0, 0] },
+        config: { duration: 300 },
         onRest: () => {
           setIsAnimating(false);
           onCardUpdate({
