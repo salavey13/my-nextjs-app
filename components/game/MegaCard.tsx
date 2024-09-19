@@ -153,7 +153,7 @@ export const MegaCard: React.FC<MegaCardProps> = React.memo(({ card, onCardUpdat
         touchAction: 'none',
         zIndex: card.zIndex,
         transform: to([x, y, rotY, rotZ, scale], (x, y, rY, rZ, s) =>
-          `translate3d(${x}px,${y}px,0) rotateY(${rY}deg) rotateZ(${rZ}deg) scale(${s})`
+          `translate3d(${x}px,${y}px,0)  rotateZ(${rZ}deg) scale(${s})`
         ),
       }}
     >
