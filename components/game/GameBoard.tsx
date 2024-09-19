@@ -8,7 +8,7 @@ import MegaAvatar from './MegaAvatar';
 import useTelegram from '@/hooks/useTelegram';
 import LoadingSpinner from "../ui/LoadingSpinner";
 
-const CARD_PROXIMITY_THRESHOLD = 69;
+const CARD_PROXIMITY_THRESHOLD = 13;
 
 interface Point {
   x: number;
@@ -174,7 +174,7 @@ const GameBoard: React.FC = () => {
 
     setTimeout(() => {
       setIsShuffling(false);
-      showMainButton(t('shuffle'));
+      showMainButton(t('shufle'));
       setBottomBarColor("#282c33");
       setHeaderColor("#282c33");
     }, 1000);
@@ -241,8 +241,8 @@ const GameBoard: React.FC = () => {
   }, []);
 
   const isCardNearPlayer = useCallback((card: Card, player: Player) => {
-    const cardCenterX = (card.position.x + 15 / window.innerWidth) * window.innerWidth;
-    const cardCenterY = (card.position.y + 22.5 / window.innerHeight) * window.innerHeight;
+    const cardCenterX = (card.position.x + 21 / window.innerWidth) * window.innerWidth;
+    const cardCenterY = (card.position.y + 31.5 / window.innerHeight) * window.innerHeight;
     const playerCenterX = (player.position.x + 64 / window.innerWidth) * window.innerWidth;
     const playerCenterY = (player.position.y + 64 / window.innerHeight) * window.innerHeight;
     
@@ -250,7 +250,7 @@ const GameBoard: React.FC = () => {
     const dy = cardCenterY - playerCenterY;
     const distance = Math.sqrt(dx * dx + dy * dy);
     
-    const cardRadius = Math.sqrt(15*15 + 22.5*22.5);
+    const cardRadius = Math.sqrt(21*21 + 31.5*31.5);
     const playerRadius = 64;
     
     return distance <= CARD_PROXIMITY_THRESHOLD + cardRadius + playerRadius;
