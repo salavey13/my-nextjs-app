@@ -177,7 +177,7 @@ export const MegaCard: React.FC<MegaCardProps> = React.memo(({ card, onCardUpdat
           position: 'absolute',
           top: 0,
           left: 0,
-          hidden: card.flipped,
+          visible: !card.flipped,
           transform: to([rotY], (r) => `rotateY(${r + 180}deg)`),
         }}
       />
