@@ -92,9 +92,9 @@ export const MegaCard: React.FC<MegaCardProps> = React.memo(({ card, onCardUpdat
         mx *= -0.5;
         newX = Math.max(0, Math.min(newX, window.innerWidth - 30));
       }
-      if (newY < topShelfHeight || newY > window.innerHeight - bottomShelfHeight - 45) {
+      if (newY < 0 || newY > window.innerHeight - bottomShelfHeight - 103) {
         my *= -0.5;
-        newY = Math.max(topShelfHeight, Math.min(newY, window.innerHeight - bottomShelfHeight - 45));
+        newY = Math.max(0, Math.min(newY, window.innerHeight - bottomShelfHeight - 103));
       }
       
       const avgVelocity = velocityHistory.current.reduce((acc, v) => ({ x: acc.x + v.x, y: acc.y + v.y }), { x: 0, y: 0 });
@@ -177,6 +177,7 @@ export const MegaCard: React.FC<MegaCardProps> = React.memo(({ card, onCardUpdat
           position: 'absolute',
           top: 0,
           left: 0,
+          hidden: card.flipped,
           transform: to([rotY], (r) => `rotateY(${r + 180}deg)`),
         }}
       />
