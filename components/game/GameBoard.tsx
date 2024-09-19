@@ -8,7 +8,7 @@ import MegaAvatar from './MegaAvatar';
 import useTelegram from '@/hooks/useTelegram';
 import LoadingSpinner from "../ui/LoadingSpinner";
 
-const CARD_PROXIMITY_THRESHOLD = 100;
+const CARD_PROXIMITY_THRESHOLD = 69;
 
 interface Point {
   x: number;
