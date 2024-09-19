@@ -67,7 +67,7 @@ export const MegaCard: React.FC<MegaCardProps> = React.memo(({ card, onCardUpdat
       }
       isDragging.current = true;
       velocityHistory.current.push({ x: vx, y: vy });
-      if (velocityHistory.current.length > 5) {
+      if (velocityHistory.current.length > 25) {
         velocityHistory.current.shift();
       }
       api.start({
