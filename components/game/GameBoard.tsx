@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef, Suspense } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 import { MegaCard, CardId } from '@/components/game/MegaCard';
 import { Button } from '@/components/ui/button';
@@ -6,8 +6,9 @@ import { useAppContext } from '@/context/AppContext';
 import { Settings, PhysicsSettings } from './Settings';
 import MegaAvatar from './MegaAvatar';
 import useTelegram from '@/hooks/useTelegram';
+import LoadingSpinner from "../ui/LoadingSpinner";
 
-const CARD_PROXIMITY_THRESHOLD = 100; // increased from 69 to 100
+const CARD_PROXIMITY_THRESHOLD = 100;
 
 interface Point {
   x: number;
@@ -23,33 +24,19 @@ interface Card {
   velocity: { x: number; y: number };
   direction: { x: number; y: number };
   zIndex: number;
+  timestamp: number;
 }
 
 interface Player {
   id: string;
   username: string;
   position: { x: number; y: number };
-  webrtc: {
-    offer?: RTCSessionDescriptionInit;
-    answer?: RTCSessionDescriptionInit;
-    iceCandidates: RTCIceCandidate[];
-  };
 }
 
 interface GameState {
   cards: Card[];
   players: Player[];
 }
-
-const rtcConfig: RTCConfiguration = {
-  iceServers: [
-    { urls: 'stun:stun.l.google.com:19302' },
-    { urls: 'stun:stun1.l.google.com:19302' },
-    { urls: 'stun:stun2.l.google.com:19302' },
-    { urls: 'stun:stun3.l.google.com:19302' },
-    { urls: 'stun:stun4.l.google.com:19302' },
-  ],
-};
 
 const GameBoard: React.FC = () => {
   const [gameState, setGameState] = useState<GameState | null>(null);
@@ -60,33 +47,13 @@ const GameBoard: React.FC = () => {
     yeetVelocityThreshold: 0.5,
   });
   const [isShuffling, setIsShuffling] = useState(false);
-  const [hasWebcamAccess, setHasWebcamAccess] = useState(false);
-  const [hasVoiceAccess, setHasVoiceAccess] = useState(false);
-  const { showMainButton, setHeaderColor, showAlert, setBottomBarColor, tg } = useTelegram();
+  const { showMainButton, setHeaderColor, setBottomBarColor, tg } = useTelegram();
   const lastUpdateRef = useRef<{ [key: string]: number }>({});
-  const [peerConnections, setPeerConnections] = useState<{ [key: string]: RTCPeerConnection }>({});
-
-  const checkMediaAccess = useCallback(async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-      setHasWebcamAccess(true);
-      setHasVoiceAccess(true);
-      stream.getTracks().forEach(track => track.stop());
-    } catch (error) {
-      console.error('Error checking media access:', error);
-      setHasWebcamAccess(false);
-      setHasVoiceAccess(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    checkMediaAccess();
-  }, [checkMediaAccess]);
 
   const randomizeTargetFrame = useCallback(() => {
     setTargetFrame({
-      x: Math.random() * 320 + 100,
-      y: Math.random() * 320 + 100,
+      x: Math.random() * (window.innerWidth - 42) + 21,
+      y: Math.random() * (window.innerHeight - 191) + 128,
       rotation: Math.random() * 360,
     });
   }, []);
@@ -101,14 +68,14 @@ const GameBoard: React.FC = () => {
     setGameState(prevState => {
       if (!prevState) return null;
       const updatedCards = prevState.cards.map(card =>
-        card.id === updatedCard.id ? updatedCard : card
+        card.id === updatedCard.id ? { ...updatedCard, timestamp: now } : card
       );
       return { ...prevState, cards: updatedCards };
     });
 
     supabase
       .from('rents')
-      .update({ game_state: { ...gameState, cards: gameState.cards.map(card => card.id === updatedCard.id ? updatedCard : card) } })
+      .update({ game_state: { ...gameState, cards: gameState.cards.map(card => card.id === updatedCard.id ? { ...updatedCard, timestamp: now } : card) } })
       .eq('id', user.currentGameId)
       .then(() => {
         console.log('Card updated successfully in Supabase');
@@ -150,7 +117,7 @@ const GameBoard: React.FC = () => {
                 ...prevState,
                 cards: payload.new.game_state.cards.map((newCard: Card) => {
                   const oldCard = prevState.cards.find(c => c.id === newCard.id);
-                  if (oldCard && oldCard.position.x === newCard.position.x && oldCard.position.y === newCard.position.y) {
+                  if (oldCard && oldCard.timestamp > newCard.timestamp) {
                     return oldCard;
                   }
                   return newCard;
@@ -186,6 +153,7 @@ const GameBoard: React.FC = () => {
         zIndex: Math.floor(Math.random() * 36),
         flipped: false,
         rotations: Math.floor(Math.random() * 4),
+        timestamp: Date.now(),
       }))
       .sort(() => Math.random() - 0.5);
 
@@ -222,10 +190,7 @@ const GameBoard: React.FC = () => {
         const newPlayer: Player = {
           id: user.id.toString(),
           username: user.telegram_username || 'Anonymous',
-          position: { x: Math.random() * 320/window.innerWidth, y: Math.random() * 320 / window.innerHeight },
-          webrtc: {
-            iceCandidates: [],
-          },
+          position: { x: Math.random() * (window.innerWidth - 128) / window.innerWidth, y: Math.random() * (window.innerHeight - 256) / window.innerHeight + 128 / window.innerHeight },
         };
         
         const updatedPlayers = [...(gameState.players || []), newPlayer];
@@ -276,11 +241,19 @@ const GameBoard: React.FC = () => {
   }, []);
 
   const isCardNearPlayer = useCallback((card: Card, player: Player) => {
-    const dx = (card.position.x - player.position.x) * window.innerWidth;
-    const dy = (card.position.y - player.position.y) * window.innerHeight;
+    const cardCenterX = (card.position.x + 15 / window.innerWidth) * window.innerWidth;
+    const cardCenterY = (card.position.y + 22.5 / window.innerHeight) * window.innerHeight;
+    const playerCenterX = (player.position.x + 64 / window.innerWidth) * window.innerWidth;
+    const playerCenterY = (player.position.y + 64 / window.innerHeight) * window.innerHeight;
+    
+    const dx = cardCenterX - playerCenterX;
+    const dy = cardCenterY - playerCenterY;
     const distance = Math.sqrt(dx * dx + dy * dy);
-    const avatarRadius = 64;
-    return distance <= CARD_PROXIMITY_THRESHOLD + avatarRadius;
+    
+    const cardRadius = Math.sqrt(15*15 + 22.5*22.5);
+    const playerRadius = 64;
+    
+    return distance <= CARD_PROXIMITY_THRESHOLD + cardRadius + playerRadius;
   }, []);
 
   useEffect(() => {
@@ -314,72 +287,6 @@ const GameBoard: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (!gameState || !user?.id) return;
-
-    const setupPeerConnections = async () => {
-      const newPeerConnections: { [key: string]: RTCPeerConnection } = {};
-
-      for (const player of gameState.players) {
-        if (player.id !== user.id.toString()) {
-          const peerConnection = new RTCPeerConnection(rtcConfig);
-
-          peerConnection.onicecandidate = (event) => {
-            if (event.candidate) {
-              updatePlayerWebRTC(player.id, { iceCandidates: [event.candidate] });
-            }
-          };
-
-          peerConnection.ontrack = (event) => {
-            const videoElement = document.getElementById(`video-${player.id}`) as HTMLVideoElement;
-            if (videoElement && event.streams[0]) {
-              videoElement.srcObject = event.streams[0];
-            }
-          };
-
-          newPeerConnections[player.id] = peerConnection;
-        }
-      }
-
-      setPeerConnections(newPeerConnections);
-    };
-
-    setupPeerConnections();
-
-    return () => {
-      Object.values(peerConnections).forEach(pc => pc.close());
-    };
-  }, [gameState?.players, user?.id]);
-
-  const updatePlayerWebRTC = useCallback(async (playerI: string, webrtcUpdate: Partial<Player['webrtc']>) => {
-    if (!user?.currentGameId) return;
-
-    const { data, error } = await supabase
-      .from('rents')
-      .select('game_state')
-      .eq('id', user.currentGameId)
-      .single();
-
-    if (error) {
-      console.error('Error fetching game state:', error);
-      return;
-    }
-
-    const currentGameState = data.game_state as GameState;
-    const updatedPlayers = currentGameState.players.map(p => 
-      p.id === playerI ? { ...p, webrtc: { ...p.webrtc, ...webrtcUpdate } } : p
-    );
-
-    const { error: updateError } = await supabase
-      .from('rents')
-      .update({ game_state: { ...currentGameState, players: updatedPlayers } })
-      .eq('id', user.currentGameId);
-
-    if (updateError) {
-      console.error('Error updating game state:', updateError);
-    }
-  }, [user?.currentGameId]);
-
-  useEffect(() => {
     const handleResize = () => {
       setTargetFrame({
         x: window.innerWidth * 0.5 - 21,
@@ -395,57 +302,49 @@ const GameBoard: React.FC = () => {
       window.removeEventListener('resize', handleResize);
     };
   }, []);
-
-  if (!hasWebcamAccess || !hasVoiceAccess) {
-    return (
-      <div className="flex flex-col items-center justify-center h-screen">
-        <p className="text-xl mb-4">{t("pleaseGrantAccess")}</p>
-        <Button onClick={checkMediaAccess}>{t("checkPermissions")}</Button>
-      </div>
-    );
-  }
-
   return (
-    <div className="game-board h-[calc(100vh-128px)] relative overflow-hidden">
-      <Settings onUpdateSettings={handleUpdateSettings} initialSettings={physicsParams} />
+    <Suspense fallback={<LoadingSpinner />}>
+      <div className="game-board h-[calc(100vh-128px)] relative overflow-hidden">
+        <Settings onUpdateSettings={handleUpdateSettings} initialSettings={physicsParams} />
 
-      {gameState?.cards.map((card) => (
-        <MegaCard
-          key={card.id}
-          card={card}
-          onCardUpdate={onCardUpdate}
-          forceFlipped={gameState.players.some(player => 
-            player.id === user?.id?.toString() && isCardNearPlayer(card, player)
-          )}
-          isShuffling={isShuffling}
-          physicsParams={physicsParams}
+        {gameState?.cards.map((card) => (
+          <MegaCard
+            key={card.id}
+            card={card}
+            onCardUpdate={onCardUpdate}
+            forceFlipped={gameState.players.some(player => 
+              player.id === user?.id?.toString() && isCardNearPlayer(card, player)
+            )}
+            isShuffling={isShuffling}
+            physicsParams={physicsParams}
+          />
+        ))}
+
+        <div
+          style={{
+            width: '42px',
+            height: '63px',
+            position: 'absolute',
+            borderColor: "#E1FF01",
+            top: targetFrame.y,
+            left: targetFrame.x,
+            transform: `rotate(${targetFrame.rotation}deg)`,
+            border: '2px dashed #E1FF01',
+            borderRadius: '5px',
+          }}
         />
-      ))}
 
-      <div
-        style={{
-          width: '42px',
-          height: '63px',
-          position: 'absolute',
-          borderColor: "#E1FF01",
-          top: targetFrame.y,
-          left: targetFrame.x,
-          transform: `rotate(${targetFrame.rotation}deg)`,
-          border: '2px dashed #E1FF01',
-          borderRadius: '5px',
-        }}
-      />
-
-      {gameState?.players?.map((player) => (
-        <MegaAvatar
-          key={player.id}
-          gameState={gameState}
-          playerId={player.id}
-          initialPosition={player.position}
-          onPositionChange={handlePositionChange}
-        />
-      ))}
-    </div>
+        {gameState?.players?.map((player) => (
+          <MegaAvatar
+            key={player.id}
+            gameState={gameState}
+            playerId={player.id}
+            initialPosition={player.position}
+            onPositionChange={handlePositionChange}
+          />
+        ))}
+      </div>
+    </Suspense>
   );
 };
 

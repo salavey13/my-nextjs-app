@@ -1,4 +1,3 @@
-// components\game\MegaCard.tsx
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useSpring, animated, to } from 'react-spring';
 import { useGesture } from '@use-gesture/react';
@@ -15,6 +14,7 @@ interface Card {
   velocity: { x: number; y: number };
   direction: { x: number; y: number };
   zIndex: number;
+  timestamp: number;
 }
 
 export type CardId = keyof typeof cardsImages;
@@ -29,16 +29,16 @@ interface MegaCardProps {
 
 export const MegaCard: React.FC<MegaCardProps> = React.memo(({ card, onCardUpdate, forceFlipped, isShuffling, physicsParams }) => {
   const cardRef = useRef<HTMLDivElement | null>(null);
-  const [isFlipped, setIsFlipped] = useState(card.flipped);
   const { t } = useAppContext();
   const [isAnimating, setIsAnimating] = useState(false);
-  const lastClickTime = useRef(0);
   const isDragging = useRef(false);
+  const dragStartTime = useRef(0);
+  const velocityHistory = useRef<{ x: number; y: number }[]>([]);
 
   const [{ x, y, rotY, rotZ, scale }, api] = useSpring(() => ({
     x: card.position.x * window.innerWidth,
     y: card.position.y * window.innerHeight,
-    rotY: card.flipped ? 180 : 0,
+    rotY: card.flipped || forceFlipped ? 180 : 0,
     rotZ: card.rotations * 360,
     scale: 1,
     config: { mass: 1, tension: 170, friction: 26 },
@@ -56,15 +56,20 @@ export const MegaCard: React.FC<MegaCardProps> = React.memo(({ card, onCardUpdat
   }, [card.position, card.rotations, isShuffling, api, isAnimating]);
 
   useEffect(() => {
-    setIsFlipped(card.flipped || forceFlipped);
     api.start({ rotY: (card.flipped || forceFlipped) ? 180 : 0 });
   }, [card.flipped, forceFlipped, api]);
 
-
-
   const handleDrag = useCallback((mx: number, my: number, vx: number, vy: number, down: boolean) => {
     if (down) {
+      if (!isDragging.current) {
+        dragStartTime.current = Date.now();
+        velocityHistory.current = [];
+      }
       isDragging.current = true;
+      velocityHistory.current.push({ x: vx, y: vy });
+      if (velocityHistory.current.length > 5) {
+        velocityHistory.current.shift();
+      }
       api.start({
         x: card.position.x * window.innerWidth + mx,
         y: card.position.y * window.innerHeight + my,
@@ -72,55 +77,66 @@ export const MegaCard: React.FC<MegaCardProps> = React.memo(({ card, onCardUpdat
         immediate: true,
       });
     } else {
-      if (!isDragging.current) return;
+      if (!isDragging.current || Math.abs(mx) < 13) return;
       isDragging.current = false;
 
+      const dragDuration = Date.now() - dragStartTime.current;
       const yeetCoefficient = physicsParams.yeetCoefficient;
-      const newX = (card.position.x * window.innerWidth + mx * yeetCoefficient + window.innerWidth) % window.innerWidth;
-      const newY = (card.position.y * window.innerHeight + my * yeetCoefficient + window.innerHeight) % window.innerHeight;
       
-      const velocity = Math.sqrt(vx * vx + vy * vy);
+      let newX = card.position.x * window.innerWidth + mx * yeetCoefficient;
+      let newY = card.position.y * window.innerHeight + my * yeetCoefficient;
+      
+      // Bounce off walls
+      if (newX < 0 || newX > window.innerWidth - 30) {
+        mx *= -0.5;
+        newX = Math.max(0, Math.min(newX, window.innerWidth - 30));
+      }
+      if (newY < 128 || newY > window.innerHeight - 45) {
+        my *= -0.5;
+        newY = Math.max(128, Math.min(newY, window.innerHeight - 45));
+      }
+      
+      const avgVelocity = velocityHistory.current.reduce((acc, v) => ({ x: acc.x + v.x, y: acc.y + v.y }), { x: 0, y: 0 });
+      avgVelocity.x /= velocityHistory.current.length;
+      avgVelocity.y /= velocityHistory.current.length;
+      
+      const velocity = Math.sqrt(avgVelocity.x * avgVelocity.x + avgVelocity.y * avgVelocity.y);
       const isYeeted = velocity > physicsParams.yeetVelocityThreshold;
+      
+      const isCurved = velocityHistory.current.reduce((count, v, i) => {
+        if (i > 1 && (Math.sign(v.x) !== Math.sign(velocityHistory.current[i-1].x) || Math.sign(v.y) !== Math.sign(velocityHistory.current[i-1].y))) {
+          return count + 1;
+        }
+        return count;
+      }, 0) >= 2;
       
       setIsAnimating(true);
       api.start({
         x: newX,
         y: newY,
-        rotZ: card.rotations * 360 + (isYeeted ? Math.sign(vx + vy) * Math.min(velocity * 360, 720) : 0),
+        rotZ: card.rotations * 360 + (isYeeted ? Math.sign(mx + my) * Math.min(velocity * 360, 720) : 0),
         scale: 1,
-        config: { velocity: isYeeted ? [vx * yeetCoefficient, vy * yeetCoefficient] : [0, 0] },
+        config: { velocity: isYeeted ? [avgVelocity.x * yeetCoefficient, avgVelocity.y * yeetCoefficient] : [0, 0] },
         onRest: () => {
           setIsAnimating(false);
           onCardUpdate({
             ...card,
             position: { 
-              x: Math.max(0, Math.min(newX / window.innerWidth, 1 - 30 / window.innerWidth)),
-              y: Math.max(0, Math.min(newY / window.innerHeight, 1 - 45 / window.innerHeight))
+              x: newX / window.innerWidth,
+              y: newY / window.innerHeight
             },
             last_position: card.position,
-            rotations: Math.floor(Math.abs(rotZ.get() / 360)) % 4,
-            flipped: isYeeted ? !card.flipped : card.flipped,
+            rotations: Math.floor(Math.abs(rotZ.get() / 360)) % 13,
+            flipped: isYeeted ? (isCurved ? !card.flipped : card.flipped) : card.flipped,
+            timestamp: Date.now(),
           });
         },
       });
     }
   }, [card, api, onCardUpdate, rotZ, physicsParams]);
 
-  const handleDoubleClick = useCallback(() => {
-    const currentTime = new Date().getTime();
-    const timeSinceLastClick = currentTime - lastClickTime.current;
-
-    if (timeSinceLastClick < 300) {
-      setIsFlipped(!isFlipped);
-      onCardUpdate({ ...card, flipped: !isFlipped });
-    }
-
-    lastClickTime.current = currentTime;
-  }, [card, isFlipped, onCardUpdate]);
-
   const bind = useGesture({
     onDrag: ({ movement: [mx, my], velocity: [vx, vy], down }) => handleDrag(mx, my, vx, vy, down),
-    onClick: handleDoubleClick,
   });
 
   return (
