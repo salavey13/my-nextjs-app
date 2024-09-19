@@ -47,7 +47,7 @@ export const Settings: React.FC<SettingsProps> = ({ onUpdateSettings, initialSet
   return (
     <div className="fixed bottom-16 left z-50">
       <Button onClick={() => setIsOpen(!isOpen)} className="mb-2">
-        {isOpen ? t('closeSettings') : t('settings')}
+        {isOpen ? t('closeSettings') : t('settings.title')}
       </Button>
       {isOpen && (
         <form onSubmit={handleSubmit} className="bg-background p-4 rounded-lg shadow-lg max-h-[calc(100vh-200px)] overflow-y-auto">
