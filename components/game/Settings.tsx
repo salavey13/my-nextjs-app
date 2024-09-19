@@ -45,7 +45,7 @@ export const Settings: React.FC<SettingsProps> = ({ onUpdateSettings, initialSet
   };
 
   return (
-    <div className="fixed bottom-16 right-4 z-50">
+    <div className="fixed bottom-16 left z-50">
       <Button onClick={() => setIsOpen(!isOpen)} className="mb-2">
         {isOpen ? t('closeSettings') : t('settings')}
       </Button>
