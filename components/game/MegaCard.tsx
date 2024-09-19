@@ -38,7 +38,7 @@ export const MegaCard: React.FC<MegaCardProps> = React.memo(({ card, onCardUpdat
   const [{ x, y, rotateY, rotateZ, scale }, api] = useSpring(() => ({
     x: card.position.x * window.innerWidth,
     y: card.position.y * window.innerHeight,
-    rotateY: card.flipped ? 180 : 0,
+    rotateY: ( forceFlipped || card.flipped ) ? 180 : 0,
     rotateZ: card.rotations * 360,
     scale: 1,
     config: { mass: 1, tension: 170, friction: 26 },
@@ -56,7 +56,7 @@ export const MegaCard: React.FC<MegaCardProps> = React.memo(({ card, onCardUpdat
   }, [card.position, card.rotations, isShuffling, api, isAnimating]);
 
   useEffect(() => {
-    api.start({ rotateY: card.flipped ? 180 : 0 });
+    api.start({ rotateY: ( card.flipped || forceFlipped ) ? 180 : 0 });
   }, [card.flipped, api]);
 
   const handleDrag = useCallback((mx: number, my: number, vx: number, vy: number, down: boolean) => {
