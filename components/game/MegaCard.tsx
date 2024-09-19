@@ -35,11 +35,11 @@ export const MegaCard: React.FC<MegaCardProps> = React.memo(({ card, onCardUpdat
   const dragStartTime = useRef(0);
   const velocityHistory = useRef<{ x: number; y: number }[]>([]);
 
-  const [{ x, y, rotY, rotZ, scale }, api] = useSpring(() => ({
+  const [{ x, y, rotateY, rotateZ, scale }, api] = useSpring(() => ({
     x: card.position.x * window.innerWidth,
     y: card.position.y * window.innerHeight,
-    rotY: card.flipped ? 180 : 0,
-    rotZ: card.rotations * 360,
+    rotateY: card.flipped ? 180 : 0,
+    rotateZ: card.rotations * 360,
     scale: 1,
     config: { mass: 1, tension: 170, friction: 26 },
   }));
@@ -49,14 +49,14 @@ export const MegaCard: React.FC<MegaCardProps> = React.memo(({ card, onCardUpdat
       api.start({
         x: card.position.x * window.innerWidth,
         y: card.position.y * window.innerHeight,
-        rotZ: card.rotations * 360,
+        rotateZ: card.rotations * 360,
         immediate: isShuffling,
       });
     }
   }, [card.position, card.rotations, isShuffling, api, isAnimating]);
 
   useEffect(() => {
-    api.start({ rotY: card.flipped ? 180 : 0 });
+    api.start({ rotateY: card.flipped ? 180 : 0 });
   }, [card.flipped, api]);
 
   const handleDrag = useCallback((mx: number, my: number, vx: number, vy: number, down: boolean) => {
@@ -115,7 +115,7 @@ export const MegaCard: React.FC<MegaCardProps> = React.memo(({ card, onCardUpdat
       api.start({
         x: newX,
         y: newY,
-        rotZ: card.rotations * 360 + (isYeeted ? Math.sign(mx + my) * 360 : 0),
+        rotateZ: card.rotations * 360 + (isYeeted ? Math.sign(mx + my) * 360 : 0),
         scale: 1,
         config: { duration: 300 },
         onRest: () => {
@@ -127,14 +127,14 @@ export const MegaCard: React.FC<MegaCardProps> = React.memo(({ card, onCardUpdat
               y: newY / window.innerHeight
             },
             last_position: card.position,
-            rotations: Math.floor(Math.abs(rotZ.get() / 360)) % 13,
+            rotations: Math.floor(Math.abs(rotateZ.get() / 360)) % 13,
             flipped: isYeeted ? (isCurved ? !card.flipped : card.flipped) : card.flipped,
             timestamp: Date.now(),
           });
         },
       });
     }
-  }, [card, api, onCardUpdate, rotZ, physicsParams]);
+  }, [card, api, onCardUpdate, rotateZ, physicsParams]);
 
   const bind = useGesture({
     onDrag: ({ movement: [mx, my], velocity: [vx, vy], down }) => handleDrag(mx, my, vx, vy, down),
@@ -152,8 +152,8 @@ export const MegaCard: React.FC<MegaCardProps> = React.memo(({ card, onCardUpdat
         position: 'absolute',
         touchAction: 'none',
         zIndex: card.zIndex,
-        transform: to([x, y, rotY, rotZ, scale], (x, y, rY, rZ, s) =>
-          `translate3d(${x}px,${y}px,0)  rotateZ(${rZ}deg) scale(${s})`
+        transform: to([x, y, rotateZ, scale], (x, y, rZ, s) =>
+          `translate3d(${x}px,${y}px,0) rotateZ(${rZ}deg) scale(${s})`
         ),
       }}
     >
@@ -165,8 +165,10 @@ export const MegaCard: React.FC<MegaCardProps> = React.memo(({ card, onCardUpdat
           backgroundSize: 'cover',
           borderRadius: '3px',
           backfaceVisibility: 'hidden',
-          transform: to([rotY], (r) => `rotateY(${r}deg)`),
-          
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          transform: to([rotateY], (r) => `rotateY(${r}deg)`),
         }}
       />
       <animated.div
@@ -180,8 +182,7 @@ export const MegaCard: React.FC<MegaCardProps> = React.memo(({ card, onCardUpdat
           position: 'absolute',
           top: 0,
           left: 0,
-          transform: to([rotY], (r) => `rotateY(${r + 180}deg)`),
-          
+          transform: to([rotateY], (r) => `rotateY(${r + 180}deg)`),
         }}
       />
     </animated.div>
