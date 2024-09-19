@@ -42,6 +42,14 @@ interface UserData {
   monthly_prices?: Record<string, any> | null;
   site?: string | null;
   dark_theme: boolean,
+  loot?: {
+    fool?: {
+      cards?: {
+        cards_img_url?: string;
+        shirt_img_url?: string;
+      }
+    }
+  }
 }
 
 interface AppContextType {

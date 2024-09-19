@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useCallback } from 'react';
+import React, { useEffect, useState, useRef, useCallback, useMemo } from 'react';
 import { useSpring, animated, to } from 'react-spring';
 import { useGesture } from '@use-gesture/react';
 import { cardsImages } from './CardsImgs';
@@ -29,7 +29,7 @@ interface MegaCardProps {
 
 export const MegaCard: React.FC<MegaCardProps> = React.memo(({ card, onCardUpdate, forceFlipped, isShuffling, physicsParams }) => {
   const cardRef = useRef<HTMLDivElement | null>(null);
-  const { t } = useAppContext();
+  const { t, user } = useAppContext();
   const [isAnimating, setIsAnimating] = useState(false);
   const isDragging = useRef(false);
   const dragStartTime = useRef(0);
@@ -38,7 +38,7 @@ export const MegaCard: React.FC<MegaCardProps> = React.memo(({ card, onCardUpdat
   const [{ x, y, rotateY, rotateZ, scale }, api] = useSpring(() => ({
     x: card.position.x * window.innerWidth,
     y: card.position.y * window.innerHeight,
-    rotateY: 0,
+    rotateY: card.flipped || forceFlipped ? 180 : 0,
     rotateZ: card.rotations * 360,
     scale: 1,
     config: { mass: 1, tension: 170, friction: 26 },
@@ -94,7 +94,7 @@ export const MegaCard: React.FC<MegaCardProps> = React.memo(({ card, onCardUpdat
       }
       if (newY < topShelfHeight || newY > window.innerHeight - bottomShelfHeight - 63) {
         my *= -0.5;
-        newY = Math.max(topShelfHeight, Math.min(newY, window.innerHeight - bottomShelfHeight - 63));
+        newY = Math.max(topShelfHeight, Math.min(newY, window.innerHeight - bottomShelfHeight - 169));
       }
       
       const avgVelocity = velocityHistory.current.reduce((acc, v) => ({ x: acc.x + v.x, y: acc.y + v.y }), { x: 0, y: 0 });
@@ -140,7 +140,69 @@ export const MegaCard: React.FC<MegaCardProps> = React.memo(({ card, onCardUpdat
     onDrag: ({ movement: [mx, my], velocity: [vx, vy], down }) => handleDrag(mx, my, vx, vy, down),
   });
 
+  const { cardFaceUrl, shirtUrl } = useMemo(() => {
+    const defaultCardFaceUrl = cardsImages[card.id];
+    const defaultShirtUrl = cardsImages["shirt"];
+
+    if (user?.loot?.fool?.cards) {
+      return {
+        cardFaceUrl: user.loot.fool.cards.cards_img_url || defaultCardFaceUrl,
+        shirtUrl: user.loot.fool.cards.shirt_img_url || defaultShirtUrl,
+      };
+    }
+
+    return { cardFaceUrl: defaultCardFaceUrl, shirtUrl: defaultShirtUrl };
+  }, [card.id, user?.loot?.fool?.cards]);
+
+  const cardFaceStyle = useMemo(() => {
+    if (cardFaceUrl.includes('sprite')) {
+      const row = Math.floor(parseInt(card.id) / 9);
+      const col = parseInt(card.id) % 9;
+      return {
+        backgroundImage: `url(${cardFaceUrl})`,
+        backgroundPosition: `${col * -100}% ${row * -100}%`,
+        backgroundSize: '900% 400%',
+      };
+    }
+    return {
+      backgroundImage: `url(${cardFaceUrl})`,
+      backgroundSize: 'cover',
+    };
+  }, [cardFaceUrl, card.id]);
+
   return (
+    <><animated.div
+      ref={cardRef}
+      {...bind()}
+      style={{
+        width: '42px',
+        height: '63px',
+        ...cardFaceStyle,
+        position: 'absolute',
+        backfaceVisibility: 'hidden',
+        touchAction: 'none',
+        zIndex: card.zIndex,
+        transform: to([x, y, rotateY, rotateZ, scale], (x, y, rotateY, rZ, s) =>
+          `translate3d(${x}px,${y}px,0) rotateY(${rotateY + 180}deg) rotateZ(${rZ}deg) scale(${s})`
+        ),
+      }}
+    >
+      <animated.div
+        style={{
+          ...cardFaceStyle,
+          width: '100%',
+          height: '100%',
+          borderRadius: '3px',
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          // transform: to([rotateY], (rotateY) =>
+          //   `translate3d(rotateY(180deg))`
+          // ),
+          //transform: 'rotateY(180deg)',
+        }}
+      />
+    </animated.div>
     <animated.div
       ref={cardRef}
       {...bind()}
@@ -149,9 +211,10 @@ export const MegaCard: React.FC<MegaCardProps> = React.memo(({ card, onCardUpdat
         height: '63px',
         position: 'absolute',
         touchAction: 'none',
+        backfaceVisibility: 'hidden',
         zIndex: card.zIndex,
-        transform: to([x, y, rotateY, rotateZ, scale], (x, y, rY, rZ, s) =>
-          `translate3d(${x}px,${y}px,0) rotateY(${rY}deg) rotateZ(${rZ}deg) scale(${s})`
+        transform: to([x, y, rotateY, rotateZ, scale], (x, y, rotateY, rZ, s) =>
+          `translate3d(${x}px,${y}px,0) rotateY(${rotateY}deg) rotateZ(${rZ}deg) scale(${s})`
         ),
       }}
     >
@@ -159,30 +222,23 @@ export const MegaCard: React.FC<MegaCardProps> = React.memo(({ card, onCardUpdat
         style={{
           width: '100%',
           height: '100%',
-          backgroundImage: `url(${cardsImages[card.id]})`,
+          backgroundImage: `url(${shirtUrl})`,
           backgroundSize: 'cover',
           borderRadius: '3px',
           backfaceVisibility: 'hidden',
           position: 'absolute',
           top: 0,
           left: 0,
-          transform: 'rotateY(180deg)',
+          // transform: to([rotateY], (rotateY) =>
+          //   `translate3d(rotateY(${rotateY + 180}deg))`
+          // ),
+          //transform: 'rotateY(180deg)',
         }}
       />
-      <animated.div
-        style={{
-          width: '100%',
-          height: '100%',
-          backgroundImage: `url(${cardsImages["shirt"]})`,
-          backgroundSize: 'cover',
-          borderRadius: '3px',
-          backfaceVisibility: 'hidden',
-          position: 'absolute',
-          top: 0,
-          left: 0,
-        }}
-      />
+      
+      
     </animated.div>
+    </>
   );
 });
 
