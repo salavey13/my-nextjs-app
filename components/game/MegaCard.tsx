@@ -166,7 +166,7 @@ export const MegaCard: React.FC<MegaCardProps> = React.memo(({ card, onCardUpdat
           borderRadius: '3px',
           backfaceVisibility: 'hidden',
           transform: to([rotY], (r) => `rotateY(${r}deg)`),
-          opacity: isFlipped ? 1 : 0,
+          
         }}
       />
       <animated.div
