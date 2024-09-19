@@ -23,6 +23,7 @@ export const ru: LanguageDictionary = {
   "yeetVelocityThreshold": "Порог скорости выброса",
   "minMovementThreshold": "Минимальный порог движения",
   applySettings: "Применить",
+  setDefault: "По умолчанию",
     newItemTypeNameRequest: "Введите имя для нового типа элемента:",
     saveRefCode: "Сохранить",
     newRentNotification: "Кто-то пытался арендовать ваш предмет",
