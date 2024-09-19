@@ -38,7 +38,7 @@ export const MegaCard: React.FC<MegaCardProps> = React.memo(({ card, onCardUpdat
   const [{ x, y, rotY, rotZ, scale }, api] = useSpring(() => ({
     x: card.position.x * window.innerWidth,
     y: card.position.y * window.innerHeight,
-    rotY: card.flipped || forceFlipped ? 180 : 0,
+    rotY: card.flipped ? 180 : 0,
     rotZ: card.rotations * 360,
     scale: 1,
     config: { mass: 1, tension: 170, friction: 26 },
@@ -56,8 +56,8 @@ export const MegaCard: React.FC<MegaCardProps> = React.memo(({ card, onCardUpdat
   }, [card.position, card.rotations, isShuffling, api, isAnimating]);
 
   useEffect(() => {
-    api.start({ rotY: (card.flipped || forceFlipped) ? 180 : 0 });
-  }, [card.flipped, forceFlipped, api]);
+    api.start({ rotY: card.flipped ? 180 : 0 });
+  }, [card.flipped, api]);
 
   const handleDrag = useCallback((mx: number, my: number, vx: number, vy: number, down: boolean) => {
     if (down) {
@@ -92,9 +92,9 @@ export const MegaCard: React.FC<MegaCardProps> = React.memo(({ card, onCardUpdat
         mx *= -0.5;
         newX = Math.max(0, Math.min(newX, window.innerWidth - 30));
       }
-      if (newY < 0 || newY > window.innerHeight - bottomShelfHeight - 103) {
+      if (newY < topShelfHeight || newY > window.innerHeight - bottomShelfHeight - 45) {
         my *= -0.5;
-        newY = Math.max(0, Math.min(newY, window.innerHeight - bottomShelfHeight - 103));
+        newY = Math.max(topShelfHeight, Math.min(newY, window.innerHeight - bottomShelfHeight - 45));
       }
       
       const avgVelocity = velocityHistory.current.reduce((acc, v) => ({ x: acc.x + v.x, y: acc.y + v.y }), { x: 0, y: 0 });
@@ -140,6 +140,8 @@ export const MegaCard: React.FC<MegaCardProps> = React.memo(({ card, onCardUpdat
     onDrag: ({ movement: [mx, my], velocity: [vx, vy], down }) => handleDrag(mx, my, vx, vy, down),
   });
 
+  const isFlipped = card.flipped || forceFlipped;
+
   return (
     <animated.div
       ref={cardRef}
@@ -164,6 +166,7 @@ export const MegaCard: React.FC<MegaCardProps> = React.memo(({ card, onCardUpdat
           borderRadius: '2px',
           backfaceVisibility: 'hidden',
           transform: to([rotY], (r) => `rotateY(${r}deg)`),
+          opacity: isFlipped ? 1 : 0,
         }}
       />
       <animated.div
@@ -177,8 +180,8 @@ export const MegaCard: React.FC<MegaCardProps> = React.memo(({ card, onCardUpdat
           position: 'absolute',
           top: 0,
           left: 0,
-          contentVisibility: `${card.flipped? 'hidden' : ''}`,
           transform: to([rotY], (r) => `rotateY(${r + 180}deg)`),
+          opacity: isFlipped ? 0 : 1,
         }}
       />
     </animated.div>
