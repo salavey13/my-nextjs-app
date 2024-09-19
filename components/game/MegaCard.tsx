@@ -86,15 +86,15 @@ export const MegaCard: React.FC<MegaCardProps> = React.memo(({ card, onCardUpdat
       let newY = card.position.y * window.innerHeight + my * yeetCoefficient;
       
       // Bounce off walls
-      const topShelfHeight = 64; // Adjust this value based on your actual top shelf height
-      const bottomShelfHeight = 64; // Adjust this value based on your actual bottom shelf height
-      if (newX < 0 || newX > window.innerWidth - 30) {
+      const topShelfHeight = 64;
+      const bottomShelfHeight = 64;
+      if (newX < 0 || newX > window.innerWidth - 60) {
         mx *= -0.5;
-        newX = Math.max(0, Math.min(newX, window.innerWidth - 30));
+        newX = Math.max(0, Math.min(newX, window.innerWidth - 60));
       }
-      if (newY < topShelfHeight || newY > window.innerHeight - bottomShelfHeight - 45) {
+      if (newY < topShelfHeight || newY > window.innerHeight - bottomShelfHeight - 90) {
         my *= -0.5;
-        newY = Math.max(topShelfHeight, Math.min(newY, window.innerHeight - bottomShelfHeight - 45));
+        newY = Math.max(topShelfHeight, Math.min(newY, window.innerHeight - bottomShelfHeight - 90));
       }
       
       const avgVelocity = velocityHistory.current.reduce((acc, v) => ({ x: acc.x + v.x, y: acc.y + v.y }), { x: 0, y: 0 });
@@ -147,8 +147,8 @@ export const MegaCard: React.FC<MegaCardProps> = React.memo(({ card, onCardUpdat
       ref={cardRef}
       {...bind()}
       style={{
-        width: '30px',
-        height: '45px',
+        width: '60px',
+        height: '90px',
         position: 'absolute',
         touchAction: 'none',
         zIndex: card.zIndex,
@@ -163,7 +163,7 @@ export const MegaCard: React.FC<MegaCardProps> = React.memo(({ card, onCardUpdat
           height: '100%',
           backgroundImage: `url(${cardsImages[card.id]})`,
           backgroundSize: 'cover',
-          borderRadius: '2px',
+          borderRadius: '4px',
           backfaceVisibility: 'hidden',
           transform: to([rotY], (r) => `rotateY(${r}deg)`),
           opacity: isFlipped ? 1 : 0,
@@ -175,7 +175,7 @@ export const MegaCard: React.FC<MegaCardProps> = React.memo(({ card, onCardUpdat
           height: '100%',
           backgroundImage: `url(${cardsImages["shirt"]})`,
           backgroundSize: 'cover',
-          borderRadius: '2px',
+          borderRadius: '4px',
           backfaceVisibility: 'hidden',
           position: 'absolute',
           top: 0,
