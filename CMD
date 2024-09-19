@@ -1,0 +1,1 @@
+git add . &&  git commit -m "card yeeting fixes7 translate shufle fix" && git push origin main
