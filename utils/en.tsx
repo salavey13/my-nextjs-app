@@ -4,6 +4,7 @@ export const en: LanguageDictionary = {
   checkPermissions: "Check Permissions",
   "yeetCoefficient": "Yeet Coefficient",
   "tension": "Tension",
+  setDefault: "Set Default",
   "rotationDistance": "Rotation Distance",
   "friction": "Friction",
   "yeetVelocityThreshold": "Yeet Velocity Threshold",
