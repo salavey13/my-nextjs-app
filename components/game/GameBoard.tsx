@@ -174,7 +174,7 @@ const GameBoard: React.FC = () => {
 
     setTimeout(() => {
       setIsShuffling(false);
-      showMainButton(t('shufle'));
+      showMainButton(t('shuffle'));
       setBottomBarColor("#282c33");
       setHeaderColor("#282c33");
     }, 1000);
