@@ -427,4 +427,5 @@ createTask: "Створити завдання",
   search: "Пошук",
   quests: "Квесты",
   totalUsers: "Всего пользователей",
+  cryptopayment: "₿",
     }

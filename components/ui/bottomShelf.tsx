@@ -18,18 +18,18 @@ const BottomShelf: React.FC = () => {
   const { t } = useAppContext()
 
   const navigationLinks: NavigationLink[] = [    
-    { href: '/paymentnotification', icon: <DollarSign className="w-6 h-6" />, label: t('paymentnotification') },
-    { href: '/dynamicitemform', icon: <List className="w-6 h-6" />, label: t('dynamicitemform') },
-    { href: '/qrcodeform', icon: <Zap className="w-6 h-6" />, label: t('qrcodeform') },
+   // { href: '/paymentnotification', icon: <DollarSign className="w-6 h-6" />, label: t('paymentnotification') },
+    //{ href: '/dynamicitemform', icon: <List className="w-6 h-6" />, label: t('dynamicitemform') },
+   // { href: '/qrcodeform', icon: <Zap className="w-6 h-6" />, label: t('qrcodeform') },
     { href: '/cryptopayment', icon: <ShoppingCart className="w-6 h-6" />, label: t('cryptopayment') },
     { href: '/', icon: <Home className="w-6 h-6" />, label: t('home') },
     { href: '/rent', icon: <Car className="w-6 h-6" />, label: t('rent') },
     { href: '/referral', icon: <Users className="w-6 h-6" />, label: t('referral') },
-    { href: '/profile', icon: <User className="w-6 h-6" />, label: t('profile') },
-    { href: '/questsforcoins', icon: <Dice1 className="w-6 h-6" />, label: t('questsforcoins') },
-    { href: '/hackbutton', icon: <Zap className="w-6 h-6" />, label: t('hackbutton') },
+    //{ href: '/profile', icon: <User className="w-6 h-6" />, label: t('profile') },
+    { href: '/questsforcoins', icon: <Dice1 className="w-6 h-6" />, label: t('!') },
+    { href: '/hackbutton', icon: <Zap className="w-6 h-6" />, label: t('IQ') },
     { href: '/createEvent', icon: <CalendarPlus className="w-6 h-6" />, label: t('createEvent') },
-    { href: '/conflictawareness', icon: <Globe className="w-6 h-6" />, label: t('conflictawareness') },
+    //{ href: '/conflictawareness', icon: <Globe className="w-6 h-6" />, label: t('conflictawareness') },
     { href: '/admin', icon: <Crown className="w-6 h-6" />, label: t('admin') },
     { href: '/dev', icon: <Lightbulb className="w-6 h-6" />, label: t('dev') },
   ]

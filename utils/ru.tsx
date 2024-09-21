@@ -432,4 +432,5 @@ createTask: "Создать задачу",
   promoteToAdmin: "Сделать Админом",
   totalUsers: "Всего пользователей",
   role: "Роль",
+  cryptopayment: "₿",
 }
