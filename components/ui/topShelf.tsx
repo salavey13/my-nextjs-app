@@ -38,7 +38,7 @@ const TopShelf: React.FC = () => {
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-            <Avatar className="h-8 w-8">
+            <Avatar className="h-8 w-8  rounded-full">
               <AvatarImage src={user?.avatar_url || '/placeholder-user.png'} alt={user?.telegram_username} />
               <AvatarFallback>{user?.telegram_username?.charAt(0).toUpperCase()}</AvatarFallback>
             </Avatar>
