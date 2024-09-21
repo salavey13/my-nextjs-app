@@ -1,36 +1,47 @@
-"use client";
+'use client'
 
-import React, { useEffect, useState } from 'react';
-import { supabase } from "../lib/supabaseClient";
-import { useAppContext } from '../context/AppContext';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUserShield } from '@fortawesome/free-solid-svg-icons';
-import LoadingSpinner from "../components/ui/LoadingSpinner"
-// Define types for summary data
+import React, { useEffect, useState } from 'react'
+import { supabase } from '@/lib/supabaseClient'
+import { useAppContext } from '@/context/AppContext'
+import { Shield } from 'lucide-react'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Skeleton } from '@/components/ui/skeleton'
+
 interface SummaryData {
-  total: number;
-  lastMonth: number;
-  lastYear: number;
-  byRefCode: { ref_code: string; count: number }[];
+  total: number
+  lastMonth: number
+  lastYear: number
+  byRefCode: { ref_code: string; count: number }[]
 }
 
-const AdminDashboard: React.FC = () => {
-  const { user, t } = useAppContext();
-  const [referrals, setReferrals] = useState<any[]>([]);
+interface Referral {
+  id: string
+  referrer: { telegram_username: string }
+  referee: { telegram_username: string }
+  ref_code: string
+  referral_date: string
+}
+
+export default function AdminDashboard() {
+  const { user, t } = useAppContext()
+  const [referrals, setReferrals] = useState<Referral[]>([])
   const [summary, setSummary] = useState<SummaryData>({
     total: 0,
     lastMonth: 0,
     lastYear: 0,
     byRefCode: []
-  });
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  })
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [searchTerm, setSearchTerm] = useState('')
 
   useEffect(() => {
     const fetchReferrals = async () => {
       try {
         if (user?.role === 1) {
-          // Fetch referrals along with related user data
           const { data: referralsData, error: fetchError } = await supabase
             .from('referrals')
             .select(`
@@ -38,117 +49,163 @@ const AdminDashboard: React.FC = () => {
               referrer:users!referrals_user_id_fkey(telegram_id, telegram_username),
               referee:users!referrals_referred_user_id_fkey(telegram_id, telegram_username)
             `)
-            .order('referral_date', { ascending: false });
+            .order('referral_date', { ascending: false })
 
-          if (fetchError) throw fetchError;
+          if (fetchError) throw fetchError
 
-          setReferrals(referralsData || []);
+          setReferrals(referralsData || [])
 
-          // Calculate summary data manually
-          const total = referralsData.length;
-          const lastMonth = referralsData.filter((referral: any) => {
-            const referralDate = new Date(referral.referral_date);
-            const now = new Date();
-            const oneMonthAgo = new Date(now.setMonth(now.getMonth() - 1));
-            return referralDate > oneMonthAgo;
-          }).length;
+          const total = referralsData.length
+          const now = new Date()
+          const oneMonthAgo = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate())
+          const oneYearAgo = new Date(now.getFullYear() - 1, now.getMonth(), now.getDate())
 
-          const lastYear = referralsData.filter((referral: any) => {
-            const referralDate = new Date(referral.referral_date);
-            const now = new Date();
-            const oneYearAgo = new Date(now.setFullYear(now.getFullYear() - 1));
-            return referralDate > oneYearAgo;
-          }).length;
+          const lastMonth = referralsData.filter(referral => new Date(referral.referral_date) > oneMonthAgo).length
+          const lastYear = referralsData.filter(referral => new Date(referral.referral_date) > oneYearAgo).length
 
-          const byRefCode = referralsData.reduce((acc: any, referral: any) => {
-            if (!referral.ref_code) return acc;
-            acc[referral.ref_code] = (acc[referral.ref_code] || 0) + 1;
-            return acc;
-          }, {});
+          const byRefCode = referralsData.reduce((acc: Record<string, number>, referral: Referral) => {
+            if (!referral.ref_code) return acc
+            acc[referral.ref_code] = (acc[referral.ref_code] || 0) + 1
+            return acc
+          }, {})
 
-          const byRefCodeArray = Object.keys(byRefCode).map(ref_code => ({
+          const byRefCodeArray = Object.entries(byRefCode).map(([ref_code, count]) => ({
             ref_code,
-            count: byRefCode[ref_code]
-          }));
+            count
+          }))
 
-          setSummary({ total, lastMonth, lastYear, byRefCode: byRefCodeArray });
-          setLoading(false);
+          setSummary({ total, lastMonth, lastYear, byRefCode: byRefCodeArray })
+          setLoading(false)
         }
       } catch (error: any) {
-        setError(error.message);
-        setLoading(false);
+        setError(error.message)
+        setLoading(false)
       }
-    };
-    fetchReferrals();
-  }, [user]);
+    }
+    fetchReferrals()
+  }, [user])
 
-  if (loading) return <LoadingSpinner />;
-  if (error) return <div>Error: {error}</div>;
+  const filteredReferrals = referrals.filter(referral =>
+    referral.referrer.telegram_username.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    referral.referee.telegram_username.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    referral.ref_code.toLowerCase().includes(searchTerm.toLowerCase())
+  )
+
+  if (error) {
+    return (
+      <div className="p-4 bg-red-100 border border-red-400 text-red-700 rounded" role="alert">
+        <strong className="font-bold">Error:</strong>
+        <span className="block sm:inline"> {error}</span>
+      </div>
+    )
+  }
 
   return (
-    <div className="p-4">
-      <h1 className="text-2xl font-bold mb-4">
-        <FontAwesomeIcon icon={faUserShield} className="gradient-icon mr-2" />
+    <div className="container mx-auto p-4 space-y-6">
+      <h1 className="text-3xl font-bold flex items-center gap-2 mb-6">
+        <Shield className="w-8 h-8 text-primary" />
         {t('adminDashboard')}
       </h1>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <div className="p-4 border rounded-lg shadow ">
-          <h2 className="text-lg font-semibold">{t('totalReferrals')}</h2>
-          <p className="text-2xl">{summary.total}</p>
-        </div>
-        <div className="p-4 border rounded-lg shadow">
-          <h2 className="text-lg font-semibold">{t('referralsLastMonth')}</h2>
-          <p className="text-2xl">{summary.lastMonth}</p>
-        </div>
-        <div className="p-4 border rounded-lg shadow">
-          <h2 className="text-lg font-semibold">{t('referralsLastYear')}</h2>
-          <p className="text-2xl">{summary.lastYear}</p>
-        </div>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">{t('totalReferrals')}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{loading ? <Skeleton className="h-8 w-20" /> : summary.total}</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">{t('referralsLastMonth')}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{loading ? <Skeleton className="h-8 w-20" /> : summary.lastMonth}</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">{t('referralsLastYear')}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{loading ? <Skeleton className="h-8 w-20" /> : summary.lastYear}</div>
+          </CardContent>
+        </Card>
       </div>
 
-      <table className="table-auto w-full border rounded-lg">
-        <thead>
-          <tr>
-            <th className="border p-2">{t('referrer')}</th>
-            <th className="border p-2">{t('referee')}</th>
-            <th className="border p-2">{t('refCode')}</th>
-            <th className="border p-2">{t('date')}</th>
-          </tr>
-        </thead>
-        <tbody>
-          {referrals.map((referral: any) => (
-            <tr key={referral.id}>
-              <td className="border p-2">{referral.referrer.telegram_username}</td>
-              <td className="border p-2">{referral.referee.telegram_username}</td>
-              <td className="border p-2">{referral.ref_code}</td>
-              <td className="border p-2">{new Date(referral.referral_date).toLocaleDateString()}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <div className="space-y-4">
+        <div className="flex justify-between items-center">
+          <h2 className="text-2xl font-semibold">{t('referralsList')}</h2>
+          <div className="flex items-center gap-2">
+            <Input
+              type="text"
+              placeholder={t('search')}
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="max-w-sm"
+            />
+            <Button onClick={() => setSearchTerm('')}>{t('clear')}</Button>
+          </div>
+        </div>
 
-      <div className="mt-8">
-        <h2 className="text-xl font-semibold mb-4">{t('referralsByCode')}</h2>
-        <table className="table-auto w-full border">
-          <thead>
-            <tr>
-              <th className="border p-2">{t('refCode')}</th>
-              <th className="border p-2">{t('referrals')}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {summary.byRefCode.map((refCode: any) => (
-              <tr key={refCode.ref_code}>
-                <td className="border p-2">{refCode.ref_code}</td>
-                <td className="border p-2">{refCode.count}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>{t('referrer')}</TableHead>
+              <TableHead>{t('referee')}</TableHead>
+              <TableHead>{t('refCode')}</TableHead>
+              <TableHead>{t('date')}</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {loading ? (
+              <TableRow>
+                <TableCell colSpan={4}>
+                  <Skeleton className="h-8 w-full" />
+                </TableCell>
+              </TableRow>
+            ) : (
+              filteredReferrals.map((referral) => (
+                <TableRow key={referral.id}>
+                  <TableCell>{referral.referrer.telegram_username}</TableCell>
+                  <TableCell>{referral.referee.telegram_username}</TableCell>
+                  <TableCell>{referral.ref_code}</TableCell>
+                  <TableCell>{new Date(referral.referral_date).toLocaleDateString()}</TableCell>
+                </TableRow>
+              ))
+            )}
+          </TableBody>
+        </Table>
+      </div>
+
+      <div className="mt-8 space-y-4">
+        <h2 className="text-2xl font-semibold">{t('referralsByCode')}</h2>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>{t('refCode')}</TableHead>
+              <TableHead>{t('referrals')}</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {loading ? (
+              <TableRow>
+                <TableCell colSpan={2}>
+                  <Skeleton className="h-8 w-full" />
+                </TableCell>
+              </TableRow>
+            ) : (
+              summary.byRefCode.map((refCode) => (
+                <TableRow key={refCode.ref_code}>
+                  <TableCell>{refCode.ref_code}</TableCell>
+                  <TableCell>{refCode.count}</TableCell>
+                </TableRow>
+              ))
+            )}
+          </TableBody>
+        </Table>
       </div>
     </div>
-  );
-};
-
-export default AdminDashboard;
+  )
+}
