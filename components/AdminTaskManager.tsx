@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { toast } from '@/hooks/use-toast'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 
 interface Task {
   id: number
@@ -241,12 +242,15 @@ export function AdminTaskManager() {
       </Card>
 
       <Tabs defaultValue="tasks">
+      <ScrollArea className="w-full whitespace-nowrap rounded-md border">
         <TabsList>
           <TabsTrigger value="tasks">{t('activeTasks')}</TabsTrigger>
           <TabsTrigger value="points">{t('userPoints')}</TabsTrigger>
           <TabsTrigger value="subscriptions">{t('subscriptions')}</TabsTrigger>
           <TabsTrigger value="messages">{t('botMessages')}</TabsTrigger>
         </TabsList>
+        <ScrollBar orientation="horizontal" className="hidden sm:flex" />
+        </ScrollArea>
 
         <TabsContent value="tasks">
           <Card>
