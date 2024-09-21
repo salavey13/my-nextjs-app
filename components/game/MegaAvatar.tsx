@@ -34,8 +34,8 @@ const MegaAvatar: React.FC<MegaAvatarProps> = React.memo(({ gameState, playerId,
 
   const handleDrag = useCallback((mx: number, my: number, down: boolean) => {
     if (!down) {
-      const newX = Math.max(64, Math.min(initialPosition.x * window.innerWidth + mx, window.innerWidth - 64));
-      const newY = Math.max(64, Math.min(initialPosition.y * window.innerHeight + my, window.innerHeight - 64));
+      const newX = Math.max(0, Math.min(initialPosition.x * window.innerWidth + mx, window.innerWidth - 64));
+      const newY = Math.max(0, Math.min(initialPosition.y * window.innerHeight + my, window.innerHeight - 64));
       onPositionChange(playerId, { 
         x: newX / window.innerWidth,
         y: newY / window.innerHeight
