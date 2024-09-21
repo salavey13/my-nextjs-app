@@ -46,8 +46,8 @@ export const Settings: React.FC<SettingsProps> = ({ onUpdateSettings, initialSet
 
   return (
     <div className="fixed bottom-16 left-2 z-50">
-      <Button onClick={() => setIsOpen(!isOpen)} className="mb-2 ml-2">
-        {isOpen ? t('Х') : t('settings.title')}
+      <Button onClick={() => setIsOpen(!isOpen)} className="mb-2 ml-2" variant="outline">
+        {isOpen ? t('Х') : "⚙"}
       </Button>
       {isOpen && (
         <form onSubmit={handleSubmit} className="bg-background p-4 rounded-lg shadow-lg max-h-[calc(100vh-200px)] overflow-y-auto">
@@ -68,10 +68,10 @@ export const Settings: React.FC<SettingsProps> = ({ onUpdateSettings, initialSet
             </div>
           ))}
           <div className="flex justify-between mt-4">
-            <Button type="submit" className="w-1/2 mr-2">
+            <Button type="submit" className="w-1/2 mr-2" variant="outline">
               {t('applySettings')}
             </Button>
-            <Button type="button" onClick={handleSetDefault} className="w-1/2 ml-2">
+            <Button type="button" onClick={handleSetDefault} variant="outline" className="w-1/2 ml-2">
               {t('setDefault')}
             </Button>
           </div>
