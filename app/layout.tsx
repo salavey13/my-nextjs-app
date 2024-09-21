@@ -3,50 +3,23 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { I18nextProvider } from 'react-i18next';
-import i18n from '../i18n';
 import { AppProvider } from "../context/AppContext";
 import { ReactNode, useEffect } from "react";
 import React, { Suspense } from "react";
 import TopShelf from "@/components/ui/topShelf";
 import BottomShelf from "../components/ui/bottomShelf";
 import LoadingSpinner from "../components/ui/LoadingSpinner"; 
-//import ThemeHandler from "../components/ThemeHandler";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "IQ/Social Score Calculator",
-  description: "Manage your IQ and social credit scenarios.",
+  description: "Manage your IQ and social credit.",
 };
 
 export default function RootLayout({
   children,
 }: Readonly<{ children: ReactNode }>) {
-  
-  // useEffect(() => {
-  //   const prefersDarkScheme = window.matchMedia("(prefers-color-scheme: dark)").matches;
-
-  //   if (prefersDarkScheme) {
-  //     document.documentElement.classList.add("dark");
-  //   } else {
-  //     document.documentElement.classList.remove("dark");
-  //   }
-
-  //   const themeChangeListener = (e: MediaQueryListEvent) => {
-  //     if (e.matches) {
-  //       document.documentElement.classList.add("dark");
-  //     } else {
-  //       document.documentElement.classList.remove("dark");
-  //     }
-  //   };
-
-  //   window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", themeChangeListener);
-
-  //   return () => {
-  //     window.matchMedia("(prefers-color-scheme: dark)").removeEventListener("change", themeChangeListener);
-  //   };
-  // }, []);//bg-black text-white 
 
 
   return (
@@ -54,7 +27,6 @@ export default function RootLayout({
       <body
         className={`${inter.className} flex flex-col min-h-screen`}
       >
-        {/* <ThemeHandler /> */}
         <Suspense fallback={<LoadingSpinner />}>  {/* Use the custom loading component */}
           <AppProvider>
             <TopShelf />

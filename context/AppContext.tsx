@@ -26,6 +26,7 @@ interface UserData {
   telegram_id: number;
   telegram_username: string;
   lang: 'ru' | 'en' | 'ukr';
+  avatar_url: string;
   coins: number;
   rp: number;
   X: number;
