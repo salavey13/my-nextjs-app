@@ -7,7 +7,7 @@ import { Settings, PhysicsSettings } from './Settings';
 import MegaAvatar from './MegaAvatar';
 import useTelegram from '@/hooks/useTelegram';
 import LoadingSpinner from "../ui/LoadingSpinner";
-
+import InfinityMirror from './InfinityMirror'
 const CARD_PROXIMITY_THRESHOLD = 13;
 
 interface Point {
@@ -305,7 +305,13 @@ const GameBoard: React.FC = () => {
   return (
     <Suspense fallback={<LoadingSpinner />}>
       <div className="game-board h-[calc(100vh-128px)] relative overflow-hidden">
-        <Settings onUpdateSettings={handleUpdateSettings} initialSettings={physicsParams} />
+        {/* Add the InfinityMirror component as the background */}
+        <div className="absolute inset-0 z-0">
+          <InfinityMirror layers={15} baseColor="#282c33" accentColor="#e1ff01" />
+        </div>
+
+        <div className="relative z-10">
+          <Settings onUpdateSettings={handleUpdateSettings} initialSettings={physicsParams} />
 
         {gameState?.cards.map((card) => (
           <MegaCard
@@ -344,6 +350,7 @@ const GameBoard: React.FC = () => {
           />
         ))}
       </div>
+      </div>  
     </Suspense>
   );
 };
