@@ -13,6 +13,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { toast } from '@/hooks/use-toast'
 import { AdminTaskManager } from './AdminTaskManager'
 import { QuestManager } from './QuestManager'
+
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
+
+
 interface SummaryData {
   total: number
   lastMonth: number
@@ -216,12 +220,15 @@ export default function AdminDashboard() {
         </div>
 
         <Tabs defaultValue="referrals">
+        <ScrollArea className="w-full whitespace-nowrap rounded-md border">
           <TabsList>
             <TabsTrigger value="referrals">{t('referrals')}</TabsTrigger>
             <TabsTrigger value="users">{t('users')}</TabsTrigger>
             <TabsTrigger value="tasks">{t('tasks')}</TabsTrigger>
             <TabsTrigger value="quests">{t('quests')}</TabsTrigger>
           </TabsList>
+        <ScrollBar orientation="horizontal" className="hidden sm:flex" />
+        </ScrollArea>
           <TabsContent value="referrals">
             <Table>
               <TableHeader>
