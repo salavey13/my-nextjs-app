@@ -17,7 +17,8 @@ const defaultStore = {
   lang: 'ru',
   X: '69',
   dark_theme: true,
-  currentGameId: 28
+  currentGameId: 28,
+  role: 0
 };
 
 interface UserData {
@@ -125,6 +126,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
           tasksTodo: data.tasksTodo ? JSON.parse(data.tasksTodo) : [],
           currentGameId: data.currentgameId || '',
           dark_theme: data.dark_theme,
+          role: data.role || 0,
         }));
         setUser(data);
       } else {
@@ -171,6 +173,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
           X: existingUser.X?.toString() || '0',
           tasksTodo: existingUser.tasksTodo ? JSON.parse(existingUser.tasksTodo) : [],
           currentGameId: existingUser.currentgameId || '',
+          role: exastingUser.role || 0,
         }));
         setUser(existingUser);
 
