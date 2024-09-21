@@ -11,7 +11,8 @@ import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { toast } from '@/hooks/use-toast'
-
+import { AdminTaskManager } from './AdminTaskManager'
+import { QuestManager } from './QuestManager'
 interface SummaryData {
   total: number
   lastMonth: number
@@ -218,6 +219,8 @@ export default function AdminDashboard() {
           <TabsList>
             <TabsTrigger value="referrals">{t('referrals')}</TabsTrigger>
             <TabsTrigger value="users">{t('users')}</TabsTrigger>
+            <TabsTrigger value="tasks">{t('tasks')}</TabsTrigger>
+            <TabsTrigger value="quests">{t('quests')}</TabsTrigger>
           </TabsList>
           <TabsContent value="referrals">
             <Table>
@@ -248,6 +251,33 @@ export default function AdminDashboard() {
                 )}
               </TableBody>
             </Table>
+            <div className="mt-8 space-y-4">
+            <h2 className="text-2xl font-semibold">{t('referralsByCode')}</h2>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>{t('refCode')}</TableHead>
+                  <TableHead>{t('referrals')}</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {loading ? (
+                  <TableRow>
+                    <TableCell colSpan={2}>
+                      <Skeleton className="h-8 w-full" />
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  summary.byRefCode.map((refCode) => (
+                    <TableRow key={refCode.ref_code}>
+                      <TableCell>{refCode.ref_code}</TableCell>
+                      <TableCell>{refCode.count}</TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </div>
           </TabsContent>
           <TabsContent value="users">
             <Table>
@@ -295,36 +325,16 @@ export default function AdminDashboard() {
               </TableBody>
             </Table>
           </TabsContent>
+          <TabsContent value="tasks">
+            <AdminTaskManager />
+          </TabsContent>
+          <TabsContent value="quests">
+            <QuestManager />
+          </TabsContent>
         </Tabs>
       </div>
 
-      <div className="mt-8 space-y-4">
-        <h2 className="text-2xl font-semibold">{t('referralsByCode')}</h2>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>{t('refCode')}</TableHead>
-              <TableHead>{t('referrals')}</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {loading ? (
-              <TableRow>
-                <TableCell colSpan={2}>
-                  <Skeleton className="h-8 w-full" />
-                </TableCell>
-              </TableRow>
-            ) : (
-              summary.byRefCode.map((refCode) => (
-                <TableRow key={refCode.ref_code}>
-                  <TableCell>{refCode.ref_code}</TableCell>
-                  <TableCell>{refCode.count}</TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </div>
+      
     </div>
   )
 }
