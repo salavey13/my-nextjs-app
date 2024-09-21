@@ -522,5 +522,6 @@ createTask: "Create Task",
   referredUserId: "Referred User ID",
   search: "Search",
   totalUsers: "Total Users",
-
+  cryptopayment: "₿",
+  avatarUrl: "Avatar Pic Link",
 }

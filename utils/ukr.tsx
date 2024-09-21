@@ -428,4 +428,5 @@ createTask: "Створити завдання",
   quests: "Квесты",
   totalUsers: "Всего пользователей",
   cryptopayment: "₿",
+  avatarUrl: "Посилання на зображення аватара",
     }

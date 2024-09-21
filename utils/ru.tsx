@@ -433,4 +433,5 @@ createTask: "Создать задачу",
   totalUsers: "Всего пользователей",
   role: "Роль",
   cryptopayment: "₿",
+  avatarUrl: "Ссылка на изображение аватара",
 }
