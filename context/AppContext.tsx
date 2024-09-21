@@ -173,7 +173,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
           X: existingUser.X?.toString() || '0',
           tasksTodo: existingUser.tasksTodo ? JSON.parse(existingUser.tasksTodo) : [],
           currentGameId: existingUser.currentgameId || '',
-          role: exastingUser.role || 0,
+          role: existingUser.role || 0,
         }));
         setUser(existingUser);
 
