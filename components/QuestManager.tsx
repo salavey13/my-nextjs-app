@@ -10,6 +10,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { toast } from '@/hooks/use-toast'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Dropdown } from './ui/dropdown';
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
+
 interface Quest {
   id: number
   title: string
@@ -302,11 +304,16 @@ export function QuestManager() {
       </Card>
 
       <Tabs defaultValue="quests">
-        <TabsList>
+        
+      <ScrollArea className="w-full whitespace-nowrap rounded-md border">
+          <TabsList>
           <TabsTrigger value="quests">{t('quests')}</TabsTrigger>
           <TabsTrigger value="questStates">{t('questStates')}</TabsTrigger>
           <TabsTrigger value="referrals">{t('referrals')}</TabsTrigger>
         </TabsList>
+        <ScrollBar orientation="horizontal" className="hidden sm:flex" />
+        </ScrollArea>
+          
 
         <TabsContent value="quests">
           <Card>
