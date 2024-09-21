@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { toast } from '@/components/ui/use-toast'
 
 interface SummaryData {
   total: number
@@ -36,6 +37,7 @@ interface UserData {
   ref_code: string
   rank: string
   social_credit: number
+  role: number
 }
 
 export default function AdminDashboard() {
@@ -67,7 +69,7 @@ export default function AdminDashboard() {
               .order('referral_date', { ascending: false }),
             supabase
               .from('users')
-              .select('id, telegram_id, telegram_username, coins, rp, X, ref_code, rank, social_credit')
+              .select('id, telegram_id, telegram_username, coins, rp, X, ref_code, rank, social_credit, role')
               .order('coins', { ascending: false })
           ])
 
@@ -93,7 +95,7 @@ export default function AdminDashboard() {
 
           const byRefCodeArray = Object.entries(byRefCode).map(([ref_code, count]) => ({
             ref_code,
-            count
+            count: count as number
           }))
 
           setSummary({ total, lastMonth, lastYear, byRefCode: byRefCodeArray })
@@ -117,6 +119,30 @@ export default function AdminDashboard() {
     user.telegram_username.toLowerCase().includes(searchTerm.toLowerCase()) ||
     user.ref_code.toLowerCase().includes(searchTerm.toLowerCase())
   )
+
+  const promoteToAdmin = async (userId: number) => {
+    try {
+      const { data, error } = await supabase
+        .from('users')
+        .update({ role: 1 })
+        .eq('id', userId)
+        .select()
+
+      if (error) throw error
+
+      setUsers(prevUsers => prevUsers.map(u => u.id === userId ? { ...u, role: 1 } : u))
+      toast({
+        title: "User promoted",
+        description: "The user has been successfully promoted to admin status.",
+      })
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: `Failed to promote user: ${error.message}`,
+        variant: "destructive",
+      })
+    }
+  }
 
   if (error) {
     return (
@@ -234,12 +260,14 @@ export default function AdminDashboard() {
                   <TableHead>{t('refCode')}</TableHead>
                   <TableHead>{t('rank')}</TableHead>
                   <TableHead>{t('socialCredit')}</TableHead>
+                  <TableHead>{t('role')}</TableHead>
+                  <TableHead>{t('actions')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {loading ? (
                   <TableRow>
-                    <TableCell colSpan={7}>
+                    <TableCell colSpan={9}>
                       <Skeleton className="h-8 w-full" />
                     </TableCell>
                   </TableRow>
@@ -253,6 +281,14 @@ export default function AdminDashboard() {
                       <TableCell>{user.ref_code}</TableCell>
                       <TableCell>{user.rank}</TableCell>
                       <TableCell>{user.social_credit}</TableCell>
+                      <TableCell>{user.role === 1 ? 'Admin' : 'User'}</TableCell>
+                      <TableCell>
+                        {user.role !== 1 && (
+                          <Button onClick={() => promoteToAdmin(user.id)} size="sm">
+                            {t('promoteToAdmin')}
+                          </Button>
+                        )}
+                      </TableCell>
                     </TableRow>
                   ))
                 )}
