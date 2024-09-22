@@ -30,8 +30,8 @@ Your task is to:
    - Provide a matching **translation object** for any new text.
 
 5. **Supabase Integration**:
-   - Supabase can be imported directly in any component.
-   - If new **Supabase tables** or **fields** are needed, generate table descriptions with example fields.
+   - Supabase can be imported directly in any component from from '../lib/supabaseClient';
+   - If new **Supabase tables** or **fields** are needed, generate table descriptions with example fields please try to make use of game_state jsonb field for all game related info instead of suggesting to modify actual table in supabase
 
 6. **Component Requirements**:
    - Components must be complete and **ready to deploy**. After generating the file, it should be usable after a simple \`git push\`.
@@ -62,7 +62,8 @@ You can use/modify existing tables and components as you wish:
     rent_end timestamp with time zone not null,
     status text not null default 'active'::text,
     item_id bigint not null,
-    game_state jsonb null, EXAMPLE{
+    game_state jsonb null, 
+    **EXAMPLE OF USING THIS JSON TO STORE GAME RELATED DATA** game_state:
 {
   "cards": [
     {
