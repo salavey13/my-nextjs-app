@@ -18,6 +18,8 @@ const defaultStore = {
   X: '69',
   dark_theme: true,
   currentGameId: 28,
+  
+  currentFoolGameId: 13,
   role: 0
 };
 
