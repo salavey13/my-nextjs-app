@@ -10,7 +10,7 @@ import EnhancedMegaAvatar from './EnhancedMegaAvatar';
 import useTelegram from '@/hooks/useTelegram';
 import LoadingSpinner from "../ui/LoadingSpinner";
 import InfinityMirror from './InfinityMirror';
-import { toast } from '@/hooks/use-toast';
+import { toast } from "@/hooks/use-toast";
 
 const CARD_PROXIMITY_THRESHOLD = 13;
 
@@ -31,11 +31,16 @@ interface Card {
   timestamp: number;
 }
 
+interface Message {
+  text: string;
+  timestamp: number;
+}
+
 interface Player {
   id: string;
   username: string;
   position: { x: number; y: number };
-  messages: string[];
+  messages: Message[];
 }
 
 interface GameState {
@@ -242,7 +247,7 @@ const GameBoard: React.FC = () => {
     await updateSupabase(updatedGameState);
   }, [gameState, user?.currentGameId]);
 
-  const handleMessageUpdate = useCallback(async (playerId: string, messages: string[]) => {
+  const handleMessageUpdate = useCallback(async (playerId: string, messages: Message[]) => {
     if (!gameState || !user?.currentGameId) return;
 
     const updatedPlayers = gameState.players.map((player) =>
