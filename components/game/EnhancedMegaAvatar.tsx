@@ -36,8 +36,8 @@ interface SpeechRecognitionAlternative {
 }
 
 interface Window {
-  SpeechRecognition: new () => SpeechRecognition;
-  webkitSpeechRecognition: new () => SpeechRecognition;
+  SpeechRecognition?: new () => SpeechRecognition;
+  webkitSpeechRecognition?: new () => SpeechRecognition;
 }
 
 interface Player {
@@ -115,8 +115,10 @@ const EnhancedMegaAvatar: React.FC<EnhancedMegaAvatarProps> = React.memo(({
     if (playerId === user?.id?.toString()) {
       let recognition: SpeechRecognition | null = null;
 
-      if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
-        recognition = new ((window as any).SpeechRecognition || (window as any).webkitSpeechRecognition)();
+      const SpeechRecognitionConstructor = (window as Window).SpeechRecognition || (window as Window).webkitSpeechRecognition;
+
+      if (SpeechRecognitionConstructor) {
+        recognition = new SpeechRecognitionConstructor();
         recognition.continuous = true;
         recognition.interimResults = true;
 
@@ -136,6 +138,8 @@ const EnhancedMegaAvatar: React.FC<EnhancedMegaAvatarProps> = React.memo(({
         };
 
         recognition.start();
+      } else {
+        console.warn(t('speechRecognitionNotSupported'));
       }
 
       return () => {
@@ -144,7 +148,7 @@ const EnhancedMegaAvatar: React.FC<EnhancedMegaAvatarProps> = React.memo(({
         }
       };
     }
-  }, [playerId, user?.id, onMessageUpdate]);
+  }, [playerId, user?.id, onMessageUpdate, t]);
 
   return (
     <animated.div
@@ -226,7 +230,7 @@ const EnhancedMegaAvatar: React.FC<EnhancedMegaAvatarProps> = React.memo(({
         >
           {message}
         </div>
-      ))}
+      )}
     </animated.div>
   );
 });
