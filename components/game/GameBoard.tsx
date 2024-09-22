@@ -338,7 +338,7 @@ const GameBoard: React.FC = () => {
               key={card.id}
               card={card}
               onCardUpdate={onCardUpdate}
-              forceFlipped={gameState.players.some(player => 
+              forceFlipped={gameState.players?.some(player => 
                 player.id === user?.id?.toString() && isCardNearPlayer(card, player)
               )}
               isShuffling={isShuffling}
