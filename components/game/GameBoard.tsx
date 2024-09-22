@@ -10,6 +10,7 @@ import EnhancedMegaAvatar from './EnhancedMegaAvatar';
 import useTelegram from '@/hooks/useTelegram';
 import LoadingSpinner from "../ui/LoadingSpinner";
 import InfinityMirror from './InfinityMirror';
+import { toast } from '@/components/ui/use-toast';
 
 const CARD_PROXIMITY_THRESHOLD = 13;
 
@@ -62,6 +63,37 @@ const GameBoard: React.FC = () => {
     });
   }, []);
 
+  const updateSupabase = async (updatedGameState: GameState): Promise<void> => {
+    if (!user?.currentGameId) return;
+
+    const updateWithRetry = async (retryCount: number = 0): Promise<void> => {
+      try {
+        const { error } = await supabase
+          .from('rents')
+          .update({ game_state: updatedGameState })
+          .eq('id', user.currentGameId);
+
+        if (error) {
+          throw error;
+        }
+      } catch (error) {
+        console.error('Error updating game state:', error);
+        if (retryCount < 1) {
+          console.log('Retrying update...');
+          await updateWithRetry(retryCount + 1);
+        } else {
+          toast({
+            title: t('updateError'),
+            description: t('updateErrorDescription'),
+            variant: "destructive",
+          });
+        }
+      }
+    };
+
+    await updateWithRetry();
+  };
+
   const onCardUpdate = useCallback((updatedCard: Card) => {
     if (!gameState || !user?.currentGameId) return;
 
@@ -74,16 +106,10 @@ const GameBoard: React.FC = () => {
       const updatedCards = prevState.cards.map(card =>
         card.id === updatedCard.id ? { ...updatedCard, timestamp: now } : card
       );
-      return { ...prevState, cards: updatedCards };
+      const updatedGameState = { ...prevState, cards: updatedCards };
+      updateSupabase(updatedGameState);
+      return updatedGameState;
     });
-
-    supabase
-      .from('rents')
-      .update({ game_state: { ...gameState, cards: gameState.cards.map(card => card.id === updatedCard.id ? { ...updatedCard, timestamp: now } : card) } })
-      .eq('id', user.currentGameId)
-      .then(() => {
-        console.log('Card updated successfully in Supabase');
-      });
   }, [gameState, user?.currentGameId]);
 
   useEffect(() => {
@@ -163,16 +189,8 @@ const GameBoard: React.FC = () => {
 
     const updatedGameState = { ...gameState, cards: shuffledCards };
 
-    const { error } = await supabase
-      .from('rents')
-      .update({ game_state: updatedGameState })
-      .eq('id', user.currentGameId);
-
-    if (error) {
-      console.error('Error updating game state:', error);
-    } else {
-      setGameState(updatedGameState);
-    }
+    setGameState(updatedGameState);
+    await updateSupabase(updatedGameState);
 
     randomizeTargetFrame();
 
@@ -201,16 +219,8 @@ const GameBoard: React.FC = () => {
         const updatedPlayers = [...(gameState.players || []), newPlayer];
         const updatedGameState = { ...gameState, players: updatedPlayers };
 
-        const { error } = await supabase
-          .from('rents')
-          .update({ game_state: updatedGameState })
-          .eq('id', user.currentGameId);
-
-        if (error) {
-          console.error('Error adding player:', error);
-        } else {
-          setGameState(updatedGameState);
-        }
+        setGameState(updatedGameState);
+        await updateSupabase(updatedGameState);
       }
     };
 
@@ -228,16 +238,8 @@ const GameBoard: React.FC = () => {
 
     const updatedGameState = { ...gameState, players: updatedPlayers };
 
-    const { error } = await supabase
-      .from('rents')
-      .update({ game_state: updatedGameState })
-      .eq('id', user.currentGameId);
-
-    if (error) {
-      console.error('Error updating player position:', error);
-    } else {
-      setGameState(updatedGameState);
-    }
+    setGameState(updatedGameState);
+    await updateSupabase(updatedGameState);
   }, [gameState, user?.currentGameId]);
 
   const handleMessageUpdate = useCallback(async (playerId: string, messages: string[]) => {
@@ -249,16 +251,8 @@ const GameBoard: React.FC = () => {
 
     const updatedGameState = { ...gameState, players: updatedPlayers };
 
-    const { error } = await supabase
-      .from('rents')
-      .update({ game_state: updatedGameState })
-      .eq('id', user.currentGameId);
-
-    if (error) {
-      console.error('Error updating player messages:', error);
-    } else {
-      setGameState(updatedGameState);
-    }
+    setGameState(updatedGameState);
+    await updateSupabase(updatedGameState);
   }, [gameState, user?.currentGameId]);
 
   const handleUpdateSettings = useCallback((settings: PhysicsSettings) => {
