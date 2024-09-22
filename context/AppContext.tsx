@@ -38,6 +38,8 @@ interface UserData {
   referer?: number | null;
   tasksTodo?: string | null;
   currentGameId?: number | null;
+  
+  currentFoolGameId?: number | null;
   game_state?: string | null;
   ton_wallet?: string | null;
   initial_readings?: Record<string, any> | null;

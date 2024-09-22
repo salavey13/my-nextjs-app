@@ -18,27 +18,8 @@ interface GameState {
 const HackButton: React.FC = () => {
   const { t, user } = useAppContext();
   const [selectedGame, setSelectedGame] = useState<'cards' | 'dice' | null>(null);
-  const [gameState, setGameState] = useState<GameState | null>(null);
 
-  useEffect(() => {
-    const fetchGameState = async () => {
-      if (!user?.currentGameId) return;
 
-      const { data, error } = await supabase
-        .from('rents')
-        .select('game_state')
-        .eq('id', user.currentGameId)
-        .single();
-
-      if (error) {
-        console.error('Error fetching game state:', error);
-      } else {
-        setGameState(data.game_state);
-      }
-    };
-
-    fetchGameState();
-  }, [user?.currentGameId]);
 
   const handleClick = async () => {
     try {
@@ -118,16 +99,16 @@ const HackButton: React.FC = () => {
           </Button>
         </>
       )}
-      {selectedGame === 'cards' && gameState && <GameBoard />}
+      {selectedGame === 'cards' && <GameBoard />}
       {selectedGame === 'dice' && <DiceGame />}
-      {selectedGame && (
+      {/* {selectedGame && (
         <Button
           onClick={() => setSelectedGame(null)}
           className="mt-4 bg-gray-500 text-white text-xl px-6 py-3 rounded-lg shadow-lg hover:bg-gray-600 transition-all"
         >
           {t('backToMenu')}
         </Button>
-      )}
+      )} */}
     </div>
   );
 };

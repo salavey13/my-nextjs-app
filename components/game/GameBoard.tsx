@@ -69,7 +69,7 @@ const GameBoard: React.FC = () => {
   }, []);
 
   const updateSupabase = useCallback(async (updatedGameState: GameState): Promise<void> => {
-    if (!user?.currentGameId) return;
+    if (!user?.currentFoolGameId) return;
 
     try {
       const { error } = await supabase
@@ -81,7 +81,7 @@ const GameBoard: React.FC = () => {
             availableGames: ['GameBoard', 'DiceGame']
           } 
         })
-        .eq('id', user.currentGameId);
+        .eq('id', user.currentFoolGameId);
 
       if (error) throw error;
     } catch (error) {
@@ -92,10 +92,10 @@ const GameBoard: React.FC = () => {
         variant: "destructive",
       });
     }
-  }, [user?.currentGameId, t]);
-  
+  }, [user?.currentFoolGameId, t]);
+
   const onCardUpdate = useCallback((updatedCard: Card) => {
-    if (!gameState || !user?.currentGameId) return;
+    if (!gameState || !user?.currentFoolGameId) return;
 
     const now = Date.now();
     if (now - (lastUpdateRef.current[updatedCard.id] || 0) < 100) return; // Throttle updates
@@ -110,21 +110,21 @@ const GameBoard: React.FC = () => {
       updateSupabase(updatedGameState);
       return updatedGameState;
     });
-  }, [gameState, user?.currentGameId]);
+  }, [gameState, user?.currentFoolGameId]);
 
   useEffect(() => {
     const handleSubscription = async () => {
-      if (!user?.currentGameId) {
+      if (!user?.currentFoolGameId) {
         console.log('No current game ID, skipping subscription');
         return;
       }
 
-      console.log('Setting up subscription for game ID:', user.currentGameId);
+      console.log('Setting up subscription for game ID:', user.currentFoolGameId);
 
       const { data, error } = await supabase
         .from('rents')
         .select('game_state')
-        .eq('id', user.currentGameId)
+        .eq('id', user.currentFoolGameId)
         .single();
 
       if (error) {
@@ -135,10 +135,10 @@ const GameBoard: React.FC = () => {
       }
 
       const channel = supabase
-        .channel(`game_state_updates_${user.currentGameId}`)
+        .channel(`game_state_updates_${user.currentFoolGameId}`)
         .on(
           'postgres_changes',
-          { event: 'UPDATE', schema: 'public', table: 'rents', filter: `id=eq.${user.currentGameId}` },
+          { event: 'UPDATE', schema: 'public', table: 'rents', filter: `id=eq.${user.currentFoolGameId}` },
           (payload) => {
             console.log('Received game state update:', payload.new.game_state);
             setGameState(prevState => {
@@ -168,10 +168,10 @@ const GameBoard: React.FC = () => {
     };
 
     handleSubscription();
-  }, [user?.currentGameId]);
+  }, [user?.currentFoolGameId]);
 
   const shuffleCards = useCallback(async () => {
-    if (!gameState || !user?.currentGameId) return;
+    if (!gameState || !user?.currentFoolGameId) return;
 
     setIsShuffling(true);
 
@@ -200,11 +200,11 @@ const GameBoard: React.FC = () => {
       setBottomBarColor("#282c33");
       setHeaderColor("#282c33");
     }, 1000);
-  }, [gameState, user?.currentGameId, randomizeTargetFrame, showMainButton, setBottomBarColor, setHeaderColor, t]);
+  }, [gameState, user?.currentFoolGameId, randomizeTargetFrame, showMainButton, setBottomBarColor, setHeaderColor, t]);
 
   useEffect(() => {
     const addPlayerIfNeeded = async () => {
-      if (!gameState || !user?.currentGameId || !user?.id) return;
+      if (!gameState || !user?.currentFoolGameId || !user?.id) return;
 
       const playerExists = gameState.players?.some((player) => player.id === user.id.toString());
 
@@ -230,7 +230,7 @@ const GameBoard: React.FC = () => {
   }, [gameState, user]);
 
   const handlePositionChange = useCallback(async (playerId: string, newPos: Point) => {
-    if (!gameState || !user?.currentGameId) return;
+    if (!gameState || !user?.currentFoolGameId) return;
 
     const updatedPlayers = gameState.players.map((player) =>
       player.id === playerId ? { ...player, position: newPos } : player
@@ -240,10 +240,10 @@ const GameBoard: React.FC = () => {
 
     setGameState(updatedGameState);
     await updateSupabase(updatedGameState);
-  }, [gameState, user?.currentGameId]);
+  }, [gameState, user?.currentFoolGameId]);
 
   const handleMessageUpdate = useCallback(async (playerId: string, messages: Message[]) => {
-    if (!gameState || !user?.currentGameId) return;
+    if (!gameState || !user?.currentFoolGameId) return;
 
     const updatedPlayers = gameState.players.map((player) =>
       player.id === playerId ? { ...player, messages } : player
@@ -253,7 +253,7 @@ const GameBoard: React.FC = () => {
 
     setGameState(updatedGameState);
     await updateSupabase(updatedGameState);
-  }, [gameState, user?.currentGameId]);
+  }, [gameState, user?.currentFoolGameId]);
 
   const handleUpdateSettings = useCallback((settings: PhysicsSettings) => {
     setPhysicsParams(settings);
