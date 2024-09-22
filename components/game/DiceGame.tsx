@@ -217,12 +217,12 @@ const DiceGame: React.FC = () => {
 
           <div className="flex space-x-4 mb-6">
             <Dice
-              value={gameState.players.find(p => p.id === gameState.currentPlayer)?.diceValues[0] || 1}
+              value={gameState.players.find(p => p.id === gameState.currentPlayer)?.diceValues?.[0] ?? 1}
               rolling={gameState.isRolling}
               onRollComplete={() => {}}
             />
             <Dice
-              value={gameState.players.find(p => p.id === gameState.currentPlayer)?.diceValues[1] || 1}
+              value={gameState.players.find(p => p.id === gameState.currentPlayer)?.diceValues?.[1] ?? 1}
               rolling={gameState.isRolling}
               onRollComplete={() => {}}
             />
