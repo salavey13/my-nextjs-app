@@ -1,10 +1,10 @@
 import React, { useCallback, useState, useEffect, useRef } from 'react';
-import { useSpring, animated, to } from '@react-spring/web';
+import { useSpring, animated, to, useTransition } from '@react-spring/web';
 import { useGesture } from '@use-gesture/react';
 import { useAppContext } from '@/context/AppContext';
 import ShineBorder from '@/components/ui/ShineBorder';
 import { Mic, MicOff } from 'lucide-react';
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 
 interface SpeechRecognition extends EventTarget {
@@ -52,7 +52,7 @@ interface Player {
   id: string;
   username: string;
   position: { x: number; y: number };
-  messages: string[];
+  messages: Message[];
 }
 
 interface GameState {
@@ -65,8 +65,15 @@ interface EnhancedMegaAvatarProps {
   playerId: string;
   initialPosition: { x: number; y: number };
   onPositionChange: (playerId: string, newPosition: { x: number; y: number }) => void;
-  onMessageUpdate: (playerId: string, messages: string[]) => void;
+  onMessageUpdate: (playerId: string, messages: Message[]) => void;
 }
+
+interface Message {
+  text: string;
+  timestamp: number;
+}
+
+const MESSAGE_LIFETIME = 60000; // 1 minute in milliseconds
 
 const profanityList = [
   'fuck', 'shit', 'ass', 'bitch', 'cunt', 'dick', 'pussy', 'cock', 'asshole',
@@ -84,16 +91,6 @@ const censorMessage = (message: string): string => {
     return word;
   }).join(' ');
 };
-
-
-// ... (keep all the existing interfaces)
-
-interface Message {
-  text: string;
-  timestamp: number;
-}
-
-const MESSAGE_LIFETIME = 60000; // 1 minute in milliseconds
 
 const EnhancedMegaAvatar: React.FC<EnhancedMegaAvatarProps> = React.memo(({ 
   gameState, 
@@ -144,7 +141,7 @@ const EnhancedMegaAvatar: React.FC<EnhancedMegaAvatarProps> = React.memo(({
 
   useEffect(() => {
     if (player && player.messages) {
-      setMessages(player.messages.map(text => ({ text, timestamp: Date.now() })));
+      setMessages(player.messages);
     }
   }, [player]);
 
@@ -155,7 +152,7 @@ const EnhancedMegaAvatar: React.FC<EnhancedMegaAvatarProps> = React.memo(({
         ...prevMessages.filter(msg => now - msg.timestamp < MESSAGE_LIFETIME),
         { text, timestamp: now }
       ];
-      onMessageUpdate(playerId, newMessages.map(msg => msg.text));
+      onMessageUpdate(playerId, newMessages);
       return newMessages;
     });
   }, [playerId, onMessageUpdate]);
