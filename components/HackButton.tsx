@@ -1,6 +1,3 @@
-copy
-
-
 // components/HackButton.tsx
 "use client";
 
