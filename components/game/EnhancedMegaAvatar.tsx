@@ -5,6 +5,7 @@ import { useAppContext } from '@/context/AppContext';
 import ShineBorder from '@/components/ui/ShineBorder';
 import { Mic, MicOff } from 'lucide-react';
 import { Button } from "@/components/ui/button"
+import { toast } from "@/hooks/use-toast";
 
 interface SpeechRecognition extends EventTarget {
   continuous: boolean;
@@ -84,6 +85,16 @@ const censorMessage = (message: string): string => {
   }).join(' ');
 };
 
+
+// ... (keep all the existing interfaces)
+
+interface Message {
+  text: string;
+  timestamp: number;
+}
+
+const MESSAGE_LIFETIME = 60000; // 1 minute in milliseconds
+
 const EnhancedMegaAvatar: React.FC<EnhancedMegaAvatarProps> = React.memo(({ 
   gameState, 
   playerId, 
@@ -93,7 +104,7 @@ const EnhancedMegaAvatar: React.FC<EnhancedMegaAvatarProps> = React.memo(({
 }) => {
   const { user, t } = useAppContext();
   const player = gameState.players.find(p => p.id === playerId);
-  const [messages, setMessages] = useState<string[]>([]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [isListening, setIsListening] = useState(false);
   const [interimTranscript, setInterimTranscript] = useState('');
   const recognitionRef = useRef<SpeechRecognition | null>(null);
@@ -103,6 +114,13 @@ const EnhancedMegaAvatar: React.FC<EnhancedMegaAvatarProps> = React.memo(({
     y: initialPosition.y * window.innerHeight,
     config: { mass: 1, tension: 200, friction: 20 },
   }));
+
+  const messageTransitions = useTransition(messages, {
+    from: { opacity: 0, transform: 'translateY(10px)' },
+    enter: { opacity: 1, transform: 'translateY(0px)' },
+    leave: { opacity: 0, transform: 'translateY(-10px)' },
+    config: { tension: 300, friction: 20 },
+  });
 
   const handleDrag = useCallback((mx: number, my: number, down: boolean) => {
     if (!down) {
@@ -126,9 +144,21 @@ const EnhancedMegaAvatar: React.FC<EnhancedMegaAvatarProps> = React.memo(({
 
   useEffect(() => {
     if (player && player.messages) {
-      setMessages(player.messages);
+      setMessages(player.messages.map(text => ({ text, timestamp: Date.now() })));
     }
   }, [player]);
+
+  const addMessage = useCallback((text: string) => {
+    const now = Date.now();
+    setMessages(prevMessages => {
+      const newMessages = [
+        ...prevMessages.filter(msg => now - msg.timestamp < MESSAGE_LIFETIME),
+        { text, timestamp: now }
+      ];
+      onMessageUpdate(playerId, newMessages.map(msg => msg.text));
+      return newMessages;
+    });
+  }, [playerId, onMessageUpdate]);
 
   const startListening = useCallback(() => {
     const SpeechRecognitionConstructor = (window as Window).SpeechRecognition || (window as Window).webkitSpeechRecognition;
@@ -154,11 +184,7 @@ const EnhancedMegaAvatar: React.FC<EnhancedMegaAvatarProps> = React.memo(({
 
         if (finalTranscript !== '') {
           const censoredMessage = censorMessage(finalTranscript);
-          setMessages(prevMessages => {
-            const updatedMessages = [...prevMessages, censoredMessage].slice(-2);
-            onMessageUpdate(playerId, updatedMessages);
-            return updatedMessages;
-          });
+          addMessage(censoredMessage);
           setInterimTranscript('');
         }
       };
@@ -170,14 +196,24 @@ const EnhancedMegaAvatar: React.FC<EnhancedMegaAvatarProps> = React.memo(({
       recognitionRef.current.onerror = (event: SpeechRecognitionErrorEvent) => {
         console.error('Speech recognition error:', event.error);
         setIsListening(false);
+        toast({
+          title: "Speech Recognition Error",
+          description: `Error: ${event.error}. Please try again.`,
+          variant: "destructive",
+        });
       };
 
       recognitionRef.current.start();
       setIsListening(true);
     } else {
       console.warn(t('speechRecognitionNotSupported'));
+      toast({
+        title: "Speech Recognition Not Supported",
+        description: "Your browser does not support speech recognition.",
+        variant: "destructive",
+      });
     }
-  }, [playerId, onMessageUpdate, t]);
+  }, [addMessage, t]);
 
   const stopListening = useCallback(() => {
     if (recognitionRef.current) {
@@ -202,6 +238,22 @@ const EnhancedMegaAvatar: React.FC<EnhancedMegaAvatarProps> = React.memo(({
       startListening();
     }
   }, [isListening, startListening, stopListening]);
+
+  const getTooltipPosition = useCallback(() => {
+    const avatarX = x.get();
+    const avatarY = y.get();
+    const distanceToRight = window.innerWidth - avatarX;
+    const distanceToBottom = window.innerHeight - avatarY;
+    const distanceToLeft = avatarX;
+    const distanceToTop = avatarY;
+
+    const maxDistance = Math.max(distanceToRight, distanceToBottom, distanceToLeft, distanceToTop);
+
+    if (maxDistance === distanceToRight) return { left: '100%', top: '50%', transform: 'translateY(-50%)' };
+    if (maxDistance === distanceToBottom) return { left: '50%', top: '100%', transform: 'translateX(-50%)' };
+    if (maxDistance === distanceToLeft) return { right: '100%', top: '50%', transform: 'translateY(-50%)' };
+    return { left: '50%', bottom: '100%', transform: 'translateX(-50%)' };
+  }, [x, y]);
 
   return (
     <animated.div
@@ -276,38 +328,42 @@ const EnhancedMegaAvatar: React.FC<EnhancedMegaAvatarProps> = React.memo(({
           {player.username}
         </div>
       )}
-      {messages.map((message, index) => (
-        <div
-          key={index}
-          style={{
-            marginTop: '5px',
-            backgroundColor: 'rgba(0, 0, 0, 0.13)',
-            color: '#E1FF01',
-            padding: '2px 6px',
-            borderRadius: '10px',
-            fontSize: '0.75rem',
-            maxWidth: '100%',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          {message}
-        </div>
-      ))}
+      <div
+        style={{
+          position: 'absolute',
+          ...getTooltipPosition(),
+          zIndex: 1000,
+        }}
+      >
+        {messageTransitions((style, message) => (
+          <animated.div
+            style={{
+              ...style,
+              backgroundColor: 'rgba(0, 0, 0, 0.13)',
+              color: '#E1FF01',
+              padding: '2px 6px',
+              borderRadius: '10px',
+              fontSize: '0.75rem',
+              maxWidth: '200px',
+              marginBottom: '5px',
+            }}
+          >
+            {message.text}
+          </animated.div>
+        ))}
+      </div>
       {interimTranscript && (
         <div
           style={{
-            marginTop: '5px',
+            position: 'absolute',
+            ...getTooltipPosition(),
+            zIndex: 1001,
             backgroundColor: 'rgba(0, 0, 0, 0.13)',
             color: '#E1FF01',
             padding: '2px 6px',
             borderRadius: '10px',
             fontSize: '0.75rem',
-            maxWidth: '100%',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
+            maxWidth: '200px',
             fontStyle: 'italic',
           }}
         >
