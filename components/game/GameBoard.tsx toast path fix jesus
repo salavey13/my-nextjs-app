@@ -10,7 +10,7 @@ import EnhancedMegaAvatar from './EnhancedMegaAvatar';
 import useTelegram from '@/hooks/useTelegram';
 import LoadingSpinner from "../ui/LoadingSpinner";
 import InfinityMirror from './InfinityMirror';
-import { toast } from '@/components/ui/use-toast';
+import { toast } from '@/hooks/use-toast';
 
 const CARD_PROXIMITY_THRESHOLD = 13;
 
