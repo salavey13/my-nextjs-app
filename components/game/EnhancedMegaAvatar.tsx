@@ -3,7 +3,6 @@ import { useSpring, animated, to } from '@react-spring/web';
 import { useGesture } from '@use-gesture/react';
 import { useAppContext } from '@/context/AppContext';
 import ShineBorder from '@/components/ui/ShineBorder';
-import { supabase } from '@/lib/supabaseClient';
 import { Mic, MicOff } from 'lucide-react';
 import { Button } from "@/components/ui/button"
 
@@ -18,11 +17,27 @@ interface SpeechRecognition extends EventTarget {
   stop: () => void;
 }
 
-interface SpeechRecognitionEvent {
+interface SpeechRecognitionEvent extends Event {
   results: SpeechRecognitionResultList;
 }
 
-interface SpeechRecognitionErrorEvent {
+interface SpeechRecognitionResultList {
+  [index: number]: SpeechRecognitionResult;
+  length: number;
+}
+
+interface SpeechRecognitionResult {
+  [index: number]: SpeechRecognitionAlternative;
+  isFinal: boolean;
+  length: number;
+}
+
+interface SpeechRecognitionAlternative {
+  transcript: string;
+  confidence: number;
+}
+
+interface SpeechRecognitionErrorEvent extends Event {
   error: string;
   message: string;
 }
@@ -127,7 +142,7 @@ const EnhancedMegaAvatar: React.FC<EnhancedMegaAvatarProps> = React.memo(({
         let interimTranscript = '';
         let finalTranscript = '';
 
-        for (let i = event.resultIndex; i < event.results.length; ++i) {
+        for (let i = 0; i < event.results.length; ++i) {
           if (event.results[i].isFinal) {
             finalTranscript += event.results[i][0].transcript;
           } else {
