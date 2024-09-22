@@ -1,5 +1,5 @@
 import React, { useCallback, useState, useEffect } from 'react';
-import { useSpring, animated, to } from 'react-spring';
+import { useSpring, animated, to } from '@react-spring/web';
 import { useGesture } from '@use-gesture/react';
 import { useAppContext } from '@/context/AppContext';
 import ShineBorder from '@/components/ui/ShineBorder';
@@ -60,12 +60,21 @@ interface EnhancedMegaAvatarProps {
   onMessageUpdate: (playerId: string, messages: string[]) => void;
 }
 
-const profanityList = ['fuck', 'shit', 'ass']; // Add more words as needed
+const profanityList = [
+  'fuck', 'shit', 'ass', 'bitch', 'cunt', 'dick', 'pussy', 'cock', 'asshole',
+  'motherfucker', 'bastard', 'slut', 'whore', 'damn', 'hell', 'piss', 'crap',
+  'nigger', 'faggot', 'retard', 'twat', 'wanker', 'bollocks', 'prick', 'tits'
+];
 
 const censorMessage = (message: string): string => {
-  return message.split(' ').map(word => 
-    profanityList.includes(word.toLowerCase()) ? '*'.repeat(word.length) : word
-  ).join(' ');
+  const words = message.split(' ');
+  return words.map(word => {
+    const lowerWord = word.toLowerCase();
+    if (profanityList.some(profanity => lowerWord.includes(profanity))) {
+      return '*'.repeat(word.length);
+    }
+    return word;
+  }).join(' ');
 };
 
 const EnhancedMegaAvatar: React.FC<EnhancedMegaAvatarProps> = React.memo(({ 
@@ -230,7 +239,7 @@ const EnhancedMegaAvatar: React.FC<EnhancedMegaAvatarProps> = React.memo(({
         >
           {message}
         </div>
-      )}
+      ))}
     </animated.div>
   );
 });
