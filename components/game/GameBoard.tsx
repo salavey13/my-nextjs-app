@@ -1,13 +1,16 @@
+"use client"
+
 import React, { useState, useEffect, useCallback, useRef, Suspense } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 import { MegaCard, CardId } from '@/components/game/MegaCard';
 import { Button } from '@/components/ui/button';
 import { useAppContext } from '@/context/AppContext';
 import { Settings, PhysicsSettings } from './Settings';
-import MegaAvatar from './MegaAvatar';
+import EnhancedMegaAvatar from './EnhancedMegaAvatar';
 import useTelegram from '@/hooks/useTelegram';
 import LoadingSpinner from "../ui/LoadingSpinner";
-import InfinityMirror from './InfinityMirror'
+import InfinityMirror from './InfinityMirror';
+
 const CARD_PROXIMITY_THRESHOLD = 13;
 
 interface Point {
@@ -31,6 +34,7 @@ interface Player {
   id: string;
   username: string;
   position: { x: number; y: number };
+  messages: string[];
 }
 
 interface GameState {
@@ -191,6 +195,7 @@ const GameBoard: React.FC = () => {
           id: user.id.toString(),
           username: user.telegram_username || 'Anonymous',
           position: { x: Math.random() * (window.innerWidth - 128) / window.innerWidth, y: Math.random() * (window.innerHeight - 256) / window.innerHeight + 128 / window.innerHeight },
+          messages: [],
         };
         
         const updatedPlayers = [...(gameState.players || []), newPlayer];
@@ -230,6 +235,27 @@ const GameBoard: React.FC = () => {
 
     if (error) {
       console.error('Error updating player position:', error);
+    } else {
+      setGameState(updatedGameState);
+    }
+  }, [gameState, user?.currentGameId]);
+
+  const handleMessageUpdate = useCallback(async (playerId: string, messages: string[]) => {
+    if (!gameState || !user?.currentGameId) return;
+
+    const updatedPlayers = gameState.players.map((player) =>
+      player.id === playerId ? { ...player, messages } : player
+    );
+
+    const updatedGameState = { ...gameState, players: updatedPlayers };
+
+    const { error } = await supabase
+      .from('rents')
+      .update({ game_state: updatedGameState })
+      .eq('id', user.currentGameId);
+
+    if (error) {
+      console.error('Error updating player messages:', error);
     } else {
       setGameState(updatedGameState);
     }
@@ -302,10 +328,10 @@ const GameBoard: React.FC = () => {
       window.removeEventListener('resize', handleResize);
     };
   }, []);
+
   return (
     <Suspense fallback={<LoadingSpinner />}>
       <div className="game-board h-[calc(100vh-128px)] relative overflow-hidden">
-        {/* Add the InfinityMirror component as the background */}
         <div className="absolute inset-0 z-0">
           <InfinityMirror layers={15} baseColor="#282c33" accentColor="#e1ff01" />
         </div>
@@ -313,43 +339,44 @@ const GameBoard: React.FC = () => {
         <div className="relative z-10">
           <Settings onUpdateSettings={handleUpdateSettings} initialSettings={physicsParams} />
 
-        {gameState?.cards.map((card) => (
-          <MegaCard
-            key={card.id}
-            card={card}
-            onCardUpdate={onCardUpdate}
-            forceFlipped={gameState.players.some(player => 
-              player.id === user?.id?.toString() && isCardNearPlayer(card, player)
-            )}
-            isShuffling={isShuffling}
-            physicsParams={physicsParams}
-          />
-        ))}
+          {gameState?.cards.map((card) => (
+            <MegaCard
+              key={card.id}
+              card={card}
+              onCardUpdate={onCardUpdate}
+              forceFlipped={gameState.players.some(player => 
+                player.id === user?.id?.toString() && isCardNearPlayer(card, player)
+              )}
+              isShuffling={isShuffling}
+              physicsParams={physicsParams}
+            />
+          ))}
 
-        <div
-          style={{
-            width: '42px',
-            height: '63px',
-            position: 'absolute',
-            borderColor: "#E1FF01",
-            top: targetFrame.y,
-            left: targetFrame.x,
-            transform: `rotate(${targetFrame.rotation}deg)`,
-            border: '2px dashed #E1FF01',
-            borderRadius: '5px',
-          }}
-        />
-
-        {gameState?.players?.map((player) => (
-          <MegaAvatar
-            key={player.id}
-            gameState={gameState}
-            playerId={player.id}
-            initialPosition={player.position}
-            onPositionChange={handlePositionChange}
+          <div
+            style={{
+              width: '42px',
+              height: '63px',
+              position: 'absolute',
+              borderColor: "#E1FF01",
+              top: targetFrame.y,
+              left: targetFrame.x,
+              transform: `rotate(${targetFrame.rotation}deg)`,
+              border: '2px dashed #E1FF01',
+              borderRadius: '5px',
+            }}
           />
-        ))}
-      </div>
+
+          {gameState?.players?.map((player) => (
+            <EnhancedMegaAvatar
+              key={player.id}
+              gameState={gameState}
+              playerId={player.id}
+              initialPosition={player.position}
+              onPositionChange={handlePositionChange}
+              onMessageUpdate={handleMessageUpdate}
+            />
+          ))}
+        </div>
       </div>  
     </Suspense>
   );
