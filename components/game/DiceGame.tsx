@@ -53,40 +53,31 @@ const DiceGame: React.FC = () => {
   const [soundEnabled, setSoundEnabled] = useState(true);
   const lastUpdateRef = useRef<number>(0);
 
-  const updateSupabase = async (updatedGameState: GameState): Promise<void> => {
+  const updateSupabase = useCallback(async (updatedGameState: GameState): Promise<void> => {
     if (!user?.currentGameId) return;
 
-    const now = Date.now();
-    if (now - lastUpdateRef.current < 100) return; // Throttle updates
-    lastUpdateRef.current = now;
+    try {
+      const { error } = await supabase
+        .from('rents')
+        .update({ 
+          game_state: {
+            ...updatedGameState,
+            gameType: 'DiceGame',
+            availableGames: ['GameBoard', 'DiceGame']
+          } 
+        })
+        .eq('id', user.currentGameId);
 
-    const updateWithRetry = async (retryCount: number = 0): Promise<void> => {
-      try {
-        const { error } = await supabase
-          .from('rents')
-          .update({ game_state: updatedGameState })
-          .eq('id', user.currentGameId);
-
-        if (error) {
-          throw error;
-        }
-      } catch (error) {
-        console.error('Error updating game state:', error);
-        if (retryCount < 1) {
-          console.log('Retrying update...');
-          await updateWithRetry(retryCount + 1);
-        } else {
-          toast({
-            title: t('updateError'),
-            description: t('updateErrorDescription'),
-            variant: "destructive",
-          });
-        }
-      }
-    };
-
-    await updateWithRetry();
-  };
+      if (error) throw error;
+    } catch (error) {
+      console.error('Error updating game state:', error);
+      toast({
+        title: t('updateError'),
+        description: t('updateErrorDescription'),
+        variant: "destructive",
+      });
+    }
+  }, [user?.currentGameId, t]);
 
   const rollDice = useCallback(async () => {
     if (!gameState || gameState.isRolling || !user?.id) return;
