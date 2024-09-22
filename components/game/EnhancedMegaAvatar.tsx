@@ -1,16 +1,19 @@
-import React, { useCallback, useState, useEffect } from 'react';
+import React, { useCallback, useState, useEffect, useRef } from 'react';
 import { useSpring, animated, to } from '@react-spring/web';
 import { useGesture } from '@use-gesture/react';
 import { useAppContext } from '@/context/AppContext';
 import ShineBorder from '@/components/ui/ShineBorder';
 import { supabase } from '@/lib/supabaseClient';
+import { Mic, MicOff } from 'lucide-react';
+import { Button } from "@/components/ui/button"
 
-// Add these type definitions at the top of the file
 interface SpeechRecognition extends EventTarget {
   continuous: boolean;
   interimResults: boolean;
   lang: string;
   onresult: (event: SpeechRecognitionEvent) => void;
+  onend: () => void;
+  onerror: (event: SpeechRecognitionErrorEvent) => void;
   start: () => void;
   stop: () => void;
 }
@@ -19,20 +22,9 @@ interface SpeechRecognitionEvent {
   results: SpeechRecognitionResultList;
 }
 
-interface SpeechRecognitionResultList {
-  [index: number]: SpeechRecognitionResult;
-  length: number;
-}
-
-interface SpeechRecognitionResult {
-  [index: number]: SpeechRecognitionAlternative;
-  isFinal: boolean;
-  length: number;
-}
-
-interface SpeechRecognitionAlternative {
-  transcript: string;
-  confidence: number;
+interface SpeechRecognitionErrorEvent {
+  error: string;
+  message: string;
 }
 
 interface Window {
@@ -87,6 +79,9 @@ const EnhancedMegaAvatar: React.FC<EnhancedMegaAvatarProps> = React.memo(({
   const { user, t } = useAppContext();
   const player = gameState.players.find(p => p.id === playerId);
   const [messages, setMessages] = useState<string[]>([]);
+  const [isListening, setIsListening] = useState(false);
+  const [interimTranscript, setInterimTranscript] = useState('');
+  const recognitionRef = useRef<SpeechRecognition | null>(null);
 
   const [{ x, y }, api] = useSpring(() => ({
     x: initialPosition.x * window.innerWidth,
@@ -120,44 +115,78 @@ const EnhancedMegaAvatar: React.FC<EnhancedMegaAvatarProps> = React.memo(({
     }
   }, [player]);
 
-  useEffect(() => {
-    if (playerId === user?.id?.toString()) {
-      let recognition: SpeechRecognition | null = null;
+  const startListening = useCallback(() => {
+    const SpeechRecognitionConstructor = (window as Window).SpeechRecognition || (window as Window).webkitSpeechRecognition;
 
-      const SpeechRecognitionConstructor = (window as Window).SpeechRecognition || (window as Window).webkitSpeechRecognition;
+    if (SpeechRecognitionConstructor) {
+      recognitionRef.current = new SpeechRecognitionConstructor();
+      recognitionRef.current.continuous = true;
+      recognitionRef.current.interimResults = true;
 
-      if (SpeechRecognitionConstructor) {
-        recognition = new SpeechRecognitionConstructor();
-        recognition.continuous = true;
-        recognition.interimResults = true;
+      recognitionRef.current.onresult = (event: SpeechRecognitionEvent) => {
+        let interimTranscript = '';
+        let finalTranscript = '';
 
-        recognition.onresult = (event: SpeechRecognitionEvent) => {
-          const transcript = Array.from(event.results)
-            .map(result => result[0].transcript)
-            .join('');
-
-          if (event.results[0].isFinal) {
-            const censoredMessage = censorMessage(transcript);
-            setMessages(prevMessages => {
-              const updatedMessages = [...prevMessages, censoredMessage].slice(-2);
-              onMessageUpdate(playerId, updatedMessages);
-              return updatedMessages;
-            });
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+          if (event.results[i].isFinal) {
+            finalTranscript += event.results[i][0].transcript;
+          } else {
+            interimTranscript += event.results[i][0].transcript;
           }
-        };
+        }
 
-        recognition.start();
-      } else {
-        console.warn(t('speechRecognitionNotSupported'));
-      }
+        setInterimTranscript(interimTranscript);
 
-      return () => {
-        if (recognition) {
-          recognition.stop();
+        if (finalTranscript !== '') {
+          const censoredMessage = censorMessage(finalTranscript);
+          setMessages(prevMessages => {
+            const updatedMessages = [...prevMessages, censoredMessage].slice(-2);
+            onMessageUpdate(playerId, updatedMessages);
+            return updatedMessages;
+          });
+          setInterimTranscript('');
         }
       };
+
+      recognitionRef.current.onend = () => {
+        setIsListening(false);
+      };
+
+      recognitionRef.current.onerror = (event: SpeechRecognitionErrorEvent) => {
+        console.error('Speech recognition error:', event.error);
+        setIsListening(false);
+      };
+
+      recognitionRef.current.start();
+      setIsListening(true);
+    } else {
+      console.warn(t('speechRecognitionNotSupported'));
     }
-  }, [playerId, user?.id, onMessageUpdate, t]);
+  }, [playerId, onMessageUpdate, t]);
+
+  const stopListening = useCallback(() => {
+    if (recognitionRef.current) {
+      recognitionRef.current.stop();
+      setIsListening(false);
+      setInterimTranscript('');
+    }
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (recognitionRef.current) {
+        recognitionRef.current.stop();
+      }
+    };
+  }, []);
+
+  const toggleListening = useCallback(() => {
+    if (isListening) {
+      stopListening();
+    } else {
+      startListening();
+    }
+  }, [isListening, startListening, stopListening]);
 
   return (
     <animated.div
@@ -181,6 +210,7 @@ const EnhancedMegaAvatar: React.FC<EnhancedMegaAvatarProps> = React.memo(({
             borderRadius: '50%',
             backgroundColor: player?.id === user?.id?.toString() ? 'rgba(225, 255, 1, 0.2)' : 'transparent',
             display: 'flex',
+            flexDirection: 'column',
             justifyContent: 'center',
             alignItems: 'center',
           }}
@@ -201,6 +231,16 @@ const EnhancedMegaAvatar: React.FC<EnhancedMegaAvatarProps> = React.memo(({
           >
             {player?.username.charAt(0).toUpperCase()}
           </div>
+          {player?.id === user?.id?.toString() && (
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={toggleListening}
+              className="mt-2"
+            >
+              {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+            </Button>
+          )}
         </div>
       </ShineBorder>
       {player && (
@@ -240,6 +280,25 @@ const EnhancedMegaAvatar: React.FC<EnhancedMegaAvatarProps> = React.memo(({
           {message}
         </div>
       ))}
+      {interimTranscript && (
+        <div
+          style={{
+            marginTop: '5px',
+            backgroundColor: 'rgba(0, 0, 0, 0.13)',
+            color: '#E1FF01',
+            padding: '2px 6px',
+            borderRadius: '10px',
+            fontSize: '0.75rem',
+            maxWidth: '100%',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+            fontStyle: 'italic',
+          }}
+        >
+          {interimTranscript}
+        </div>
+      )}
     </animated.div>
   );
 });
