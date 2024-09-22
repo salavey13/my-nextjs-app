@@ -1,24 +1,64 @@
+copy
+
+
 // components/HackButton.tsx
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAppContext } from '@/context/AppContext';
 import { Button } from '@/components/ui/button';
-import { toast } from 'react-toastify';
 import { supabase } from "../lib/supabaseClient";
 import GameBoard from './game/GameBoard';
+import DiceGame from './game/DiceGame';
+import { toast } from "@/hooks/use-toast";
+
+interface GameState {
+  cards: any[];
+  players: any[];
+  // Add other necessary fields from GameBoard's GameState
+}
 
 const HackButton: React.FC = () => {
-  const { t, store } = useAppContext();
+  const { t, user } = useAppContext();
+  const [selectedGame, setSelectedGame] = useState<'cards' | 'dice' | null>(null);
+  const [gameState, setGameState] = useState<GameState | null>(null);
+
+  useEffect(() => {
+    const fetchGameState = async () => {
+      if (!user?.currentGameId) return;
+
+      const { data, error } = await supabase
+        .from('rents')
+        .select('game_state')
+        .eq('id', user.currentGameId)
+        .single();
+
+      if (error) {
+        console.error('Error fetching game state:', error);
+      } else {
+        setGameState(data.game_state);
+      }
+    };
+
+    fetchGameState();
+  }, [user?.currentGameId]);
 
   const handleClick = async () => {
     try {
-      // Update the user balance
-      // Step 1: Fetch the current value of the 'coins' field
-      const { data: user, error: fetchError } = await supabase
+      if (!user?.id) {
+        toast({
+          title: t('error'),
+          description: t('userNotFound'),
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Fetch the current value of the 'coins' field
+      const { data: userData, error: fetchError } = await supabase
         .from('users')
         .select('coins')
-        .eq('telegram_id', store.tg_id)
+        .eq('id', user.id)
         .single();
 
       if (fetchError) {
@@ -26,37 +66,71 @@ const HackButton: React.FC = () => {
         return;
       }
 
-      // Step 2: Increment the 'coins' field by 13000
-      const newCoinsValue = user.coins + 13000;
+      // Increment the 'coins' field by 13000
+      const newCoinsValue = (userData?.coins || 0) + 13000;
 
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('users')
         .update({ coins: newCoinsValue })
-        .eq('telegram_id', store.tg_id);
+        .eq('id', user.id);
 
       if (error) {
         console.error('Error updating coins:', error);
+        toast({
+          title: t('error'),
+          description: t('updateCoinsError'),
+          variant: "destructive",
+        });
       } else {
-        console.log('Coins updated successfully:', data);
+        toast({
+          title: t('success'),
+          description: t('congratulationsMessage'),
+        });
       }
-
-      // Show success message
-      alert(t('congratulationsMessage'));
     } catch (error) {
       console.error('Error updating balance:', error);
-    } finally {
+      toast({
+        title: t('error'),
+        description: t('generalError'),
+        variant: "destructive",
+      });
     }
   };
 
   return (
-    <div className="flex ">
-      {/* <Button
-        onClick={handleClick}justify-center items-center min-h-[calc(100vh-128px)]
-        className="bg-blue-500 text-white text-xl px-6 py-3 rounded-lg shadow-lg hover:bg-blue-600 transition-all"
-      >
-        {t('hackButton')}
-      </Button> */}
-      <GameBoard/>
+    <div className="flex flex-col justify-center items-center min-h-[calc(100vh-128px)]">
+      {!selectedGame && (
+        <>
+          <Button
+            onClick={() => setSelectedGame('cards')}
+            className="bg-blue-500 text-white text-xl px-6 py-3 rounded-lg shadow-lg hover:bg-blue-600 transition-all mb-4"
+          >
+            {t('playCards')}
+          </Button>
+          <Button
+            onClick={() => setSelectedGame('dice')}
+            className="bg-green-500 text-white text-xl px-6 py-3 rounded-lg shadow-lg hover:bg-green-600 transition-all mb-4"
+          >
+            {t('playDice')}
+          </Button>
+          <Button
+            onClick={handleClick}
+            className="bg-yellow-500 text-black text-xl px-6 py-3 rounded-lg shadow-lg hover:bg-yellow-600 transition-all"
+          >
+            {t('hackButton')}
+          </Button>
+        </>
+      )}
+      {selectedGame === 'cards' && gameState && <GameBoard />}
+      {selectedGame === 'dice' && <DiceGame />}
+      {selectedGame && (
+        <Button
+          onClick={() => setSelectedGame(null)}
+          className="mt-4 bg-gray-500 text-white text-xl px-6 py-3 rounded-lg shadow-lg hover:bg-gray-600 transition-all"
+        >
+          {t('backToMenu')}
+        </Button>
+      )}
     </div>
   );
 };
