@@ -190,7 +190,7 @@ function Scene({ gameState, onRollComplete, wallTexture }: { gameState: GameStat
       break;
     default:
       // Default portrait
-      setGyro({ x: -(z as number), y: (x as number), z: (y as number) });
+      setGyro({ x: (z as number), y: (y as number), z: (x as number) });
       break;
   }
 };
@@ -510,7 +510,7 @@ function Scene({ gameState, onRollComplete, wallTexture }: { gameState: GameStat
                 </div>
             ))}
 
-            <div className="game-board h-[calc(100vh-313px)] relative overflow-hidden">
+            <div className="game-board h-[calc(100vh-340px)] relative overflow-hidden">
                 <Canvas shadows>
                 <Scene gameState={gameState} onRollComplete={handleRollComplete} wallTexture={wallTexture} />
                 </Canvas>
