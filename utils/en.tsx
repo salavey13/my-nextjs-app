@@ -557,4 +557,6 @@ createTask: "Create Task",
   tryAgainLater: "Please try again later",
   hacking: "Hacking...",
   hack: "Hack",
+  currentTurn: "Current Turn",
+  turn: "turn",
 }

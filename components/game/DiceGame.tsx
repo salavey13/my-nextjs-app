@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, Suspense } from 'react'
 import { useAppContext } from '@/context/AppContext'
 import { supabase } from '@/lib/supabaseClient'
 import { Button } from "@/components/ui/button"
@@ -14,6 +14,8 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { Box, Text, useTexture, Environment } from '@react-three/drei'
 import { Physics, useBox, usePlane } from '@react-three/cannon'
 import { Mesh, Vector3, Quaternion, Euler } from 'three'
+import LoadingSpinner from '../ui/LoadingSpinner'
+import InfinityMirror from './InfinityMirror'
 
 interface Player {
   id: string
@@ -185,7 +187,7 @@ function Scene({ gameState, onRollComplete, wallTexture }: { gameState: GameStat
   
     return (
       <>
-        <ambientLight intensity={0.5} />
+        <ambientLight intensity={1.99} />
         <pointLight position={[10, 10, 10]} />
         <Physics>
           <Dice
@@ -206,6 +208,7 @@ function Scene({ gameState, onRollComplete, wallTexture }: { gameState: GameStat
           <Wall position={[0, 5, -5]} rotation={[0, 0, 0]} texture={wallTexture} />
           <Wall position={[5, 5, 0]} rotation={[0, -Math.PI / 2, 0]} texture={wallTexture} />
           <Wall position={[-5, 5, 0]} rotation={[0, Math.PI / 2, 0]} texture={wallTexture} />
+          <Wall position={[0, 5, 5]} rotation={[0, Math.PI, 0]} texture={wallTexture} />
         </Physics>
         <Text
           position={[0, 6, 0]}
@@ -213,6 +216,7 @@ function Scene({ gameState, onRollComplete, wallTexture }: { gameState: GameStat
           color="#e1ff01"
           anchorX="center"
           anchorY="middle"
+          rotation={[0, Math.PI / 4, 0]} 
         >
           {`${gameState.players.find(p => p.id === gameState.currentPlayer)?.username}'s ${t('turn')}`}
         </Text>
@@ -386,14 +390,30 @@ function Scene({ gameState, onRollComplete, wallTexture }: { gameState: GameStat
   }
 
   useEffect(() => {
-    tg?.MainButton?.hide()
-    tg?.BackButton?.show()
-    tg?.BackButton?.onClick(goBack)
-
-    return () => {
-      tg?.BackButton?.onClick(goBack)
+    if (!tg) return;
+  
+    tg?.BackButton?.show();
+    tg?.BackButton?.onClick(goBack);
+  
+    // Setup Telegram MainButton
+    if (gameState && !gameState.winner) {
+      tg?.MainButton?.show();
+      tg?.MainButton?.setText(gameState.isRolling ? t('rolling') : t('rollDice'));
+      tg?.MainButton?.setParams({ is_active: gameState.isRolling || gameState.currentPlayer !== String(user?.id) });
+  
+      tg?.MainButton?.onClick(() => {
+        if (!gameState.isRolling && gameState.currentPlayer === String(user?.id)) {
+          rollDice();
+        }
+      });
     }
-  }, [tg])
+  
+    return () => {
+      // Cleanup when unmounting
+      tg?.MainButton?.hide();
+      tg?.BackButton?.onClick(goBack); // Remove listener on cleanup
+    };
+  }, [tg, gameState, user]);
 
 
   useEffect(() => {
@@ -442,50 +462,59 @@ function Scene({ gameState, onRollComplete, wallTexture }: { gameState: GameStat
   }
 
   return (
-    <div className="flex flex-col items-stretch justify-between min-h-screen bg-gray-900 text-white p-4">
-      <div className="flex justify-end mb-4">
-        <Button onClick={toggleSound} variant="ghost" size="icon" className="fixed top-4 right-4 z-10">
-          <FontAwesomeIcon icon={soundEnabled ? faVolumeUp : faVolumeMute} />
-        </Button>
-      </div>
-
-      <h1 className="text-3xl font-bold mb-6 text-center">{t('diceGame')}</h1>
-
-      {!gameState ? (
-        <GameModes onSelectMode={startGame} onShowRules={() => setShowRules(true)} />
-      ) : (
-        <div className="flex flex-col items-center flex-grow">
-          {gameState.players.map((player, index) => (
-            <div key={player.id} className="text-2xl mb-4">
-              {player.username}: {player.score}
-              {gameState.currentPlayer === player.id && ` (${t('currentTurn')})`}
-            </div>
-          ))}
-
-          <div className="w-full h-64 mb-6 flex-grow">
-            <Canvas shadows>
-              <Scene gameState={gameState} onRollComplete={handleRollComplete} wallTexture={wallTexture} />
-            </Canvas>
-          </div>
-
-          {gameState.winner ? (
-            <div className="text-3xl font-bold mt-6">
-              {gameState.winner === String(user?.id) 
-                ? t('youWon')
-                : t('youLost')}
-            </div>
-          ) : (
-            <Button
-              onClick={rollDice}
-              disabled={gameState.isRolling || gameState.currentPlayer !== String(user?.id)}
-              className="bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-2 px-4 rounded-full"
-            >
-              {gameState.isRolling ? t('rolling') : t('rollDice')}
-            </Button>
-          )}
+    <Suspense fallback={<LoadingSpinner />}>
+      <div className="game-board h-[calc(100vh-128px)] relative overflow-hidden">
+        <div className="absolute inset-0 z-[-10]">
+          <InfinityMirror layers={15} baseColor="#282c33" accentColor="#e1ff01" />
         </div>
-      )}
-    </div>
+        <div className="flex justify-end mb-4">
+            <Button onClick={toggleSound} variant="ghost" size="icon" className="fixed top-4 right-4 z-10">
+            <FontAwesomeIcon icon={soundEnabled ? faVolumeUp : faVolumeMute} />
+            </Button>
+        </div>
+
+        <h1 className="text-3xl font-bold mb-6 text-center">{t('diceGame')}</h1>
+
+        {!gameState ? (
+            <div className="flex flex-col justify-center items-center min-h-[calc(100vh-128px)] flex-grow">
+                <GameModes onSelectMode={startGame} onShowRules={() => setShowRules(true)} />
+            </div>
+        ) : (
+            <div className="flex flex-col items-center flex-grow">
+            {gameState.players.map((player, index) => (
+                <div key={player.id} className="text-2xl mb-4">
+                {player.username}: {player.score}
+                {gameState.currentPlayer === player.id && ` (${t('currentTurn')})`}
+                </div>
+            ))}
+
+            <div className="game-board h-[calc(100vh-313px)] relative overflow-hidden">
+                <Canvas shadows>
+                <Scene gameState={gameState} onRollComplete={handleRollComplete} wallTexture={wallTexture} />
+                </Canvas>
+            </div>
+
+            {gameState.winner && (
+                <div className="text-3xl font-bold mt-6">
+                {gameState.winner === String(user?.id) 
+                    ? t('youWon')
+                    : t('youLost')}
+                </div>
+            ) }
+
+            { (tg && tg.MainButton && !tg.MainButton.isVisible) && (
+                <Button
+                onClick={rollDice}
+                disabled={gameState.isRolling || gameState.currentPlayer !== String(user?.id)}
+                className="bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-2 px-4 rounded-full"
+                >
+                    {gameState.isRolling ? t('rolling') : t('rollDice')}
+                </Button>
+            )}
+            </div>
+        )}
+        </div>
+    </Suspense>
   )
 }
 

@@ -462,4 +462,6 @@ createTask: "Створити завдання",
   tryAgainLater: "Спробуйте пізніше",
   hacking: "Злом...",
   hack: "Зламати",
+  currentTurn: "Твоя черга",
+  turn: "черга",
 }
