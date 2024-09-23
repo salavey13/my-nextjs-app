@@ -190,7 +190,7 @@ function Scene({ gameState, onRollComplete, wallTexture }: { gameState: GameStat
       break;
     default:
       // Default portrait
-      setGyro({ x: (x as number), y: (y as number), z: (z as number) });
+      setGyro({ x: (z as number), y: (y as number), z: (x as number) });
       break;
   }
 };
@@ -413,7 +413,7 @@ function Scene({ gameState, onRollComplete, wallTexture }: { gameState: GameStat
     tg?.BackButton?.show();
     tg?.BackButton?.onClick(goBack);
   
-    // Update MainButton based on game state
+    /* Update MainButton based on game state
     if (gameState && !gameState.winner) {
       tg?.MainButton?.show();
       tg?.MainButton?.setText(gameState.isRolling ? t('rolling') : t('rollDice'));
@@ -426,13 +426,13 @@ function Scene({ gameState, onRollComplete, wallTexture }: { gameState: GameStat
           rollDice();
         }
       });
-    }
+    }*/
   
     return () => {
       // Cleanup when unmounting
-      tg?.MainButton?.hide();
+      //tg?.MainButton?.hide();
       tg?.BackButton?.hide();
-      tg?.MainButton?.offClick(rollDice); // Remove listener on cleanup
+      //tg?.MainButton?.offClick(rollDice); // Remove listener on cleanup
     };
   }, [tg, gameState, user]);
 
@@ -524,7 +524,6 @@ function Scene({ gameState, onRollComplete, wallTexture }: { gameState: GameStat
                 </div>
             ) }
 
-            { (tg && tg.MainButton ) && (
                 <Button
                 onClick={rollDice}
                 disabled={gameState.isRolling || gameState.currentPlayer !== String(user?.id)}
@@ -532,7 +531,6 @@ function Scene({ gameState, onRollComplete, wallTexture }: { gameState: GameStat
                 >
                     {gameState.isRolling ? t('rolling') : t('rollDice')}
                 </Button>
-            )}
             </div>
         )}
         </div>
