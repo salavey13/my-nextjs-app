@@ -125,7 +125,7 @@ interface DiceProps {
         return (
           <mesh ref={ref} receiveShadow>
             <planeGeometry args={[10, 10]} />
-            <meshStandardMaterial color="#282c23" />
+            <meshStandardMaterial color="#282c33" />
           </mesh>
         )
       }
@@ -190,7 +190,7 @@ function Scene({ gameState, onRollComplete, wallTexture }: { gameState: GameStat
       break;
     default:
       // Default portrait
-      setGyro({ x: -(y as number), y: (z as number), z: (x as number) });
+      setGyro({ x: -(y as number), y: (z as number), z: -(x as number) });
       break;
   }
 };
@@ -486,9 +486,9 @@ function Scene({ gameState, onRollComplete, wallTexture }: { gameState: GameStat
   return (
     <Suspense fallback={<LoadingSpinner />}>
       <div className="game-board h-[calc(100vh-128px)] relative overflow-hidden">
-        <div className="absolute inset-0 z-[-10]">
+        {/* <div className="absolute inset-0 z-[-10]">
           <InfinityMirror layers={15} baseColor="#282c33" accentColor="#e1ff01" />
-        </div>
+        </div> */}
         <div className="flex justify-end mb-4">
             <Button onClick={toggleSound} variant="ghost" size="icon" className="fixed top-4 right-4 z-10">
             <FontAwesomeIcon icon={soundEnabled ? faVolumeUp : faVolumeMute} />
@@ -502,7 +502,7 @@ function Scene({ gameState, onRollComplete, wallTexture }: { gameState: GameStat
                 <GameModes onSelectMode={startGame} onShowRules={() => setShowRules(true)} />
             </div>
         ) : (
-            <div className="relative h-screen w-screen flex justify-center items-center">
+            <div className="game-board absolute inset-0 min-h-[calc(100vh-128px)] w-full overflow-hidden">
                 {/* Game Board - full screen */}
                 <div className="game-board absolute inset-0 min-h-[calc(100vh-128px)] w-full overflow-hidden">
                     <Canvas shadows className="w-full h-full">
