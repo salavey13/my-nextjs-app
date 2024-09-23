@@ -61,10 +61,10 @@ interface DiceProps {
 }
 
 function Dice({ position, onRollComplete, customTextures, gyro, isRolling, initialValue }: DiceProps) {
-  const [ref, api] = useBox<Mesh>(() => ({ mass: 1, position }))
-  const textures = useTexture(customTextures || diceFaceUrls)
-  const velocityRef = useRef<Vector3>(new Vector3())
-  const angularVelocityRef = useRef<Vector3>(new Vector3())
+    const [ref, api] = useBox<Mesh>(() => ({ mass: 1, position }))
+    const textures = useTexture(customTextures || diceFaceUrls)
+    const velocityRef = useRef<Vector3>(new Vector3())
+    const angularVelocityRef = useRef<Vector3>(new Vector3())
 
   useFrame(() => {
     api.velocity.subscribe((v) => velocityRef.current.set(v[0], v[1], v[2]))
@@ -105,7 +105,6 @@ function Dice({ position, onRollComplete, customTextures, gyro, isRolling, initi
     >
       {textures.map((texture, index) => (
         <meshStandardMaterial
-          attachArray="material"
           key={index}
           map={texture}
         />
@@ -115,24 +114,24 @@ function Dice({ position, onRollComplete, customTextures, gyro, isRolling, initi
 }
 
 function Wall({ position, rotation }: { position: [number, number, number], rotation: [number, number, number] }) {
-  const [ref] = usePlane(() => ({ position, rotation }))
-  return (
-    <mesh ref={ref} receiveShadow>
-      <planeGeometry args={[10, 10]} />
-      <meshStandardMaterial color="#282c23" />
-    </mesh>
-  )
-}
-
-function Floor() {
-  const [ref] = usePlane(() => ({ rotation: [-Math.PI / 2, 0, 0] }))
-  return (
-    <mesh ref={ref} receiveShadow>
-      <planeGeometry args={[10, 10]} />
-      <meshStandardMaterial color="#282c23" />
-    </mesh>
-  )
-}
+    const [ref] = usePlane<Mesh>(() => ({ position, rotation }))
+    return (
+      <mesh ref={ref} receiveShadow>
+        <planeGeometry args={[10, 10]} />
+        <meshStandardMaterial color="#282c23" />
+      </mesh>
+    )
+  }
+  
+  function Floor() {
+    const [ref] = usePlane<Mesh>(() => ({ rotation: [-Math.PI / 2, 0, 0] }))
+    return (
+      <mesh ref={ref} receiveShadow>
+        <planeGeometry args={[10, 10]} />
+        <meshStandardMaterial color="#282c23" />
+      </mesh>
+    )
+  }
 
 function getDiceValue(rotation: { x: number; y: number; z: number }): number {
   const eps = 0.1
@@ -221,37 +220,102 @@ function Scene({ gameState, onRollComplete }: { gameState: GameState, onRollComp
 }
 
 const DiceGame: React.FC = () => {
-  const { user, t } = useAppContext()
-  const { tg } = useTelegram()
-  const [gameState, setGameState] = useState<GameState | null>(null)
-  const [soundEnabled, setSoundEnabled] = useState(true)
-  const [showRules, setShowRules] = useState(false)
-
-  const toggleSound = () => setSoundEnabled(!soundEnabled)
-
-  const startGame = async (mode: string) => {
-    if (!user?.currentGameId) {
-      toast({
-        title: t('error'),
-        description: t('noActiveGame'),
-        variant: "destructive",
-      })
-      return
+    const { user, t } = useAppContext()
+    const { tg } = useTelegram()
+    const [gameState, setGameState] = useState<GameState | null>(null)
+    const [soundEnabled, setSoundEnabled] = useState(true)
+    const [showRules, setShowRules] = useState(false)
+    const [diceRollAudio] = useState(typeof Audio !== 'undefined' ? new Audio('/dice-roll.mp3') : null)
+    const [screamAudio] = useState(typeof Audio !== 'undefined' ? new Audio('/mixkit-falling-male-scream-391.mp3') : null)
+    const [giggleAudio] = useState(typeof Audio !== 'undefined' ? new Audio('/mixkit-funny-giggling-2885.mp3') : null)
+    const [popAudio] = useState(typeof Audio !== 'undefined' ? new Audio('/mixkit-long-pop-2358.mp3') : null)
+  
+    const toggleSound = () => {
+      setSoundEnabled(!soundEnabled)
+      if (diceRollAudio) diceRollAudio.muted = soundEnabled
+      if (screamAudio) screamAudio.muted = soundEnabled
+      if (giggleAudio) giggleAudio.muted = soundEnabled
+      if (popAudio) popAudio.muted = soundEnabled
     }
-
-    const initialGameState: GameState = {
-      players: [
-        { id: String(user.id), username: user.telegram_username || 'Player 1', score: 0, diceValues: [1, 1] },
-        { id: mode === 'twoPlayer' ? 'waiting' : 'ai', username: mode === 'twoPlayer' ? 'Waiting...' : 'AI', score: 0, diceValues: [1, 1] },
-      ],
-      currentPlayer: String(user.id),
-      gameMode: mode as GameState['gameMode'],
-      isRolling: false,
-      winner: null,
+  
+    const playSound = (audio: HTMLAudioElement | null) => {
+      if (soundEnabled && audio) {
+        audio.play()
+      }
     }
-
-    await updateGameState(initialGameState)
-  }
+  
+    const startGame = async (mode: string) => {
+      if (!user?.currentGameId) {
+        toast({
+          title: t('error'),
+          description: "No active game? What a shocker! Did you forget to turn on your brain today?",
+          variant: "destructive",
+        })
+        playSound(popAudio)
+        return
+      }
+  
+      const initialGameState: GameState = {
+        players: [
+          { id: String(user.id), username: user.telegram_username || 'Player 1', score: 0, diceValues: [1, 1] },
+          { id: mode === 'twoPlayer' ? 'waiting' : 'ai', username: mode === 'twoPlayer' ? 'Waiting...' : 'AI (probably smarter than you)', score: 0, diceValues: [1, 1] },
+        ],
+        currentPlayer: String(user.id),
+        gameMode: mode as GameState['gameMode'],
+        isRolling: false,
+        winner: null,
+      }
+  
+      await updateGameState(initialGameState)
+      playSound(giggleAudio)
+    }
+  
+    const rollDice = async () => {
+      if (!gameState || gameState.isRolling || gameState.currentPlayer !== String(user?.id)) return
+  
+      const updatedGameState = { ...gameState, isRolling: true }
+      await updateGameState(updatedGameState)
+      playSound(diceRollAudio)
+  
+      setTimeout(async () => {
+        const newDiceValues: [number, number] = [
+          Math.floor(Math.random() * 6) + 1,
+          Math.floor(Math.random() * 6) + 1,
+        ]
+  
+        const currentPlayerIndex = gameState.players.findIndex(p => p.id === gameState.currentPlayer)
+        const updatedPlayers = gameState.players.map((player, index) => 
+          index === currentPlayerIndex 
+            ? { ...player, score: player.score + newDiceValues[0] + newDiceValues[1], diceValues: newDiceValues } 
+            : player
+        )
+  
+        const nextPlayerIndex = (currentPlayerIndex + 1) % gameState.players.length
+        const isGameOver = updatedPlayers.some(player => player.score >= 100)
+  
+        let winner = null
+        if (isGameOver) {
+          winner = updatedPlayers.reduce((maxPlayer, player) => 
+            player.score > maxPlayer.score ? player : maxPlayer
+          ).id
+          playSound(winner === String(user?.id) ? giggleAudio : screamAudio)
+        }
+  
+        const updatedGameState: GameState = {
+          ...gameState,
+          players: updatedPlayers,
+          currentPlayer: isGameOver ? gameState.currentPlayer : gameState.players[nextPlayerIndex].id,
+          isRolling: false,
+          winner,
+        }
+  
+        await updateGameState(updatedGameState)
+  
+        if (updatedGameState.gameMode === 'ai' && updatedGameState.currentPlayer === 'ai') {
+          setTimeout(() => rollDice(), 1000)
+        }
+      }, 1000)
+    }
 
   const updateGameState = async (newState: GameState) => {
     if (!user?.currentGameId) return
@@ -273,13 +337,6 @@ const DiceGame: React.FC = () => {
         variant: "destructive",
       })
     }
-  }
-
-  const rollDice = async () => {
-    if (!gameState || gameState.isRolling || gameState.currentPlayer !== String(user?.id)) return
-
-    const updatedGameState = { ...gameState, isRolling: true }
-    await updateGameState(updatedGameState)
   }
 
   const handleRollComplete = async (newDiceValues: [number, number]) => {
@@ -313,17 +370,12 @@ const DiceGame: React.FC = () => {
     await updateGameState(updatedGameState)
 
     if (soundEnabled) {
-      playDiceSound()
+        playSound(winner === String(user?.id) ? giggleAudio : screamAudio)
     }
 
     if (updatedGameState.gameMode === 'ai' && updatedGameState.currentPlayer === 'ai') {
       setTimeout(() => rollDice(), 1000)
     }
-  }
-
-  const playDiceSound = () => {
-    // Implement sound playing logic here
-    console.log("Playing dice sound")
   }
 
   const goBack = () => {
@@ -381,30 +433,27 @@ const DiceGame: React.FC = () => {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-white p-4">
-      <div className="flex justify-between w-full mb-4">
-        <Button onClick={goBack} variant="ghost" size="icon">
-          <FontAwesomeIcon icon={faArrowLeft} />
-        </Button>
-        <Button onClick={toggleSound} variant="ghost" size="icon">
+    <div className="flex flex-col items-stretch justify-between min-h-screen bg-gray-900 text-white p-4">
+      <div className="flex justify-end mb-4">
+        <Button onClick={toggleSound} variant="ghost" size="icon" className="fixed top-4 right-4 z-10">
           <FontAwesomeIcon icon={soundEnabled ? faVolumeUp : faVolumeMute} />
         </Button>
       </div>
 
-      <h1 className="text-3xl font-bold mb-6">{t('diceGame')}</h1>
+      <h1 className="text-3xl font-bold mb-6 text-center">{t('diceGame')} (Now with 100% more sarcasm!)</h1>
 
       {!gameState ? (
         <GameModes onSelectMode={startGame} onShowRules={() => setShowRules(true)} />
       ) : (
-        <div className="flex flex-col items-center">
+        <div className="flex flex-col items-center flex-grow">
           {gameState.players.map((player, index) => (
             <div key={player.id} className="text-2xl mb-4">
               {player.username}: {player.score}
-              {gameState.currentPlayer === player.id && " (Current Turn)"}
+              {gameState.currentPlayer === player.id && " (Current Turn - Try not to mess it up)"}
             </div>
           ))}
 
-          <div className="w-full h-64 mb-6">
+          <div className="w-full h-64 mb-6 flex-grow">
             <Canvas shadows>
               <Scene gameState={gameState} onRollComplete={handleRollComplete} />
             </Canvas>
@@ -412,7 +461,9 @@ const DiceGame: React.FC = () => {
 
           {gameState.winner ? (
             <div className="text-3xl font-bold mt-6">
-              {`${t('winner')}: ${gameState.players.find(p => p.id === gameState.winner)?.username}`}
+              {gameState.winner === String(user?.id) 
+                ? "Congratulations! You've won. Want a cookie?" 
+                : "You lost. Shocking, I know."}
             </div>
           ) : (
             <Button
@@ -420,11 +471,13 @@ const DiceGame: React.FC = () => {
               disabled={gameState.isRolling || gameState.currentPlayer !== String(user?.id)}
               className="bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-2 px-4 rounded-full"
             >
-              {gameState.isRolling ? t('rolling') : t('rollDice')}
+              {gameState.isRolling ? "Rolling (pray for luck)" : "Roll Dice (if you dare)"}
             </Button>
           )}
         </div>
       )}
+
+      {showRules && <Rules onClose={() => setShowRules(false)} />}
     </div>
   )
 }
