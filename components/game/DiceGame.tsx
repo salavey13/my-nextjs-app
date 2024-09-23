@@ -190,7 +190,7 @@ function Scene({ gameState, onRollComplete, wallTexture }: { gameState: GameStat
       break;
     default:
       // Default portrait
-      setGyro({ x: (x as number), y: (z as number), z: -(y as number) });
+      setGyro({ x: -(y as number), y: (z as number), z: (x as number) });
       break;
   }
 };
@@ -495,42 +495,53 @@ function Scene({ gameState, onRollComplete, wallTexture }: { gameState: GameStat
             </Button>
         </div>
 
-        <h1 className="text-3xl font-bold mb-6 text-center">{t('diceGame')}</h1>
+        {/* <h1 className="text-3xl font-bold mb-6 text-center">{t('diceGame')}</h1> */}
 
         {!gameState ? (
             <div className="flex flex-col justify-center items-center min-h-[calc(100vh-128px)] flex-grow">
                 <GameModes onSelectMode={startGame} onShowRules={() => setShowRules(true)} />
             </div>
         ) : (
-            <div className="flex flex-col items-center flex-grow">
-            {gameState.players.map((player, index) => (
-                <div key={player.id} className="text-l mb-4">
-                {player.username}: {player.score}
-                {gameState.currentPlayer === player.id && ` (${t('currentTurn')})`}
+            <div className="relative h-screen w-screen flex justify-center items-center">
+                {/* Game Board - full screen */}
+                <div className="game-board absolute inset-0 min-h-[calc(100vh-128px)] w-full overflow-hidden">
+                    <Canvas shadows className="w-full h-full">
+                    <Scene gameState={gameState} onRollComplete={handleRollComplete} wallTexture={wallTexture} />
+                    </Canvas>
                 </div>
-            ))}
 
-            <div className="game-board h-[calc(100vh-340px)] relative overflow-hidden">
-                <Canvas shadows>
-                <Scene gameState={gameState} onRollComplete={handleRollComplete} wallTexture={wallTexture} />
-                </Canvas>
-            </div>
+                {/* Overlay elements - positioned absolutely */}
+                <div className="absolute top-0 left-0 right-0 z-10 flex flex-col items-center space-y-6 p-4">
+                    {/* Players' Info */}
+                    <div className="flex flex-col items-center space-y-2">
+                    {gameState.players.map((player) => (
+                        <div key={player.id} className="text-lg">
+                        {player.username}: {player.score}
+                        {gameState.currentPlayer === player.id && ` (${t('currentTurn')})`}
+                        </div>
+                    ))}
+                    </div>
 
-            {gameState.winner && (
-                <div className="text-3xl font-bold mt-6">
-                {gameState.winner === String(user?.id) 
-                    ? t('youWon')
-                    : t('youLost')}
+                    {/* Winner Info */}
+                    {gameState.winner && (
+                    <div className="text-3xl font-bold">
+                        {gameState.winner === String(user?.id) ? t('youWon') : t('youLost')}
+                    </div>
+                    )}
+                    {/* Roll Dice Button - fixed at the bottom */}
+                    <div className="top-1/2  z-99">
+                        <Button
+                        onClick={rollDice}
+                        variant="outline"
+                        disabled={gameState.isRolling || gameState.currentPlayer !== String(user?.id)}
+                        className="bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-4 px-8 rounded-lg"
+                        >
+                        {gameState.isRolling ? t('rolling') : t('rollDice')}
+                        </Button>
+                    </div>
                 </div>
-            ) }
 
-                <Button
-                onClick={rollDice}
-                disabled={gameState.isRolling || gameState.currentPlayer !== String(user?.id)}
-                className="bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-2 px-4 rounded-full"
-                >
-                    {gameState.isRolling ? t('rolling') : t('rollDice')}
-                </Button>
+                
             </div>
         )}
         </div>
