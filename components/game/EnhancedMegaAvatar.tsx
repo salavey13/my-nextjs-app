@@ -124,7 +124,7 @@ const EnhancedMegaAvatar: React.FC<EnhancedMegaAvatarProps> = React.memo(({
     config: { tension: 300, friction: 20 },
   });
 
-  const handleDrag = useCallback((mx, my, down) => {
+  const handleDrag = useCallback((mx: number, my: number, down:boolean) => {
     if (!down) {
       const newX = Math.max(0, Math.min(initialPosition.x * window.innerWidth + mx, window.innerWidth - 128));
       const newY = Math.max(0, Math.min(initialPosition.y * window.innerHeight + my, window.innerHeight - 128));
