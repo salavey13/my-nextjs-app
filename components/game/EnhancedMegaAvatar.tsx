@@ -186,7 +186,7 @@ const EnhancedMegaAvatar: React.FC<EnhancedMegaAvatarProps> = React.memo(({
     if (SpeechRecognitionConstructor) {
       recognitionRef.current = new SpeechRecognitionConstructor();
       recognitionRef.current.continuous = true;
-      recognitionRef.current.interimResults = false;
+      recognitionRef.current.interimResults = true;
       recognitionRef.current.onresult = (event) => {
         let interimTranscript = '';
         let finalTranscript = '';
@@ -222,7 +222,11 @@ const EnhancedMegaAvatar: React.FC<EnhancedMegaAvatarProps> = React.memo(({
       };
 
       recognitionRef.current.onend = () => {
-        if (!isMuted) recognitionRef.current?.start();
+        if (!isMuted && hasMicPermission) {
+          setTimeout(() => {
+            recognitionRef.current?.start();
+          }, 420); // Add a slight delay
+        }
       };
 
       recognitionRef.current.start();
