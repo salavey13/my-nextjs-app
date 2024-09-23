@@ -284,5 +284,8 @@ const EnhancedMegaAvatar: React.FC<EnhancedMegaAvatarProps> = React.memo(({
     </animated.div>
   );
 });
+// Add the display name
+EnhancedMegaAvatar.displayName = "EnhancedMegaAvatar";
+
 
 export default EnhancedMegaAvatar;
