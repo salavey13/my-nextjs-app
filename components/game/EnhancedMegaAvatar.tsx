@@ -184,9 +184,9 @@ const EnhancedMegaAvatar: React.FC<EnhancedMegaAvatarProps> = React.memo(({
 
         for (let i = event.results.length - 1; i < event.results.length; ++i) {
           if (event.results[i].isFinal) {
-            finalTranscript += event.results[i][0].transcript;
+            finalTranscript = event.results[i][0].transcript;
           } else {
-            interimTranscript += event.results[i][0].transcript;
+            interimTranscript = event.results[i][0].transcript;
           }
         }
 
@@ -329,10 +329,10 @@ const EnhancedMegaAvatar: React.FC<EnhancedMegaAvatarProps> = React.memo(({
       {player && (
         <div
           style={{
-            marginTop: '5px',
+            marginTop: '8px',
             backgroundColor: 'rgba(0, 0, 0, 0.13)',
             color: '#E1FF01',
-            padding: '2px 6px',
+            padding: '2px 8px',
             borderRadius: '10px',
             fontSize: '0.75rem',
             maxWidth: '100%',
