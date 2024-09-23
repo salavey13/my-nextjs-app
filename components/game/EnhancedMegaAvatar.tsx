@@ -93,15 +93,12 @@ const censorMessage = (message: string): string => {
   }).join(' ');
 };
 
-
-let hasMicPermission = false;
-
 const EnhancedMegaAvatar: React.FC<EnhancedMegaAvatarProps> = React.memo(({ 
   gameState, 
   playerId, 
   initialPosition, 
-  onPositionChange, 
-  onMessageUpdate 
+  onPositionChange,
+  onMessageUpdate
 }) => {
   const { user, t } = useAppContext();
   const player = gameState.players.find(p => p.id === playerId);
@@ -124,7 +121,7 @@ const EnhancedMegaAvatar: React.FC<EnhancedMegaAvatarProps> = React.memo(({
     config: { tension: 300, friction: 20 },
   });
 
-  const handleDrag = useCallback((mx: number, my: number, down:boolean) => {
+  const handleDrag = useCallback((mx: number, my: number, down: boolean) => {
     if (!down) {
       const newX = Math.max(0, Math.min(initialPosition.x * window.innerWidth + mx, window.innerWidth - 128));
       const newY = Math.max(0, Math.min(initialPosition.y * window.innerHeight + my, window.innerHeight - 128));
@@ -150,16 +147,13 @@ const EnhancedMegaAvatar: React.FC<EnhancedMegaAvatarProps> = React.memo(({
     }
   }, [player]);
 
-  const addMessage = useCallback((text:string, isInterim:boolean = false) => {
+  const addMessage = useCallback((text: string, isInterim: boolean = false) => {
     const now = Date.now();
     setMessages(prevMessages => {
-      // Update only the last interim message
       const newMessages = [
         ...prevMessages.filter(msg => now - msg.timestamp < (isInterim ? INTERIM_MESSAGE_LIFETIME : MESSAGE_LIFETIME)),
         { text, timestamp: now }
       ];
-
-      // Only push the final message to the server
       if (!isInterim) {
         onMessageUpdate(playerId, newMessages);
       }
@@ -177,21 +171,18 @@ const EnhancedMegaAvatar: React.FC<EnhancedMegaAvatarProps> = React.memo(({
   }, [playerId, onMessageUpdate]);
 
   const startListening = useCallback(() => {
-    if (hasMicPermission) {
-      if (recognitionRef.current) recognitionRef.current.start();
-      return;
-    }
-
     const SpeechRecognitionConstructor = (window as Window).SpeechRecognition || (window as Window).webkitSpeechRecognition;
+
     if (SpeechRecognitionConstructor) {
       recognitionRef.current = new SpeechRecognitionConstructor();
       recognitionRef.current.continuous = true;
       recognitionRef.current.interimResults = true;
-      recognitionRef.current.onresult = (event) => {
+
+      recognitionRef.current.onresult = (event: SpeechRecognitionEvent) => {
         let interimTranscript = '';
         let finalTranscript = '';
 
-        for (let i = 0; i < event.results.length; i++) {
+        for (let i = event.results.length - 1; i < event.results.length; ++i) {
           if (event.results[i].isFinal) {
             finalTranscript += event.results[i][0].transcript;
           } else {
@@ -212,43 +203,47 @@ const EnhancedMegaAvatar: React.FC<EnhancedMegaAvatarProps> = React.memo(({
         }
       };
 
-      recognitionRef.current.onerror = (event) => {
-        console.error('Speech recognition error:', event.error);
-        toast({
-          title: "Speech Recognition Error",
-          description: `Error: ${event.error}. Please try again.`,
-          variant: "destructive",
-        });
+      recognitionRef.current.onend = () => {
+        if (!isMuted) {
+          recognitionRef.current?.start();
+        }
       };
 
-      recognitionRef.current.onend = () => {
-        if (!isMuted && hasMicPermission) {
-          setTimeout(() => {
-            recognitionRef.current?.start();
-          }, 420); // Add a slight delay
+      recognitionRef.current.onerror = (event: SpeechRecognitionErrorEvent) => {
+        console.error('Speech recognition error:', event.error);
+        if (event.error !== 'no-speech') {
+          toast({
+            title: "Speech Recognition Error",
+            description: `Error: ${event.error}. Please try again.`,
+            variant: "destructive",
+          });
         }
       };
 
       recognitionRef.current.start();
-      hasMicPermission = true; // Mark permission granted after first request
     } else {
+      console.warn(t('speechRecognitionNotSupported'));
       toast({
         title: "Speech Recognition Not Supported",
         description: "Your browser does not support speech recognition.",
         variant: "destructive",
       });
     }
-  }, [addMessage, isMuted]);
+  }, [addMessage, isMuted, t]);
 
   const stopListening = useCallback(() => {
-    if (recognitionRef.current) recognitionRef.current.stop();
+    if (recognitionRef.current) {
+      recognitionRef.current.stop();
+    }
   }, []);
 
   useEffect(() => {
     if (player?.id === user?.id?.toString() && !isMuted) {
       startListening();
     }
-    return () => stopListening();
+    return () => {
+      stopListening();
+    };
   }, [player, user, isMuted, startListening, stopListening]);
 
   const toggleMute = useCallback(() => {
@@ -260,22 +255,21 @@ const EnhancedMegaAvatar: React.FC<EnhancedMegaAvatarProps> = React.memo(({
     }
   }, [isMuted, startListening, stopListening]);
 
-
   const getTooltipPosition = useCallback(() => {
-      const avatarX = x.get();
-      const avatarY = y.get();
-      const distanceToRight = window.innerWidth - avatarX;
-      const distanceToBottom = window.innerHeight - avatarY;
-      const distanceToLeft = avatarX;
-      const distanceToTop = avatarY;
-  
-      const maxDistance = Math.max(distanceToRight, distanceToBottom, distanceToLeft, distanceToTop);
-  
-      if (maxDistance === distanceToRight) return { left: '100%', top: '50%', transform: 'translateY(-50%)' };
-      if (maxDistance === distanceToBottom) return { left: '50%', top: '100%', transform: 'translateX(-50%)' };
-      if (maxDistance === distanceToLeft) return { right: '100%', top: '50%', transform: 'translateY(-50%)' };
-      return { left: '50%', bottom: '100%', transform: 'translateX(-50%)' };
-    }, [x, y]);
+    const avatarX = x.get();
+    const avatarY = y.get();
+    const distanceToRight = window.innerWidth - avatarX;
+    const distanceToBottom = window.innerHeight - avatarY;
+    const distanceToLeft = avatarX;
+    const distanceToTop = avatarY;
+
+    const maxDistance = Math.max(distanceToRight, distanceToBottom, distanceToLeft, distanceToTop);
+
+    if (maxDistance === distanceToRight) return { left: '100%', top: '50%', transform: 'translateY(-50%)' };
+    if (maxDistance === distanceToBottom) return { left: '50%', top: '100%', transform: 'translateX(-50%)' };
+    if (maxDistance === distanceToLeft) return { right: '100%', top: '50%', transform: 'translateY(-50%)' };
+    return { left: '50%', bottom: '100%', transform: 'translateX(-50%)' };
+  }, [x, y]);
 
   return (
     <animated.div
@@ -377,8 +371,7 @@ const EnhancedMegaAvatar: React.FC<EnhancedMegaAvatarProps> = React.memo(({
     </animated.div>
   );
 });
-// Add the display name
-EnhancedMegaAvatar.displayName = "EnhancedMegaAvatar";
 
+EnhancedMegaAvatar.displayName = 'EnhancedMegaAvatar';
 
 export default EnhancedMegaAvatar;
