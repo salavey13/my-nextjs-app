@@ -61,7 +61,7 @@ interface DiceProps {
 }
 
 function Dice({ position, onRollComplete, customTextures, gyro, isRolling, initialValue }: DiceProps) {
-  const [ref, api] = useBox(() => ({ mass: 1, position }))
+  const [ref, api] = useBox<Mesh>(() => ({ mass: 1, position }))
   const textures = useTexture(customTextures || diceFaceUrls)
   const velocityRef = useRef<Vector3>(new Vector3())
   const angularVelocityRef = useRef<Vector3>(new Vector3())
