@@ -61,42 +61,6 @@ interface DiceProps {
 }
 
 function Dice({ position, onRollComplete, customTextures, gyro, isRolling, initialValue }: DiceProps) {
-  const [ref, api] = useBox(() => ({ mass: 1, position }))
-  const textures = useTexture(customTextures || diceFaceUrls)
-  const velocityRef = useRef<Vector3>(new Vector3())
-  const angularVelocityRef = useRef<Vector3>(new Vector3())
-
-  useFrame(() => {
-    api.velocity.subscribe((v) => velocityRef.current.set(v[0], v[1], v[2]))
-    api.angularVelocity.subscribe((v) => angularVelocityRef.current.set(v[0], v[1], v[2]))
-
-    // Apply gyro force
-    api.applyForce([gyro.x * 5, gyro.y * 5, gyro.z * 5], [0, 0, 0])
-
-    if (isRolling && velocityRef.current.length() < 0.1 && angularVelocityRef.current.length() < 0.1) {
-      const rotation = ref.current?.rotation
-      if (rotation) {
-        const value = getDiceValue(rotation)
-        onRollComplete(value)
-      }
-    }
-  })
-
-  useEffect(() => {
-    if (isRolling) {
-      const force = 15
-      api.velocity.set(
-        (Math.random() - 0.5) * force,
-interface DiceProps {
-  position: [number, number, number]
-  onRollComplete: (value: number) => void
-  customTextures?: string[]
-  gyro: { x: number; y: number; z: number }
-  isRolling: boolean
-  initialValue: number
-}
-
-function Dice({ position, onRollComplete, customTextures, gyro, isRolling, initialValue }: DiceProps) {
   const [ref, api] = useBox<Mesh>(() => ({ mass: 1, position }))
   const textures = useTexture(customTextures || diceFaceUrls)
   const velocityRef = useRef<Vector3>(new Vector3())
