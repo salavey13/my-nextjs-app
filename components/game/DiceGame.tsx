@@ -170,12 +170,30 @@ function Scene({ gameState, onRollComplete, wallTexture }: { gameState: GameStat
     }, [])
   
     const handleMotion = (event: DeviceMotionEvent) => {
-      setGyro({
-        x: event.accelerationIncludingGravity?.x || 0,
-        y: event.accelerationIncludingGravity?.y || 0,
-        z: event.accelerationIncludingGravity?.z || 0,
-      })
-    }
+  const orientation = window.screen.orientation?.angle || 0;
+
+  let { x, y, z } = event.accelerationIncludingGravity? event.accelerationIncludingGravity : { x: 0, y: 0, z: 0 };
+
+  // Adjust axes based on screen orientation
+  switch (orientation) {
+    case 90:
+      // Landscape left
+      setGyro({ x: (y as number), y: -(x as number), z: (z as number) });
+      break;
+    case -90:
+      // Landscape right
+      setGyro({ x: -(y as number), y: (x as number), z: (z as number)});
+      break;
+    case 180:
+      // Upside down portrait
+      setGyro({ x: -(x as number), y: -(y as number), z: (z as number) });
+      break;
+    default:
+      // Default portrait
+      setGyro({ x: (x as number), y: (y as number), z: (z as number) });
+      break;
+  }
+};
   
     const handleDiceRollComplete = (index: number, value: number) => {
       const newValues = [...gameState.players.find(p => p.id === gameState.currentPlayer)!.diceValues]
@@ -395,11 +413,13 @@ function Scene({ gameState, onRollComplete, wallTexture }: { gameState: GameStat
     tg?.BackButton?.show();
     tg?.BackButton?.onClick(goBack);
   
-    // Setup Telegram MainButton
+    // Update MainButton based on game state
     if (gameState && !gameState.winner) {
       tg?.MainButton?.show();
       tg?.MainButton?.setText(gameState.isRolling ? t('rolling') : t('rollDice'));
-      tg?.MainButton?.setParams({ is_active: gameState.isRolling || gameState.currentPlayer !== String(user?.id) });
+      tg?.MainButton?.setParams({
+        is_active: !gameState.isRolling && gameState.currentPlayer === String(user?.id),
+      });
   
       tg?.MainButton?.onClick(() => {
         if (!gameState.isRolling && gameState.currentPlayer === String(user?.id)) {
@@ -411,7 +431,8 @@ function Scene({ gameState, onRollComplete, wallTexture }: { gameState: GameStat
     return () => {
       // Cleanup when unmounting
       tg?.MainButton?.hide();
-      tg?.BackButton?.onClick(goBack); // Remove listener on cleanup
+      tg?.BackButton?.hide();
+      tg?.MainButton?.offClick(rollDice); // Remove listener on cleanup
     };
   }, [tg, gameState, user]);
 
@@ -461,6 +482,7 @@ function Scene({ gameState, onRollComplete, wallTexture }: { gameState: GameStat
     return <Rules onClose={() => setShowRules(false)} />
   }
 
+
   return (
     <Suspense fallback={<LoadingSpinner />}>
       <div className="game-board h-[calc(100vh-128px)] relative overflow-hidden">
@@ -482,7 +504,7 @@ function Scene({ gameState, onRollComplete, wallTexture }: { gameState: GameStat
         ) : (
             <div className="flex flex-col items-center flex-grow">
             {gameState.players.map((player, index) => (
-                <div key={player.id} className="text-2xl mb-4">
+                <div key={player.id} className="text-l mb-4">
                 {player.username}: {player.score}
                 {gameState.currentPlayer === player.id && ` (${t('currentTurn')})`}
                 </div>
@@ -502,7 +524,7 @@ function Scene({ gameState, onRollComplete, wallTexture }: { gameState: GameStat
                 </div>
             ) }
 
-            { (tg && tg.MainButton && !tg.MainButton.isVisible) && (
+            { (tg && tg.MainButton ) && (
                 <Button
                 onClick={rollDice}
                 disabled={gameState.isRolling || gameState.currentPlayer !== String(user?.id)}
