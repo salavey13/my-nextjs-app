@@ -105,11 +105,11 @@ const EnhancedMegaAvatar: React.FC<EnhancedMegaAvatarProps> = React.memo(({
 }) => {
   const { user, t } = useAppContext();
   const player = gameState.players.find(p => p.id === playerId);
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [isMuted, setIsMuted] = useState(false);
   const [interimTranscript, setInterimTranscript] = useState('');
-  const recognitionRef = useRef(null);
-  const interimTimeoutRef = useRef(null);
+  const recognitionRef = useRef<SpeechRecognition | null>(null);
+  const interimTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const [{ x, y }, api] = useSpring(() => ({
     x: initialPosition.x * window.innerWidth,
@@ -150,7 +150,7 @@ const EnhancedMegaAvatar: React.FC<EnhancedMegaAvatarProps> = React.memo(({
     }
   }, [player]);
 
-  const addMessage = useCallback((text, isInterim = false) => {
+  const addMessage = useCallback((text:string, isInterim:boolean = false) => {
     const now = Date.now();
     setMessages(prevMessages => {
       // Update only the last interim message
@@ -182,7 +182,7 @@ const EnhancedMegaAvatar: React.FC<EnhancedMegaAvatarProps> = React.memo(({
       return;
     }
 
-    const SpeechRecognitionConstructor = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const SpeechRecognitionConstructor = (window as Window).SpeechRecognition || (window as Window).webkitSpeechRecognition;
     if (SpeechRecognitionConstructor) {
       recognitionRef.current = new SpeechRecognitionConstructor();
       recognitionRef.current.continuous = true;
@@ -222,7 +222,7 @@ const EnhancedMegaAvatar: React.FC<EnhancedMegaAvatarProps> = React.memo(({
       };
 
       recognitionRef.current.onend = () => {
-        if (!isMuted) recognitionRef.current.start();
+        if (!isMuted) recognitionRef.current?.start();
       };
 
       recognitionRef.current.start();
@@ -256,6 +256,23 @@ const EnhancedMegaAvatar: React.FC<EnhancedMegaAvatarProps> = React.memo(({
     }
   }, [isMuted, startListening, stopListening]);
 
+
+  const getTooltipPosition = useCallback(() => {
+      const avatarX = x.get();
+      const avatarY = y.get();
+      const distanceToRight = window.innerWidth - avatarX;
+      const distanceToBottom = window.innerHeight - avatarY;
+      const distanceToLeft = avatarX;
+      const distanceToTop = avatarY;
+  
+      const maxDistance = Math.max(distanceToRight, distanceToBottom, distanceToLeft, distanceToTop);
+  
+      if (maxDistance === distanceToRight) return { left: '100%', top: '50%', transform: 'translateY(-50%)' };
+      if (maxDistance === distanceToBottom) return { left: '50%', top: '100%', transform: 'translateX(-50%)' };
+      if (maxDistance === distanceToLeft) return { right: '100%', top: '50%', transform: 'translateY(-50%)' };
+      return { left: '50%', bottom: '100%', transform: 'translateX(-50%)' };
+    }, [x, y]);
+
   return (
     <animated.div
       {...bind()}
@@ -270,14 +287,86 @@ const EnhancedMegaAvatar: React.FC<EnhancedMegaAvatarProps> = React.memo(({
         alignItems: 'center',
       }}
     >
-      <ShineBorder borderWidth={2} />
-      <Button onClick={toggleMute}>
-        {isMuted ? <MicOff /> : <Mic />}
-      </Button>
-      <div>
-        {messageTransitions((style, item) => (
-          <animated.div style={style}>
-            {item.text}
+      <ShineBorder borderWidth={2} duration={10} color="#E1FF01">
+        <div
+          style={{
+            width: '128px',
+            height: '128px',
+            borderRadius: '50%',
+            backgroundColor: player?.id === user?.id?.toString() ? 'rgba(225, 255, 1, 0.2)' : 'transparent',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          <div
+            style={{
+              width: '64px',
+              height: '64px',
+              borderRadius: '50%',
+              backgroundColor: '#E1FF01',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              color: '#000000',
+              fontWeight: 'bold',
+              fontSize: '24px',
+            }}
+          >
+            {player?.username.charAt(0).toUpperCase()}
+          </div>
+          {player?.id === user?.id?.toString() && (
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={toggleMute}
+              className="mt-2"
+            >
+              {isMuted ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+            </Button>
+          )}
+        </div>
+      </ShineBorder>
+      {player && (
+        <div
+          style={{
+            marginTop: '5px',
+            backgroundColor: 'rgba(0, 0, 0, 0.13)',
+            color: '#E1FF01',
+            padding: '2px 6px',
+            borderRadius: '10px',
+            fontSize: '0.75rem',
+            maxWidth: '100%',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {player.username}
+        </div>
+      )}
+      <div
+        style={{
+          position: 'absolute',
+          ...getTooltipPosition(),
+          zIndex: 1000,
+        }}
+      >
+        {messageTransitions((style, message) => (
+          <animated.div
+            style={{
+              ...style,
+              backgroundColor: 'rgba(0, 0, 0, 0.13)',
+              color: '#E1FF01',
+              padding: '2px 6px',
+              borderRadius: '10px',
+              fontSize: '0.75rem',
+              maxWidth: '200px',
+              marginBottom: '5px',
+            }}
+          >
+            {message.text}
           </animated.div>
         ))}
       </div>
