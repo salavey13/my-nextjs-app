@@ -96,7 +96,7 @@ const censorMessage = (message: string): string => {
 
 let hasMicPermission = false;
 
-const EnhancedMegaAvatar = React.memo(({ 
+const EnhancedMegaAvatar: React.FC<EnhancedMegaAvatarProps> = React.memo(({ 
   gameState, 
   playerId, 
   initialPosition, 
