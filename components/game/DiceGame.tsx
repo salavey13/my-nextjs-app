@@ -190,7 +190,7 @@ function Scene({ gameState, onRollComplete, wallTexture }: { gameState: GameStat
       break;
     default:
       // Default portrait
-      setGyro({ x: (z as number), y: (x as number), z: (y as number) });
+      setGyro({ x: (z as number), y: (y as number), z: (x as number) });
       break;
   }
 };
