@@ -74,6 +74,7 @@ interface Message {
 }
 
 const MESSAGE_LIFETIME = 60000; // 1 minute in milliseconds
+const INTERIM_MESSAGE_LIFETIME = 5000; // 5 seconds in milliseconds
 
 const profanityList = [
   'fuck', 'shit', 'ass', 'bitch', 'cunt', 'dick', 'pussy', 'cock', 'asshole',
@@ -102,9 +103,10 @@ const EnhancedMegaAvatar: React.FC<EnhancedMegaAvatarProps> = React.memo(({
   const { user, t } = useAppContext();
   const player = gameState.players.find(p => p.id === playerId);
   const [messages, setMessages] = useState<Message[]>([]);
-  const [isListening, setIsListening] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
   const [interimTranscript, setInterimTranscript] = useState('');
   const recognitionRef = useRef<SpeechRecognition | null>(null);
+  const interimTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const [{ x, y }, api] = useSpring(() => ({
     x: initialPosition.x * window.innerWidth,
@@ -145,30 +147,41 @@ const EnhancedMegaAvatar: React.FC<EnhancedMegaAvatarProps> = React.memo(({
     }
   }, [player]);
 
-  const addMessage = useCallback((text: string) => {
+  const addMessage = useCallback((text: string, isInterim: boolean = false) => {
     const now = Date.now();
     setMessages(prevMessages => {
       const newMessages = [
-        ...prevMessages.filter(msg => now - msg.timestamp < MESSAGE_LIFETIME),
+        ...prevMessages.filter(msg => now - msg.timestamp < (isInterim ? INTERIM_MESSAGE_LIFETIME : MESSAGE_LIFETIME)),
         { text, timestamp: now }
       ];
-      onMessageUpdate(playerId, newMessages);
+      if (!isInterim) {
+        onMessageUpdate(playerId, newMessages);
+      }
       return newMessages;
     });
+
+    if (isInterim) {
+      if (interimTimeoutRef.current) {
+        clearTimeout(interimTimeoutRef.current);
+      }
+      interimTimeoutRef.current = setTimeout(() => {
+        setMessages(prevMessages => prevMessages.filter(msg => now - msg.timestamp < MESSAGE_LIFETIME));
+      }, INTERIM_MESSAGE_LIFETIME);
+    }
   }, [playerId, onMessageUpdate]);
 
   const startListening = useCallback(() => {
     const SpeechRecognitionConstructor = (window as Window).SpeechRecognition || (window as Window).webkitSpeechRecognition;
-
+  
     if (SpeechRecognitionConstructor) {
       recognitionRef.current = new SpeechRecognitionConstructor();
       recognitionRef.current.continuous = true;
       recognitionRef.current.interimResults = true;
-
+  
       recognitionRef.current.onresult = (event: SpeechRecognitionEvent) => {
         let interimTranscript = '';
         let finalTranscript = '';
-
+  
         for (let i = 0; i < event.results.length; ++i) {
           if (event.results[i].isFinal) {
             finalTranscript += event.results[i][0].transcript;
@@ -176,32 +189,38 @@ const EnhancedMegaAvatar: React.FC<EnhancedMegaAvatarProps> = React.memo(({
             interimTranscript += event.results[i][0].transcript;
           }
         }
-
-        setInterimTranscript(interimTranscript);
-
-        if (finalTranscript !== '') {
-          const censoredMessage = censorMessage(finalTranscript);
-          addMessage(censoredMessage);
+  
+        if (interimTranscript) {
+          const censoredInterim = censorMessage(interimTranscript);
+          setInterimTranscript(censoredInterim);
+          addMessage(censoredInterim, true);
+        }
+  
+        if (finalTranscript) {
+          const censoredFinal = censorMessage(finalTranscript);
+          addMessage(censoredFinal);
           setInterimTranscript('');
         }
       };
-
+  
       recognitionRef.current.onend = () => {
-        setIsListening(false);
+        if (!isMuted) {
+          recognitionRef.current?.start();
+        }
       };
-
+  
       recognitionRef.current.onerror = (event: SpeechRecognitionErrorEvent) => {
         console.error('Speech recognition error:', event.error);
-        setIsListening(false);
-        toast({
-          title: "Speech Recognition Error",
-          description: `Error: ${event.error}. Please try again.`,
-          variant: "destructive",
-        });
+        if (event.error !== 'no-speech') {
+          toast({
+            title: "Speech Recognition Error",
+            description: `Error: ${event.error}. Please try again.`,
+            variant: "destructive",
+          });
+        }
       };
-
+  
       recognitionRef.current.start();
-      setIsListening(true);
     } else {
       console.warn(t('speechRecognitionNotSupported'));
       toast({
@@ -210,31 +229,31 @@ const EnhancedMegaAvatar: React.FC<EnhancedMegaAvatarProps> = React.memo(({
         variant: "destructive",
       });
     }
-  }, [addMessage, t]);
+  }, [addMessage, isMuted, t]);
 
   const stopListening = useCallback(() => {
     if (recognitionRef.current) {
       recognitionRef.current.stop();
-      setIsListening(false);
-      setInterimTranscript('');
     }
   }, []);
 
   useEffect(() => {
-    return () => {
-      if (recognitionRef.current) {
-        recognitionRef.current.stop();
-      }
-    };
-  }, []);
-
-  const toggleListening = useCallback(() => {
-    if (isListening) {
-      stopListening();
-    } else {
+    if (player?.id === user?.id?.toString() && !isMuted) {
       startListening();
     }
-  }, [isListening, startListening, stopListening]);
+    return () => {
+      stopListening();
+    };
+  }, [player, user, isMuted, startListening, stopListening]);
+
+  const toggleMute = useCallback(() => {
+    setIsMuted(prev => !prev);
+    if (isMuted) {
+      startListening();
+    } else {
+      stopListening();
+    }
+  }, [isMuted, startListening, stopListening]);
 
   const getTooltipPosition = useCallback(() => {
     const avatarX = x.get();
@@ -299,10 +318,10 @@ const EnhancedMegaAvatar: React.FC<EnhancedMegaAvatarProps> = React.memo(({
             <Button
               variant="outline"
               size="icon"
-              onClick={toggleListening}
+              onClick={toggleMute}
               className="mt-2"
             >
-              {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+              {isMuted ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
             </Button>
           )}
         </div>
@@ -349,24 +368,6 @@ const EnhancedMegaAvatar: React.FC<EnhancedMegaAvatarProps> = React.memo(({
           </animated.div>
         ))}
       </div>
-      {interimTranscript && (
-        <div
-          style={{
-            position: 'absolute',
-            ...getTooltipPosition(),
-            zIndex: 1001,
-            backgroundColor: 'rgba(0, 0, 0, 0.13)',
-            color: '#E1FF01',
-            padding: '2px 6px',
-            borderRadius: '10px',
-            fontSize: '0.75rem',
-            maxWidth: '200px',
-            fontStyle: 'italic',
-          }}
-        >
-          {interimTranscript}
-        </div>
-      )}
     </animated.div>
   );
 });
