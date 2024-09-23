@@ -52,86 +52,81 @@ const diceFaceUrls = [
 ]
 
 interface DiceProps {
-  position: [number, number, number]
-  onRollComplete: (value: number) => void
-  customTextures?: string[]
-  gyro: { x: number; y: number; z: number }
-  isRolling: boolean
-  initialValue: number
-}
-
-function Dice({ position, onRollComplete, customTextures, gyro, isRolling, initialValue }: DiceProps) {
+    position: [number, number, number]
+    onRollComplete: (value: number) => void
+    customTextures?: string[]
+    gyro: { x: number; y: number; z: number }
+    isRolling: boolean
+    initialValue: number
+  }
+  
+  function Dice({ position, onRollComplete, customTextures, gyro, isRolling, initialValue }: DiceProps) {
     const [ref, api] = useBox<Mesh>(() => ({ mass: 1, position }))
     const textures = useTexture(customTextures || diceFaceUrls)
     const velocityRef = useRef<Vector3>(new Vector3())
     const angularVelocityRef = useRef<Vector3>(new Vector3())
-
-  useFrame(() => {
-    api.velocity.subscribe((v) => velocityRef.current.set(v[0], v[1], v[2]))
-    api.angularVelocity.subscribe((v) => angularVelocityRef.current.set(v[0], v[1], v[2]))
-
-    // Apply gyro force
-    api.applyForce([gyro.x * 5, gyro.y * 5, gyro.z * 5], [0, 0, 0])
-
-    if (isRolling && velocityRef.current.length() < 0.1 && angularVelocityRef.current.length() < 0.1) {
-      const rotation = ref.current?.rotation
-      if (rotation) {
-        const value = getDiceValue(rotation)
-        onRollComplete(value)
-      }
-    }
-  })
-
-  useEffect(() => {
-    if (isRolling) {
-      const force = 15
-      api.velocity.set(
-        (Math.random() - 0.5) * force,
-        Math.random() * force + 5,
-        (Math.random() - 0.5) * force
-      )
-      api.angularVelocity.set(
-        (Math.random() - 0.5) * force,
-        (Math.random() - 0.5) * force,
-        (Math.random() - 0.5) * force
-      )
-    }
-  }, [isRolling, api])
-
-  return (
-    <Box
-      ref={ref}
-      args={[1, 1, 1]}
-    >
-      {textures.map((texture, index) => (
-        <meshStandardMaterial
-          key={index}
-          map={texture}
-        />
-      ))}
-    </Box>
-  )
-}
-
-function Wall({ position, rotation }: { position: [number, number, number], rotation: [number, number, number] }) {
-    const [ref] = usePlane<Mesh>(() => ({ position, rotation }))
-    return (
-      <mesh ref={ref} receiveShadow>
-        <planeGeometry args={[10, 10]} />
-        <meshStandardMaterial color="#282c23" />
-      </mesh>
-    )
-  }
   
-  function Floor() {
-    const [ref] = usePlane<Mesh>(() => ({ rotation: [-Math.PI / 2, 0, 0] }))
+    useFrame(() => {
+      api.velocity.subscribe((v) => velocityRef.current.set(v[0], v[1], v[2]))
+      api.angularVelocity.subscribe((v) => angularVelocityRef.current.set(v[0], v[1], v[2]))
+  
+      api.applyForce([gyro.x * 5, gyro.y * 5, gyro.z * 5], [0, 0, 0])
+  
+      if (isRolling && velocityRef.current.length() < 0.1 && angularVelocityRef.current.length() < 0.1) {
+        const rotation = ref.current?.rotation
+        if (rotation) {
+          const value = getDiceValue(rotation)
+          onRollComplete(value)
+        }
+      }
+    })
+  
+    useEffect(() => {
+      if (isRolling) {
+        const force = 10
+        api.velocity.set(
+          (Math.random() - 0.5) * force,
+          Math.random() * force + 5,
+          (Math.random() - 0.5) * force
+        )
+        api.angularVelocity.set(
+          (Math.random() - 0.5) * force * 2,
+          (Math.random() - 0.5) * force * 2,
+          (Math.random() - 0.5) * force * 2
+        )
+      }
+    }, [isRolling, api])
+
     return (
-      <mesh ref={ref} receiveShadow>
-        <planeGeometry args={[10, 10]} />
-        <meshStandardMaterial color="#282c23" />
-      </mesh>
-    )
-  }
+        <Box ref={ref} args={[1, 1, 1]}>
+          {textures.map((texture, index) => (
+            <meshStandardMaterial key={index} map={texture} />
+          ))}
+        </Box>
+      )
+    }
+
+    function Wall({ position, rotation, texture }: { position: [number, number, number], rotation: [number, number, number], texture: string }) {
+        const [ref] = usePlane<Mesh>(() => ({ position, rotation }))
+        const wallTexture = useTexture(texture)
+        
+        return (
+          <mesh ref={ref} receiveShadow>
+            <planeGeometry args={[10, 10]} />
+            <meshStandardMaterial map={wallTexture} />
+          </mesh>
+        )
+      }
+      
+      function Floor() {
+        const [ref] = usePlane<Mesh>(() => ({ rotation: [-Math.PI / 2, 0, 0] }))
+        return (
+          <mesh ref={ref} receiveShadow>
+            <planeGeometry args={[10, 10]} />
+            <meshStandardMaterial color="#282c23" />
+          </mesh>
+        )
+      }
 
 function getDiceValue(rotation: { x: number; y: number; z: number }): number {
   const eps = 0.1
@@ -148,78 +143,84 @@ function getDiceValue(rotation: { x: number; y: number; z: number }): number {
   return 1 // Default to 1 if no clear face is up
 }
 
-function Scene({ gameState, onRollComplete }: { gameState: GameState, onRollComplete: (values: [number, number]) => void }) {
-  const { camera } = useThree()
-  const [gyro, setGyro] = useState({ x: 0, y: 0, z: 0 })
-
-  useEffect(() => {
-    camera.position.set(5, 5, 5)
-    camera.lookAt(0, 0, 0)
-
-    if (typeof window !== 'undefined' && 'DeviceMotionEvent' in window) {
-      window.addEventListener('devicemotion', handleMotion)
-    }
-
-    return () => {
+function Scene({ gameState, onRollComplete, wallTexture }: { gameState: GameState, onRollComplete: (values: [number, number]) => void, wallTexture: string }) {
+    const { camera } = useThree()
+    const { t } = useAppContext()
+    const [gyro, setGyro] = useState({ x: 0, y: 0, z: 0 })
+    const dicePositions = useRef<[Vector3, Vector3]>([new Vector3(-1, 3, 0), new Vector3(1, 3, 0)])
+  
+    useFrame(() => {
+      const midPoint = new Vector3().addVectors(dicePositions.current[0], dicePositions.current[1]).multiplyScalar(0.5)
+      camera.position.lerp(new Vector3(midPoint.x + 5, midPoint.y + 5, midPoint.z + 5), 0.1)
+      camera.lookAt(midPoint)
+    })
+  
+    useEffect(() => {
       if (typeof window !== 'undefined' && 'DeviceMotionEvent' in window) {
-        window.removeEventListener('devicemotion', handleMotion)
+        window.addEventListener('devicemotion', handleMotion)
+      }
+  
+      return () => {
+        if (typeof window !== 'undefined' && 'DeviceMotionEvent' in window) {
+          window.removeEventListener('devicemotion', handleMotion)
+        }
+      }
+    }, [])
+  
+    const handleMotion = (event: DeviceMotionEvent) => {
+      setGyro({
+        x: event.accelerationIncludingGravity?.x || 0,
+        y: event.accelerationIncludingGravity?.y || 0,
+        z: event.accelerationIncludingGravity?.z || 0,
+      })
+    }
+  
+    const handleDiceRollComplete = (index: number, value: number) => {
+      const newValues = [...gameState.players.find(p => p.id === gameState.currentPlayer)!.diceValues]
+      newValues[index] = value
+      if (newValues.every(v => v !== 0)) {
+        onRollComplete(newValues as [number, number])
       }
     }
-  }, [camera])
-
-  const handleMotion = (event: DeviceMotionEvent) => {
-    setGyro({
-      x: event.accelerationIncludingGravity?.x || 0,
-      y: event.accelerationIncludingGravity?.y || 0,
-      z: event.accelerationIncludingGravity?.z || 0,
-    })
+  
+    return (
+      <>
+        <ambientLight intensity={0.5} />
+        <pointLight position={[10, 10, 10]} />
+        <Physics>
+          <Dice
+            position={[-1, 3, 0]}
+            onRollComplete={(value) => handleDiceRollComplete(0, value)}
+            gyro={gyro}
+            isRolling={gameState.isRolling}
+            initialValue={gameState.players.find(p => p.id === gameState.currentPlayer)!.diceValues[0]}
+          />
+          <Dice
+            position={[1, 3, 0]}
+            onRollComplete={(value) => handleDiceRollComplete(1, value)}
+            gyro={gyro}
+            isRolling={gameState.isRolling}
+            initialValue={gameState.players.find(p => p.id === gameState.currentPlayer)!.diceValues[1]}
+          />
+          <Floor />
+          <Wall position={[0, 5, -5]} rotation={[0, 0, 0]} texture={wallTexture} />
+          <Wall position={[5, 5, 0]} rotation={[0, -Math.PI / 2, 0]} texture={wallTexture} />
+          <Wall position={[-5, 5, 0]} rotation={[0, Math.PI / 2, 0]} texture={wallTexture} />
+        </Physics>
+        <Text
+          position={[0, 6, 0]}
+          fontSize={0.5}
+          color="#e1ff01"
+          anchorX="center"
+          anchorY="middle"
+        >
+          {`${gameState.players.find(p => p.id === gameState.currentPlayer)?.username}'s ${t('turn')}`}
+        </Text>
+      </>
+    )
   }
-
-  const handleDiceRollComplete = (index: number, value: number) => {
-    const newValues = [...gameState.players.find(p => p.id === gameState.currentPlayer)!.diceValues]
-    newValues[index] = value
-    if (newValues.every(v => v !== 0)) {
-      onRollComplete(newValues as [number, number])
-    }
-  }
-
-  return (
-    <>
-      <ambientLight intensity={0.5} />
-      <pointLight position={[10, 10, 10]} />
-      <Physics>
-        <Dice
-          position={[-1, 3, 0]}
-          onRollComplete={(value) => handleDiceRollComplete(0, value)}
-          gyro={gyro}
-          isRolling={gameState.isRolling}
-          initialValue={gameState.players.find(p => p.id === gameState.currentPlayer)!.diceValues[0]}
-        />
-        <Dice
-          position={[1, 3, 0]}
-          onRollComplete={(value) => handleDiceRollComplete(1, value)}
-          gyro={gyro}
-          isRolling={gameState.isRolling}
-          initialValue={gameState.players.find(p => p.id === gameState.currentPlayer)!.diceValues[1]}
-        />
-        <Floor />
-        <Wall position={[0, 5, -5]} rotation={[0, 0, 0]} />
-        <Wall position={[5, 5, 0]} rotation={[0, -Math.PI / 2, 0]} />
-        <Wall position={[-5, 5, 0]} rotation={[0, Math.PI / 2, 0]} />
-      </Physics>
-      <Text
-        position={[0, 4, -3]}
-        fontSize={0.5}
-        color="#e1ff01"
-      >
-        {`${gameState.players.find(p => p.id === gameState.currentPlayer)?.username}'s Turn`}
-      </Text>
-      <Environment preset="sunset" background />
-    </>
-  )
-}
-
-const DiceGame: React.FC = () => {
+  
+  const DiceGame: React.FC = () => {
     const { user, t } = useAppContext()
     const { tg } = useTelegram()
     const [gameState, setGameState] = useState<GameState | null>(null)
@@ -229,6 +230,7 @@ const DiceGame: React.FC = () => {
     const [screamAudio] = useState(typeof Audio !== 'undefined' ? new Audio('/mixkit-falling-male-scream-391.mp3') : null)
     const [giggleAudio] = useState(typeof Audio !== 'undefined' ? new Audio('/mixkit-funny-giggling-2885.mp3') : null)
     const [popAudio] = useState(typeof Audio !== 'undefined' ? new Audio('/mixkit-long-pop-2358.mp3') : null)
+    const [wallTexture, setWallTexture] = useState('/default-wall-texture.jpg')
   
     const toggleSound = () => {
       setSoundEnabled(!soundEnabled)
@@ -245,99 +247,99 @@ const DiceGame: React.FC = () => {
     }
   
     const startGame = async (mode: string) => {
-      if (!user?.currentGameId) {
-        toast({
-          title: t('error'),
-          description: "No active game? What a shocker! Did you forget to turn on your brain today?",
-          variant: "destructive",
-        })
-        playSound(popAudio)
-        return
-      }
-  
-      const initialGameState: GameState = {
-        players: [
-          { id: String(user.id), username: user.telegram_username || 'Player 1', score: 0, diceValues: [1, 1] },
-          { id: mode === 'twoPlayer' ? 'waiting' : 'ai', username: mode === 'twoPlayer' ? 'Waiting...' : 'AI (probably smarter than you)', score: 0, diceValues: [1, 1] },
-        ],
-        currentPlayer: String(user.id),
-        gameMode: mode as GameState['gameMode'],
-        isRolling: false,
-        winner: null,
-      }
-  
-      await updateGameState(initialGameState)
-      playSound(giggleAudio)
-    }
-  
-    const rollDice = async () => {
-      if (!gameState || gameState.isRolling || gameState.currentPlayer !== String(user?.id)) return
-  
-      const updatedGameState = { ...gameState, isRolling: true }
-      await updateGameState(updatedGameState)
-      playSound(diceRollAudio)
-  
-      setTimeout(async () => {
-        const newDiceValues: [number, number] = [
-          Math.floor(Math.random() * 6) + 1,
-          Math.floor(Math.random() * 6) + 1,
-        ]
-  
-        const currentPlayerIndex = gameState.players.findIndex(p => p.id === gameState.currentPlayer)
-        const updatedPlayers = gameState.players.map((player, index) => 
-          index === currentPlayerIndex 
-            ? { ...player, score: player.score + newDiceValues[0] + newDiceValues[1], diceValues: newDiceValues } 
-            : player
-        )
-  
-        const nextPlayerIndex = (currentPlayerIndex + 1) % gameState.players.length
-        const isGameOver = updatedPlayers.some(player => player.score >= 100)
-  
-        let winner = null
-        if (isGameOver) {
-          winner = updatedPlayers.reduce((maxPlayer, player) => 
-            player.score > maxPlayer.score ? player : maxPlayer
-          ).id
-          playSound(winner === String(user?.id) ? giggleAudio : screamAudio)
+        if (!user?.currentGameId) {
+          toast({
+            title: t('error'),
+            description: t('noActiveGame'),
+            variant: "destructive",
+          })
+          playSound(popAudio)
+          return
         }
-  
-        const updatedGameState: GameState = {
-          ...gameState,
-          players: updatedPlayers,
-          currentPlayer: isGameOver ? gameState.currentPlayer : gameState.players[nextPlayerIndex].id,
+    
+        const initialGameState: GameState = {
+          players: [
+            { id: String(user.id), username: user.telegram_username || t('player1'), score: 0, diceValues: [1, 1] },
+            { id: mode === 'twoPlayer' ? 'waiting' : 'ai', username: mode === 'twoPlayer' ? t('waiting') : t('ai'), score: 0, diceValues: [1, 1] },
+          ],
+          currentPlayer: String(user.id),
+          gameMode: mode as GameState['gameMode'],
           isRolling: false,
-          winner,
+          winner: null,
         }
+    
+        await updateGameState(initialGameState)
+        playSound(giggleAudio)
+      }
   
+      const rollDice = async () => {
+        if (!gameState || gameState.isRolling || gameState.currentPlayer !== String(user?.id)) return
+    
+        const updatedGameState = { ...gameState, isRolling: true }
         await updateGameState(updatedGameState)
-  
-        if (updatedGameState.gameMode === 'ai' && updatedGameState.currentPlayer === 'ai') {
-          setTimeout(() => rollDice(), 1000)
+        playSound(diceRollAudio)
+    
+        setTimeout(async () => {
+          const newDiceValues: [number, number] = [
+            Math.floor(Math.random() * 6) + 1,
+            Math.floor(Math.random() * 6) + 1,
+          ]
+    
+          const currentPlayerIndex = gameState.players.findIndex(p => p.id === gameState.currentPlayer)
+          const updatedPlayers = gameState.players.map((player, index) => 
+            index === currentPlayerIndex 
+              ? { ...player, score: player.score + newDiceValues[0] + newDiceValues[1], diceValues: newDiceValues } 
+              : player
+          )
+    
+          const nextPlayerIndex = (currentPlayerIndex + 1) % gameState.players.length
+          const isGameOver = updatedPlayers.some(player => player.score >= 100)
+    
+          let winner = null
+          if (isGameOver) {
+            winner = updatedPlayers.reduce((maxPlayer, player) => 
+              player.score > maxPlayer.score ? player : maxPlayer
+            ).id
+            playSound(winner === String(user?.id) ? giggleAudio : screamAudio)
+          }
+    
+          const updatedGameState: GameState = {
+            ...gameState,
+            players: updatedPlayers,
+            currentPlayer: isGameOver ? gameState.currentPlayer : gameState.players[nextPlayerIndex].id,
+            isRolling: false,
+            winner,
+          }
+    
+          await updateGameState(updatedGameState)
+    
+          if (updatedGameState.gameMode === 'ai' && updatedGameState.currentPlayer === 'ai') {
+            setTimeout(() => rollDice(), 1000)
+          }
+        }, 1000)
+      }
+
+      const updateGameState = async (newState: GameState) => {
+        if (!user?.currentGameId) return
+    
+        try {
+          const { error } = await supabase
+            .from('rents')
+            .update({ game_state: newState })
+            .eq('id', user.currentGameId)
+    
+          if (error) throw error
+    
+          setGameState(newState)
+        } catch (error) {
+          console.error('Error updating game state:', error)
+          toast({
+            title: t('updateError'),
+            description: t('updateErrorDescription'),
+            variant: "destructive",
+          })
         }
-      }, 1000)
-    }
-
-  const updateGameState = async (newState: GameState) => {
-    if (!user?.currentGameId) return
-
-    try {
-      const { error } = await supabase
-        .from('rents')
-        .update({ game_state: newState })
-        .eq('id', user.currentGameId)
-
-      if (error) throw error
-
-      setGameState(newState)
-    } catch (error) {
-      console.error('Error updating game state:', error)
-      toast({
-        title: t('updateError'),
-        description: t('updateErrorDescription'),
-        variant: "destructive",
-      })
-    }
-  }
+      }
 
   const handleRollComplete = async (newDiceValues: [number, number]) => {
     if (!gameState) return
@@ -393,13 +395,14 @@ const DiceGame: React.FC = () => {
     }
   }, [tg])
 
+
   useEffect(() => {
     const handleSubscription = async () => {
       if (!user?.currentGameId) return
 
       const { data, error } = await supabase
         .from('rents')
-        .select('game_state')
+        .select('game_state, loot')
         .eq('id', user.currentGameId)
         .single()
 
@@ -407,6 +410,9 @@ const DiceGame: React.FC = () => {
         console.error('Error fetching initial game state:', error)
       } else {
         setGameState(data.game_state)
+        if (data.loot?.dice?.walls) {
+          setWallTexture(data.loot.dice.walls)
+        }
       }
 
       const channel = supabase
@@ -416,6 +422,9 @@ const DiceGame: React.FC = () => {
           { event: 'UPDATE', schema: 'public', table: 'rents', filter: `id=eq.${user.currentGameId}` },
           (payload) => {
             setGameState(payload.new.game_state)
+            if (payload.new.loot?.dice?.walls) {
+              setWallTexture(payload.new.loot.dice.walls)
+            }
           }
         )
         .subscribe()
@@ -440,7 +449,7 @@ const DiceGame: React.FC = () => {
         </Button>
       </div>
 
-      <h1 className="text-3xl font-bold mb-6 text-center">{t('diceGame')} (Now with 100% more sarcasm!)</h1>
+      <h1 className="text-3xl font-bold mb-6 text-center">{t('diceGame')}</h1>
 
       {!gameState ? (
         <GameModes onSelectMode={startGame} onShowRules={() => setShowRules(true)} />
@@ -449,21 +458,21 @@ const DiceGame: React.FC = () => {
           {gameState.players.map((player, index) => (
             <div key={player.id} className="text-2xl mb-4">
               {player.username}: {player.score}
-              {gameState.currentPlayer === player.id && " (Current Turn - Try not to mess it up)"}
+              {gameState.currentPlayer === player.id && ` (${t('currentTurn')})`}
             </div>
           ))}
 
           <div className="w-full h-64 mb-6 flex-grow">
             <Canvas shadows>
-              <Scene gameState={gameState} onRollComplete={handleRollComplete} />
+              <Scene gameState={gameState} onRollComplete={handleRollComplete} wallTexture={wallTexture} />
             </Canvas>
           </div>
 
           {gameState.winner ? (
             <div className="text-3xl font-bold mt-6">
               {gameState.winner === String(user?.id) 
-                ? "Congratulations! You've won. Want a cookie?" 
-                : "You lost. Shocking, I know."}
+                ? t('youWon')
+                : t('youLost')}
             </div>
           ) : (
             <Button
@@ -471,13 +480,11 @@ const DiceGame: React.FC = () => {
               disabled={gameState.isRolling || gameState.currentPlayer !== String(user?.id)}
               className="bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-2 px-4 rounded-full"
             >
-              {gameState.isRolling ? "Rolling (pray for luck)" : "Roll Dice (if you dare)"}
+              {gameState.isRolling ? t('rolling') : t('rollDice')}
             </Button>
           )}
         </div>
       )}
-
-      {showRules && <Rules onClose={() => setShowRules(false)} />}
     </div>
   )
 }
