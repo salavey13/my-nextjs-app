@@ -170,30 +170,30 @@ function Scene({ gameState, onRollComplete, wallTexture }: { gameState: GameStat
     }, [])
   
     const handleMotion = (event: DeviceMotionEvent) => {
-  const orientation = window.screen.orientation?.angle || 0;
+        const orientation = window.screen.orientation?.angle || 0;
 
-  let { x, y, z } = event.accelerationIncludingGravity? event.accelerationIncludingGravity : { x: 0, y: 0, z: 0 };
+        let { x, y, z } = event.accelerationIncludingGravity? event.accelerationIncludingGravity : { x: 0, y: 0, z: 0 };
 
-  // Adjust axes based on screen orientation
-  switch (orientation) {
-    case 90:
-      // Landscape left
-      setGyro({ x: (y as number), y: -(x as number), z: (z as number) });
-      break;
-    case -90:
-      // Landscape right
-      setGyro({ x: -(y as number), y: (x as number), z: (z as number)});
-      break;
-    case 180:
-      // Upside down portrait
-      setGyro({ x: -(x as number), y: -(y as number), z: (z as number) });
-      break;
-    default:
-      // Default portrait
-      setGyro({ x: -(y as number), y: (z as number), z: -(x as number) });
-      break;
-  }
-};
+        // Adjust axes based on screen orientation
+        switch (orientation) {
+            case 90:
+            // Landscape left
+            setGyro({ x: (y as number), y: -(x as number), z: (z as number) });
+            break;
+            case -90:
+            // Landscape right
+            setGyro({ x: -(y as number), y: (x as number), z: (z as number)});
+            break;
+            case 180:
+            // Upside down portrait
+            setGyro({ x: -(x as number), y: -(y as number), z: (z as number) });
+            break;
+            default:
+            // Default portrait
+            setGyro({ x: -(y as number), y: (z as number), z: -(x as number) });
+            break;
+        }
+    };
   
     const handleDiceRollComplete = (index: number, value: number) => {
       const newValues = [...gameState.players.find(p => p.id === gameState.currentPlayer)!.diceValues]
@@ -489,8 +489,8 @@ function Scene({ gameState, onRollComplete, wallTexture }: { gameState: GameStat
         {/* <div className="absolute inset-0 z-[-10]">
           <InfinityMirror layers={15} baseColor="#282c33" accentColor="#e1ff01" />
         </div> */}
-        <div className="flex justify-end mb-4">
-            <Button onClick={toggleSound} variant="ghost" size="icon" className="fixed top-4 right-4 z-10">
+        <div className="flex justify-end mb-4 z-99">
+            <Button onClick={toggleSound} variant="ghost" size="icon" className="absolute top-4 right-4">
             <FontAwesomeIcon icon={soundEnabled ? faVolumeUp : faVolumeMute} />
             </Button>
         </div>
