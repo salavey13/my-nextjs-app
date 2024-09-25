@@ -173,7 +173,7 @@ export default function Rents() {
     if (matchingUser && matchingUser.site) {
       setTopEmbedUrl(matchingUser.site);
     } else {
-      setTopEmbedUrl("http://vip-motorbikers-club.framer.ai/"); // Fallback to default if no matching user
+      setTopEmbedUrl("https://sustained-signposts-768587.framer.app/"); // Fallback to default if no matching user
     }
 
     try {
