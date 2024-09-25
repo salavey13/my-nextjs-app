@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useEffect, useRef } from 'react';
+import React, { useCallback, useState, useEffect, useRef, useMemo  } from 'react';
 import { useSpring, animated, to, useTransition } from '@react-spring/web';
 import { useGesture } from '@use-gesture/react';
 import { useAppContext } from '@/context/AppContext';
@@ -103,10 +103,11 @@ const EnhancedMegaAvatar: React.FC<EnhancedMegaAvatarProps> = React.memo(({
   const { user, t } = useAppContext();
   const player = gameState.players.find(p => p.id === playerId);
   const [messages, setMessages] = useState<Message[]>([]);
-  const [isMuted, setIsMuted] = useState(false);
+  const [isMuted, setIsMuted] = useState(true);
   const [interimTranscript, setInterimTranscript] = useState('');
   const recognitionRef = useRef<SpeechRecognition | null>(null);
   const interimTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [permissionGranted, setPermissionGranted] = useState(false);
 
   const [{ x, y }, api] = useSpring(() => ({
     x: initialPosition.x * window.innerWidth,
@@ -150,10 +151,10 @@ const EnhancedMegaAvatar: React.FC<EnhancedMegaAvatarProps> = React.memo(({
   const addMessage = useCallback((text: string, isInterim: boolean = false) => {
     const now = Date.now();
     setMessages(prevMessages => {
-      const newMessages = [
-        ...prevMessages.filter(msg => now - msg.timestamp < (isInterim ? INTERIM_MESSAGE_LIFETIME : MESSAGE_LIFETIME)),
-        { text, timestamp: now }
-      ];
+      const newMessages = isInterim
+        ? [{ text, timestamp: now }]
+        : [...prevMessages.filter(msg => now - msg.timestamp < MESSAGE_LIFETIME), { text, timestamp: now }];
+      
       if (!isInterim) {
         onMessageUpdate(playerId, newMessages);
       }
@@ -182,11 +183,13 @@ const EnhancedMegaAvatar: React.FC<EnhancedMegaAvatarProps> = React.memo(({
         let interimTranscript = '';
         let finalTranscript = '';
 
-        for (let i = event.results.length - 1; i < event.results.length; ++i) {
-          if (event.results[i].isFinal) {
-            finalTranscript = event.results[i][0].transcript;
+        for (let i = event.results.length - 1; i >= 0; i--) {
+          const result = event.results[i];
+          if (result.isFinal) {
+            finalTranscript = result[0].transcript;
+            break;
           } else {
-            interimTranscript = event.results[i][0].transcript;
+            interimTranscript = result[0].transcript;
           }
         }
 
@@ -238,26 +241,41 @@ const EnhancedMegaAvatar: React.FC<EnhancedMegaAvatarProps> = React.memo(({
   }, []);
 
   useEffect(() => {
-    if (player?.id === user?.id?.toString() && !isMuted) {
+    if (player?.id === user?.id?.toString() && !isMuted && permissionGranted) {
       startListening();
     }
     return () => {
       stopListening();
     };
-  }, [player, user, isMuted, startListening, stopListening]);
+  }, [player, user, isMuted, permissionGranted, startListening, stopListening]);
 
-  const toggleMute = useCallback(() => {
+  const toggleMute = useCallback(async () => {
+    if (isMuted && !permissionGranted) {
+      try {
+        await navigator.mediaDevices.getUserMedia({ audio: true });
+        setPermissionGranted(true);
+      } catch (err) {
+        console.error('Failed to get user media', err);
+        toast({
+          title: "Microphone Access Denied",
+          description: "Please allow microphone access to use voice chat.",
+          variant: "destructive",
+        });
+        return;
+      }
+    }
+
     setIsMuted(prev => !prev);
     if (isMuted) {
       startListening();
     } else {
       stopListening();
     }
-  }, [isMuted, startListening, stopListening]);
+  }, [isMuted, permissionGranted, startListening, stopListening]);
 
-  const getTooltipPosition = useCallback(() => {
-    const avatarX = x.get();
-    const avatarY = y.get();
+  const tooltipPosition = useMemo(() => {
+    const avatarX = initialPosition.x * window.innerWidth;
+    const avatarY = initialPosition.y * window.innerHeight;
     const distanceToRight = window.innerWidth - avatarX;
     const distanceToBottom = window.innerHeight - avatarY;
     const distanceToLeft = avatarX;
@@ -269,7 +287,7 @@ const EnhancedMegaAvatar: React.FC<EnhancedMegaAvatarProps> = React.memo(({
     if (maxDistance === distanceToBottom) return { left: '50%', top: '100%', transform: 'translateX(-50%)' };
     if (maxDistance === distanceToLeft) return { right: '100%', top: '50%', transform: 'translateY(-50%)' };
     return { left: '50%', bottom: '100%', transform: 'translateX(-50%)' };
-  }, [x, y]);
+  }, [initialPosition]);
 
   return (
     <animated.div
@@ -347,7 +365,7 @@ const EnhancedMegaAvatar: React.FC<EnhancedMegaAvatarProps> = React.memo(({
       <div
         style={{
           position: 'absolute',
-          ...getTooltipPosition(),
+          ...tooltipPosition,
           zIndex: 1000,
         }}
       >
