@@ -26,7 +26,7 @@ export default function Rents() {
   const [users, setUsers] = useState<User[]>([]);
   const [newItemModalOpen, setNewItemModalOpen] = useState(false);
   const [itemType, setItemType] = useState<string>("evo"); // Default to "evo" type
-  const [topEmbedUrl, setTopEmbedUrl] = useState("https://excellent-lots-147907.framer.app"); // Default URL
+  const [topEmbedUrl, setTopEmbedUrl] = useState("http://vip-motorbikers-club.framer.ai/"); // Default URL
   const [selectedItem, setSelectedItem] = useState<Item | null>(null);
   const [itemDetailsModalOpen, setItemDetailsModalOpen] = useState(false);
   const { user, t } = useAppContext();
