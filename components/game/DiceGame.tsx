@@ -15,6 +15,7 @@ import { Box, Text, useTexture } from '@react-three/drei'
 import { Physics, useBox, usePlane } from '@react-three/cannon'
 import { Mesh, Vector3, Quaternion, Euler } from 'three'
 import LoadingSpinner from '../ui/LoadingSpinner'
+import * as THREE from 'three';
 
 interface Player {
   id: string
@@ -40,6 +41,12 @@ interface DiceProps {
   initialValue: number
 }
 
+// Define an interface for the face
+interface Face {
+    normal: THREE.Vector3;
+    value: number;
+  }
+
 function Dice({ position, onRollComplete, customTextures, gyro, isRolling, initialValue }: DiceProps) {
   const [ref, api] = useBox<Mesh>(() => ({ mass: 1, position }))
   const textures = useTexture(customTextures || [
@@ -55,25 +62,101 @@ function Dice({ position, onRollComplete, customTextures, gyro, isRolling, initi
   const stableFrames = useRef(0)
 
   useFrame(() => {
-    api.velocity.subscribe((v) => velocityRef.current.set(v[0], v[1], v[2]))
-    api.angularVelocity.subscribe((v) => angularVelocityRef.current.set(v[0], v[1], v[2]))
-
-    api.applyForce([gyro.x * 5, gyro.y * 5, gyro.z * 5], [0, 0, 0])
-
+    // Update velocity and angular velocity references
+    api.velocity.subscribe((v) => velocityRef.current.set(v[0], v[1], v[2]));
+    api.angularVelocity.subscribe((v) => angularVelocityRef.current.set(v[0], v[1], v[2]));
+  
+    // Apply gyro-based force
+    api.applyForce([gyro.x * 5, gyro.y * 5, gyro.z * 5], [0, 0, 0]);
+  
+    // Check for stability and rolling state
     if (isRolling) {
       if (velocityRef.current.length() < 0.1 && angularVelocityRef.current.length() < 0.1) {
-        stableFrames.current += 1
+        stableFrames.current += 1;
         if (stableFrames.current > 60) { // Wait for 60 frames of stability
-          const rotation = ref.current?.rotation
+          const rotation = ref.current?.rotation;
           if (rotation) {
-            onRollComplete(2) // Always give 2 points when dice rest
+            // Create a new Matrix4 from Euler rotation
+            const rotationMatrix = new THREE.Matrix4();
+            rotationMatrix.makeRotationFromEuler(rotation); // Convert Euler to Matrix4
+  
+            // Get the dice value based on rotation matrix
+            const value = getDiceValue(rotationMatrix);
+            onRollComplete(value);
           }
         }
       } else {
-        stableFrames.current = 0
+        stableFrames.current = 0;
       }
     }
-  })
+  });
+  
+
+  // Dice face normals based on their texture index
+const faceNormals = [
+    { normal: { x: 0, y: 1, z: 0 }, value: 1 }, // Top face (face 1)
+    { normal: { x: 0, y: -1, z: 0 }, value: 6 }, // Bottom face (face 6)
+    { normal: { x: 0, y: 0, z: 1 }, value: 2 }, // Front face (face 2)
+    { normal: { x: 0, y: 0, z: -1 }, value: 5 }, // Back face (face 5)
+    { normal: { x: -1, y: 0, z: 0 }, value: 4 }, // Left face (face 4)
+    { normal: { x: 1, y: 0, z: 0 }, value: 3 }, // Right face (face 3)
+  ];
+  
+  // Function to calculate dot product between two vectors
+  function dotProduct(v1: { x: number; y: number; z: number }, v2: { x: number; y: number; z: number }): number {
+    return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
+  }
+  
+// Function to get the dice value based on its current orientation
+function getDiceValue(rotationMatrix: THREE.Matrix4): number {
+    // Define face normals corresponding to each face of the dice
+    const faceNormals: Face[] = [
+      { normal: new THREE.Vector3(0, 1, 0), value: 1 }, // Top face (value = 1)
+      { normal: new THREE.Vector3(0, -1, 0), value: 6 }, // Bottom face (value = 6)
+      { normal: new THREE.Vector3(1, 0, 0), value: 3 }, // Right face (value = 3)
+      { normal: new THREE.Vector3(-1, 0, 0), value: 4 }, // Left face (value = 4)
+      { normal: new THREE.Vector3(0, 0, 1), value: 5 }, // Front face (value = 5)
+      { normal: new THREE.Vector3(0, 0, -1), value: 2 }, // Back face (value = 2)
+    ];
+  
+    // World up vector
+    const worldUp = new THREE.Vector3(0, 1, 0);
+  
+    // Apply the dice's rotation matrix to the face normals
+    const transformedNormals: Face[] = faceNormals.map(face => {
+      const transformedNormal = face.normal.clone().applyMatrix4(rotationMatrix);
+      return { normal: transformedNormal, value: face.value };
+    });
+  
+    // Debug: log transformed normals
+    console.log("Transformed Normals:");
+    transformedNormals.forEach((face, idx) => {
+      console.log(`Face ${idx + 1}:`, face);
+    });
+  
+    // Find the face whose normal is most aligned with the world up vector
+    let closestFace = transformedNormals[0];
+    let closestDotProduct = -Infinity;
+  
+    transformedNormals.forEach(face => {
+      const dotProduct = face.normal.dot(worldUp); // Dot product between transformed normal and world up
+      console.log(`Dot product for face value ${face.value}: ${dotProduct}`);
+      if (dotProduct > closestDotProduct) {
+        closestDotProduct = dotProduct;
+        closestFace = face;
+      }
+    });
+  
+    // Debug: log closest face and dot product
+    console.log("Closest face value:", closestFace.value);
+    console.log("Closest dot product:", closestDotProduct);
+  
+    return closestFace.value; // Return the dice face value that is most upward
+  }
+  
+  
+  
+  
 
   useEffect(() => {
     if (isRolling) {
@@ -98,7 +181,7 @@ function Dice({ position, onRollComplete, customTextures, gyro, isRolling, initi
         <meshStandardMaterial key={index} map={texture} attach={`material-${index}`} />
       ))}
     </Box>
-  )
+  );
 }
 
 function Wall({ position, rotation, texture }: { position: [number, number, number], rotation: [number, number, number], texture: string }) {
