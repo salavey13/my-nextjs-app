@@ -41,57 +41,65 @@ interface DiceProps {
 }
 
 function Dice({ position, onRollComplete, customTextures, gyro, isRolling, initialValue }: DiceProps) {
-    const [ref, api] = useBox<Mesh>(() => ({ mass: 1, position }))
-    const textures = useTexture(customTextures || [
-      '/dice/face_1.png',
-      '/dice/face_2.png',
-      '/dice/face_3.png',
-      '/dice/face_4.png',
-      '/dice/face_5.png',
-      '/dice/face_6.png',
-    ])
-    const velocityRef = useRef<Vector3>(new Vector3())
-    const angularVelocityRef = useRef<Vector3>(new Vector3())
-  
-    useFrame(() => {
-      api.velocity.subscribe((v) => velocityRef.current.set(v[0], v[1], v[2]))
-      api.angularVelocity.subscribe((v) => angularVelocityRef.current.set(v[0], v[1], v[2]))
-  
-      api.applyForce([gyro.x * 5, gyro.y * 5, gyro.z * 5], [0, 0, 0])
-  
-      if (isRolling && velocityRef.current.length() < 0.1 && angularVelocityRef.current.length() < 0.1) {
-        const rotation = ref.current?.rotation
-        if (rotation) {
-          const value = getDiceValue(rotation)
-          onRollComplete(value)
+  const [ref, api] = useBox<Mesh>(() => ({ mass: 1, position }))
+  const textures = useTexture(customTextures || [
+    '/dice/face_1.png',
+    '/dice/face_2.png',
+    '/dice/face_3.png',
+    '/dice/face_4.png',
+    '/dice/face_5.png',
+    '/dice/face_6.png',
+  ])
+  const velocityRef = useRef<Vector3>(new Vector3())
+  const angularVelocityRef = useRef<Vector3>(new Vector3())
+  const stableFrames = useRef(0)
+
+  useFrame(() => {
+    api.velocity.subscribe((v) => velocityRef.current.set(v[0], v[1], v[2]))
+    api.angularVelocity.subscribe((v) => angularVelocityRef.current.set(v[0], v[1], v[2]))
+
+    api.applyForce([gyro.x * 5, gyro.y * 5, gyro.z * 5], [0, 0, 0])
+
+    if (isRolling) {
+      if (velocityRef.current.length() < 0.1 && angularVelocityRef.current.length() < 0.1) {
+        stableFrames.current += 1
+        if (stableFrames.current > 60) { // Wait for 60 frames of stability
+          const rotation = ref.current?.rotation
+          if (rotation) {
+            onRollComplete(2) // Always give 2 points when dice rest
+          }
         }
+      } else {
+        stableFrames.current = 0
       }
-    })
-  
-    useEffect(() => {
-      if (isRolling) {
-        const force = 10
-        api.velocity.set(
-          (Math.random() - 0.5) * force,
-          Math.random() * force + 5,
-          (Math.random() - 0.5) * force
-        )
-        api.angularVelocity.set(
-          (Math.random() - 0.5) * force * 2,
-          (Math.random() - 0.5) * force * 2,
-          (Math.random() - 0.5) * force * 2
-        )
-      }
-    }, [isRolling, api])
-  
-    return (
-      <Box ref={ref} args={[1, 1, 1]}>
-        {textures.map((texture, index) => (
-          <meshStandardMaterial key={index} map={texture} attach={`material-${index}`} />
-        ))}
-      </Box>
-    )
-  }
+    }
+  })
+
+  useEffect(() => {
+    if (isRolling) {
+      const force = 10
+      api.velocity.set(
+        (Math.random() - 0.5) * force,
+        Math.random() * force + 5,
+        (Math.random() - 0.5) * force
+      )
+      api.angularVelocity.set(
+        (Math.random() - 0.5) * force * 2,
+        (Math.random() - 0.5) * force * 2,
+        (Math.random() - 0.5) * force * 2
+      )
+      stableFrames.current = 0
+    }
+  }, [isRolling, api])
+
+  return (
+    <Box ref={ref} args={[1, 1, 1]}>
+      {textures.map((texture, index) => (
+        <meshStandardMaterial key={index} map={texture} attach={`material-${index}`} />
+      ))}
+    </Box>
+  )
+}
 
 function Wall({ position, rotation, texture }: { position: [number, number, number], rotation: [number, number, number], texture: string }) {
   const [ref] = usePlane<Mesh>(() => ({ position, rotation }))
@@ -115,21 +123,6 @@ function Floor() {
   )
 }
 
-function getDiceValue(rotation: { x: number; y: number; z: number }): number {
-  const eps = 0.1
-  const isUp = (v: number) => Math.abs(v % (Math.PI * 2)) < eps
-  const isDown = (v: number) => Math.abs(v % (Math.PI * 2) - Math.PI) < eps
-
-  if (isUp(rotation.x) && isUp(rotation.z)) return 1
-  if (isDown(rotation.x) && isUp(rotation.z)) return 6
-  if (isUp(rotation.y) && rotation.x < 0) return 2
-  if (isUp(rotation.y) && rotation.x > 0) return 5
-  if (isDown(rotation.y) && rotation.x < 0) return 3
-  if (isDown(rotation.y) && rotation.x > 0) return 4
-
-  return 1 // Default to 1 if no clear face is up
-}
-
 function Scene({ gameState, onRollComplete, wallTexture }: { gameState: GameState, onRollComplete: (values: [number, number]) => void, wallTexture: string }) {
   const { camera } = useThree()
   const { t } = useAppContext()
@@ -142,12 +135,10 @@ function Scene({ gameState, onRollComplete, wallTexture }: { gameState: GameStat
     const midPoint = new Vector3().addVectors(dicePositions.current[0], dicePositions.current[1]).multiplyScalar(0.5)
     
     if (state.clock.elapsedTime < 2) {
-      // Matrix-style camera movement for the first 2 seconds
       const t = Math.min(1, state.clock.elapsedTime / 2)
       const position = new Vector3().lerpVectors(initialCameraPosition.current, finalCameraPosition.current, t)
       camera.position.copy(position)
     } else {
-      // Maintain the final camera position after animation
       camera.position.copy(finalCameraPosition.current)
     }
     
@@ -293,7 +284,7 @@ const DiceGame: React.FC = () => {
                 ? existingSecondPlayer
                 : { 
                     id: mode === 'twoPlayer' ? 'waiting' : 'ai', 
-                    username: mode === 'twoPlayer' ? (existingSecondPlayer?.username || t('waiting')) : t('ai'), 
+                    username: mode === 'twoPlayer' ? t('waiting') : t('ai'), 
                     score: 0, 
                     diceValues: [1, 1] as [number, number]
                   }
@@ -320,50 +311,11 @@ const DiceGame: React.FC = () => {
   }
 
   const rollDice = async () => {
-    if (!gameState || gameState.isRolling || gameState.currentPlayer !== String(user?.id)) return
+    if (!gameState || gameState.isRolling || (gameState.currentPlayer !== String(user?.id) && gameState.currentPlayer !== 'ai')) return
 
     const updatedGameState = { ...gameState, isRolling: true }
     await updateGameState(updatedGameState)
     playSound(diceRollAudio)
-
-    setTimeout(async () => {
-      const newDiceValues: [number, number] = [
-        Math.floor(Math.random() * 6) + 1,
-        Math.floor(Math.random() * 6) + 1,
-      ]
-
-      const currentPlayerIndex = gameState.players.findIndex(p => p.id === gameState.currentPlayer)
-      const updatedPlayers = gameState.players.map((player, index) => 
-        index === currentPlayerIndex 
-          ? { ...player, score: player.score + newDiceValues[0] + newDiceValues[1], diceValues: newDiceValues } 
-          : player
-      )
-
-      const nextPlayerIndex = (currentPlayerIndex + 1) % gameState.players.length
-      const isGameOver = updatedPlayers.some(player => player.score >= 100)
-
-      let winner = null
-      if (isGameOver) {
-        winner = updatedPlayers.reduce((maxPlayer, player) => 
-          player.score > maxPlayer.score ? player : maxPlayer
-        ).id
-        playSound(winner === String(user?.id) ? giggleAudio : screamAudio)
-      }
-
-      const updatedGameState: GameState = {
-        ...gameState,
-        players: updatedPlayers,
-        currentPlayer: isGameOver ? gameState.currentPlayer : gameState.players[nextPlayerIndex].id,
-        isRolling: false,
-        winner,
-      }
-
-      await updateGameState(updatedGameState)
-
-      if (updatedGameState.gameMode === 'ai' && updatedGameState.currentPlayer === 'ai' && !isGameOver) {
-        setTimeout(() => rollDice(), 1000)
-      }
-    }, 1000)
   }
 
   const updateGameState = async (newState: GameState) => {
@@ -394,12 +346,12 @@ const DiceGame: React.FC = () => {
     const currentPlayerIndex = gameState.players.findIndex(p => p.id === gameState.currentPlayer)
     const updatedPlayers = gameState.players.map((player, index) => 
       index === currentPlayerIndex 
-        ? { ...player, score: player.score + newDiceValues[0] + newDiceValues[1], diceValues: newDiceValues } 
+        ? { ...player, score: player.score + 4, diceValues: newDiceValues } 
         : player
     )
 
     const nextPlayerIndex = (currentPlayerIndex + 1) % gameState.players.length
-    const isGameOver = updatedPlayers.some(player => player.score >= 100)
+    const isGameOver = updatedPlayers.some(player => player.score >= 69)
 
     let winner = null
     if (isGameOver) {
@@ -529,10 +481,10 @@ const DiceGame: React.FC = () => {
                     <div className="w-32 h-4 bg-gray-300 rounded-full overflow-hidden">
                       <div
                         className="h-full bg-yellow-500"
-                        style={{ width: `${(player.score / 100) * 100}%` }}
+                        style={{ width: `${(player.score / 69) * 100}%` }}
                       ></div>
                     </div>
-                    <div className="text-sm mt-1">{player.score}/100</div>
+                    <div className="text-sm mt-1">{player.score} / 69</div>
                     {gameState.currentPlayer === player.id && (
                       <div className="text-sm text-yellow-500">{t('currentTurn')}</div>
                     )}
@@ -550,7 +502,7 @@ const DiceGame: React.FC = () => {
                 <Button
                   onClick={rollDice}
                   variant="outline"
-                  disabled={gameState.isRolling || gameState.currentPlayer !== String(user?.id)}
+                  disabled={gameState.isRolling || (gameState.currentPlayer !== String(user?.id) && gameState.currentPlayer !== 'ai')}
                   className="bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-4 px-8 rounded-lg"
                 >
                   {gameState.isRolling ? t('rolling') : t('rollDice')}
