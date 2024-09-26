@@ -1,7 +1,13 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 
-export default function NavBar({ sections, currentSection, scrollToSection }) {
+interface NavBarProps {
+  sections: string[];
+  currentSection: string;
+  scrollToSection: (section: string) => void;
+}
+
+export default function NavBar({ sections, currentSection, scrollToSection }: NavBarProps) {
   const [isVisible, setIsVisible] = useState(true);
   const [isExpanded, setIsExpanded] = useState(false);
 
