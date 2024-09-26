@@ -31,7 +31,7 @@ export default function NavBar({ sections, currentSection, scrollToSection }: Na
     <nav
       className={`fixed bottom-14 right-0 z-50 p-4 transition-transform duration-500 ${
         isVisible ? "translate-y-0" : "translate-y-full"
-      } ${isExpanded ? "w-full h-auto bg-white shadow-xl rounded-md" : "w-16 h-16 bg-primary rounded-full"}`}
+      } ${isExpanded ? "w-full h-auto bg-white shadow-xl rounded-lg" : "rounded-lg shadow-xl"}`}
       onClick={() => setIsExpanded(!isExpanded)}
     >
       {!isExpanded ? (
@@ -39,7 +39,7 @@ export default function NavBar({ sections, currentSection, scrollToSection }: Na
           ☰
         </Button>
       ) : (
-        <div className="flex flex-col space-y-1">
+        <div className="flex flex-col">
           {sections.map((section, index) => (
             <Button
               key={index}
