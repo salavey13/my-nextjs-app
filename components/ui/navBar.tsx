@@ -35,16 +35,16 @@ export default function NavBar({ sections, currentSection, scrollToSection }: Na
       onClick={() => setIsExpanded(!isExpanded)}
     >
       {!isExpanded ? (
-        <Button variant="neumorphism" size="smallIcon">
+        <Button variant="outline" size="smallIcon">
           ☰
         </Button>
       ) : (
-        <div className="flex flex-col space-y-2">
+        <div className="flex flex-col space-y-1">
           {sections.map((section, index) => (
             <Button
               key={index}
               onClick={() => scrollToSection(index)}
-              variant={currentSection === index ? "neumorphism" : "secondary"}
+              variant={currentSection === index ? "secondary" : "neumorphism"}
               size="smallIcon"
               className="w-full text-center rounded-lg"
             >
