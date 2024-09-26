@@ -74,6 +74,12 @@ const MainSection: React.FC = () => {
           >
             VIP Bike
           </Button>
+          <Button
+            onClick={() => setSelectedCreator("Поставить аву ")}
+            className="px-6 py-3 text-white rounded-lg bg-gradient-to-r from-green-500 to-green-700 hover:from-green-600 hover:to-green-800 transition-all"
+          >
+            Dota
+          </Button>
         </div>
       </div>
   
