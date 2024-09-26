@@ -13,6 +13,7 @@ import ClipboardManager from './ClipboardManager';
 import { zeroStageRequest, zeroStageRequest4Type } from "./requestTemplate";
 import EnhancedChatButton from './ui/enhancedChatButton';
 import NavBar from "@/components/ui/navBar";
+import useTelegram from '@/hooks/useTelegram';
 
 interface Achievement {
   id: string;
@@ -32,7 +33,19 @@ const Dev: React.FC = () => {
   const [githubTaskLink, setGithubTaskLink] = useState<string>("");
   const [currentSection, setCurrentSection] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
-
+  const {
+    tg,
+    theme,
+    openLink,
+    showMainButton,
+    hideMainButton,
+    showBackButton,
+    closeWebApp,
+    setBottomBarColor,
+    setHeaderColor,
+    setBackgroundColor
+  } = useTelegram();
+  
   useEffect(() => {
     fetchAchievements();
   }, [user]);
@@ -180,7 +193,7 @@ const Dev: React.FC = () => {
                       <li>{t('step4Description')}</li>
                     </ol>
                     <Button
-                      onClick={() => window.open('https://v0.dev', '_blank')}
+                      onClick={() => openLink('https://v0.dev')}
                       variant="outline"
                       className="mt-4 w-full"
                     >
@@ -220,16 +233,27 @@ const Dev: React.FC = () => {
                         <h3 className="text-xl font-semibold mb-2">{t('githubProjectIntegration')}</h3>
                         <p>{t('githubProjectDescription')}</p>
                         <Button
-                          onClick={() => window.open('https://github.com/users/salavey13/projects/2', '_blank')}
+                          onClick={() => openLink('https://github.com/users/salavey13/projects/2')}
                           variant="outline"
                           className="mt-4 w-full"
                         >
                           {t('openGitHubProject')}
                         </Button>
                       </div>
+                      <div>
+                        <h3 className="text-xl font-semibold mb-2">{t('vercelDeployment')}</h3>
+                        <p>{t('vercelDeploymentDescription')}</p>
+                        <Button
+                          onClick={() => openLink('https://vercel.com/salavey13s-projects/my-nextjs-app/deployments')}
+                          variant="outline"
+                          className="mt-4 w-full"
+                        >
+                          {t('openVercelDashboard')}
+                        </Button>
+                      </div>
                     </div>
                     <Button
-                      onClick={() => window.open('https://github.com/salavey13/my-nextjs-app/tree/main/components', '_blank')}
+                      onClick={() => openLink('https://github.com/salavey13/my-nextjs-app/tree/main/components')}
                       variant="outline"
                       className="mt-4 w-full"
                     >
