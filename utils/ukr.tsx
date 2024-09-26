@@ -1,5 +1,6 @@
 import { LanguageDictionary } from "../utils/TranslationUtils";
 export const ukr: LanguageDictionary = {
+  mileage: "Пробіг",
   pay:"Сплатити",
   backToCreators:"Все",
   pleaseGrantAccess: "Будь ласка, надайте доступ до своєї камери та мікрофона для гри.",
