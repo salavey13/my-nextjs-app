@@ -45,7 +45,7 @@ export default function NavBar({ sections, currentSection, scrollToSection }: Na
               key={index}
               onClick={() => scrollToSection(index)}
               variant={currentSection === index ? "neon" : "ghost"}
-              size="large"
+              size="lg"
               className="w-full text-left"
             >
               {section.title}
