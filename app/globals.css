@@ -68,17 +68,43 @@
     height: 100%;
   }
 
-  h1 {
-    background: linear-gradient(45deg, #8e2de2, #4a00e0, #9c27b0);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    text-fill-color: transparent;
-    animation: slide-in-left 1s ease-out;
-    -webkit-text-stroke: #E1FF01;
-    -webkit-text-stroke-color: #FFFFFF;
-    -webkit-text-stroke-width: 0.25px;
-  }
+  /* Fixed h1 to remove stroke and add a clean gradient effect */
+h1 {
+  background: linear-gradient(45deg, #8e2de2, #4a00e0, #9c27b0);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-fill-color: transparent;
+  animation: slide-in-left 1s ease-out;
+  /* Removed the stroke */
+  font-weight: 700;
+}
+
+/* Fix button text color on active state */
+button:active {
+  background-color: var(--accent-color); /* Keep the yellow background */
+  color: #000000; /* Text should turn black */
+}
+
+/* Added neon glow variant */
+.shadow-neon-glow {
+  text-shadow: 0 0 8px rgba(0, 0, 0, 0.13), 0 0 16px rgba(136, 255, 0, 0.322);
+}
+
+/* Added neumorphism variant */
+.shadow-neumorphism {
+  background: hsl(var(--background));
+  border-radius: var(--radius);
+  box-shadow: 8px 8px 16px hsl(var(--background) / 0.4), -8px -8px 16px hsl(var(--foreground) / 0.2);
+}
+
+/* Button Ripple Effect */
+
+/* Navigation Animations */
+nav {
+  transition: transform 0.5s ease;
+}
+
 
   @keyframes slide-in-left {
     from {
@@ -140,6 +166,7 @@
     border-radius: 10px;
     border: 3px solid hsl(var(--background));
   }
+
 
   /* Button Ripple Effect */
   @keyframes ripple {
