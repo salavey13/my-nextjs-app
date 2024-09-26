@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
+
 interface Section {
   title: string;
 }
+
 interface NavBarProps {
   sections: Section[];
   currentSection: number;
@@ -42,7 +44,9 @@ export default function NavBar({ sections, currentSection, scrollToSection }: Na
             <Button
               key={index}
               onClick={() => scrollToSection(index)}
-              variant={currentSection === index ? "default" : "outline"}
+              variant={currentSection === index ? "solid" : "ghost"} // solid for current, ghost for others
+              size="large" // assuming you have a large button size variant for nav items
+              className="w-full text-left" // making buttons full-width and aligned to the left for better UI/UX
             >
               {section.title}
             </Button>
