@@ -299,9 +299,9 @@ const Dev: React.FC = () => {
         ))}
       </div>
 
-      <div className="fixed bottom-20 right-4 z-50">
+      {/*<div className="fixed bottom-20 right-4 z-50">
         <EnhancedChatButton />
-      </div>
+      </div>*/}
     </div>
   );
 };
