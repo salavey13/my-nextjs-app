@@ -4,9 +4,8 @@ import React, { useEffect, useState } from "react"
 import { supabase } from "../lib/supabaseClient"
 import { Button } from "@/components/ui/button"
 import LoadingSpinner from "./ui/LoadingSpinner"
-import Link from "next/link"
-import { useAppContext } from "@/context/AppContext"
 import Image from "next/image"
+import { useAppContext } from "@/context/AppContext"
 
 interface Item {
   id: number
@@ -38,9 +37,14 @@ interface Creator {
   image: string
 }
 
-export default function MainSection() {
+interface MainSectionProps {
+  setItemDetailsModalOpen: (open: boolean) => void
+  setSelectedItem: (item: Item | null) => void
+  items: Item[]
+}
+
+export default function MainSection({ setItemDetailsModalOpen, setSelectedItem, items }: MainSectionProps) {
   const { t } = useAppContext()
-  const [items, setItems] = useState<Item[]>([])
   const [creators, setCreators] = useState<Creator[]>([])
   const [selectedCreator, setSelectedCreator] = useState<string | null>(null)
   const [loading, setLoading] = useState<boolean>(true)
@@ -48,54 +52,28 @@ export default function MainSection() {
   // Fetch unique creator_ref_codes and a sample image for each
   const fetchCreators = async () => {
     setLoading(true)
-    const { data, error } = await supabase
-      .from("items")
-      .select("creator_ref_code, details")
-      .order("creator_ref_code")
-
-    if (error) {
-      console.error("Error fetching creators:", error)
-    } else {
-      const uniqueCreators = data.reduce((acc: Creator[], item: Item) => {
-        if (!acc.find(c => c.ref_code === item.creator_ref_code)) {
-          acc.push({
-            ref_code: item.creator_ref_code,
-            name: item.creator_ref_code, // You might want to replace this with a proper name if available
-            image: item.details.photo_upload?.photo || '/placeholder.svg'
-          })
-        }
-        return acc
-      }, [])
-      setCreators(uniqueCreators)
-    }
-    setLoading(false)
-  }
-
-  // Fetch items for a specific creator
-  const fetchItems = async (creatorRefCode: string) => {
-    setLoading(true)
-    const { data, error } = await supabase
-      .from("items")
-      .select("*")
-      .eq("creator_ref_code", creatorRefCode)
-
-    if (error) {
-      console.error("Error fetching data:", error)
-    } else {
-      setItems(data)
-    }
+    const uniqueCreators = items.reduce((acc: Creator[], item: Item) => {
+      if (!acc.find(c => c.ref_code === item.creator_ref_code)) {
+        acc.push({
+          ref_code: item.creator_ref_code,
+          name: item.creator_ref_code, // You might want to replace this with a proper name if available
+          image: item.details.photo_upload?.photo || '/placeholder.svg'
+        })
+      }
+      return acc
+    }, [])
+    setCreators(uniqueCreators)
     setLoading(false)
   }
 
   useEffect(() => {
     fetchCreators()
-  }, [])
+  }, [items])
 
-  useEffect(() => {
-    if (selectedCreator) {
-      fetchItems(selectedCreator)
-    }
-  }, [selectedCreator])
+  const handleItemClick = (item: Item) => {
+    setSelectedItem(item)
+    setItemDetailsModalOpen(true)
+  }
 
   if (loading) {
     return <LoadingSpinner />
@@ -138,7 +116,7 @@ export default function MainSection() {
             </div>
           </div>
           <main className="w-full h-screen items-center snap-y snap-mandatory overflow-y-scroll">
-            {items.map((item) => (
+            {items.filter(item => item.creator_ref_code === selectedCreator).map((item) => (
               <section
                 key={item.id}
                 className="w-full h-[100vh] relative snap-start flex flex-col items-center justify-center"
@@ -158,10 +136,9 @@ export default function MainSection() {
                   <Button
                     className="relative z-10 px-8 py-3 bg-gradient-to-r from-blue-600 to-blue-800 text-white rounded-lg hover:from-blue-700 hover:to-blue-900 transition-all shadow-lg"
                     variant="outline"
+                    onClick={() => handleItemClick(item)}
                   >
-                    <Link href={`https://t.me/oneSitePlsBot/vip?ref_item=${item.id}`}>
-                      {t("rentNow")}
-                    </Link>
+                    {t("rentNow")}
                   </Button>
                 </div>
               </section>
