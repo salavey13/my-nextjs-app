@@ -17,7 +17,7 @@ import { faPlus, faMinus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import useTelegram from '../hooks/useTelegram';
 import { Textarea } from "./ui/textarea";
-  
+import  MainSection  from "@/components/MainSection"
 
 
 export default function Rents() {
@@ -26,7 +26,7 @@ export default function Rents() {
   const [users, setUsers] = useState<User[]>([]);
   const [newItemModalOpen, setNewItemModalOpen] = useState(false);
   const [itemType, setItemType] = useState<string>("evo"); // Default to "evo" type
-  const [topEmbedUrl, setTopEmbedUrl] = useState("https://excellent-lots-147907.framer.app"); // Default URL
+  const [topEmbedUrl, setTopEmbedUrl] = useState(""); // Default URL
   const [selectedItem, setSelectedItem] = useState<Item | null>(null);
   const [itemDetailsModalOpen, setItemDetailsModalOpen] = useState(false);
   const { user, t } = useAppContext();
@@ -300,17 +300,25 @@ export default function Rents() {
   return (
     <div className="relative w-full h-[calc(200vh-128px)] bg-muted/40">
       {/* The iframe fills the whole 200vh */}
-      <div className="absolute top-0 left-0 w-full h-[calc(200vh-128px)] z-0">
-        <iframe
-          width="100%"
-          height="100%"
-          src={topEmbedUrl}
-          title="Top Embed"
-          frameBorder="0"
-          allowFullScreen
-          style={{ height: '100%' }} // 100% of the container's height (200vh)h-[200vh]
-        ></iframe>
-      </div>
+      {topEmbedUrl != "" && (
+        <div className="absolute top-0 left-0 w-full h-[calc(200vh-128px)] z-0">
+          <iframe
+            width="100%"
+            height="100%"
+            src={topEmbedUrl}
+            title="Top Embed"
+            frameBorder="0"
+            allowFullScreen
+            style={{ height: '100%' }} // 100% of the container's height (200vh)h-[200vh]
+          ></iframe>
+        </div>
+      )}
+
+      {topEmbedUrl == "" && <MainSection />}
+        {/* <div className="absolute top-0 left-0 w-full h-[calc(200vh-128px)] z-0">
+          <MainSection />
+        {/* </div> *
+      )}*/}
 
       {/* Content positioned 64px from the bottom, occupying the bottom 100vh overflow-auto*/}
       <div className="absolute bottom-0 left-0 scrollbars-hide w-full z-10 max-h-[calc(100vh-128px)] backdrop-blur-lg rounded-t-2xl">

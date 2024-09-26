@@ -559,4 +559,5 @@ createTask: "Create Task",
   hack: "Hack",
   currentTurn: "Current Turn",
   turn: "turn",
+  rentNow: "Rent Now",
 }
