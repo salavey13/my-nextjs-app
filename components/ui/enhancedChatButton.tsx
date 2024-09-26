@@ -51,7 +51,7 @@ const EnhancedChatButton = () => {
   };
   
   return (
-    <div className={`flex items-center justify-center ${theme === 'dark' ? 'bg-black' : 'bg-white'} p-4 gap-8`}>
+    <div className={`flex items-center justify-center ${theme === 'dark' ? 'bg-black' : 'bg-white'} p-2 gap-2`}>
       <Button
         onClick={handleOpenVPN}
         className="group flex flex-col items-center justify-center text-gray-400 w-36 h-18 gap-2 hover:text-blue-500 transition-all duration-300 rounded-lg transform hover:scale-110"
