@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-
+interface Section {
+  title: string;
+}
 interface NavBarProps {
-  sections: string[];
+  sections: Section[];
   currentSection: string;
   scrollToSection: (section: string) => void;
 }
