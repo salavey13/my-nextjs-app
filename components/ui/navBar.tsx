@@ -44,9 +44,9 @@ export default function NavBar({ sections, currentSection, scrollToSection }: Na
             <Button
               key={index}
               onClick={() => scrollToSection(index)}
-              variant={currentSection === index ? "solid" : "ghost"} // solid for current, ghost for others
-              size="large" // assuming you have a large button size variant for nav items
-              className="w-full text-left" // making buttons full-width and aligned to the left for better UI/UX
+              variant={currentSection === index ? "solid" : "ghost"}
+              size="large"
+              className="w-full text-left"
             >
               {section.title}
             </Button>
