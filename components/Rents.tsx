@@ -19,6 +19,29 @@ import useTelegram from '../hooks/useTelegram';
 import { Textarea } from "./ui/textarea";
 import  MainSection  from "@/components/MainSection"
 
+interface Item {
+  id: number
+  title: string
+  creator_ref_code: string
+  item_type: string
+  details: {
+    ad_info: {
+      title: string
+      description: string
+    }
+    general_info: {
+      make: string
+      year: string
+      model: string
+      price: string // Changed from number to string
+      mileage?: string
+      color?: string
+    }
+    photo_upload: {
+      photo: string
+    }
+  }
+}
 
 export default function Rents() {
   const [rents, setRents] = useState<Rent[]>([]);
