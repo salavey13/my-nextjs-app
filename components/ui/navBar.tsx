@@ -5,8 +5,8 @@ interface Section {
 }
 interface NavBarProps {
   sections: Section[];
-  currentSection: string;
-  scrollToSection: (section: string) => void;
+  currentSection: number;
+  scrollToSection: (index: number) => void;
 }
 
 export default function NavBar({ sections, currentSection, scrollToSection }: NavBarProps) {
