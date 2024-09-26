@@ -21,7 +21,7 @@ interface Item {
       make: string
       year: string
       model: string
-      price: number
+      price: string
       mileage?: string
       color?: string
     }
