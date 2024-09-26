@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useAppContext } from '../context/AppContext';
 import { supabase } from "../lib/supabaseClient";
 import { Button } from "@/components/ui/button";
@@ -8,9 +8,10 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
-import { Trophy, AlertCircle, Github, Vercel, Send } from 'lucide-react';
+import { Trophy, AlertCircle, Send } from 'lucide-react';
 import ClipboardManager from './ClipboardManager';
 import { zeroStageRequest, zeroStageRequest4Type } from "./requestTemplate";
+import EnhancedChatButton from './ui/enhancedChatButton';
 
 interface Achievement {
   id: string;
@@ -28,10 +29,35 @@ const Dev: React.FC = () => {
   const [requestGenerationCount, setRequestGenerationCount] = useState<number>(0);
   const [v0DevLink, setV0DevLink] = useState<string>("");
   const [githubTaskLink, setGithubTaskLink] = useState<string>("");
+  const [currentSection, setCurrentSection] = useState(0);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     fetchAchievements();
   }, [user]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (containerRef.current) {
+        const scrollPosition = containerRef.current.scrollTop;
+        const windowHeight = window.innerHeight - 128; // Adjust for topShelf and bottomShelf
+        const sectionIndex = Math.round(scrollPosition / windowHeight);
+        setCurrentSection(sectionIndex);
+      }
+    };
+
+    containerRef.current?.addEventListener('scroll', handleScroll);
+    return () => containerRef.current?.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const scrollToSection = (index: number) => {
+    if (containerRef.current) {
+      containerRef.current.scrollTo({
+        top: index * (window.innerHeight - 128),
+        behavior: 'smooth'
+      });
+    }
+  };
 
   const fetchAchievements = async () => {
     if (!user) return;
@@ -88,7 +114,6 @@ const Dev: React.FC = () => {
       return;
     }
     
-    // This is a placeholder. You should implement the actual notification logic.
     const response = await fetch('/api/notify-salavey13', {
       method: 'POST',
       headers: {
@@ -104,200 +129,178 @@ const Dev: React.FC = () => {
     }
   };
 
+  const sections = [
+    { title: t('welcomeSection') },
+    { title: t('ideaSection') },
+    { title: t('projectSection') },
+    { title: t('achievementsSection') },
+    { title: t('notifySection') },
+  ];
+
   return (
-    <div className="dev-container p-4 bg-gray-800 text-white rounded-md">
-      <h1 className="text-3xl font-bold mb-6">{t('developerDashboard')}</h1>
-
-      <Card className="mb-6 bg-gray-700">
-        <CardHeader>
-          <CardTitle>{t('welcomeToDevTab')}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p>{t('devTabInstructions')}</p>
-          <ol className="list-decimal list-inside mt-4">
-            <li>{t('step1Description')}</li>
-            <li>{t('step2Description')}</li>
-            <li>{t('step3Description')}</li>
-            <li>{t('step4Description')}</li>
-          </ol>
+    <div className="dev-container bg-gray-900 text-white h-[calc(100vh-128px)] overflow-hidden">
+      <nav className="fixed top-16 right-0 p-4 z-50">
+        {sections.map((section, index) => (
           <Button
-            onClick={() => window.open('https://v0.dev', '_blank')}
-            variant="outline"
-            className="mt-4 w-full"
+            key={index}
+            onClick={() => scrollToSection(index)}
+            variant={currentSection === index ? "default" : "outline"}
+            className="mr-2"
           >
-            {t('openV0Dev')}
+            {section.title}
           </Button>
-        </CardContent>
-      </Card>
+        ))}
+      </nav>
 
-      <Card className="mb-6 bg-gray-700">
-        <CardHeader>
-          <CardTitle>{t('enterYourIdeaTitle')}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Textarea
-            value={ideaText}
-            onChange={(e) => setIdeaText(e.target.value)}
-            placeholder={t("describeYourIdeaPlaceholder")}
-            className="bg-gray-600 text-white mb-4"
-          />
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <Button onClick={() => handleZeroStageRequest('normal')} variant="outline">
-              {t('generateRequestButton')}
-            </Button>
-            <Button onClick={() => handleZeroStageRequest('type')} variant="outline">
-              {t('generateRequestButton4type')}
-            </Button>
+      <div ref={containerRef} className="h-full overflow-y-auto snap-y snap-mandatory">
+        {sections.map((section, index) => (
+          <div
+            key={index}
+            className="h-[calc(100vh-128px)] snap-start flex items-center justify-center p-8"
+          >
+            <Card className="w-full max-w-4xl bg-gray-800 text-white">
+              <CardHeader>
+                <CardTitle>{section.title}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {index === 0 && (
+                  <>
+                    <p>{t('devTabInstructions')}</p>
+                    <ol className="list-decimal list-inside mt-4">
+                      <li>{t('step1Description')}</li>
+                      <li>{t('step2Description')}</li>
+                      <li>{t('step3Description')}</li>
+                      <li>{t('step4Description')}</li>
+                    </ol>
+                    <Button
+                      onClick={() => window.open('https://v0.dev', '_blank')}
+                      variant="outline"
+                      className="mt-4 w-full"
+                    >
+                      {t('openV0Dev')}
+                    </Button>
+                  </>
+                )}
+                {index === 1 && (
+                  <>
+                    <Textarea
+                      value={ideaText}
+                      onChange={(e) => setIdeaText(e.target.value)}
+                      placeholder={t("describeYourIdeaPlaceholder")}
+                      className="bg-gray-700 text-white mb-4"
+                    />
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <Button onClick={() => handleZeroStageRequest('normal')} variant="outline">
+                        {t('generateRequestButton')}
+                      </Button>
+                      <Button onClick={() => handleZeroStageRequest('type')} variant="outline">
+                        {t('generateRequestButton4type')}
+                      </Button>
+                    </div>
+                    {requestGenerated && (
+                      <div className="mt-4 text-green-400">
+                        <AlertCircle className="inline mr-2" />
+                        {t('requestGeneratedSuccess')}
+                      </div>
+                    )}
+                    <ClipboardManager requestText={ideaText + "\n" + zeroStageRequest} />
+                  </>
+                )}
+                {index === 2 && (
+                  <>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div>
+                        <h3 className="text-xl font-semibold mb-2">{t('githubProjectIntegration')}</h3>
+                        <p>{t('githubProjectDescription')}</p>
+                        <Button
+                          onClick={() => window.open('https://github.com/users/salavey13/projects/2', '_blank')}
+                          variant="outline"
+                          className="mt-4 w-full"
+                        >
+                          {t('openGitHubProject')}
+                        </Button>
+                      </div>
+                      <div>
+                        <h3 className="text-xl font-semibold mb-2">{t('vercelDeployment')}</h3>
+                        <p>{t('vercelDeploymentDescription')}</p>
+                        <Button
+                          onClick={() => window.open('https://vercel.com/salavey13s-projects/my-nextjs-app/deployments', '_blank')}
+                          variant="outline"
+                          className="mt-4 w-full"
+                        >
+                          {t('openVercelDashboard')}
+                        </Button>
+                      </div>
+                    </div>
+                    <Button
+                      onClick={() => window.open('https://github.com/salavey13/my-nextjs-app/tree/main/components', '_blank')}
+                      variant="outline"
+                      className="mt-4 w-full"
+                    >
+                      {t('viewProjectComponents')}
+                    </Button>
+                  </>
+                )}
+                {index === 3 && (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {achievements.map((achievement) => (
+                      <div key={achievement.id} className="p-4 bg-gray-700 rounded-lg">
+                        <div className="flex items-center">
+                          <Trophy className="mr-2 text-yellow-400" />
+                          <h3 className="text-xl font-semibold">{achievement.title}</h3>
+                        </div>
+                        <p className="text-gray-300">{achievement.description}</p>
+                        <div className="mt-2">
+                          <div className="bg-gray-600 h-2 rounded-full">
+                            <div
+                              className="bg-blue-500 h-2 rounded-full"
+                              style={{ width: `${(achievement.progress / achievement.max_progress) * 100}%` }}
+                            ></div>
+                          </div>
+                          <p className="text-sm text-gray-400 mt-1">
+                            {achievement.progress} / {achievement.max_progress}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                    <div className="p-4 bg-gray-700 rounded-lg">
+                      <div className="flex items-center">
+                        <Trophy className="mr-2 text-yellow-400" />
+                        <h3 className="text-xl font-semibold">{t('requestGenerationAchievement')}</h3>
+                      </div>
+                      <p className="text-gray-300">{t('requestGenerationDescription')}</p>
+                      <p className="text-2xl font-bold mt-2">{requestGenerationCount}</p>
+                    </div>
+                  </div>
+                )}
+                {index === 4 && (
+                  <>
+                    <Input
+                      value={v0DevLink}
+                      onChange={(e) => setV0DevLink(e.target.value)}
+                      placeholder={t('v0DevLinkPlaceholder')}
+                      className="mb-2"
+                    />
+                    <Input
+                      value={githubTaskLink}
+                      onChange={(e) => setGithubTaskLink(e.target.value)}
+                      placeholder={t('githubTaskLinkPlaceholder')}
+                      className="mb-2"
+                    />
+                    <Button onClick={notifySalavey13} variant="outline" className="w-full">
+                      <Send className="mr-2" />
+                      {t('sendNotification')}
+                    </Button>
+                  </>
+                )}
+              </CardContent>
+            </Card>
           </div>
-          {requestGenerated && (
-            <div className="mt-4 text-green-400">
-              <AlertCircle className="inline mr-2" />
-              {t('requestGeneratedSuccess')}
-            </div>
-          )}
-          <ClipboardManager requestText={ideaText + "\n" + zeroStageRequest} />
-        </CardContent>
-      </Card>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-        <Card className="bg-gray-700">
-          <CardHeader>
-            <CardTitle>{t('githubProjectIntegration')}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p>{t('githubProjectDescription')}</p>
-            <Button
-              onClick={() => window.open('https://github.com/users/salavey13/projects/2', '_blank')}
-              variant="outline"
-              className="mt-4 w-full"
-            >
-              <Github className="mr-2" />
-              {t('openGitHubProject')}
-            </Button>
-            <iframe
-              src="https://github.com/users/salavey13/projects/2"
-              className="w-full h-64 mt-4 border border-gray-600 rounded"
-              title="GitHub Project"
-            />
-            <Button
-              onClick={() => window.open('https://github.com/salavey13/my-nextjs-app/tree/main/components', '_blank')}
-              variant="outline"
-              className="mt-4 w-full"
-            >
-              {t('viewProjectComponents')}
-            </Button>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-gray-700">
-          <CardHeader>
-            <CardTitle>{t('vercelDeployment')}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p>{t('vercelDeploymentDescription')}</p>
-            <Button
-              onClick={() => window.open('https://vercel.com/salavey13s-projects/my-nextjs-app/deployments', '_blank')}
-              variant="outline"
-              className="mt-4 w-full"
-            >
-              <Vercel className="mr-2" />
-              {t('openVercelDashboard')}
-            </Button>
-            <iframe
-              src="https://vercel.com/salavey13s-projects/my-nextjs-app/deployments"
-              className="w-full h-64 mt-4 border border-gray-600 rounded"
-              title="Vercel Dashboard"
-            />
-          </CardContent>
-        </Card>
+        ))}
       </div>
 
-      <Card className="mb-6 bg-gray-700">
-        <CardHeader>
-          <CardTitle>{t('achievements')}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {achievements.map((achievement) => (
-              <div key={achievement.id} className="p-4 bg-gray-600 rounded-lg">
-                <div className="flex items-center">
-                  <Trophy className="mr-2 text-yellow-400" />
-                  <h3 className="text-xl font-semibold">{achievement.title}</h3>
-                </div>
-                <p className="text-gray-300">{achievement.description}</p>
-                <div className="mt-2">
-                  <div className="bg-gray-700 h-2 rounded-full">
-                    <div
-                      className="bg-blue-500 h-2 rounded-full"
-                      style={{ width: `${(achievement.progress / achievement.max_progress) * 100}%` }}
-                    ></div>
-                  </div>
-                  <p className="text-sm text-gray-400 mt-1">
-                    {achievement.progress} / {achievement.max_progress}
-                  </p>
-                </div>
-              </div>
-            ))}
-            <div className="p-4 bg-gray-600 rounded-lg">
-              <div className="flex items-center">
-                <Trophy className="mr-2 text-yellow-400" />
-                <h3 className="text-xl font-semibold">{t('requestGenerationAchievement')}</h3>
-              </div>
-              <p className="text-gray-300">{t('requestGenerationDescription')}</p>
-              <p className="text-2xl font-bold mt-2">{requestGenerationCount}</p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card className="mb-6 bg-gray-700">
-        <CardHeader>
-          <CardTitle>{t('getStartedWithGitHub')}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p>{t('githubAccountInstructions')}</p>
-          <Button
-            onClick={() => window.open('https://github.com/join', '_blank')}
-            variant="outline"
-            className="mt-4 w-full"
-          >
-            {t('createGitHubAccount')}
-          </Button>
-        </CardContent>
-      </Card>
-
-      <Card className="mb-6 bg-gray-700">
-        <CardHeader>
-          <CardTitle>{t('notifySalavey13')}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Input
-            value={v0DevLink}
-            onChange={(e) => setV0DevLink(e.target.value)}
-            placeholder={t('v0DevLinkPlaceholder')}
-            className="mb-2"
-          />
-          <Input
-            value={githubTaskLink}
-            onChange={(e) => setGithubTaskLink(e.target.value)}
-            placeholder={t('githubTaskLinkPlaceholder')}
-            className="mb-2"
-          />
-          <Button onClick={notifySalavey13} variant="outline" className="w-full">
-            <Send className="mr-2" />
-            {t('sendNotification')}
-          </Button>
-        </CardContent>
-      </Card>
-
-      <div className="fixed bottom-4 right-4">
-        <Button
-          onClick={() => window.open('https://your-vpn-url.com', '_blank')}
-          variant="outline"
-          size="sm"
-        >
-          {t('vpnAccess')}
-        </Button>
+      <div className="fixed bottom-20 right-4 z-50">
+        <EnhancedChatButton />
       </div>
     </div>
   );

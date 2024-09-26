@@ -55,6 +55,7 @@
     "save": "^2.9.0",
     "tailwind-merge": "^2.4.0",
     "tailwindcss-animate": "^1.0.7",
+    "telegraf": "^4.16.3",
     "three": "^0.168.0",
     "zlib-sync": "^0.1.9"
   },
