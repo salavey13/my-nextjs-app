@@ -196,7 +196,7 @@ export default function Rents() {
     if (matchingUser && matchingUser.site) {
       setTopEmbedUrl(matchingUser.site);
     } else {
-      setTopEmbedUrl("https://sustained-signposts-768587.framer.app/"); // Fallback to default if no matching user
+      setTopEmbedUrl("https://oneSitePls.framer.ai/ru/"); // Fallback to default if no matching user
     }
 
     try {
@@ -339,7 +339,7 @@ export default function Rents() {
 
       {topEmbedUrl == "" && (
         <MainSection
-          setItemDetailsModalOpen={setItemDetailsModalOpen}
+          setItemDetailsModalOpen={handleRowClick}
           setSelectedItem={setSelectedItem}
           items={items}
         />

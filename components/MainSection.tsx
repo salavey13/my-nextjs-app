@@ -38,7 +38,7 @@ interface Creator {
 }
 
 interface MainSectionProps {
-  setItemDetailsModalOpen: (open: boolean) => void
+  setItemDetailsModalOpen: (item: Item) => void
   setSelectedItem: (item: Item | null) => void
   items: Item[]
 }
@@ -72,7 +72,7 @@ export default function MainSection({ setItemDetailsModalOpen, setSelectedItem, 
 
   const handleItemClick = (item: Item) => {
     setSelectedItem(item)
-    setItemDetailsModalOpen(true)
+    setItemDetailsModalOpen(item)
   }
 
   if (loading) {
