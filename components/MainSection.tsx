@@ -57,7 +57,7 @@ export default function MainSection({ setItemDetailsModalOpen, setSelectedItem, 
         acc.push({
           ref_code: item.creator_ref_code,
           name: item.creator_ref_code, // You might want to replace this with a proper name if available
-          image: item.details.photo_upload?.photo || '/placeholder.svg'
+          image: item.details.photo_upload?.photo || '/next.svg'
         })
       }
       return acc
@@ -126,7 +126,7 @@ export default function MainSection({ setItemDetailsModalOpen, setSelectedItem, 
                   style={{ backgroundImage: `url(${item.details.photo_upload?.photo})` }}
                 ></div>
                 <div className="absolute inset-0 bg-black/50 z-1"></div>
-                <div className="relative h-[69vh] items-center flex flex-col gap-[142px] justify-between">
+                <div className="relative h-[69vh] items-center flex flex-col gap-[69px] justify-between">
                   <div className="relative z-10 text-white text-center px-8">
                     <h1 className="text-4xl font-bold mb-4 drop-shadow-lg">
                       {item.details.ad_info?.title}
