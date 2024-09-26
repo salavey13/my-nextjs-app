@@ -12,7 +12,7 @@ import { Trophy, AlertCircle, Send } from 'lucide-react';
 import ClipboardManager from './ClipboardManager';
 import { zeroStageRequest, zeroStageRequest4Type } from "./requestTemplate";
 import EnhancedChatButton from './ui/enhancedChatButton';
-import { NavBar } from "@/components/ui/navBar";
+import NavBar from "@/components/ui/navBar";
 
 interface Achievement {
   id: string;
