@@ -103,7 +103,7 @@ const MainSection: React.FC = () => {
               <div className="absolute inset-0 bg-black/50 z-1"></div>
   
               {/* Content */}
-              <div className="relative h-[69vh]] items-center flex flex-col gap-[200px]  justify-between">
+              <div className="relative h-[69vh]] items-center flex flex-col gap-[142px]  justify-between">
                 <div className="relative z-10 text-white text-center px-8">
                     <h1 className="text-4xl font-bold mb-4 drop-shadow-lg">
                     {item.details.ad_info?.title}
