@@ -227,17 +227,6 @@ const Dev: React.FC = () => {
                           {t('openGitHubProject')}
                         </Button>
                       </div>
-                      <div>
-                        <h3 className="text-xl font-semibold mb-2">{t('vercelDeployment')}</h3>
-                        <p>{t('vercelDeploymentDescription')}</p>
-                        <Button
-                          onClick={() => window.open('https://vercel.com/salavey13s-projects/my-nextjs-app/deployments', '_blank')}
-                          variant="outline"
-                          className="mt-4 w-full"
-                        >
-                          {t('openVercelDashboard')}
-                        </Button>
-                      </div>
                     </div>
                     <Button
                       onClick={() => window.open('https://github.com/salavey13/my-nextjs-app/tree/main/components', '_blank')}
