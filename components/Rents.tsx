@@ -1,6 +1,5 @@
 "use client";
 
-import MainSection from "@/components/MainSection"
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation"; // Adjust import if not using Next.js
 import { supabase } from "../lib/supabaseClient";
