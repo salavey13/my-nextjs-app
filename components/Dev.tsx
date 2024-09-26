@@ -153,8 +153,12 @@ const Dev: React.FC = () => {
         ))}
       </nav>*/}
 
-      <NavBar sections currentSection scrollToSection/>
-
+      <NavBar 
+        sections={sections} 
+        currentSection={currentSection} 
+        scrollToSection={scrollToSection} 
+      />
+      
       <div ref={containerRef} className="h-full overflow-y-auto snap-y snap-mandatory">
         {sections.map((section, index) => (
           <div
