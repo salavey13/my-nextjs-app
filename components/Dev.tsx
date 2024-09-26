@@ -12,6 +12,7 @@ import { Trophy, AlertCircle, Send } from 'lucide-react';
 import ClipboardManager from './ClipboardManager';
 import { zeroStageRequest, zeroStageRequest4Type } from "./requestTemplate";
 import EnhancedChatButton from './ui/enhancedChatButton';
+import { NavBar } from "@/components/ui/navBar";
 
 interface Achievement {
   id: string;
@@ -139,7 +140,7 @@ const Dev: React.FC = () => {
 
   return (
     <div className="dev-container bg-gray-900 text-white h-[calc(100vh-128px)] overflow-hidden">
-      <nav className="fixed top-16 right-0 p-4 z-50">
+      {/*<nav className="fixed top-16 right-0 p-4 z-50">
         {sections.map((section, index) => (
           <Button
             key={index}
@@ -150,7 +151,9 @@ const Dev: React.FC = () => {
             {section.title}
           </Button>
         ))}
-      </nav>
+      </nav>*/}
+
+      <NavBar sections currentSection scrollToSection/>
 
       <div ref={containerRef} className="h-full overflow-y-auto snap-y snap-mandatory">
         {sections.map((section, index) => (
