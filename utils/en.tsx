@@ -1,5 +1,6 @@
 import { LanguageDictionary } from "../utils/TranslationUtils";
 export const en: LanguageDictionary = {
+  pay: "Pay",
   backToCreators:"Back to Creators",
   pleaseGrantAccess: "Please grant access to your camera and microphone to play the game.",
   checkPermissions: "Check Permissions",
