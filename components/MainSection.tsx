@@ -90,12 +90,10 @@ export default function MainSection({ setItemDetailsModalOpen, setSelectedItem, 
               onClick={() => setSelectedCreator(creator.ref_code)}
             >
               <div className="relative w-full h-full">
-                <Image
-                  src={creator.image}
-                  alt={creator.name}
-                  layout="fill"
-                  objectFit="cover"
-                />
+                <div
+                  className="absolute inset-0 bg-cover bg-center z-0"
+                  style={{ backgroundImage: `url(${creator.image})` }}
+                ></div>
                 <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
                   <span className="text-white text-xl font-bold">{creator.name}</span>
                 </div>
@@ -126,7 +124,7 @@ export default function MainSection({ setItemDetailsModalOpen, setSelectedItem, 
                   style={{ backgroundImage: `url(${item.details.photo_upload?.photo})` }}
                 ></div>
                 <div className="absolute inset-0 bg-black/50 z-1"></div>
-                <div className="relative h-[69vh] items-center flex flex-col gap-[69px] justify-between">
+                <div className="relative h-[42vh] items-center flex flex-col gap-[69px] justify-between">
                   <div className="relative z-10 text-white text-center px-8">
                     <h1 className="text-4xl font-bold mb-4 drop-shadow-lg">
                       {item.details.ad_info?.title}
