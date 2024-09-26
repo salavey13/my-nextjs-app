@@ -1,5 +1,6 @@
 "use client";
 
+import MainSection from "@/components/MainSection"
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation"; // Adjust import if not using Next.js
 import { supabase } from "../lib/supabaseClient";
@@ -314,11 +315,13 @@ export default function Rents() {
         </div>
       )}
 
-      {topEmbedUrl == "" && <MainSection />}
-        {/* <div className="absolute top-0 left-0 w-full h-[calc(200vh-128px)] z-0">
-          <MainSection />
-        {/* </div> *
-      )}*/}
+      {topEmbedUrl == "" && (
+        <MainSection
+          setItemDetailsModalOpen={setItemDetailsModalOpen}
+          setSelectedItem={setSelectedItem}
+          items={items}
+        />
+      )}
 
       {/* Content positioned 64px from the bottom, occupying the bottom 100vh overflow-auto*/}
       <div className="absolute bottom-0 left-0 scrollbars-hide w-full z-10 max-h-[calc(100vh-128px)] backdrop-blur-lg rounded-t-2xl">
