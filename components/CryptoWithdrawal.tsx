@@ -9,8 +9,8 @@ import { useAppContext } from '@/context/AppContext';
 import PaymentNotification from './PaymentNotification';
 
 const CryptoWithdrawal: React.FC = () => {
-    const { t, user } = useAppContext();
-    const [withdrawalAmount, setWithdrawalAmount] = useState<number | string>('');
+    const { state, dispatch, t } = useAppContext()
+    const user = state.userconst [withdrawalAmount, setWithdrawalAmount] = useState<number | string>('');
     const [loading, setLoading] = useState<boolean>(false);
     const [withdrawalLink, setWithdrawalLink] = useState<string | null>(null);
 
