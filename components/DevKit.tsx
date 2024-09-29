@@ -23,7 +23,7 @@ export default function DevKit() {
   const [debugMode, setDebugMode] = useState(false)
   
   const { isDebugMode, toggleDebugMode, logs, clearLogs } = useDebugStore()
-  
+
   const handleTriggerEvent = (event: string) => {
     debugLog(`Triggered event: ${event}`)
     // Implement event triggering logic here
@@ -154,7 +154,7 @@ export default function DevKit() {
       </CardHeader>
       <CardContent>
         <Tabs defaultValue="gameState">
-          <TabsList>
+          <TabsList className="space-x-8">
             <TabsTrigger value="gameState">Game State</TabsTrigger>
             <TabsTrigger value="events">Events</TabsTrigger>
             <TabsTrigger value="logs">Logs</TabsTrigger>
