@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { useAppContext } from "../context/AppContext";
 
 export default function CreateEvent() {
-  const { t, addDebugLog } = useAppContext();
+  const { t } = useAppContext();
   const [title, setTitle] = useState<string>('');
   const [description, setDescription] = useState<string>('');
   const [titleRu, setTitleRu] = useState<string>('');
@@ -36,10 +36,8 @@ export default function CreateEvent() {
 
       if (error) {
         console.error("Error creating event:", error);
-        addDebugLog("Error creating event: " + error.message);
-      } else {
+        else {
         setShowConfirmation(true);
-        addDebugLog("Event created successfully");
         resetForm();
       }
     }
