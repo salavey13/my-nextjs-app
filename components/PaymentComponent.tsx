@@ -38,7 +38,8 @@ const PaymentComponent: FC<PaymentComponentProps> = ({ item }) => {
   const [endDate, setEndDate] = useState<string>(new Date(new Date().setDate(new Date().getDate() + 1)).toISOString().split('T')[0]);
   const [selectedPricingOption, setSelectedPricingOption] = useState<string | null>(null);
   const [totalPrice, setTotalPrice] = useState<number>(0);
-  const { user, t } = useAppContext();
+  const { state, dispatch, t } = useAppContext()
+  const user = state.user
   
   const [users, setUsers] = useState<User[]>([]);
   useEffect(() => {

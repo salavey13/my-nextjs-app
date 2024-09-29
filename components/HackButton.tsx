@@ -16,7 +16,8 @@ interface GameState {
 }
 
 const HackButton: React.FC = () => {
-  const { t, user } = useAppContext();
+  const { state, dispatch, t } = useAppContext()
+  const user = state.user
   const [selectedGame, setSelectedGame] = useState<'cards' | 'dice' | null>(null);
 
 

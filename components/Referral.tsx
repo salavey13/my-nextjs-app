@@ -12,7 +12,8 @@ import { Button } from "./ui/button";
 import {Input} from "./ui/input";
 
 const Referral: React.FC = () => {
-  const { user, updateUserReferrals, t  } = useAppContext();
+  const { state, updateUserReferrals, dispatch, t } = useAppContext()
+  const user = state.user
   const [referralName, setReferralName] = useState('');
   const [referralCode, setReferralCode] = useState<string | null>(null);
   const [inviteCount, setInviteCount] = useState(0);

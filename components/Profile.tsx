@@ -44,7 +44,8 @@ interface UserData {
 }
 
 const Profile: React.FC = () => {
-  const { user, t } = useAppContext();
+  const { state, dispatch, t } = useAppContext()
+  const user = state.user
   const [site, setSite] = useState<string>('');
   const [telegramUsername, setTelegramUsername] = useState<string>(user?.telegram_username || '');
   const [walletAddress, setWalletAddress] = useState<string>(user?.ton_wallet || '');

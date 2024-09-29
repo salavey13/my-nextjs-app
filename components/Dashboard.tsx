@@ -45,7 +45,8 @@ export default function Dashboard() {
   const [allEvents, setAllEvents] = useState<Event[]>([]);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [betAmount, setBetAmount] = useState<string>('');
-  const { user, setUser, t, store } = useAppContext();
+  const { state, dispatch, t } = useAppContext()
+  const user = state.user
 
   useEffect(() => {
     if (!user) return;
@@ -115,11 +116,11 @@ export default function Dashboard() {
     const event = allEvents.find(e => e.id === eventId);
     if (!event) return { title: t("unknownEvent"), description: t("unknownDescription") };
 
-    const title = store.lang === 'ru' ? event.title_ru : store.lang === 'ukr' ? event.title_ukr : event.title;
-    const description = store.lang === 'ru' ? event.description_ru : store.lang === 'ukr' ? event.description_ukr : event.description;
+    const title = user?.lang === 'ru' ? event.title_ru : user?.lang === 'ukr' ? event.title_ukr : event.title;
+    const description = user?.lang === 'ru' ? event.description_ru : user?.lang === 'ukr' ? event.description_ukr : event.description;
 
     return { title, description };
-  }, [allEvents, store.lang, t]);
+  }, [allEvents, user?.lang, t]);
 
   const handlePlaceBet = async (eventId: number) => {
     const event = events.find(e => e.id === eventId);
@@ -172,8 +173,6 @@ export default function Dashboard() {
   
         if (rankError) {
           console.error("Error updating user rank:", rankError);
-        } else {
-          setUser((prevUser) => prevUser ? { ...prevUser, rank: updatedRank.toString() } : null);
         }
   
       } catch (error) {
@@ -299,7 +298,7 @@ export default function Dashboard() {
           <DialogContent>
             <DialogHeader>
               <DialogTitle>{t("placeBet")}</DialogTitle>
-              <DialogDescription>{store.lang === 'ru' ? selectedEvent.title_ru : store.lang === 'ukr' ? selectedEvent.title_ukr : selectedEvent.title}</DialogDescription>
+              <DialogDescription>{user?.lang === 'ru' ? selectedEvent.title_ru : user?.lang === 'ukr' ? selectedEvent.title_ukr : selectedEvent.title}</DialogDescription>
             </DialogHeader>
             {selectedEvent.educational_video_url && (
               <div className="my-4">

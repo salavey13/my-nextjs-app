@@ -17,8 +17,79 @@ import { CryptoPayment } from '@/components/CryptoPayment'
 import CreateEvent from '@/components/CreateEvent'
 import { motion, AnimatePresence } from 'framer-motion'
 
-const storyStages = [
-  // ... (keep the existing storyStages array)
+const storyStages: StoryStage[] = [
+  {
+    stage: 0,
+    trigger: "Start Game",
+    storyContent: "Welcome to the system. You are about to dive into a world of simple games.",
+    jsonState: JSON.stringify({ stage: 0, coins: 1000 }),
+    activeComponent: "None",
+    expectedInput: "Launch Game",
+    nextStageTrigger: "Game Launched"
+  },
+  {
+    stage: 1,
+    trigger: "Hack Button Clicked",
+    storyContent: "System Crash: Looks like you've broken something. Was it a mistake, or is this all part of a deeper game?",
+    jsonState: JSON.stringify({ stage: 1, coins: 1000 }),
+    activeComponent: "Hack Button",
+    expectedInput: "Yes/No Prompt",
+    nextStageTrigger: "User Input: Yes"
+  },
+  {
+    stage: 2,
+    trigger: "Yes Chosen",
+    storyContent: "You've made your first hack! A new world of possibilities opens up.",
+    jsonState: JSON.stringify({ stage: 2, coins: 13000 }),
+    activeComponent: "Skins",
+    expectedInput: "None",
+    nextStageTrigger: "Skin Selected"
+  },
+  {
+    stage: 3,
+    trigger: "Skin Selected",
+    storyContent: "Congratulations on your new skin! Now, let's introduce you to the world of crypto.",
+    jsonState: JSON.stringify({ stage: 3, coins: 13000, crypto: 100 }),
+    activeComponent: "Crypto Wallet",
+    expectedInput: "None",
+    nextStageTrigger: "Crypto Introduced"
+  },
+  {
+    stage: 4,
+    trigger: "Crypto Introduced",
+    storyContent: "With crypto in your wallet, you can now participate in events and place bets!",
+    jsonState: JSON.stringify({ stage: 4, coins: 13000, crypto: 100 }),
+    activeComponent: "Events",
+    expectedInput: "None",
+    nextStageTrigger: "Event Participated"
+  },
+  {
+    stage: 5,
+    trigger: "Event Participated",
+    storyContent: "You've experienced events and bets. Now, let's explore the world of rents!",
+    jsonState: JSON.stringify({ stage: 5, coins: 15000, crypto: 150 }),
+    activeComponent: "Rents",
+    expectedInput: "None",
+    nextStageTrigger: "Rent Explored"
+  },
+  {
+    stage: 6,
+    trigger: "Rent Explored",
+    storyContent: "The system crashes again... but this time, Versimcel appears!",
+    jsonState: JSON.stringify({ stage: 6, coins: 10000, crypto: 100 }),
+    activeComponent: "Versimcel",
+    expectedInput: "Debug",
+    nextStageTrigger: "Debug Complete"
+  },
+  {
+    stage: 7,
+    trigger: "Debug Complete",
+    storyContent: "Welcome to the admin level. It's time for some real GitHub source hunting!",
+    jsonState: JSON.stringify({ stage: 7, coins: 20000, crypto: 200 }),
+    activeComponent: "GitHub",
+    expectedInput: "None",
+    nextStageTrigger: "Game Complete"
+  }
 ]
 
 export default function HackButtonStoryShower() {

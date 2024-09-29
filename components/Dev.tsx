@@ -24,7 +24,8 @@ interface Achievement {
 }
 
 const Dev: React.FC = () => {
-  const { user, t } = useAppContext();
+  const { state, dispatch, t } = useAppContext()
+  const user = state.user
   const [ideaText, setIdeaText] = useState<string>("");
   const [requestGenerated, setRequestGenerated] = useState<boolean>(false);
   const [achievements, setAchievements] = useState<Achievement[]>([]);

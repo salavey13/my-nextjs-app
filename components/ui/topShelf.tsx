@@ -16,7 +16,8 @@ import {
 } from "@/components/ui/dropdown-menu"
 
 const TopShelf: React.FC = () => {
-  const { user, t } = useAppContext()
+  const { state, dispatch, t } = useAppContext()
+  const user = state.user
   const pathname = usePathname()
 
   return (

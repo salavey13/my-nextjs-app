@@ -31,18 +31,17 @@ interface Item {
     }
     general_info: {
       make: string
-      year: string
-      model: string
-      price: string // Changed from number to string
-      mileage?: string
-      color?: string
-    }
-    photo_upload: {
-      photo: string
-    }
-  }
-}
-
+       year: string
+       model: string
+       price: string // Changed from number to string
+       mileage?: string
+       color?: string
+     }
+     photo_upload: {
+       photo: string
+     }
+   }
+ }
 export default function Rents() {
   const [rents, setRents] = useState<Rent[]>([]);
   const [items, setItems] = useState<Item[]>([]);
@@ -52,7 +51,8 @@ export default function Rents() {
   const [topEmbedUrl, setTopEmbedUrl] = useState(""); // Default URL
   const [selectedItem, setSelectedItem] = useState<Item | null>(null);
   const [itemDetailsModalOpen, setItemDetailsModalOpen] = useState(false);
-  const { user, t } = useAppContext();
+  const { state, dispatch, t } = useAppContext()
+  const user = state.user
   const [itemDetails, setItemDetails] = useState<any>(null); // Adjust type if needed
   const [itemTypes, setItemTypes] = useState<ItemType[]>([]);
   const router = useRouter(); // Initialize the router here
@@ -196,7 +196,7 @@ export default function Rents() {
     if (matchingUser && matchingUser.site) {
       setTopEmbedUrl(matchingUser.site);
     } else {
-      setTopEmbedUrl("https://oneSitePls.framer.ai/ru/"); // Fallback to default if no matching user
+      setTopEmbedUrl("https://excellent-lots-147907.framer.app"); // Fallback to default if no matching user
     }
 
     try {
@@ -339,7 +339,7 @@ export default function Rents() {
 
       {topEmbedUrl == "" && (
         <MainSection
-          setItemDetailsModalOpen={handleRowClick}
+          setItemDetailsModalOpen={setItemDetailsModalOpen}
           setSelectedItem={setSelectedItem}
           items={items}
         />

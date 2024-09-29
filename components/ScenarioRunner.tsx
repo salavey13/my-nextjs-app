@@ -22,7 +22,8 @@ const scenarios = [
 ]
 
 export const ScenarioRunner: React.FC = () => {
-  const { user, setUser } = useAppContext()
+    const { state, dispatch, t } = useAppContext()
+    const user = state.user
   const [selectedScenario, setSelectedScenario] = useState('')
 
   const runScenario = () => {
@@ -32,23 +33,23 @@ export const ScenarioRunner: React.FC = () => {
         ...user?.game_state,
         ...scenario.setup,
       }
-      setUser({ ...user,
-        id: user?.id || 43,  // ensure `id` is not undefined
-        telegram_id: user?.telegram_id || 413553377,
-        telegram_username: user?.telegram_username || "SALAVEY13",
-        lang: user?.lang || "ru",
-        avatar_url: user?.avatar_url || "",
-        rp: user?.rp || 69,
-        X: user?.X || 69,
-        ref_code: user?.ref_code || "salavey13",
-        rank: user?.rank || "13",
-        social_credit: user?.social_credit || 0,
-        role: user?.role || 1,
-        cheers_count: user?.cheers_count || 1,
-        dark_theme: user?.dark_theme || true,
-        coins: user?.coins || 169000,
-        crypto: user?.crypto || 420,
-        game_state: updatedGameState })
+    //   setUser({ ...user,
+    //     id: user?.id || 43,  // ensure `id` is not undefined
+    //     telegram_id: user?.telegram_id || 413553377,
+    //     telegram_username: user?.telegram_username || "SALAVEY13",
+    //     lang: user?.lang || "ru",
+    //     avatar_url: user?.avatar_url || "",
+    //     rp: user?.rp || 69,
+    //     X: user?.X || 69,
+    //     ref_code: user?.ref_code || "salavey13",
+    //     rank: user?.rank || "13",
+    //     social_credit: user?.social_credit || 0,
+    //     role: user?.role || 1,
+    //     cheers_count: user?.cheers_count || 1,
+    //     dark_theme: user?.dark_theme || true,
+    //     coins: user?.coins || 169000,
+    //     crypto: user?.crypto || 420,
+    //     game_state: updatedGameState })
       debugLog(`Running scenario: ${selectedScenario}`)
     }
   }

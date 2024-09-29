@@ -50,7 +50,8 @@ interface GameState {
 
 const GameBoard: React.FC = () => {
   const [gameState, setGameState] = useState<GameState | null>(null);
-  const { user, t } = useAppContext();
+  const { state, dispatch, t } = useAppContext()
+  const user = state.user
   const [targetFrame, setTargetFrame] = useState({ x: 400, y: 300, rotation: 0 });
   const [physicsParams, setPhysicsParams] = useState<PhysicsSettings>({
     yeetCoefficient: 1.5,
