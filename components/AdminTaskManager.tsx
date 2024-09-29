@@ -32,7 +32,8 @@ interface Subscription {
 
 export function AdminTaskManager() {
   const { state, dispatch, t } = useAppContext()
-  const user = state.user  const [tasks, setTasks] = useState<Task[]>([])
+  const user = state.user
+  const [tasks, setTasks] = useState<Task[]>([])
   const [userPoints, setUserPoints] = useState<UserPoints[]>([])
   const [subscriptions, setSubscriptions] = useState<Subscription[]>([])
   const [newTask, setNewTask] = useState({
