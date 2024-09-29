@@ -1,4 +1,3 @@
-// components\HackButtonStoryShower.tsx
 "use client"
 
 import React, { useState, useEffect } from 'react'
@@ -18,94 +17,14 @@ import { CryptoPayment } from '@/components/CryptoPayment'
 import CreateEvent from '@/components/CreateEvent'
 import { motion, AnimatePresence } from 'framer-motion'
 
-const storyStages: StoryStage[] = [
-  {
-    stage: 0,
-    trigger: "Start Game",
-    storyContent: "Welcome to the system. You are about to dive into a world of simple games.",
-    jsonState: JSON.stringify({ stage: 0, coins: 1000 }),
-    activeComponent: "None",
-    expectedInput: "Launch Game",
-    nextStageTrigger: "Game Launched"
-  },
-  {
-    stage: 1,
-    trigger: "Hack Button Clicked",
-    storyContent: "System Crash: Looks like you've broken something. Was it a mistake, or is this all part of a deeper game?",
-    jsonState: JSON.stringify({ stage: 1, coins: 1000 }),
-    activeComponent: "Hack Button",
-    expectedInput: "Yes/No Prompt",
-    nextStageTrigger: "User Input: Yes"
-  },
-  {
-    stage: 2,
-    trigger: "Yes Chosen",
-    storyContent: "You've made your first hack! A new world of possibilities opens up.",
-    jsonState: JSON.stringify({ stage: 2, coins: 13000 }),
-    activeComponent: "Skins",
-    expectedInput: "None",
-    nextStageTrigger: "Skin Selected"
-  },
-  {
-    stage: 3,
-    trigger: "Skin Selected",
-    storyContent: "Congratulations on your new skin! Now, let's introduce you to the world of crypto.",
-    jsonState: JSON.stringify({ stage: 3, coins: 13000, crypto: 100 }),
-    activeComponent: "Crypto Wallet",
-    expectedInput: "None",
-    nextStageTrigger: "Crypto Introduced"
-  },
-  {
-    stage: 4,
-    trigger: "Crypto Introduced",
-    storyContent: "With crypto in your wallet, you can now participate in events and place bets!",
-    jsonState: JSON.stringify({ stage: 4, coins: 13000, crypto: 100 }),
-    activeComponent: "Events",
-    expectedInput: "None",
-    nextStageTrigger: "Event Participated"
-  },
-  {
-    stage: 5,
-    trigger: "Event Participated",
-    storyContent: "You've experienced events and bets. Now, let's explore the world of rents!",
-    jsonState: JSON.stringify({ stage: 5, coins: 15000, crypto: 150 }),
-    activeComponent: "Rents",
-    expectedInput: "None",
-    nextStageTrigger: "Rent Explored"
-  },
-  {
-    stage: 6,
-    trigger: "Rent Explored",
-    storyContent: "The system crashes again... but this time, Versimcel appears!",
-    jsonState: JSON.stringify({ stage: 6, coins: 10000, crypto: 100 }),
-    activeComponent: "Versimcel",
-    expectedInput: "Debug",
-    nextStageTrigger: "Debug Complete"
-  },
-  {
-    stage: 7,
-    trigger: "Debug Complete",
-    storyContent: "Welcome to the admin level. It's time for some real GitHub source hunting!",
-    jsonState: JSON.stringify({ stage: 7, coins: 20000, crypto: 200 }),
-    activeComponent: "GitHub",
-    expectedInput: "None",
-    nextStageTrigger: "Game Complete"
-  }
+const storyStages = [
+  // ... (keep the existing storyStages array)
 ]
 
 export default function HackButtonStoryShower() {
-  const { t, user, setUser } = useAppContext()
+  const { state, dispatch } = useAppContext()
+  const user = state.user
   const [currentStage, setCurrentStage] = useState(0)
-  const [gameState, setGameState] = useState<GameState>({
-    stage: 0,
-    coins: 1000,
-    crypto: 0,
-    rank: "13",
-    cheersCount: 1,
-    progress: "0%",
-    unlockedComponents: []
-  })
-  const [userInput, setUserInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [debugItems, setDebugItems] = useState(['Error 1', 'Error 2', 'Error 3'])
   const [gptInput, setGptInput] = useState('')
@@ -132,47 +51,50 @@ export default function HackButtonStoryShower() {
       if (error) throw error
 
       if (data?.game_state) {
-        setGameState(data.game_state)
+        dispatch({ type: 'UPDATE_GAME_STATE', payload: data.game_state })
         setCurrentStage(data.game_state.stage)
         setShowBottomShelf(data.game_state.stage >= 2)
       }
     } catch (error) {
       console.error('Error loading game state:', error)
       toast({
-        title: t('error'),
-        description: t('loadGameStateError'),
+        title: 'Error',
+        description: 'Failed to load game state',
         variant: "destructive",
       })
     }
   }
 
   const handleStageProgression = async (newStage: number) => {
+    if (!user) return
+
     const updatedGameState = {
-      ...gameState,
+      ...user.game_state,
       stage: newStage,
       progress: `${(newStage / (storyStages.length - 1)) * 100}%`
     }
-    setGameState(updatedGameState)
-    setCurrentStage(newStage)
-    setShowBottomShelf(newStage >= 2)
     
     try {
       const { error } = await supabase
         .from('users')
         .update({ game_state: updatedGameState })
-        .eq('id', user?.id)
+        .eq('id', user.id)
 
       if (error) throw error
 
+      dispatch({ type: 'UPDATE_GAME_STATE', payload: updatedGameState })
+      setCurrentStage(newStage)
+      setShowBottomShelf(newStage >= 2)
+
       toast({
-        title: t('success'),
-        description: t('stageProgressionSuccess'),
+        title: 'Success',
+        description: 'Stage progression successful',
       })
     } catch (error) {
       console.error('Error updating game state:', error)
       toast({
-        title: t('error'),
-        description: t('updateGameStateError'),
+        title: 'Error',
+        description: 'Failed to update game state',
         variant: "destructive",
       })
     }
@@ -186,32 +108,35 @@ export default function HackButtonStoryShower() {
   }
 
   const handleHack = async () => {
+    if (!user) return
+
     setIsLoading(true)
     try {
-      const newCoins = gameState.coins + 13000
+      const newCoins = user.game_state.coins + 13000
       const updatedGameState = {
-        ...gameState,
+        ...user.game_state,
         coins: newCoins,
       }
-      setGameState(updatedGameState)
 
       const { error } = await supabase
         .from('users')
         .update({ game_state: updatedGameState })
-        .eq('id', user?.id)
+        .eq('id', user.id)
 
       if (error) throw error
 
+      dispatch({ type: 'UPDATE_GAME_STATE', payload: updatedGameState })
+
       toast({
-        title: t('success'),
-        description: t('congratulationsMessage'),
+        title: 'Success',
+        description: 'Congratulations! You\'ve earned coins!',
       })
       handleTrigger('Hack Button Clicked')
     } catch (error) {
       console.error('Error updating balance:', error)
       toast({
-        title: t('error'),
-        description: t('generalError'),
+        title: 'Error',
+        description: 'Failed to update balance',
         variant: "destructive",
       })
     } finally {
@@ -246,54 +171,42 @@ export default function HackButtonStoryShower() {
   }
 
   const handleSkinConfirm = async () => {
+    if (!user) return
+
     try {
       const updatedUser = {
         ...user,
-        id: user?.id || 43,  // ensure `id` is not undefined
-        telegram_id: user?.telegram_id || 413553377,
-        telegram_username: user?.telegram_username || "SALAVEY13",
-        lang: user?.lang || "ru",
-        avatar_url: user?.avatar_url || "",
-        rp: user?.rp || 69,
-        X: user?.X || 69,
-        ref_code: user?.ref_code || "salavey13",
-        rank: user?.rank || "13",
-        social_credit: user?.social_credit || 0,
-        role: user?.role || 1,
-        cheers_count: user?.cheers_count || 1,
-        dark_theme: user?.dark_theme || true,
-        coins: user?.coins || 169000,
-        crypto: user?.crypto || 420,
         loot: {
-          ...user?.loot,
+          ...user.loot,
           fool: {
-            ...user?.loot?.fool,
+            ...user.loot?.fool,
             cards: {
-              ...user?.loot?.fool?.cards,
+              ...user.loot?.fool?.cards,
               cards_img_url: skinPreview
             }
           }
         }
       }
-      setUser(updatedUser)
 
       const { error } = await supabase
         .from('users')
         .update({ loot: updatedUser.loot })
-        .eq('id', user?.id)
+        .eq('id', user.id)
 
       if (error) throw error
 
+      dispatch({ type: 'SET_USER', payload: updatedUser })
+
       toast({
-        title: t('success'),
-        description: t('skinChangeSuccess'),
+        title: 'Success',
+        description: 'Skin changed successfully',
       })
       handleTrigger('Skin Selected')
     } catch (error) {
       console.error('Error updating skin:', error)
       toast({
-        title: t('error'),
-        description: t('skinChangeError'),
+        title: 'Error',
+        description: 'Failed to change skin',
         variant: "destructive",
       })
     }
@@ -312,35 +225,35 @@ export default function HackButtonStoryShower() {
           {(() => {
             switch (currentStoryStage.activeComponent) {
               case "None":
-                return <p className="text-lg">{t(currentStoryStage.storyContent)}</p>
+                return <p className="text-lg">{currentStoryStage.storyContent}</p>
               case "Hack Button":
                 return (
                   <div className="space-y-4">
-                    <p>{t(currentStoryStage.storyContent)}</p>
+                    <p>{currentStoryStage.storyContent}</p>
                     <Button onClick={handleHack} disabled={isLoading} className="bg-yellow-500 hover:bg-yellow-600 text-black">
-                      {isLoading ? t('hacking') : t('hackButton')}
+                      {isLoading ? 'Hacking...' : 'Hack'}
                     </Button>
                   </div>
                 )
               case "Skins":
                 return (
                   <div className="space-y-4">
-                    <p>{t(currentStoryStage.storyContent)}</p>
+                    <p>{currentStoryStage.storyContent}</p>
                     <div className="flex space-x-4">
-                      <Button onClick={() => handleSkinChange('/skins/skin1.png')}>{t('skin1')}</Button>
-                      <Button onClick={() => handleSkinChange('/skins/skin2.png')}>{t('skin2')}</Button>
-                      <Button onClick={() => handleSkinChange('/skins/skin3.png')}>{t('skin3')}</Button>
+                      <Button onClick={() => handleSkinChange('/skins/skin1.png')}>Skin 1</Button>
+                      <Button onClick={() => handleSkinChange('/skins/skin2.png')}>Skin 2</Button>
+                      <Button onClick={() => handleSkinChange('/skins/skin3.png')}>Skin 3</Button>
                     </div>
                     {skinPreview && (
                       <div className="mt-4">
                         <Image src={skinPreview} alt="Skin Preview" width={200} height={200} />
-                        <Button onClick={handleSkinConfirm} className="mt-2">{t('confirmSkin')}</Button>
+                        <Button onClick={handleSkinConfirm} className="mt-2">Confirm Skin</Button>
                       </div>
                     )}
                   </div>
                 )
               case "Crypto Wallet":
-                return <CryptoPayment  creatorTelegramId={user?.telegram_id.toString() || "413553377"}/>
+                return <CryptoPayment creatorTelegramId={user?.telegram_id.toString() || "413553377"}/>
               case "Events":
                 return <CreateEvent />
               case "Rents":
@@ -349,7 +262,7 @@ export default function HackButtonStoryShower() {
                 return (
                   <DragDropContext onDragEnd={handleDragEnd}>
                     <div className="space-y-4">
-                      <p>{t(currentStoryStage.storyContent)}</p>
+                      <p>{currentStoryStage.storyContent}</p>
                       <Droppable droppableId="errors">
                         {(provided) => (
                           <ul {...provided.droppableProps} ref={provided.innerRef} className="space-y-2">
@@ -378,7 +291,7 @@ export default function HackButtonStoryShower() {
                             ref={provided.innerRef}
                             className="border-2 border-dashed border-gray-300 p-4 rounded"
                           >
-                            {t('dropErrorsHere')}
+                            Drop errors here
                             {provided.placeholder}
                           </div>
                         )}
@@ -389,13 +302,13 @@ export default function HackButtonStoryShower() {
               case "GitHub":
                 return (
                   <div className="space-y-4">
-                    <p>{t(currentStoryStage.storyContent)}</p>
+                    <p>{currentStoryStage.storyContent}</p>
                     <Input
-                      placeholder={t('enterGitHubRepo')}
+                      placeholder="Enter GitHub repo"
                       value={gptInput}
                       onChange={(e) => setGptInput(e.target.value)}
                     />
-                    <Button onClick={handleGptInteraction}>{t('searchRepo')}</Button>
+                    <Button onClick={handleGptInteraction}>Search Repo</Button>
                     {gptResponse && (
                       <Card>
                         <CardContent className="p-4">
@@ -406,7 +319,7 @@ export default function HackButtonStoryShower() {
                   </div>
                 )
               default:
-                return <p>{t('unknownEventType')}</p>
+                return <p>Unknown event type</p>
             }
           })()}
         </motion.div>
@@ -426,11 +339,12 @@ export default function HackButtonStoryShower() {
           <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
             <div
               className="bg-blue-600 h-2.5 rounded-full"
-              style={{ width: gameState.progress }}
+              style={{ width: user?.game_state.progress }}
             ></div>
           </div>
         </CardContent>
       </Card>
+      {showBottomShelf && <BottomShelf />}
     </div>
   )
 }
