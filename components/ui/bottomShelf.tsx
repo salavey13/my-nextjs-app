@@ -6,57 +6,76 @@ import { useAppContext } from "@/context/AppContext"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { Home, List, Plus, Bell, User, CalendarPlus, Lightbulb, Crown, Users, Dice1, DollarSign, Zap, Globe, ShoppingCart, Car, Gamepad } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
 
 export interface NavigationLink {
   href: string
   icon: React.ReactNode
   label: string
+  stageMask: number
 }
 
 const BottomShelf: React.FC = () => {
   const pathname = usePathname()
-  const { t } = useAppContext()
+  const { t, user } = useAppContext()
 
   const navigationLinks: NavigationLink[] = [    
-   // { href: '/paymentnotification', icon: <DollarSign className="w-6 h-6" />, label: t('paymentnotification') },
-    //{ href: '/dynamicitemform', icon: <List className="w-6 h-6" />, label: t('dynamicitemform') },
-   // { href: '/qrcodeform', icon: <Zap className="w-6 h-6" />, label: t('qrcodeform') },
-    { href: '/cryptopayment', icon: <ShoppingCart className="w-6 h-6" />, label: t('cryptopayment') },
-    { href: '/', icon: <Home className="w-6 h-6" />, label: t('home') },
-    { href: '/rent', icon: <Car className="w-6 h-6" />, label: t('rent') },
-    { href: '/referral', icon: <Users className="w-6 h-6" />, label: t('referral') },
-    //{ href: '/profile', icon: <User className="w-6 h-6" />, label: t('profile') },
-    { href: '/questsforcoins', icon: <Dice1 className="w-6 h-6" />, label: t('!') },
-    { href: '/hackbutton', icon: <Zap className="w-6 h-6" />, label: t('IQ') },
-    { href: '/createEvent', icon: <CalendarPlus className="w-6 h-6" />, label: t('createEvent') },
-    //{ href: '/conflictawareness', icon: <Globe className="w-6 h-6" />, label: t('conflictawareness') },
-    { href: '/admin', icon: <Crown className="w-6 h-6" />, label: t('admin') },
-    { href: '/dev', icon: <Lightbulb className="w-6 h-6" />, label: t('dev') },
+    { href: '/paymentnotification', icon: <DollarSign className="w-6 h-6" />, label: t('paymentnotification'), stageMask: 0b11111000 },
+    { href: '/dynamicitemform', icon: <List className="w-6 h-6" />, label: t('dynamicitemform'), stageMask: 0b11111000 },
+    { href: '/qrcodeform', icon: <Zap className="w-6 h-6" />, label: t('qrcodeform'), stageMask: 0b11111000 },
+    { href: '/cryptopayment', icon: <ShoppingCart className="w-6 h-6" />, label: t('cryptopayment'), stageMask: 0b11111000 },
+    { href: '/', icon: <Home className="w-6 h-6" />, label: t('home'), stageMask: 0b11111111 },
+    { href: '/rent', icon: <Car className="w-6 h-6" />, label: t('rent'), stageMask: 0b11111000 },
+    { href: '/referral', icon: <Users className="w-6 h-6" />, label: t('referral'), stageMask: 0b11111000 },
+    { href: '/profile', icon: <User className="w-6 h-6" />, label: t('profile'), stageMask: 0b11111111 },
+    { href: '/questsforcoins', icon: <Dice1 className="w-6 h-6" />, label: t('!'), stageMask: 0b11111000 },
+    { href: '/hackbutton', icon: <Zap className="w-6 h-6" />, label: t('IQ'), stageMask: 0b11111111 },
+    { href: '/createEvent', icon: <CalendarPlus className="w-6 h-6" />, label: t('createEvent'), stageMask: 0b11111000 },
+    { href: '/conflictawareness', icon: <Globe className="w-6 h-6" />, label: t('conflictawareness'), stageMask: 0b11111000 },
+    { href: '/admin', icon: <Crown className="w-6 h-6" />, label: t('admin'), stageMask: 0b10000000 },
+    { href: '/dev', icon: <Lightbulb className="w-6 h-6" />, label: t('dev'), stageMask: 0b11000000 },
   ]
+
+  const currentStage = user?.game_state?.stage || 0
+  const stageBitmask = 1 << currentStage
 
   return (
     <TooltipProvider>
       <footer className="fixed bottom-0 left-0 w-full h-16 bg-gray-900/80 text-white z-10 backdrop-blur-lg shadow-lg">
         <ScrollArea className="w-full h-full">
           <div className="flex items-center h-full px-4">
-            {navigationLinks.map((link, index) => (
-              <Tooltip key={index}>
-                <TooltipTrigger asChild>
-                  <Link
-                    href={link.href}
-                    className={`flex flex-col items-center justify-center w-16 h-16 text-blue-500 ${
-                      pathname === link.href ? 'text-blue-300' : 'text-gray-400'
-                    }`}
+            <AnimatePresence>
+              {navigationLinks
+                .filter(link => (link.stageMask & stageBitmask) !== 0)
+                .map((link, index) => (
+                  <motion.div
+                    key={link.href}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 20 }}
+                    transition={{ duration: 0.3, delay: index * 0.1 }}
                   >
-                    {link.icon}
-                    <span className="text-xs mt-1">{link.label}</span>
-                  </Link>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>{link.label}</p>
-                </TooltipContent>
-              </Tooltip>
-            ))}
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Link
+                          href={link.href}
+                          className={`flex flex-col items-center justify-center w-16 h-16 ${
+                            pathname === link.href
+                              ? 'text-blue-300 bg-blue-500/20 rounded-lg'
+                              : 'text-gray-400 hover:text-blue-500 transition-colors'
+                          }`}
+                        >
+                          {link.icon}
+                          <span className="text-xs mt-1">{link.label}</span>
+                        </Link>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>{link.label}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </motion.div>
+                ))}
+            </AnimatePresence>
           </div>
           <ScrollBar orientation="horizontal" />
         </ScrollArea>

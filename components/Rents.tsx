@@ -110,7 +110,7 @@ export default function Rents() {
     const fetchUsers = async () => {
       const { data, error } = await supabase
         .from("users")
-        .select("id, ref_code, site, telegram_id");
+        .select("*");
 
       if (error) {
         console.error("Error fetching users:", error);

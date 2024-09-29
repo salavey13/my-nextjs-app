@@ -114,12 +114,12 @@ const Referral: React.FC = () => {
   };
 
   const sendTelegramInvite = useCallback(async (referralCode: string) => {
-    if (!process.env.NEXT_PUBLIC_BOT_TOKEN || !user) {
+    if (!process.env.BOT_TOKEN || !user) {
       console.error('Bot token is missing');
       return;
     }
 
-    const botToken = process.env.NEXT_PUBLIC_BOT_TOKEN;
+    const botToken = process.env.BOT_TOKEN;
     const inviteLink = `https://t.me/oneSitePlsBot/vip?ref=${referralCode}`;
     const url = new URL(`https://api.telegram.org/bot${botToken}/sendMessage`);
     const message = `${t('playWithUs')} ${user.telegram_username} ! 🎮✨`;

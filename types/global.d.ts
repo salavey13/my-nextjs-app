@@ -207,13 +207,60 @@ interface Window {
   
   interface User {
     id: number;
-    telegram_id: string;
+    telegram_id: number;
+    telegram_username: string;
+    lang: 'ru' | 'en' | 'ukr';
+    avatar_url: string;
+    coins: number;
+    rp: number;
+    X: number;
     ref_code: string;
-    site: string;
+    rank: string;
+    social_credit: number;
+    role: number;
+    cheers_count: number;
+    referer?: number | null;
+    tasksTodo?: string | null;
+    currentGameId?: number | null;
+    currentFoolGameId?: number | null;
+    game_state?: Record<string, any> | null; // Adjusted game_state type
+    ton_wallet?: string | null;
+    initial_readings?: Record<string, any> | null;
+    monthly_prices?: Record<string, any> | null;
+    site?: string | null;
+    dark_theme: boolean;
+    loot?: {
+      fool?: {
+        cards?: {
+          cards_img_url?: string;
+          shirt_img_url?: string;
+        }
+      }
+    };
   }
   
   interface ItemType {
     id: string;
     type: string;
     fields: any;
+  }
+
+  interface StoryStage {
+    stage: number;
+    trigger: string;
+    storyContent: string;
+    jsonState: string;
+    activeComponent: string;
+    expectedInput: string;
+    nextStageTrigger: string;
+  }
+  
+  interface GameState {
+    stage: number;
+    coins: number;
+    rank: string;
+    crypto: number;
+    cheersCount: number;
+    progress: string;
+    unlockedComponents: string[];
   }

@@ -12,15 +12,14 @@ import LoadingSpinner from '@/components/ui/LoadingSpinner';
 const defaultStore = {
   tg_id: 413553377,
   username: 'salavey13',
-  coins: '2000000',
-  rp: '420',
+  coins: 2000000,
+  rp: 420,
   lang: 'ru',
-  X: '69',
+  X: 69,
   dark_theme: true,
   currentGameId: 28,
-  
   currentFoolGameId: 13,
-  role: 0
+  role: 0,
 };
 
 interface UserData {
@@ -30,6 +29,7 @@ interface UserData {
   lang: 'ru' | 'en' | 'ukr';
   avatar_url: string;
   coins: number;
+  crypto: number;
   rp: number;
   X: number;
   ref_code: string;
@@ -40,14 +40,13 @@ interface UserData {
   referer?: number | null;
   tasksTodo?: string | null;
   currentGameId?: number | null;
-  
   currentFoolGameId?: number | null;
-  game_state?: string | null;
+  game_state?: Record<string, any> | null; // Adjusted game_state type
   ton_wallet?: string | null;
   initial_readings?: Record<string, any> | null;
   monthly_prices?: Record<string, any> | null;
   site?: string | null;
-  dark_theme: boolean,
+  dark_theme: boolean;
   loot?: {
     fool?: {
       cards?: {
@@ -55,8 +54,22 @@ interface UserData {
         shirt_img_url?: string;
       }
     }
-  }
+  };
 }
+
+interface AppContextType {
+  store: typeof defaultStore;
+  setStore: React.Dispatch<React.SetStateAction<typeof defaultStore>>;
+  user: UserData | null;
+  setUser: React.Dispatch<React.SetStateAction<UserData | null>>;
+  fetchPlayer: (tg_id: number, username: string, lang: string) => void;
+  t: (key: string) => string;
+  debugLogs: string[];
+  addDebugLog: (log: string) => void;
+  updateUserReferrals: (newReferralCode: string) => void;
+  toggleTheme: () => void;
+}
+
 
 interface AppContextType {
   store: typeof defaultStore;
@@ -113,7 +126,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         .eq('telegram_id', tg_id)
         .single();
 
-      if (error && error.code !== 'PGRST116') {
+      if (error) {
         console.error('Fetch error:', error);
         addDebugLog(`Fetch error: ${error}`);
         return;
@@ -124,25 +137,80 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
           ...prev,
           tg_id: data.telegram_id.toString(),
           username: data.telegram_username || '',
-          coins: data.coins.toString(),
-          rp: data.rp.toString(),
+          coins: data.coins,
+          rp: data.rp,
           lang: data.lang,
-          X: data.X.toString(),
+          X: data.X,
           tasksTodo: data.tasksTodo ? JSON.parse(data.tasksTodo) : [],
-          currentGameId: data.currentgameId || '',
+          currentGameId: data.currentGameId || null,
+          currentFoolGameId: data.currentFoolGameId || null,
           dark_theme: data.dark_theme,
           role: data.role || 0,
+          game_state: data.game_state,
         }));
         setUser(data);
-      } else {
-        // Handle new user insertion
-        await insertNewUser(tg_id, username, lang);
       }
     } catch (error) {
-      console.error('Fetch/Insert error:', error);
-      addDebugLog(`Fetch/Insert error: ${error}`);
+      console.error('Fetch error:', error);
+      addDebugLog(`Fetch error: ${error}`);
     }
   };
+
+  // Subscription to user updates (like coin changes)
+  useEffect(() => {
+    if (!user?.telegram_id) return;
+
+    const channel = supabase
+      .channel(`user_updates_${user.telegram_id}`)
+      .on(
+        'postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'users', filter: `telegram_id=eq.${user.telegram_id}` },
+        (payload) => {
+          console.log('Received user update:', payload.new);
+          setUser((prevUser) => ({
+            ...prevUser,
+            id: payload.new.id ?? prevUser?.id,  // ensure `id` is not undefined
+            telegram_id: payload.new.telegram_id ?? prevUser?.telegram_id,
+            telegram_username: payload.new.telegram_username ?? prevUser?.telegram_username,
+            lang: payload.new.lang ?? prevUser?.lang,
+            avatar_url: payload.new.avatar_url ?? prevUser?.avatar_url,
+            coins: payload.new.coins ?? prevUser?.coins,
+            rp: payload.new.rp ?? prevUser?.rp,
+            X: payload.new.X ?? prevUser?.X,
+            ref_code: payload.new.ref_code ?? prevUser?.ref_code,
+            rank: payload.new.rank ?? prevUser?.rank,
+            social_credit: payload.new.social_credit ?? prevUser?.social_credit,
+            role: payload.new.role ?? prevUser?.role,
+            cheers_count: payload.new.cheers_count ?? prevUser?.cheers_count,
+            dark_theme: payload.new.dark_theme ?? prevUser?.dark_theme,
+            game_state: payload.new.game_state ?? prevUser?.game_state,
+            crypto: payload.new.crypto ?? prevUser?.crypto,
+            // Handle other fields similarly to prevent `undefined` assignments
+          }));
+          setStore((prevStore) => ({
+            ...prevStore,
+            coins: payload.new.coins,
+            rp: payload.new.rp,
+            X: payload.new.X,
+            currentGameId: payload.new.currentGameId || null,
+            currentFoolGameId: payload.new.currentFoolGameId || null,
+            dark_theme: payload.new.dark_theme,
+            ref_code: payload.new.ref_code,
+            rank: payload.new.rank,
+            social_credit: payload.new.social_credit,
+            role: payload.new.role  || 0,
+            cheers_count: payload.new.cheers_count,
+            game_state: payload.new.game_state,
+            // Update other values as necessary
+          }));
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user?.telegram_id]);
 
   const insertNewUser = async (tg_id: number, username: string, lang: string) => {
     try {
