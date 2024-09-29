@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode, Suspense } from 'react';
+import React, { createContext, useContext, useReducer, useEffect, ReactNode, Suspense } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { LanguageDictionary, translations } from "../utils/TranslationUtils";
 import { usePathname, useSearchParams } from 'next/navigation';
@@ -8,19 +8,15 @@ import { updateUserReferral, increaseReferrerX, addReferralEntry } from '../serv
 import useTelegram from '../hooks/useTelegram';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
-// Default store state
-const defaultStore = {
-  tg_id: 413553377,
-  username: 'salavey13',
-  coins: 2000000,
-  rp: 420,
-  lang: 'ru',
-  X: 69,
-  dark_theme: true,
-  currentGameId: 28,
-  currentFoolGameId: 13,
-  role: 0,
-};
+interface GameState {
+  stage: number;
+  coins: number;
+  crypto: number;
+  rank: string;
+  cheersCount: number;
+  progress: string;
+  unlockedComponents: string[];
+}
 
 interface UserData {
   id: number;
@@ -41,7 +37,7 @@ interface UserData {
   tasksTodo?: string | null;
   currentGameId?: number | null;
   currentFoolGameId?: number | null;
-  game_state?: Record<string, any> | null; // Adjusted game_state type
+  game_state: GameState;
   ton_wallet?: string | null;
   initial_readings?: Record<string, any> | null;
   monthly_prices?: Record<string, any> | null;
@@ -57,43 +53,66 @@ interface UserData {
   };
 }
 
-interface AppContextType {
-  store: typeof defaultStore;
-  setStore: React.Dispatch<React.SetStateAction<typeof defaultStore>>;
+interface AppState {
   user: UserData | null;
-  setUser: React.Dispatch<React.SetStateAction<UserData | null>>;
-  fetchPlayer: (tg_id: number, username: string, lang: string) => void;
-  t: (key: string) => string;
   debugLogs: string[];
-  addDebugLog: (log: string) => void;
-  updateUserReferrals: (newReferralCode: string) => void;
-  toggleTheme: () => void;
+  formState: any;
 }
 
+type Action =
+  | { type: 'SET_USER'; payload: UserData }
+  | { type: 'UPDATE_USER'; payload: Partial<UserData> }
+  | { type: 'UPDATE_GAME_STATE'; payload: Partial<GameState> }
+  | { type: 'ADD_DEBUG_LOG'; payload: string }
+  | { type: 'SET_FORM_STATE'; payload: any }
+  | { type: 'RESET_USER' };
 
 interface AppContextType {
-  store: typeof defaultStore;
-  setStore: React.Dispatch<React.SetStateAction<typeof defaultStore>>;
-  user: UserData | null;
-  setUser: React.Dispatch<React.SetStateAction<UserData | null>>;
-  fetchPlayer: (tg_id: number, username: string, lang: string) => void;
-  t: (key: string) => string;
+  state: AppState;
+  dispatch: React.Dispatch<Action>;
+  fetchPlayer: (tg_id: number, username: string, lang: string) => Promise<void>;
+  t: (key: string, variables?: Record<string, string>) => string;
   changeLanguage: (langCode: string) => void;
-  debugLogs: string[];
-  addDebugLog: (log: string) => void;
   updateUserReferrals: (newReferralCode: string) => void;
-  toggleTheme: () => void,
-  formState: any;
+  toggleTheme: () => Promise<void>;
   saveFormState: () => void;
+}
+
+const initialState: AppState = {
+  user: null,
+  debugLogs: [],
+  formState: {},
+};
+
+function appReducer(state: AppState, action: Action): AppState {
+  switch (action.type) {
+    case 'SET_USER':
+      return { ...state, user: action.payload };
+    case 'UPDATE_USER':
+      return state.user ? { ...state, user: { ...state.user, ...action.payload } } : state;
+    case 'UPDATE_GAME_STATE':
+      return state.user ? {
+        ...state,
+        user: {
+          ...state.user,
+          game_state: { ...state.user.game_state, ...action.payload }
+        }
+      } : state;
+    case 'ADD_DEBUG_LOG':
+      return { ...state, debugLogs: [...state.debugLogs, action.payload] };
+    case 'SET_FORM_STATE':
+      return { ...state, formState: action.payload };
+    case 'RESET_USER':
+      return { ...state, user: null };
+    default:
+      return state;
+  }
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [store, setStore] = useState(defaultStore);
-  const [user, setUser] = useState<UserData | null>(null);
-  const [debugLogs, setDebugLogs] = useState<string[]>([]);
-  const [formState, setFormState] = useState<any>({});
+  const [state, dispatch] = useReducer(appReducer, initialState);
   const {
     tg,
     setTheme,
@@ -105,19 +124,6 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const saveFormState = () => {
-    console.log("Saving form state:", formState);
-    localStorage.setItem('formState', JSON.stringify(formState));
-  };
-
-  const updateUserReferrals = (newReferralCode: string) => {
-    setUser((prevUser: any) => ({ ...prevUser, ref_code: newReferralCode }));
-  };
-
-  const addDebugLog = (log: string) => {
-    setDebugLogs((prevLogs) => [...prevLogs, log]);
-  };
-
   const fetchPlayer = async (tg_id: number, username: string, lang: string) => {
     try {
       const { data, error } = await supabase
@@ -128,95 +134,39 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
       if (error) {
         console.error('Fetch error:', error);
-        addDebugLog(`Fetch error: ${error}`);
+        dispatch({ type: 'ADD_DEBUG_LOG', payload: `Fetch error: ${error.message}` });
         return;
       }
 
       if (data) {
-        setStore((prev) => ({
-          ...prev,
-          tg_id: data.telegram_id.toString(),
-          username: data.telegram_username || '',
-          coins: data.coins,
-          rp: data.rp,
-          lang: data.lang,
-          X: data.X,
-          tasksTodo: data.tasksTodo ? JSON.parse(data.tasksTodo) : [],
-          currentGameId: data.currentGameId || null,
-          currentFoolGameId: data.currentFoolGameId || null,
-          dark_theme: data.dark_theme,
-          role: data.role || 0,
-          game_state: data.game_state,
-        }));
-        setUser(data);
+        dispatch({ type: 'SET_USER', payload: data });
+      } else {
+        await insertNewUser(tg_id, username, lang);
       }
     } catch (error) {
       console.error('Fetch error:', error);
-      addDebugLog(`Fetch error: ${error}`);
+      dispatch({ type: 'ADD_DEBUG_LOG', payload: `Fetch error: ${error}` });
     }
   };
-
-  // Subscription to user updates (like coin changes)
-  useEffect(() => {
-    if (!user?.telegram_id) return;
-
-    const channel = supabase
-      .channel(`user_updates_${user.telegram_id}`)
-      .on(
-        'postgres_changes',
-        { event: 'UPDATE', schema: 'public', table: 'users', filter: `telegram_id=eq.${user.telegram_id}` },
-        (payload) => {
-          console.log('Received user update:', payload.new);
-          setUser((prevUser) => ({
-            ...prevUser,
-            id: payload.new.id ?? prevUser?.id,  // ensure `id` is not undefined
-            telegram_id: payload.new.telegram_id ?? prevUser?.telegram_id,
-            telegram_username: payload.new.telegram_username ?? prevUser?.telegram_username,
-            lang: payload.new.lang ?? prevUser?.lang,
-            avatar_url: payload.new.avatar_url ?? prevUser?.avatar_url,
-            coins: payload.new.coins ?? prevUser?.coins,
-            rp: payload.new.rp ?? prevUser?.rp,
-            X: payload.new.X ?? prevUser?.X,
-            ref_code: payload.new.ref_code ?? prevUser?.ref_code,
-            rank: payload.new.rank ?? prevUser?.rank,
-            social_credit: payload.new.social_credit ?? prevUser?.social_credit,
-            role: payload.new.role ?? prevUser?.role,
-            cheers_count: payload.new.cheers_count ?? prevUser?.cheers_count,
-            dark_theme: payload.new.dark_theme ?? prevUser?.dark_theme,
-            game_state: payload.new.game_state ?? prevUser?.game_state,
-            crypto: payload.new.crypto ?? prevUser?.crypto,
-            // Handle other fields similarly to prevent `undefined` assignments
-          }));
-          setStore((prevStore) => ({
-            ...prevStore,
-            coins: payload.new.coins,
-            rp: payload.new.rp,
-            X: payload.new.X,
-            currentGameId: payload.new.currentGameId || null,
-            currentFoolGameId: payload.new.currentFoolGameId || null,
-            dark_theme: payload.new.dark_theme,
-            ref_code: payload.new.ref_code,
-            rank: payload.new.rank,
-            social_credit: payload.new.social_credit,
-            role: payload.new.role  || 0,
-            cheers_count: payload.new.cheers_count,
-            game_state: payload.new.game_state,
-            // Update other values as necessary
-          }));
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [user?.telegram_id]);
 
   const insertNewUser = async (tg_id: number, username: string, lang: string) => {
     try {
       const { data: newUser, error } = await supabase
         .from('users')
-        .insert([{ telegram_id: tg_id, telegram_username: username, lang: lang }])
+        .insert([{
+          telegram_id: tg_id,
+          telegram_username: username,
+          lang: lang,
+          game_state: {
+            stage: 0,
+            coins: 1000,
+            crypto: 0,
+            rank: "13",
+            cheersCount: 1,
+            progress: "0%",
+            unlockedComponents: []
+          }
+        }])
         .single();
 
       if (error) {
@@ -224,42 +174,17 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         throw error;
       }
 
-      const { data: existingUser, error: fetchError } = await supabase
-        .from('users')
-        .select('*')
-        .eq('telegram_id', tg_id)
-        .single();
+      dispatch({ type: 'SET_USER', payload: newUser });
 
-      if (fetchError && fetchError.code !== 'PGRST116') {
-        console.error('Fetch after insert error:', fetchError);
-        return;
-      }
-
-      if (existingUser) {
-        setStore((prev) => ({
-          ...prev,
-          tg_id: existingUser.telegram_id,
-          username: existingUser.telegram_username || '',
-          coins: existingUser.coins?.toString() || '0',
-          rp: existingUser.rp?.toString() || '0',
-          lang: existingUser.lang,
-          X: existingUser.X?.toString() || '0',
-          tasksTodo: existingUser.tasksTodo ? JSON.parse(existingUser.tasksTodo) : [],
-          currentGameId: existingUser.currentgameId || '',
-          role: existingUser.role || 0,
-        }));
-        setUser(existingUser);
-
-        if (searchParams) {
-          const refCode = searchParams.get('ref');
-          if (refCode) {
-            await handleReferral(refCode, existingUser);
-          }
+      if (searchParams) {
+        const refCode = searchParams.get('ref');
+        if (refCode) {
+          await handleReferral(refCode, newUser);
         }
       }
     } catch (error) {
       console.error('Insert error:', error);
-      addDebugLog(`Insert error: ${error}`);
+      dispatch({ type: 'ADD_DEBUG_LOG', payload: `Insert error: ${error}` });
     }
   };
 
@@ -289,24 +214,24 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
             await addReferralEntry(referrer.telegram_id, user.telegram_id, refCode);
             await updateUserReferral(user.id, referrer.id);
             await increaseReferrerX(referrer.id);
-            setUser({ ...user, referer: referrer.id });
+            dispatch({ type: 'UPDATE_USER', payload: { referer: referrer.id } });
           }
         }
       }
     } catch (error) {
       console.error('Referral error:', error);
-      addDebugLog(`Referral error: ${error}`);
+      dispatch({ type: 'ADD_DEBUG_LOG', payload: `Referral error: ${error}` });
     }
   };
 
   const changeLanguage = (langCode: string) => {
-    setStore((prev) => ({ ...prev, lang: langCode }));
+    dispatch({ type: 'UPDATE_USER', payload: { lang: langCode as 'ru' | 'en' | 'ukr' } });
     sessionStorage.setItem('lang', langCode);
   };
 
   const t = (key: string, variables?: Record<string, string>): string => {
     const keys = key.split('.');
-    let translation: string | LanguageDictionary = translations[store.lang];
+    let translation: string | LanguageDictionary = translations[state.user?.lang || 'en'];
 
     for (const k of keys) {
       if (typeof translation === 'string') {
@@ -328,91 +253,88 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   };
 
   useEffect(() => {
-    // Initialize Telegram WebApp and fetch user data
     if (tg) {
       tg.ready();
-      //tg.toggleThemeSettings(toggleTheme)
-      setTheme("dark"); // Set the dark theme immediately
+      setTheme(state.user?.dark_theme ? "dark" : "light");
+      if (state.user && !state.user.dark_theme) {
+        setHeaderColor("#FFFFFF");
+        setBackgroundColor("#FFFFFF");
+        setBottomBarColor("#FFFFFF");
+      } else {
+        setHeaderColor("#282c33");
+        setBackgroundColor("#282c33");
+        setBottomBarColor("#282c33");
+      }
+      disableVerticalSwipes();
 
       const tgUser = tg.initDataUnsafe?.user;
       if (tgUser) {
         fetchPlayer(tgUser.id, tgUser.username, tgUser.language_code);
-      } else {
-        fetchPlayer(defaultStore.tg_id, defaultStore.username, defaultStore.lang);
       }
-      setTheme(user? user.dark_theme ? "dark" :"light" :"dark"); // Set the dark theme immediately
-      if (user && !user.dark_theme) {
-        setHeaderColor("#FFFFFF"); // Set the header color to black
-        setBackgroundColor("#FFFFFF"); // Set the background color to black
-        setBottomBarColor("#FFFFFF");
-      }
-      else {
-        setHeaderColor("#282c33"); // Set the header color to black
-        setBackgroundColor("#282c33"); // Set the background color to black
-        setBottomBarColor("#282c33");
-      }
-      disableVerticalSwipes(); // Disable vertical swipes in the Telegram WebApp
     }
   }, [tg]);
 
   useEffect(() => {
-    if (searchParams) {
-      const refItemId = searchParams.get('ref_item');
-      if (refItemId) {
-        // Store item ID in context or any other way to open the modal with preloaded data
-      }
-    }
-  }, [searchParams]);
+    const channel = supabase
+      .channel(`user_updates_${state.user?.telegram_id}`)
+      .on(
+        'postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'users', filter: `telegram_id=eq.${state.user?.telegram_id}` },
+        (payload) => {
+          dispatch({ type: 'UPDATE_USER', payload: payload.new });
+        }
+      )
+      .subscribe();
 
-  const setupTelegramBackButton = () => {
-    const backButton = window.Telegram?.WebApp?.BackButton;
-    if (backButton) {
-      backButton.show();
-      backButton.onClick(() => window.history.back());
-    }
-  }; 
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [state.user?.telegram_id]);
 
-  const applyTelegramTheme = () => {
-    const themeParams = window.Telegram?.WebApp?.themeParams
-    if (themeParams) {
-        Object.entries(themeParams).forEach(([key, value]) => {
-            document.documentElement.style.setProperty(
-                `--tg-theme-${key.replace(/_/g, "-")}`,
-                String(value)
-            )
-        })
-    }
-  }
+  const updateUserReferrals = (newReferralCode: string) => {
+    dispatch({ type: 'UPDATE_USER', payload: { ref_code: newReferralCode } });
+  };
 
-  // Function to toggle theme and save to Supabase
   const toggleTheme = async () => {
-    if (user) {
-      const newTheme = !user.dark_theme;
-      setUser({ ...user, dark_theme: newTheme });
-      setStore((prev) => ({ ...prev, dark_theme: newTheme }));
+    if (state.user) {
+      const newTheme = !state.user.dark_theme;
+      dispatch({ type: 'UPDATE_USER', payload: { dark_theme: newTheme } });
       
       const { error } = await supabase
         .from('users')
         .update({ dark_theme: newTheme })
-        .eq('telegram_id', user.telegram_id);
+        .eq('telegram_id', state.user.telegram_id);
       
       if (error) {
         console.error('Error updating theme in Supabase:', error);
-        addDebugLog(`Error updating theme in Supabase: ${error.message}`);
+        dispatch({ type: 'ADD_DEBUG_LOG', payload: `Error updating theme in Supabase: ${error.message}` });
       }
     }
   };
 
+  const saveFormState = () => {
+    console.log("Saving form state:", state.formState);
+    localStorage.setItem('formState', JSON.stringify(state.formState));
+  };
+
   return (
     <Suspense fallback={<LoadingSpinner />}>
-      <AppContext.Provider value={{ store, setStore, user, setUser, fetchPlayer, t, changeLanguage, debugLogs, addDebugLog, updateUserReferrals,formState, saveFormState, toggleTheme }}>
+      <AppContext.Provider value={{
+        state,
+        dispatch,
+        fetchPlayer,
+        t,
+        changeLanguage,
+        updateUserReferrals,
+        toggleTheme,
+        saveFormState
+      }}>
         {children}
       </AppContext.Provider>
     </Suspense>
   );
 };
 
-// Custom hook to use AppContext
 export const useAppContext = () => {
   const context = useContext(AppContext);
   if (!context) throw new Error('useAppContext must be used within an AppProvider');
