@@ -8,9 +8,11 @@ export default function HackButtonPage() {
   // if (!process.env.NEXT_PUBLIC_ENABLE_DEVKIT || (user && user.role !== 'developer')) {
   //   return <div>Access Denied</div>
   // }
-  return 
-  //<>
-    {/*<HackButtonStoryShower />;*/}
-    <DevKit />
-  //</> 
+  return (
+    <div className="container mx-auto py-8">
+      <HackButtonStoryShower />
+      <h1 className="text-2xl font-bold mb-4">Developer Tools</h1>
+      <DevKit />
+    </div>
+  )
 }
