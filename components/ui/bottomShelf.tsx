@@ -17,23 +17,24 @@ export interface NavigationLink {
 
 const BottomShelf: React.FC = () => {
   const pathname = usePathname()
-  const { t, user } = useAppContext()
+  const { state } = useAppContext()
+  const user = state.user
 
   const navigationLinks: NavigationLink[] = [    
-    { href: '/paymentnotification', icon: <DollarSign className="w-6 h-6" />, label: t('paymentnotification'), stageMask: 0b11111000 },
-    { href: '/dynamicitemform', icon: <List className="w-6 h-6" />, label: t('dynamicitemform'), stageMask: 0b11111000 },
-    { href: '/qrcodeform', icon: <Zap className="w-6 h-6" />, label: t('qrcodeform'), stageMask: 0b11111000 },
-    { href: '/cryptopayment', icon: <ShoppingCart className="w-6 h-6" />, label: t('cryptopayment'), stageMask: 0b11111000 },
-    { href: '/', icon: <Home className="w-6 h-6" />, label: t('home'), stageMask: 0b11111111 },
-    { href: '/rent', icon: <Car className="w-6 h-6" />, label: t('rent'), stageMask: 0b11111000 },
-    { href: '/referral', icon: <Users className="w-6 h-6" />, label: t('referral'), stageMask: 0b11111000 },
-    { href: '/profile', icon: <User className="w-6 h-6" />, label: t('profile'), stageMask: 0b11111111 },
-    { href: '/questsforcoins', icon: <Dice1 className="w-6 h-6" />, label: t('!'), stageMask: 0b11111000 },
-    { href: '/hackbutton', icon: <Zap className="w-6 h-6" />, label: t('IQ'), stageMask: 0b11111111 },
-    { href: '/createEvent', icon: <CalendarPlus className="w-6 h-6" />, label: t('createEvent'), stageMask: 0b11111000 },
-    { href: '/conflictawareness', icon: <Globe className="w-6 h-6" />, label: t('conflictawareness'), stageMask: 0b11111000 },
-    { href: '/admin', icon: <Crown className="w-6 h-6" />, label: t('admin'), stageMask: 0b10000000 },
-    { href: '/dev', icon: <Lightbulb className="w-6 h-6" />, label: t('dev'), stageMask: 0b11000000 },
+    { href: '/paymentnotification', icon: <DollarSign className="w-6 h-6" />, label: 'Payment Notification', stageMask: 0b11111000 },
+    { href: '/dynamicitemform', icon: <List className="w-6 h-6" />, label: 'Dynamic Item Form', stageMask: 0b11111000 },
+    { href: '/qrcodeform', icon: <Zap className="w-6 h-6" />, label: 'QR Code Form', stageMask: 0b11111000 },
+    { href: '/cryptopayment', icon: <ShoppingCart className="w-6 h-6" />, label: 'Crypto Payment', stageMask: 0b11111000 },
+    { href: '/', icon: <Home className="w-6 h-6" />, label: 'Home', stageMask: 0b11111111 },
+    { href: '/rent', icon: <Car className="w-6 h-6" />, label: 'Rent', stageMask: 0b11111000 },
+    { href: '/referral', icon: <Users className="w-6 h-6" />, label: 'Referral', stageMask: 0b11111000 },
+    { href: '/profile', icon: <User className="w-6 h-6" />, label: 'Profile', stageMask: 0b11111111 },
+    { href: '/questsforcoins', icon: <Dice1 className="w-6 h-6" />, label: '!', stageMask: 0b11111000 },
+    { href: '/hackbutton', icon: <Zap className="w-6 h-6" />, label: 'IQ', stageMask: 0b11111111 },
+    { href: '/createEvent', icon: <CalendarPlus className="w-6 h-6" />, label: 'Create Event', stageMask: 0b11111000 },
+    { href: '/conflictawareness', icon: <Globe className="w-6 h-6" />, label: 'Conflict Awareness', stageMask: 0b11111000 },
+    { href: '/admin', icon: <Crown className="w-6 h-6" />, label: 'Admin', stageMask: 0b10000000 },
+    { href: '/dev', icon: <Lightbulb className="w-6 h-6" />, label: 'Dev', stageMask: 0b11000000 },
   ]
 
   const currentStage = user?.game_state?.stage || 0
