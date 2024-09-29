@@ -46,7 +46,8 @@ interface UserData {
 }
 
 export default function AdminDashboard() {
-  const { user, t } = useAppContext()
+  const { state, dispatch, t } = useAppContext()
+  const user = state.user
   const [referrals, setReferrals] = useState<Referral[]>([])
   const [users, setUsers] = useState<UserData[]>([])
   const [summary, setSummary] = useState<SummaryData>({
