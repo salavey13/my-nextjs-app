@@ -32,7 +32,7 @@ interface StageStats {
 export default function DevKit() {
   const { state, dispatch, t } = useAppContext()
   const [storyStages, setStoryStages] = useState<StoryStage[]>([])
-  const [selectedStage, setSelectedStage] = useState(state.user?.game_state?.stage || 0)
+  const [selectedStage, setSelectedStage] = useState(state.user?.game_state?.stage?.toString() || "0")
   const [coins, setCoins] = useState(state.user?.game_state?.coins || 0)
   const [crypto, setCrypto] = useState(state.user?.game_state?.crypto || 0)
   const [stageStats, setStageStats] = useState<StageStats>({})
@@ -76,15 +76,15 @@ export default function DevKit() {
   }
 
   const handleStageChange = (value: string) => {
-    setSelectedStage(parseInt(value))
+    setSelectedStage(value)
   }
 
-  const handleCoinsChange = (value: number) => {
-    setCoins(value)
+  const handleCoinsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setCoins(parseInt(e.target.value) || 0)
   }
 
-  const handleCryptoChange = (value: number) => {
-    setCrypto(value)
+  const handleCryptoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setCrypto(parseInt(e.target.value) || 0)
   }
 
   const handleApplyChanges = async () => {
@@ -93,7 +93,7 @@ export default function DevKit() {
     try {
       const updatedGameState = {
         ...state.user.game_state,
-        stage: selectedStage,
+        stage: parseInt(selectedStage),
         coins: coins,
         crypto: crypto,
       }
@@ -147,7 +147,7 @@ export default function DevKit() {
               </TabsList>
               <TabsContent value="gameState">
                 <div className="space-y-4">
-                  <Select onValueChange={handleStageChange} value={selectedStage.toString()}>
+                  <Select onValueChange={handleStageChange} value={selectedStage}>
                     <SelectTrigger>
                       <SelectValue placeholder={t("devKit.selectStage")} />
                     </SelectTrigger>
@@ -162,13 +162,13 @@ export default function DevKit() {
                   <Input
                     type="number"
                     value={coins}
-                    onChange={(e) => handleCoinsChange(parseInt(e.target.value))}
+                    onChange={handleCoinsChange}
                     placeholder={t("devKit.coins")}
                   />
                   <Input
                     type="number"
                     value={crypto}
-                    onChange={(e) => handleCryptoChange(parseInt(e.target.value))}
+                    onChange={handleCryptoChange}
                     placeholder={t("devKit.crypto")}
                   />
                   <Button onClick={handleApplyChanges}>{t("devKit.applyChanges")}</Button>
