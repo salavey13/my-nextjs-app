@@ -48,7 +48,7 @@ interface GameState {
 const GameBoard: React.FC = () => {
   const [gameState, setGameState] = useState<GameState | null>(null);
   const [subscription, setSubscription] = useState<any>(null);
-  const { user, t } = useAppContext();
+  const { state, t } = useAppContext();
 
   useEffect(() => {
     // Subscribe to changes in the `rents` table for the current game
@@ -57,7 +57,7 @@ const GameBoard: React.FC = () => {
       const { data, error } = await supabase
         .from('rents')
         .select('game_state')
-        .eq('id', user?.currentGameId)
+        .eq('id', state?.user?.currentGameId)
         .single();
 
       if (error) {
@@ -82,7 +82,7 @@ const GameBoard: React.FC = () => {
     };
 
     handleSubscription();
-  }, [user]);
+  }, [state?.user]);
 
    // Fetch game state from Supabase
 useEffect(() => {

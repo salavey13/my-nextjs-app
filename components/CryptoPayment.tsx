@@ -12,7 +12,7 @@ import { supabase } from "../lib/supabaseClient";
 //import { fetchTargetWallet } from "@/lib/fetchTargetWallet"; // Import the fetch function
 
 export const CryptoPayment: React.FC<{ creatorTelegramId: string }> = ({ creatorTelegramId }) => {
-    const { t, user } = useAppContext();
+    const { t, state, dispatch,  } = useAppContext();
     const [amount, setAmount] = useState<number | string>('');
     const [paymentLink, setPaymentLink] = useState<string | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
@@ -49,7 +49,7 @@ export const CryptoPayment: React.FC<{ creatorTelegramId: string }> = ({ creator
             if (!targetWallet) throw new Error('Target wallet not available');
 
             // Create the payment link from the user's wallet to the target wallet
-            const link = `ton://transfer/${user?.ton_wallet}?amount=${amount}&to=${targetWallet}`;
+            const link = `ton://transfer/${state?.user?.ton_wallet}?amount=${amount}&to=${targetWallet}`;
             setPaymentLink(link);
         } catch (error) {
             console.error('Error generating payment link:', error);

@@ -8,13 +8,13 @@ import { useAppContext } from "../../context/AppContext";
 
 const Footer: React.FC = () => {
   const pathname = usePathname(); // Use usePathname to get the current path
-  const { user } = useAppContext();
+  const { state } = useAppContext();
 
   // Determine if the current page is the home page
   const isHomePage = pathname === "/";
 
   // Determine which set of links to show based on the user's language setting
-  const isRussian = user?.lang === "ru";
+  const isRussian = state?.user?.lang === "ru";
 
   return (
     <footer className="bg-gray-900 text-gray-400 p-3">

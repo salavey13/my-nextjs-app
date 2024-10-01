@@ -6,15 +6,15 @@ import { useAppContext } from "@/context/AppContext";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { generateQrCodeBase64 } from "../utils/qrcodeUtils"
 const PaymentNotification: React.FC<{ link?: string }> = ({ link }) => {
-  const { user, t } = useAppContext();
+  const { state, t } = useAppContext();
   const [loading, setLoading] = useState(false);
   const [notificationSent, setNotificationSent] = useState(false);
 
   useEffect(() => {
-    if (user && link && !notificationSent) {
+    if (state?.user && link && !notificationSent) {
       sendPaymentNotification(link);
     }
-  }, [user, link]);
+  }, [state?.user, link]);
 
   const sendPaymentNotification = async (link: string) => {
     setLoading(true);
@@ -40,7 +40,7 @@ const PaymentNotification: React.FC<{ link?: string }> = ({ link }) => {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
-                chat_id: user?.telegram_id,
+                chat_id: state?.user?.telegram_id,
                 text: `${t("paymentSuccessMessage")}`,
                 reply_markup: {
                     inline_keyboard: [
@@ -62,7 +62,7 @@ const PaymentNotification: React.FC<{ link?: string }> = ({ link }) => {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
-                chat_id: user?.telegram_id,
+                chat_id: state?.user?.telegram_id,
                 photo: qrCodeImage,
                 caption: `${t("scanQR")}`,
             }),

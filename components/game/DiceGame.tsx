@@ -308,7 +308,7 @@ function Scene({ gameState, onRollComplete, wallTexture }: { gameState: GameStat
 }
 
 const DiceGame: React.FC = () => {
-  const { user, t } = useAppContext()
+  const { state, t } = useAppContext()
   const { tg } = useTelegram()
   const [gameState, setGameState] = useState<GameState | null>(null)
   const [soundEnabled, setSoundEnabled] = useState(true)
@@ -335,7 +335,7 @@ const DiceGame: React.FC = () => {
   }
 
   const startGame = async (mode: string) => {
-    if (!user?.currentGameId) {
+    if (!state?.user?.currentGameId) {
       toast({
         title: t('error'),
         description: t('noActiveGame'),
@@ -349,7 +349,7 @@ const DiceGame: React.FC = () => {
       const { data, error } = await supabase
         .from('rents')
         .select('game_state')
-        .eq('id', user.currentGameId)
+        .eq('id', state?.user.currentGameId)
         .single()
 
       if (error) throw error
@@ -361,7 +361,7 @@ const DiceGame: React.FC = () => {
 
       const initialGameState: GameState = {
         players: [
-          { id: String(user.id), username: user.telegram_username || t('player1'), score: 0, diceValues: [1, 1] },
+          { id: String(state?.user.id), username: state?.user.telegram_username || t('player1'), score: 0, diceValues: [1, 1] },
           ...(mode !== 'single' 
             ? [existingSecondPlayer && existingSecondPlayer.id !== 'waiting'
                 ? existingSecondPlayer
@@ -375,7 +375,7 @@ const DiceGame: React.FC = () => {
             : []
           ),
         ],
-        currentPlayer: String(user.id),
+        currentPlayer: String(state?.user.id),
         gameMode: mode as GameState['gameMode'],
         isRolling: false,
         winner: null,
@@ -394,7 +394,7 @@ const DiceGame: React.FC = () => {
   }
 
   const rollDice = async () => {
-    if (!gameState || gameState.isRolling || (gameState.currentPlayer !== String(user?.id) && gameState.currentPlayer !== 'ai')) return
+    if (!gameState || gameState.isRolling || (gameState.currentPlayer !== String(state?.user?.id) && gameState.currentPlayer !== 'ai')) return
 
     const updatedGameState = { ...gameState, isRolling: true }
     await updateGameState(updatedGameState)
@@ -402,13 +402,13 @@ const DiceGame: React.FC = () => {
   }
 
   const updateGameState = async (newState: GameState) => {
-    if (!user?.currentGameId) return
+    if (!state?.user?.currentGameId) return
 
     try {
       const { error } = await supabase
         .from('rents')
         .update({ game_state: newState })
-        .eq('id', user.currentGameId)
+        .eq('id', state?.user.currentGameId)
 
       if (error) throw error
 
@@ -454,7 +454,7 @@ const DiceGame: React.FC = () => {
     await updateGameState(updatedGameState)
 
     if (soundEnabled) {
-      playSound(winner === String(user?.id) ? giggleAudio : screamAudio)
+      playSound(winner === String(state?.user?.id) ? giggleAudio : screamAudio)
     }
 
     if (updatedGameState.gameMode === 'ai' && updatedGameState.currentPlayer === 'ai' && !isGameOver) {
@@ -476,16 +476,16 @@ const DiceGame: React.FC = () => {
     return () => {
       tg?.BackButton?.hide();
     };
-  }, [tg, gameState, user]);
+  }, [tg, gameState, state?.user]);
 
   useEffect(() => {
     const handleSubscription = async () => {
-      if (!user?.currentGameId) return
+      if (!state?.user?.currentGameId) return
 
       const { data, error } = await supabase
         .from('rents')
         .select('game_state, loot')
-        .eq('id', user.currentGameId)
+        .eq('id', state?.user.currentGameId)
         .single()
 
       if (error) {
@@ -508,10 +508,10 @@ const DiceGame: React.FC = () => {
       }
 
       const channel = supabase
-        .channel(`game_state_updates_${user.currentGameId}`)
+        .channel(`game_state_updates_${state?.user.currentGameId}`)
         .on(
           'postgres_changes',
-          { event: 'UPDATE', schema: 'public', table: 'rents', filter: `id=eq.${user.currentGameId}` },
+          { event: 'UPDATE', schema: 'public', table: 'rents', filter: `id=eq.${state?.user.currentGameId}` },
           (payload) => {
             setGameState(payload.new.game_state)
             if (payload.new.loot?.dice?.walls) {
@@ -537,7 +537,7 @@ const DiceGame: React.FC = () => {
     }
 
     handleSubscription()
-  }, [user?.currentGameId])
+  }, [state?.user?.currentGameId])
 
   if (showRules) {
     return <Rules onClose={() => setShowRules(false)} />
@@ -577,7 +577,7 @@ const DiceGame: React.FC = () => {
 
               {gameState.winner && (
                 <div className="text-3xl font-bold">
-                  {gameState.winner === String(user?.id) ? t('youWon') : t('youLost')}
+                  {gameState.winner === String(state?.user?.id) ? t('youWon') : t('youLost')}
                 </div>
               )}
 
@@ -585,7 +585,7 @@ const DiceGame: React.FC = () => {
                 <Button
                   onClick={rollDice}
                   variant="outline"
-                  disabled={gameState.isRolling || (gameState.currentPlayer !== String(user?.id) && gameState.currentPlayer !== 'ai')}
+                  disabled={gameState.isRolling || (gameState.currentPlayer !== String(state?.user?.id) && gameState.currentPlayer !== 'ai')}
                   className="bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-4 px-8 rounded-lg"
                 >
                   {gameState.isRolling ? t('rolling') : t('rollDice')}

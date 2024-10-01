@@ -8,7 +8,7 @@ import { useAppContext } from '@/context/AppContext'
 
 export const DebugOverlay: React.FC = () => {
   const { isDebugMode, logs } = useDebugStore()
-  const { user } = useAppContext()
+  const { state } = useAppContext()
 
   if (!isDebugMode) return null
 
@@ -19,7 +19,7 @@ export const DebugOverlay: React.FC = () => {
       </CardHeader>
       <CardContent>
         <div className="mb-2">
-          <strong>Game State:</strong> {JSON.stringify(user?.game_state, null, 2)}
+          <strong>Game State:</strong> {JSON.stringify(state?.user?.game_state, null, 2)}
         </div>
         <ScrollArea className="h-64">
           {logs.map((log, index) => (

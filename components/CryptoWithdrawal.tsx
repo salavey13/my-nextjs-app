@@ -10,7 +10,8 @@ import PaymentNotification from './PaymentNotification';
 
 const CryptoWithdrawal: React.FC = () => {
     const { state, dispatch, t } = useAppContext()
-    const user = state.userconst [withdrawalAmount, setWithdrawalAmount] = useState<number | string>('');
+    const user = state.user
+    const [withdrawalAmount, setWithdrawalAmount] = useState<number | string>('');
     const [loading, setLoading] = useState<boolean>(false);
     const [withdrawalLink, setWithdrawalLink] = useState<string | null>(null);
 

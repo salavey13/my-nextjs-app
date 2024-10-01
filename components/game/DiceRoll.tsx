@@ -13,7 +13,7 @@ interface DiceRollProps {
 }
 
 const DiceRoll: React.FC<DiceRollProps> = ({ mode, soundEnabled }) => {
-  const { user, t } = useAppContext();
+  const { t } = useAppContext();
   const [dice1, setDice1] = useState(1);
   const [dice2, setDice2] = useState(1);
   const [isRolling, setIsRolling] = useState(false);

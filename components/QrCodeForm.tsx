@@ -10,7 +10,7 @@ import { usePathname } from 'next/navigation';
 import { supabase } from "@/lib/supabaseClient";  // Make sure you have your Supabase client setup
 
 const QrCodeForm: React.FC = () => {
-  const { formState, saveFormState, t } = useAppContext();
+  const { state, saveFormState, t } = useAppContext();
   const [qrCodeUrl, setQrCodeUrl] = useState<string | null>(null);
 
   useEffect(() => {
@@ -21,7 +21,7 @@ const QrCodeForm: React.FC = () => {
     // Save form state to Supabase and get the form ID
     const { data, error } = await supabase
       .from('forms')
-      .insert([{ state: formState }])
+      .insert([{ state: state.formState }])
       .select("id")
       .single();
 

@@ -3,7 +3,7 @@ import { useContext } from 'react';
 import { useAppContext } from '@/context/AppContext'; 
 
 const ThemeToggle: React.FC = () => {
-  const { t, user, toggleTheme } = useAppContext();
+  const { t, state, toggleTheme } = useAppContext();
 
   return (
     <div>
@@ -11,7 +11,7 @@ const ThemeToggle: React.FC = () => {
         {t("darkTheme")}
         <input 
           type="checkbox" 
-          checked={user? user.dark_theme : true} 
+          checked={state?.user? state?.user.dark_theme : true} 
           onChange={() =>toggleTheme()} 
         />
       </label>

@@ -39,7 +39,7 @@ export interface DynamicItemFormProps {
 }
 
 const DynamicItemForm: React.FC<DynamicItemFormProps> = ({ itemType }) => {
-  const { t, user } = useAppContext();
+  const { t, state } = useAppContext();
   const [formSections, setFormSections] = useState<FormSection[]>([]);
   const [loading, setLoading] = useState(false);
   const [qrCodeUrl, setQrCodeUrl] = useState<string | null>(null);
@@ -153,7 +153,7 @@ const DynamicItemForm: React.FC<DynamicItemFormProps> = ({ itemType }) => {
       const { error } = await supabase.from("items").insert({
         item_type: itemType,
         details: itemData,
-        creator_ref_code: user?.ref_code,
+        creator_ref_code: state?.user?.ref_code,
         title:
           itemData.ad_info?.title ||
           itemData.lesson_info?.title ||

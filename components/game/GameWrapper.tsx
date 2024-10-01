@@ -9,18 +9,18 @@ import DiceGame from './DiceGame';
 import LoadingSpinner from "../ui/LoadingSpinner";
 
 const GameWrapper: React.FC = () => {
-  const { user } = useAppContext();
+  const { state } = useAppContext();
   const [gameType, setGameType] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchGameType = async () => {
-      if (!user?.currentGameId) return;
+      if (!state?.user?.currentGameId) return;
 
       try {
         const { data, error } = await supabase
           .from('rents')
           .select('game_state')
-          .eq('id', user.currentGameId)
+          .eq('id', state?.user.currentGameId)
           .single();
 
         if (error) throw error;
@@ -35,10 +35,10 @@ const GameWrapper: React.FC = () => {
     fetchGameType();
 
     const channel = supabase
-      .channel(`game_type_updates_${user?.currentGameId}`)
+      .channel(`game_type_updates_${state?.user?.currentGameId}`)
       .on(
         'postgres_changes',
-        { event: 'UPDATE', schema: 'public', table: 'rents', filter: `id=eq.${user?.currentGameId}` },
+        { event: 'UPDATE', schema: 'public', table: 'rents', filter: `id=eq.${state?.user?.currentGameId}` },
         (payload) => {
           setGameType(payload.new.game_state.gameType || 'GameBoard');
         }
@@ -48,7 +48,7 @@ const GameWrapper: React.FC = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [user?.currentGameId]);
+  }, [state?.user?.currentGameId]);
 
   if (!gameType) {
     return <LoadingSpinner />;

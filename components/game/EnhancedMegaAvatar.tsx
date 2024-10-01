@@ -100,7 +100,7 @@ const EnhancedMegaAvatar: React.FC<EnhancedMegaAvatarProps> = React.memo(({
   onPositionChange,
   onMessageUpdate
 }) => {
-  const { user, t } = useAppContext();
+  const { state, t } = useAppContext();
   const player = gameState.players.find(p => p.id === playerId);
   const [messages, setMessages] = useState<Message[]>([]);
   const [isMuted, setIsMuted] = useState(true);
@@ -241,13 +241,13 @@ const EnhancedMegaAvatar: React.FC<EnhancedMegaAvatarProps> = React.memo(({
   }, []);
 
   useEffect(() => {
-    if (player?.id === user?.id?.toString() && !isMuted && permissionGranted) {
+    if (player?.id === state?.user?.id?.toString() && !isMuted && permissionGranted) {
       startListening();
     }
     return () => {
       stopListening();
     };
-  }, [player, user, isMuted, permissionGranted, startListening, stopListening]);
+  }, [player, state?.user, isMuted, permissionGranted, startListening, stopListening]);
 
   const toggleMute = useCallback(async () => {
     if (isMuted && !permissionGranted) {
@@ -309,7 +309,7 @@ const EnhancedMegaAvatar: React.FC<EnhancedMegaAvatarProps> = React.memo(({
             width: '128px',
             height: '128px',
             borderRadius: '50%',
-            backgroundColor: player?.id === user?.id?.toString() ? 'rgba(225, 255, 1, 0.2)' : 'transparent',
+            backgroundColor: player?.id === state?.user?.id?.toString() ? 'rgba(225, 255, 1, 0.2)' : 'transparent',
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'center',
@@ -332,7 +332,7 @@ const EnhancedMegaAvatar: React.FC<EnhancedMegaAvatarProps> = React.memo(({
           >
             {player?.username.charAt(0).toUpperCase()}
           </div>
-          {player?.id === user?.id?.toString() && (
+          {player?.id === state?.user?.id?.toString() && (
             <Button
               variant="outline"
               size="icon"

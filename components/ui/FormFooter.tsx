@@ -6,8 +6,8 @@ import Link from "next/link";
 import { useAppContext } from "../../context/AppContext";
 
 const FormFooter: React.FC = () => {
-  const { user } = useAppContext();
-  const isRussian = user?.lang === "ru";
+  const { state } = useAppContext();
+  const isRussian = state?.user?.lang === "ru";
 
   return (
     <div className="text-xs text-gray-600 mt-4">

@@ -21,8 +21,8 @@ interface TranslationProviderProps {
 }
 
 export const TranslationProvider: FC<TranslationProviderProps> = ({ children }) => {
-  const { store } = useAppContext(); // Assuming useAppContext() provides current language
-  const currentLanguage = store.lang || "en";
+  const { state } = useAppContext(); // Assuming useAppContext() provides current language
+  const currentLanguage = state?.user?.lang || "en";
 
   const t = (key: string, variables?: Record<string, string>): string => {
     const keys = key.split('.');

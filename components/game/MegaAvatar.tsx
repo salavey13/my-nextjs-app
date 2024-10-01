@@ -23,7 +23,7 @@ interface MegaAvatarProps {
 }
 
 const MegaAvatar: React.FC<MegaAvatarProps> = React.memo(({ gameState, playerId, initialPosition, onPositionChange }) => {
-  const { user } = useAppContext();
+  const { state } = useAppContext();
   const player = gameState.players.find(p => p.id === playerId);
 
   const [{ x, y }, api] = useSpring(() => ({
@@ -72,7 +72,7 @@ const MegaAvatar: React.FC<MegaAvatarProps> = React.memo(({ gameState, playerId,
             width: '128px',
             height: '128px',
             borderRadius: '50%',
-            backgroundColor: player?.id === user?.id?.toString() ? 'rgba(225, 255, 1, 0.2)' : 'transparent',
+            backgroundColor: player?.id === state?.user?.id?.toString() ? 'rgba(225, 255, 1, 0.2)' : 'transparent',
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
