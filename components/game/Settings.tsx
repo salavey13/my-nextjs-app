@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -28,12 +28,30 @@ export const Settings: React.FC<SettingsProps> = ({ onUpdateSettings, initialSet
   const [settings, setSettings] = useState<GameSettings>(initialSettings || defaultSettings);
   const [isOpen, setIsOpen] = useState(false);
   const { state, dispatch, t } = useAppContext();
+  const [stage, setStage] = useState<number | null>(null);
 
   useEffect(() => {
     if (initialSettings) {
       setSettings(initialSettings);
     }
   }, [initialSettings]);
+
+  useEffect(() => {
+    const fetchStage = async () => {
+      if (state.user) {
+        const { data, error } = await supabase
+          .from('users')
+          .select('game_state->>stage')
+          .eq('id', state.user.id)
+          .single();
+
+        if (error) console.error('Error fetching stage:', error);
+        else setStage(Number(data.stage));
+      }
+    };
+
+    fetchStage();
+  }, [state.user]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -89,37 +107,42 @@ export const Settings: React.FC<SettingsProps> = ({ onUpdateSettings, initialSet
 
   return (
     <div className="fixed bottom-16 left-2 z-50">
-      <Button onClick={() => setIsOpen(!isOpen)} className="mb-2 ml-2" variant="outline">
-        {isOpen ? 'X' : "⚙"}
-      </Button>
-      {isOpen && (
-        <form onSubmit={handleSubmit} className="bg-background p-4 rounded-lg shadow-lg max-h-[calc(100vh-200px)] overflow-y-auto">
-          {Object.entries(settings).map(([key, value]) => (
-            <div key={key} className="mb-2">
-              <Label htmlFor={key} className="block mb-1">
-                {key}
-              </Label>
-              <Input
-                type={key.includes('Url') ? 'text' : 'number'}
-                id={key}
-                name={key}
-                value={value}
-                onChange={handleChange}
-                step={key.includes('Url') ? undefined : '0.1'}
-                className="w-full"
-              />
-            </div>
-          ))}
-          <div className="flex justify-between mt-4">
-            <Button type="submit" className="w-1/2 mr-2" variant="outline">
-              {t("applySettings")}
-            </Button>
-            <Button type="button" onClick={handleSetDefault} variant="outline" className="w-1/2 ml-2">
-              {t("setdDefault")}
-            </Button>
-          </div>
-        </form>
+      {stage && stage >= 3 && (
+        <>
+          <Button onClick={() => setIsOpen(!isOpen)} className="mb-2 ml-2" variant="outline">
+            {isOpen ? 'X' : "⚙"}
+          </Button>
+          {isOpen && (
+            <form onSubmit={handleSubmit} className="bg-background p-4 rounded-lg shadow-lg max-h-[calc(100vh-200px)] overflow-y-auto">
+              {Object.entries(settings).map(([key, value]) => (
+                <div key={key} className="mb-2">
+                  <Label htmlFor={key} className="block mb-1">
+                    {key}
+                  </Label>
+                  <Input
+                    type={key.includes('Url') ? 'text' : 'number'}
+                    id={key}
+                    name={key}
+                    value={value}
+                    onChange={handleChange}
+                    step={key.includes('Url') ? undefined : '0.1'}
+                    className="w-full"
+                  />
+                </div>
+              ))}
+              <div className="flex justify-between mt-4">
+                <Button type="submit" className="w-1/2 mr-2" variant="outline">
+                  {t("applySettings")}
+                </Button>
+                <Button type="button" onClick={handleSetDefault} variant="outline" className="w-1/2 ml-2">
+                  {t("setDefault")}
+                </Button>
+              </div>
+            </form>
+          )}
+        </>
       )}
     </div>
   );
 };
+

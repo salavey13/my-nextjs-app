@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import { toast } from '@/hooks/use-toast'
 import { supabase } from '@/lib/supabaseClient'
 import { StoryEdit } from './StoryEdit'
@@ -35,6 +36,7 @@ export default function DevKit() {
   const [coins, setCoins] = useState(state.user?.game_state?.coins || 0)
   const [crypto, setCrypto] = useState(state.user?.game_state?.crypto || 0)
   const [stageStats, setStageStats] = useState<StageStats>({})
+  const [isOpen, setIsOpen] = useState(false)
 
   useEffect(() => {
     fetchStoryStages()
@@ -120,63 +122,76 @@ export default function DevKit() {
     }
   }
 
+  if (state.user?.role !== 1) {
+    return null
+  }
+
   return (
-    <Card className="w-full max-w-2xl mx-auto">
-      <CardHeader>
-        <CardTitle>{t("devKit.title")}</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <Tabs defaultValue="gameState">
-          <TabsList>
-            <TabsTrigger value="gameState">{t("devKit.gameState")}</TabsTrigger>
-            <TabsTrigger value="storyEdit">{t("devKit.storyEdit")}</TabsTrigger>
-            <TabsTrigger value="stats">{t("devKit.stats")}</TabsTrigger>
-          </TabsList>
-          <TabsContent value="gameState">
-            <div className="space-y-4">
-              <Select onValueChange={handleStageChange} value={selectedStage.toString()}>
-                <SelectTrigger>
-                  <SelectValue placeholder={t("devKit.selectStage")} />
-                </SelectTrigger>
-                <SelectContent>
-                  {storyStages.map((stage) => (
-                    <SelectItem key={stage.id} value={stage.stage.toString()}>
-                      {t("devKit.stage")} {stage.stage}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Input
-                type="number"
-                value={coins}
-                onChange={(e) => handleCoinsChange(parseInt(e.target.value))}
-                placeholder={t("devKit.coins")}
-              />
-              <Input
-                type="number"
-                value={crypto}
-                onChange={(e) => handleCryptoChange(parseInt(e.target.value))}
-                placeholder={t("devKit.crypto")}
-              />
-              <Button onClick={handleApplyChanges}>{t("devKit.applyChanges")}</Button>
-            </div>
-          </TabsContent>
-          <TabsContent value="storyEdit">
-            <StoryEdit />
-          </TabsContent>
-          <TabsContent value="stats">
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold">{t("devKit.playersPerStage")}</h3>
-              {Object.entries(stageStats).map(([stage, count]) => (
-                <div key={stage} className="flex justify-between">
-                  <span>{t("devKit.stage")} {stage}:</span>
-                  <span>{count} {t("devKit.players")}</span>
+    <Collapsible open={isOpen} onOpenChange={setIsOpen} className="w-full">
+      <CollapsibleTrigger asChild>
+        <Button variant="outline" className="w-full mb-2">
+          {isOpen ? "Hide DevKit" : "Show DevKit"}
+        </Button>
+      </CollapsibleTrigger>
+      <CollapsibleContent>
+        <Card className="w-full">
+          <CardHeader>
+            <CardTitle>{t("devKit.title")}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Tabs defaultValue="gameState">
+              <TabsList className="w-full flex justify-between mb-4">
+                <TabsTrigger value="gameState" className="flex-1">{t("devKit.gameState")}</TabsTrigger>
+                <TabsTrigger value="storyEdit" className="flex-1">{t("devKit.storyEdit")}</TabsTrigger>
+                <TabsTrigger value="stats" className="flex-1">{t("devKit.stats")}</TabsTrigger>
+              </TabsList>
+              <TabsContent value="gameState">
+                <div className="space-y-4">
+                  <Select onValueChange={handleStageChange} value={selectedStage.toString()}>
+                    <SelectTrigger>
+                      <SelectValue placeholder={t("devKit.selectStage")} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {storyStages.map((stage) => (
+                        <SelectItem key={stage.id} value={stage.stage.toString()}>
+                          {t("devKit.stage")} {stage.stage} (ID: {stage.id})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Input
+                    type="number"
+                    value={coins}
+                    onChange={(e) => handleCoinsChange(parseInt(e.target.value))}
+                    placeholder={t("devKit.coins")}
+                  />
+                  <Input
+                    type="number"
+                    value={crypto}
+                    onChange={(e) => handleCryptoChange(parseInt(e.target.value))}
+                    placeholder={t("devKit.crypto")}
+                  />
+                  <Button onClick={handleApplyChanges}>{t("devKit.applyChanges")}</Button>
                 </div>
-              ))}
-            </div>
-          </TabsContent>
-        </Tabs>
-      </CardContent>
-    </Card>
+              </TabsContent>
+              <TabsContent value="storyEdit">
+                <StoryEdit />
+              </TabsContent>
+              <TabsContent value="stats">
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold">{t("devKit.playersPerStage")}</h3>
+                  {Object.entries(stageStats).map(([stage, count]) => (
+                    <div key={stage} className="flex justify-between">
+                      <span>{t("devKit.stage")} {stage}:</span>
+                      <span>{count} {t("devKit.players")}</span>
+                    </div>
+                  ))}
+                </div>
+              </TabsContent>
+            </Tabs>
+          </CardContent>
+        </Card>
+      </CollapsibleContent>
+    </Collapsible>
   )
 }

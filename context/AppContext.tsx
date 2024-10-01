@@ -31,7 +31,7 @@ export interface SkinSettings {
 
 export interface GameSettings extends PhysicsSettings, SkinSettings {}
 
-interface UserData {
+export interface UserData {
   id: number;
   telegram_id: number;
   telegram_username: string;
@@ -80,6 +80,86 @@ type Action =
   | { type: 'SET_FORM_STATE'; payload: any }
   | { type: 'RESET_USER' };
 
+interface StageTrigger {
+  unlockCustomization: boolean;
+  unlockCrypto: boolean;
+  showOtherSkins: boolean;
+  unlockHackButton: boolean;
+  unlockEvents: boolean;
+  unlockRents: boolean;
+  unlockVersimcel: boolean;
+  unlockGitHub: boolean;
+}
+
+interface SideHustle {
+  storyContent: string;
+  trigger: string;
+  activeComponent: string;
+  minigame: string;
+  achievement: string;
+}
+
+const STAGE_TRIGGERS: { [key: number]: StageTrigger } = {
+  0: { unlockCustomization: false, unlockCrypto: false, showOtherSkins: true, unlockHackButton: false, unlockEvents: false, unlockRents: false, unlockVersimcel: false, unlockGitHub: false },
+  1: { unlockCustomization: true, unlockCrypto: false, showOtherSkins: true, unlockHackButton: true, unlockEvents: false, unlockRents: false, unlockVersimcel: false, unlockGitHub: false },
+  2: { unlockCustomization: true, unlockCrypto: true, showOtherSkins: true, unlockHackButton: true, unlockEvents: false, unlockRents: false, unlockVersimcel: false, unlockGitHub: false },
+  3: { unlockCustomization: true, unlockCrypto: true, showOtherSkins: true, unlockHackButton: true, unlockEvents: true, unlockRents: false, unlockVersimcel: false, unlockGitHub: false },
+  4: { unlockCustomization: true, unlockCrypto: true, showOtherSkins: true, unlockHackButton: true, unlockEvents: true, unlockRents: true, unlockVersimcel: false, unlockGitHub: false },
+  5: { unlockCustomization: true, unlockCrypto: true, showOtherSkins: true, unlockHackButton: true, unlockEvents: true, unlockRents: true, unlockVersimcel: true, unlockGitHub: false },
+  6: { unlockCustomization: true, unlockCrypto: true, showOtherSkins: true, unlockHackButton: true, unlockEvents: true, unlockRents: true, unlockVersimcel: true, unlockGitHub: true },
+};
+
+const SIDE_HUSTLES: { [key: number]: SideHustle } = {
+  0: { storyContent: "Welcome to the system...", trigger: "Start Game", activeComponent: "", minigame: "", achievement: "Welcome to the System" },
+  1: { storyContent: "System Crash...", trigger: "Hack Button Clicked", activeComponent: "hack", minigame: "hack", achievement: "First Hack" },
+  2: { storyContent: "You've executed your first hack...", trigger: "Yes Chosen", activeComponent: "Skins", minigame: "", achievement: "Hacker Initiate" },
+  3: { storyContent: "Congratulations on your new skin! Now, let's introduce you to the world of crypto.", trigger: "Skin Selected", activeComponent: "Crypto Wallet", minigame: "", achievement: "Crypto Novice" },
+  4: { storyContent: "With crypto in your wallet, you can now participate in events and place bets!", trigger: "Crypto Introduced", activeComponent: "Events", minigame: "", achievement: "Event Participant" },
+  5: { storyContent: "You've experienced events and bets. Now, let's explore the world of rents!", trigger: "Event Participated", activeComponent: "Rents", minigame: "", achievement: "Rent Explorer" },
+  6: { storyContent: "The system crashes again... but this time, Versimcel appears!", trigger: "Rent Explored", activeComponent: "Versimcel", minigame: "debug", achievement: "Versimcel Encounter" },
+  7: { storyContent: "Welcome to the admin level. It's time for some real GitHub source hunting!", trigger: "Debug Complete", activeComponent: "GitHub", minigame: "", achievement: "Admin Access" },
+};
+
+const checkStage = (playerStage: number): StageTrigger => {
+  return STAGE_TRIGGERS[playerStage] || STAGE_TRIGGERS[0];
+};
+
+const isCustomizationUnlocked = (playerStage: number): boolean => {
+  return checkStage(playerStage).unlockCustomization;
+};
+
+const isCryptoUnlocked = (playerStage: number): boolean => {
+  return checkStage(playerStage).unlockCrypto;
+};
+
+const canShowOtherSkins = (playerStage: number): boolean => {
+  return checkStage(playerStage).showOtherSkins;
+};
+
+const isHackButtonUnlocked = (playerStage: number): boolean => {
+  return checkStage(playerStage).unlockHackButton;
+};
+
+const areEventsUnlocked = (playerStage: number): boolean => {
+  return checkStage(playerStage).unlockEvents;
+};
+
+const areRentsUnlocked = (playerStage: number): boolean => {
+  return checkStage(playerStage).unlockRents;
+};
+
+const isVersimcelUnlocked = (playerStage: number): boolean => {
+  return checkStage(playerStage).unlockVersimcel;
+};
+
+const isGitHubUnlocked = (playerStage: number): boolean => {
+  return checkStage(playerStage).unlockGitHub;
+};
+
+const getSideHustleTrigger = (hustleId: number): SideHustle => {
+  return SIDE_HUSTLES[hustleId] || SIDE_HUSTLES[0];
+};
+
 interface AppContextType {
   state: AppState;
   dispatch: React.Dispatch<Action>;
@@ -89,10 +169,66 @@ interface AppContextType {
   updateUserReferrals: (newReferralCode: string) => void;
   toggleTheme: () => Promise<void>;
   saveFormState: () => void;
+  isCustomizationUnlocked: (playerStage: number) => boolean;
+  isCryptoUnlocked: (playerStage: number) => boolean;
+  canShowOtherSkins: (playerStage: number) => boolean;
+  isHackButtonUnlocked: (playerStage: number) => boolean;
+  areEventsUnlocked: (playerStage: number) => boolean;
+  areRentsUnlocked: (playerStage: number) => boolean;
+  isVersimcelUnlocked: (playerStage: number) => boolean;
+  isGitHubUnlocked: (playerStage: number) => boolean;
+  getSideHustleTrigger: (hustleId: number) => SideHustle;
 }
 
 const initialState: AppState = {
-  user: null,
+  user: {
+    id: 1,
+    telegram_id: 413553377,
+    telegram_username: "test_user",
+    lang: "ru",
+    avatar_url: "https://example.com/avatar.jpg",
+    coins: 1000,
+    crypto: 50,
+    rp: 100,
+    X: 5,
+    ref_code: "TEST123",
+    rank: "Novice Hacker",
+    social_credit: 75,
+    role: 1,
+    cheers_count: 10,
+    referer: null,
+    tasksTodo: null,
+    currentGameId: 13,
+    currentFoolGameId: 28,
+    game_state: {
+      stage: 0,
+      coins: 1000,
+      crypto: 50,
+      rank: "Novice Hacker",
+      cheersCount: 10,
+      progress: "0%",
+      unlockedComponents: [],
+      settings: {
+        yeetCoefficient: 1,
+        yeetVelocityThreshold: 10,
+        shirtImgUrl: "https://example.com/shirt.jpg",
+        cardsImgUrl: "https://example.com/cards.jpg"
+      }
+    },
+    ton_wallet: null,
+    initial_readings: null,
+    monthly_prices: null,
+    site: null,
+    dark_theme: false,
+    loot: {
+      fool: {
+        cards: {
+          cards_img_url: "https://example.com/cards.jpg",
+          shirt_img_url: "https://example.com/shirt.jpg"
+        }
+      }
+    }
+  },
   debugLogs: [],
   formState: {},
 };
@@ -340,7 +476,16 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         changeLanguage,
         updateUserReferrals,
         toggleTheme,
-        saveFormState
+        saveFormState,
+        isCustomizationUnlocked,
+        isCryptoUnlocked,
+        canShowOtherSkins,
+        isHackButtonUnlocked,
+        areEventsUnlocked,
+        areRentsUnlocked,
+        isVersimcelUnlocked,
+        isGitHubUnlocked,
+        getSideHustleTrigger
       }}>
         {children}
       </AppContext.Provider>

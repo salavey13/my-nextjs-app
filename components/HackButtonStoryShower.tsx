@@ -30,6 +30,7 @@ id,parentid,stage,storycontent,xuinitydialog,trigger,activecomponent,minigame,ac
 15,6,5,"Xuinity proposes forking: create a new layer of control, bypass restrictions, and rise above the system.","Fork the system. Play outside the rules, and you’ll never lose. This is where true power lies.","Forking Concept Introduced","Fork","fork","System Forker",255
 */
 
+
 interface StoryStage {
   id: string;
   parentId: string | null;
@@ -51,7 +52,7 @@ interface MinigameState {
 }
 
 export default function HackButtonStoryShower() {
-  const { state, dispatch } = useAppContext()
+  const { state, dispatch, getSideHustleTrigger } = useAppContext()
   const [currentStage, setCurrentStage] = useState<StoryStage | null>(null)
   const [storyStages, setStoryStages] = useState<StoryStage[]>([])
   const [xuinityDialog, setXuinityDialog] = useState('')
@@ -120,6 +121,15 @@ export default function HackButtonStoryShower() {
         if (nextStage.stage === 1 || nextStage.stage === 6) {
           setShowCrashSimulation(true)
           setTimeout(() => setShowCrashSimulation(false), 5000)
+        }
+
+        // Check for side hustle triggers
+        const sideHustle = getSideHustleTrigger(nextStage.stage)
+        if (sideHustle && sideHustle.trigger === nextStage.trigger) {
+          toast({
+            title: 'Side Hustle Unlocked!',
+            description: sideHustle.storyContent,
+          })
         }
       } catch (error) {
         console.error('Error updating game state:', error)
