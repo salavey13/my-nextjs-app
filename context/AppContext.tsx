@@ -16,7 +16,20 @@ interface GameState {
   cheersCount: number;
   progress: string;
   unlockedComponents: string[];
+  settings: GameSettings;
 }
+
+export interface PhysicsSettings {
+  yeetCoefficient: number;
+  yeetVelocityThreshold: number;
+}
+
+export interface SkinSettings {
+  shirtImgUrl: string;
+  cardsImgUrl: string;
+}
+
+export interface GameSettings extends PhysicsSettings, SkinSettings {}
 
 interface UserData {
   id: number;

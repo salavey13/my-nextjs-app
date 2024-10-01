@@ -1,421 +1,300 @@
-"use client"
-
 import React, { useState, useEffect } from 'react'
-import { useAppContext } from '@/context/AppContext'
+import { GameSettings, useAppContext } from '@/context/AppContext'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Card, CardContent } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { toast } from '@/hooks/use-toast'
-import { Skeleton } from '@/components/ui/skeleton'
-import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd'
-import Image from 'next/image'
 import { supabase } from '@/lib/supabaseClient'
-import BottomShelf from '@/components/ui/bottomShelf'
-import { Home, List, Plus, Bell, User, CalendarPlus, Lightbulb, Crown, Users, Dice1, DollarSign, Zap, Globe, ShoppingCart, Car, Gamepad } from 'lucide-react'
-import Rents from '@/components/Rents'
-import { CryptoPayment } from '@/components/CryptoPayment'
-import CreateEvent from '@/components/CreateEvent'
 import { motion, AnimatePresence } from 'framer-motion'
+import { DragDropContext, Draggable, Droppable, DropResult } from 'react-beautiful-dnd'
+import BottomShelf from '@/components/ui/bottomShelf'
+import InfinityMirror from '@/components/game/InfinityMirror'
+import { Settings } from '@/components/game/Settings'
 
-const storyStages: StoryStage[] = [
-  {
-    stage: 0,
-    trigger: "Start Game",
-    storyContent: "Welcome to the system. You are about to dive into a world of simple games.",
-    jsonState: JSON.stringify({ stage: 0, coins: 1000 }),
-    activeComponent: "None",
-    expectedInput: "Launch Game",
-    nextStageTrigger: "Game Launched"
-  },
-  {
-    stage: 1,
-    trigger: "Hack Button Clicked",
-    storyContent: "System Crash: Looks like you've broken something. Was it a mistake, or is this all part of a deeper game?",
-    jsonState: JSON.stringify({ stage: 1, coins: 1000 }),
-    activeComponent: "Hack Button",
-    expectedInput: "Yes/No Prompt",
-    nextStageTrigger: "User Input: Yes"
-  },
-  {
-    stage: 2,
-    trigger: "Yes Chosen",
-    storyContent: "You've made your first hack! A new world of possibilities opens up.",
-    jsonState: JSON.stringify({ stage: 2, coins: 13000 }),
-    activeComponent: "Skins",
-    expectedInput: "None",
-    nextStageTrigger: "Skin Selected"
-  },
-  {
-    stage: 3,
-    trigger: "Skin Selected",
-    storyContent: "Congratulations on your new skin! Now, let's introduce you to the world of crypto.",
-    jsonState: JSON.stringify({ stage: 3, coins: 13000, crypto: 100 }),
-    activeComponent: "Crypto Wallet",
-    expectedInput: "None",
-    nextStageTrigger: "Crypto Introduced"
-  },
-  {
-    stage: 4,
-    trigger: "Crypto Introduced",
-    storyContent: "With crypto in your wallet, you can now participate in events and place bets!",
-    jsonState: JSON.stringify({ stage: 4, coins: 13000, crypto: 100 }),
-    activeComponent: "Events",
-    expectedInput: "None",
-    nextStageTrigger: "Event Participated"
-  },
-  {
-    stage: 5,
-    trigger: "Event Participated",
-    storyContent: "You've experienced events and bets. Now, let's explore the world of rents!",
-    jsonState: JSON.stringify({ stage: 5, coins: 15000, crypto: 150 }),
-    activeComponent: "Rents",
-    expectedInput: "None",
-    nextStageTrigger: "Rent Explored"
-  },
-  {
-    stage: 6,
-    trigger: "Rent Explored",
-    storyContent: "The system crashes again... but this time, Versimcel appears!",
-    jsonState: JSON.stringify({ stage: 6, coins: 10000, crypto: 100 }),
-    activeComponent: "Versimcel",
-    expectedInput: "Debug",
-    nextStageTrigger: "Debug Complete"
-  },
-  {
-    stage: 7,
-    trigger: "Debug Complete",
-    storyContent: "Welcome to the admin level. It's time for some real GitHub source hunting!",
-    jsonState: JSON.stringify({ stage: 7, coins: 20000, crypto: 200 }),
-    activeComponent: "GitHub",
-    expectedInput: "None",
-    nextStageTrigger: "Game Complete"
-  }
-]
+// CSV stages for Supabase story_stages table:
+/*
+id,parentId,stage,storyContent,xuinityDialog,trigger,activeComponent,minigame,achievement,bottomShelfBitmask
+1,,0,"Welcome to the system. You are about to dive into a world of simple games.","Greetings, human. I am Xuinity. Are you ready to begin your journey?","Start Game","None","","Welcome to the System",1
+2,1,1,"System Crash: Looks like you've broken something. Was it a mistake, or is this all part of a deeper game?","Interesting. You've triggered a system crash. Perhaps there's more to you than meets the eye.","Hack Button Clicked","Hack Button","hack","First Hack",3
+3,2,2,"You've made your first hack! A new world of possibilities opens up.","Well done. You're starting to see the cracks in the system. Let's see how far you can go.","Yes Chosen","Skins","","Hacker Initiate",7
+4,3,3,"Congratulations on your new skin! Now, let's introduce you to the world of crypto.","Ah, crypto. The lifeblood of the digital underground. Use it wisely.","Skin Selected","Crypto Wallet","","Crypto Novice",15
+5,4,4,"With crypto in your wallet, you can now participate in events and place bets!","Events and bets. A playground for those who understand risk and reward.","Crypto Introduced","Events","","Event Participant",31
+6,5,5,"You've experienced events and bets. Now, let's explore the world of rents!","Rents. Another way the system tries to control you. But you're learning to play the game.","Event Participated","Rents","","Rent Explorer",63
+7,6,6,"The system crashes again... but this time, Versimcel appears!","Versimcel. A glitch in the system, or something more? Time to debug and find out.","Rent Explored","Versimcel","debug","Versimcel Encounter",127
+8,7,7,"Welcome to the admin level. It's time for some real GitHub source hunting!","You've reached the admin level. The source code awaits. What will you discover?","Debug Complete","GitHub","","Admin Access",255
+9,4,3.1,"Side Hustle: QR Code Form","Interesting. You've discovered a way to create custom QR codes. This could be useful for... certain operations.","QR Code Form Discovered","QR Code Form","","QR Code Master",23
+10,5,4.1,"Side Hustle: Dynamic Item Form","A dynamic item form? Now we're talking. This could revolutionize how we manage inventory.","Dynamic Form Created","Dynamic Item Form","","Form Wizard",47
+11,6,5.1,"Side Hustle: Payment Notification","Payment notifications, eh? Keep track of the money flow. Knowledge is power, after all.","Payment System Integrated","Payment Notification","","Financial Overseer",95
+12,7,6.1,"Side Hustle: Conflict Awareness","Conflict awareness? Interesting choice. Sometimes, chaos can be... beneficial.","Conflict Module Activated","Conflict Awareness","","Chaos Navigator",191
+*/
+
+interface StoryStage {
+  id: string;
+  parentId: string | null;
+  stage: number;
+  storyContent: string;
+  xuinityDialog: string;
+  trigger: string;
+  activeComponent: string;
+  minigame: string;
+  achievement: string;
+  bottomShelfBitmask: number;
+}
+
+interface MinigameState {
+  type: string;
+  errors?: string[];
+  targetNumber?: number;
+  attempts?: number;
+}
 
 export default function HackButtonStoryShower() {
   const { state, dispatch } = useAppContext()
-  const user = state.user
-  const [currentStage, setCurrentStage] = useState(0)
-  const [isLoading, setIsLoading] = useState(false)
-  const [debugItems, setDebugItems] = useState(['Error 1', 'Error 2', 'Error 3'])
-  const [gptInput, setGptInput] = useState('')
-  const [gptResponse, setGptResponse] = useState('')
-  const [skinPreview, setSkinPreview] = useState('')
+  const [currentStage, setCurrentStage] = useState<StoryStage | null>(null)
+  const [storyStages, setStoryStages] = useState<StoryStage[]>([])
+  const [xuinityDialog, setXuinityDialog] = useState('')
+  const [minigameState, setMinigameState] = useState<MinigameState | null>(null)
   const [showBottomShelf, setShowBottomShelf] = useState(false)
-
-  const currentStoryStage = storyStages[currentStage]
+  const [showCrashSimulation, setShowCrashSimulation] = useState(false)
 
   useEffect(() => {
-    if (user?.id) {
-      loadGameState()
-    }
-  }, [user?.id])
+    fetchStoryStages()
+  }, [])
 
-  const loadGameState = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('users')
-        .select('game_state')
-        .eq('id', user?.id)
-        .single()
-
-      if (error) throw error
-
-      if (data?.game_state) {
-        dispatch({ type: 'UPDATE_GAME_STATE', payload: data.game_state })
-        setCurrentStage(data.game_state.stage)
-        setShowBottomShelf(data.game_state.stage >= 2)
+  useEffect(() => {
+    if (storyStages.length > 0 && state.user?.game_state?.stage !== undefined) {
+      const stage = storyStages.find(s => s.stage === state.user?.game_state.stage)
+      if (stage) {
+        setCurrentStage(stage)
+        setXuinityDialog(stage.xuinityDialog)
+        initializeMinigame(stage.minigame)
+        setShowBottomShelf(stage.bottomShelfBitmask > 1)
       }
-    } catch (error) {
-      console.error('Error loading game state:', error)
-      toast({
-        title: 'Error',
-        description: 'Failed to load game state',
-        variant: "destructive",
-      })
     }
-  }
+  }, [storyStages, state.user?.game_state?.stage])
 
-  const handleStageProgression = async (newStage: number) => {
-    if (!user) return
+  const fetchStoryStages = async () => {
+    const { data, error } = await supabase
+      .from('story_stages')
+      .select('*')
+      .order('stage', { ascending: true })
 
-    const updatedGameState = {
-      ...user.game_state,
-      stage: newStage,
-      progress: `${(newStage / (storyStages.length - 1)) * 100}%`
-    }
-    
-    try {
-      const { error } = await supabase
-        .from('users')
-        .update({ game_state: updatedGameState })
-        .eq('id', user.id)
-
-      if (error) throw error
-
-      dispatch({ type: 'UPDATE_GAME_STATE', payload: updatedGameState })
-      setCurrentStage(newStage)
-      setShowBottomShelf(newStage >= 2)
-
-      toast({
-        title: 'Success',
-        description: 'Stage progression successful',
-      })
-    } catch (error) {
-      console.error('Error updating game state:', error)
-      toast({
-        title: 'Error',
-        description: 'Failed to update game state',
-        variant: "destructive",
-      })
-    }
-  }
-
-  const handleTrigger = (trigger: string) => {
-    const nextStage = storyStages.find(stage => stage.trigger === trigger)
-    if (nextStage) {
-      handleStageProgression(nextStage.stage)
-    }
-  }
-
-  const handleHack = async () => {
-    if (!user) return
-
-    setIsLoading(true)
-    try {
-      const newCoins = user.game_state.coins + 13000
-      const updatedGameState = {
-        ...user.game_state,
-        coins: newCoins,
-      }
-
-      const { error } = await supabase
-        .from('users')
-        .update({ game_state: updatedGameState })
-        .eq('id', user.id)
-
-      if (error) throw error
-
-      dispatch({ type: 'UPDATE_GAME_STATE', payload: updatedGameState })
-
-      toast({
-        title: 'Success',
-        description: 'Congratulations! You\'ve earned coins!',
-      })
-      handleTrigger('Hack Button Clicked')
-    } catch (error) {
-      console.error('Error updating balance:', error)
-      toast({
-        title: 'Error',
-        description: 'Failed to update balance',
-        variant: "destructive",
-      })
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  const handleDragEnd = (result: any) => {
-    const { destination, source, draggableId } = result
-    
-    if (!destination) return
-
-    if (destination.droppableId === 'fix-box') {
-      setDebugItems((items) => items.filter((item) => item !== draggableId))
-      toast({ title: "Error Fixed", description: "You've resolved an error!" })
-      if (debugItems.length === 1) {
-        handleTrigger('Debug Complete')
-      }
+    if (error) {
+      console.error('Error fetching story stages:', error)
     } else {
-      toast({ title: "Try Again", description: "Drag the error to the correct box!" })
+      setStoryStages(data || [])
     }
   }
 
-  const handleGptInteraction = () => {
-    setGptResponse(`Here's a solution for "${gptInput}": ${Math.random().toString(36).substring(7)}`)
-    setGptInput('')
-    handleTrigger('GPT Interaction Complete')
-  }
+  const handleStageProgression = async () => {
+    if (!currentStage || !state.user) return
 
-  const handleSkinChange = (skinUrl: string) => {
-    setSkinPreview(skinUrl)
-  }
-
-  const handleSkinConfirm = async () => {
-    if (!user) return
-
-    try {
-      const updatedUser = {
-        ...user,
-        loot: {
-          ...user.loot,
-          fool: {
-            ...user.loot?.fool,
-            cards: {
-              ...user.loot?.fool?.cards,
-              cards_img_url: skinPreview
-            }
-          }
-        }
+    const nextStage = storyStages.find(s => s.parentId === currentStage.id)
+    if (nextStage) {
+      const updatedGameState = {
+        ...state.user.game_state,
+        stage: nextStage.stage,
       }
 
-      const { error } = await supabase
-        .from('users')
-        .update({ loot: updatedUser.loot })
-        .eq('id', user.id)
+      try {
+        const { error } = await supabase
+          .from('users')
+          .update({ game_state: updatedGameState })
+          .eq('id', state.user.id)
 
-      if (error) throw error
+        if (error) throw error
 
-      dispatch({ type: 'SET_USER', payload: updatedUser })
+        dispatch({ type: 'UPDATE_GAME_STATE', payload: updatedGameState })
+        setCurrentStage(nextStage)
+        setXuinityDialog(nextStage.xuinityDialog)
+        initializeMinigame(nextStage.minigame)
+        setShowBottomShelf(nextStage.bottomShelfBitmask > 1)
 
-      toast({
-        title: 'Success',
-        description: 'Skin changed successfully',
-      })
-      handleTrigger('Skin Selected')
-    } catch (error) {
-      console.error('Error updating skin:', error)
-      toast({
-        title: 'Error',
-        description: 'Failed to change skin',
-        variant: "destructive",
-      })
+        toast({
+          title: 'Achievement Unlocked!',
+          description: nextStage.achievement,
+        })
+
+        if (nextStage.stage === 1 || nextStage.stage === 6) {
+          setShowCrashSimulation(true)
+          setTimeout(() => setShowCrashSimulation(false), 5000)
+        }
+      } catch (error) {
+        console.error('Error updating game state:', error)
+        toast({
+          title: 'Error',
+          description: 'Failed to progress to the next stage',
+          variant: "destructive",
+        })
+      }
     }
   }
 
-  const renderEvent = () => {
-    return (
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={currentStoryStage.stage}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -20 }}
-          transition={{ duration: 0.3 }}
-        >
-          {(() => {
-            switch (currentStoryStage.activeComponent) {
-              case "None":
-                return <p className="text-lg">{currentStoryStage.storyContent}</p>
-              case "Hack Button":
-                return (
-                  <div className="space-y-4">
-                    <p>{currentStoryStage.storyContent}</p>
-                    <Button onClick={handleHack} disabled={isLoading} className="bg-yellow-500 hover:bg-yellow-600 text-black">
-                      {isLoading ? 'Hacking...' : 'Hack'}
-                    </Button>
-                  </div>
-                )
-              case "Skins":
-                return (
-                  <div className="space-y-4">
-                    <p>{currentStoryStage.storyContent}</p>
-                    <div className="flex space-x-4">
-                      <Button onClick={() => handleSkinChange('/skins/skin1.png')}>Skin 1</Button>
-                      <Button onClick={() => handleSkinChange('/skins/skin2.png')}>Skin 2</Button>
-                      <Button onClick={() => handleSkinChange('/skins/skin3.png')}>Skin 3</Button>
-                    </div>
-                    {skinPreview && (
-                      <div className="mt-4">
-                        <Image src={skinPreview} alt="Skin Preview" width={200} height={200} />
-                        <Button onClick={handleSkinConfirm} className="mt-2">Confirm Skin</Button>
-                      </div>
-                    )}
-                  </div>
-                )
-              case "Crypto Wallet":
-                return <CryptoPayment creatorTelegramId={user?.telegram_id.toString() || "413553377"}/>
-              case "Events":
-                return <CreateEvent />
-              case "Rents":
-                return <Rents />
-              case "Versimcel":
-                return (
-                  <DragDropContext onDragEnd={handleDragEnd}>
-                    <div className="space-y-4">
-                      <p>{currentStoryStage.storyContent}</p>
-                      <Droppable droppableId="errors">
-                        {(provided) => (
-                          <ul {...provided.droppableProps} ref={provided.innerRef} className="space-y-2">
-                            {debugItems.map((item, index) => (
-                              <Draggable key={item} draggableId={item} index={index}>
-                                {(provided) => (
-                                  <li
-                                    ref={provided.innerRef}
-                                    {...provided.draggableProps}
-                                    {...provided.dragHandleProps}
-                                    className="bg-red-100 p-2 rounded"
-                                  >
-                                    {item}
-                                  </li>
-                                )}
-                              </Draggable>
-                            ))}
-                            {provided.placeholder}
-                          </ul>
-                        )}
-                      </Droppable>
-                      <Droppable droppableId="fix-box">
-                        {(provided) => (
-                          <div
-                            {...provided.droppableProps}
-                            ref={provided.innerRef}
-                            className="border-2 border-dashed border-gray-300 p-4 rounded"
-                          >
-                            Drop errors here
-                            {provided.placeholder}
-                          </div>
-                        )}
-                      </Droppable>
-                    </div>
-                  </DragDropContext>
-                )
-              case "GitHub":
-                return (
-                  <div className="space-y-4">
-                    <p>{currentStoryStage.storyContent}</p>
-                    <Input
-                      placeholder="Enter GitHub repo"
-                      value={gptInput}
-                      onChange={(e) => setGptInput(e.target.value)}
-                    />
-                    <Button onClick={handleGptInteraction}>Search Repo</Button>
-                    {gptResponse && (
-                      <Card>
-                        <CardContent className="p-4">
-                          <p>{gptResponse}</p>
-                        </CardContent>
-                      </Card>
-                    )}
-                  </div>
-                )
-              default:
-                return <p>Unknown event type</p>
-            }
-          })()}
-        </motion.div>
-      </AnimatePresence>
-    )
+  const initializeMinigame = (minigame: string) => {
+    switch (minigame) {
+      case 'debug':
+        setMinigameState({
+          type: 'debug',
+          errors: ['Error 1', 'Error 2', 'Error 3'],
+        })
+        break
+      case 'hack':
+        setMinigameState({
+          type: 'hack',
+          targetNumber: Math.floor(Math.random() * 100) + 1,
+          attempts: 0,
+        })
+        break
+      default:
+        setMinigameState(null)
+    }
+  }
+
+  const renderMinigame = () => {
+    if (!minigameState) return null
+
+    switch (minigameState.type) {
+      case 'debug':
+        return (
+          <DragDropContext onDragEnd={handleDragEnd}>
+            <Droppable droppableId="errors">
+              {(provided) => (
+                <ul {...provided.droppableProps} ref={provided.innerRef} className="space-y-2">
+                  {minigameState.errors?.map((error, index) => (
+                    <Draggable key={error} draggableId={error} index={index}>
+                      {(provided) => (
+                        <li
+                          ref={provided.innerRef}
+                          {...provided.draggableProps}
+                          {...provided.dragHandleProps}
+                          className="bg-red-100 p-2 rounded"
+                        >
+                          {error}
+                        </li>
+                      )}
+                    </Draggable>
+                  ))}
+                  {provided.placeholder}
+                </ul>
+              )}
+            </Droppable>
+            <div className="mt-4 border-2 border-dashed border-gray-300 p-4 rounded">
+              Drop errors here to fix
+            </div>
+          </DragDropContext>
+        )
+      case 'hack':
+        return (
+          <div className="space-y-4">
+            <p>Guess the number between 1 and 100:</p>
+            <input
+              type="number"
+              className="border p-2 rounded"
+              onChange={(e) => handleHackGuess(parseInt(e.target.value))}
+            />
+            <p>Attempts: {minigameState.attempts}</p>
+          </div>
+        )
+      default:
+        return null
+    }
+  }
+
+  const handleDragEnd = (result: DropResult) => {
+    if (!result.destination || !minigameState || !minigameState.errors) return
+
+    const newErrors = Array.from(minigameState.errors)
+    const [reorderedItem] = newErrors.splice(result.source.index, 1)
+    newErrors.splice(result.destination.index, 0, reorderedItem)
+
+    setMinigameState({
+      ...minigameState,
+      errors: newErrors,
+    })
+
+    if (newErrors.length === 0) {
+      toast({
+        title: 'Debugging Complete',
+        description: 'You\'ve fixed all the errors!',
+      })
+      handleStageProgression()
+    }
+  }
+
+  const handleHackGuess = (guess: number) => {
+    if (!minigameState || minigameState.type !== 'hack') return
+
+    const newAttempts = (minigameState.attempts || 0) + 1
+    setMinigameState({
+      ...minigameState,
+      attempts: newAttempts,
+    })
+
+    if (guess === minigameState.targetNumber) {
+      toast({
+        title: 'Hacking Successful',
+        description: `You guessed the number in ${newAttempts} attempts!`,
+      })
+      handleStageProgression()
+    } else if (newAttempts >= 10) {
+      toast({
+        title: 'Hacking Failed',
+        description: 'You\'ve run out of attempts. Try again!',
+      })
+      initializeMinigame('hack')
+    } else {
+      toast({
+        title: 'Incorrect Guess',
+        description: guess > (minigameState.targetNumber || 0) ? 'Too high!' : 'Too low!',
+      })
+    }
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4">
-      <Card className="w-full max-w-2xl">
-        <CardContent className="p-6 space-y-6">
-          {isLoading ? (
-            <Skeleton className="w-full h-40" />
-          ) : (
-            renderEvent()
-          )}
-          <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
-            <div
-              className="bg-blue-600 h-2.5 rounded-full"
-              style={{ width: user?.game_state.progress }}
-            ></div>
-          </div>
+    <div className="space-y-6 relative">
+      {showCrashSimulation && (
+        <div className="fixed inset-0 z-50">
+          <InfinityMirror layers={10} baseColor="#000000" accentColor="#ff0000" />
+        </div>
+      )}
+      <Card>
+        <CardHeader>
+          <CardTitle>Stage {currentStage?.stage}: {currentStage?.storyContent}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {renderMinigame()}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5 }}
+            className="fixed top-4 right-4 bg-background p-4 rounded-lg shadow-lg z-40"
+          >
+            <p className="text-lg font-semibold">Xuinity says:</p>
+            <p className="italic">{xuinityDialog}</p>
+            {currentStage?.trigger === 'User Input Required' && (
+              <Button onClick={handleStageProgression} className="mt-2">
+                Continue
+              </Button>
+            )}
+          </motion.div>
+          <Button onClick={handleStageProgression} className="mt-4">
+            Continue
+          </Button>
         </CardContent>
       </Card>
-      {showBottomShelf && <BottomShelf />}
+      {showBottomShelf && <BottomShelf bitmask={currentStage?.bottomShelfBitmask || 0} />}
+      <Settings
+        onUpdateSettings={(settings: GameSettings) => {
+          // Update user's game state with new settings
+          if (state.user) {
+            const updatedGameState = {
+              ...state.user.game_state,
+              settings: settings,
+            }
+            dispatch({ type: 'UPDATE_GAME_STATE', payload: updatedGameState })
+          }
+        }}
+        initialSettings={state.user?.game_state?.settings}
+      />
     </div>
   )
 }

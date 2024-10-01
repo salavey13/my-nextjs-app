@@ -3,7 +3,7 @@ import { useSpring, animated, to } from 'react-spring';
 import { useGesture } from '@use-gesture/react';
 import { cardsImages } from './CardsImgs';
 import { useAppContext } from '@/context/AppContext';
-import { PhysicsSettings } from './Settings';
+import { GameSettings } from './Settings';
 
 interface Card {
   id: CardId;
@@ -24,12 +24,12 @@ interface MegaCardProps {
   onCardUpdate: (card: Card) => void;
   forceFlipped: boolean;
   isShuffling: boolean;
-  physicsParams: PhysicsSettings;
+  physicsParams: GameSettings;
 }
 
 export const MegaCard: React.FC<MegaCardProps> = React.memo(({ card, onCardUpdate, forceFlipped, isShuffling, physicsParams }) => {
   const cardRef = useRef<HTMLDivElement | null>(null);
-  const { t, user } = useAppContext();
+  const { t, state } = useAppContext();
   const [isAnimating, setIsAnimating] = useState(false);
   const isDragging = useRef(false);
   const dragStartTime = useRef(0);
@@ -144,15 +144,15 @@ export const MegaCard: React.FC<MegaCardProps> = React.memo(({ card, onCardUpdat
     const defaultCardFaceUrl = cardsImages[card.id];
     const defaultShirtUrl = cardsImages["shirt"];
 
-    if (user?.loot?.fool?.cards) {
+    if (state.user?.loot?.fool?.cards) {
       return {
-        cardFaceUrl: user.loot.fool.cards.cards_img_url || defaultCardFaceUrl,
-        shirtUrl: user.loot.fool.cards.shirt_img_url || defaultShirtUrl,
+        cardFaceUrl: state.user.loot.fool.cards.cards_img_url || defaultCardFaceUrl,
+        shirtUrl: state.user.loot.fool.cards.shirt_img_url || defaultShirtUrl,
       };
     }
 
     return { cardFaceUrl: defaultCardFaceUrl, shirtUrl: defaultShirtUrl };
-  }, [card.id, user?.loot?.fool?.cards]);
+  }, [card.id, state.user?.loot?.fool?.cards]);
 
   const cardFaceStyle = useMemo(() => {
     if (cardFaceUrl.includes('sprite')) {

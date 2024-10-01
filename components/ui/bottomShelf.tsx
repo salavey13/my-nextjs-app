@@ -15,7 +15,11 @@ export interface NavigationLink {
   stageMask: number
 }
 
-const BottomShelf: React.FC = () => {
+interface BottomShelfProps {
+  bitmask: number
+}
+
+const BottomShelf: React.FC<BottomShelfProps> = ({ bitmask }) => {
   const pathname = usePathname()
   const { state } = useAppContext()
   const user = state.user
@@ -37,9 +41,6 @@ const BottomShelf: React.FC = () => {
     { href: '/dev', icon: <Lightbulb className="w-6 h-6" />, label: 'Dev', stageMask: 0b11000000 },
   ]
 
-  const currentStage = user?.game_state?.stage || 0
-  const stageBitmask = 1 << currentStage
-
   return (
     <TooltipProvider>
       <footer className="fixed bottom-0 left-0 w-full h-16 bg-gray-900/80 text-white z-10 backdrop-blur-lg shadow-lg">
@@ -47,7 +48,7 @@ const BottomShelf: React.FC = () => {
           <div className="flex items-center h-full px-4">
             <AnimatePresence>
               {navigationLinks
-                .filter(link => (link.stageMask & stageBitmask) !== 0)
+                .filter(link => (link.stageMask & bitmask) !== 0)
                 .map((link, index) => (
                   <motion.div
                     key={link.href}

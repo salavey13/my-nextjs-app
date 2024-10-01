@@ -5,7 +5,7 @@ import { supabase } from '../../lib/supabaseClient';
 import { MegaCard, CardId } from '@/components/game/MegaCard';
 import { Button } from '@/components/ui/button';
 import { useAppContext } from '@/context/AppContext';
-import { Settings, PhysicsSettings } from './Settings';
+import { Settings, GameSettings } from './Settings';
 import EnhancedMegaAvatar from './EnhancedMegaAvatar';
 import useTelegram from '@/hooks/useTelegram';
 import LoadingSpinner from "../ui/LoadingSpinner";
@@ -53,9 +53,11 @@ const GameBoard: React.FC = () => {
   const { state, dispatch, t } = useAppContext()
   const user = state.user
   const [targetFrame, setTargetFrame] = useState({ x: 400, y: 300, rotation: 0 });
-  const [physicsParams, setPhysicsParams] = useState<PhysicsSettings>({
+  const [gameSettings, setGameSettings] = useState<GameSettings>({
     yeetCoefficient: 1.5,
     yeetVelocityThreshold: 0.5,
+    shirtImgUrl: '',
+    cardsImgUrl: '',
   });
   const [isShuffling, setIsShuffling] = useState(false);
   const { showMainButton, setHeaderColor, setBottomBarColor, tg } = useTelegram();
@@ -256,10 +258,40 @@ const GameBoard: React.FC = () => {
     await updateSupabase(updatedGameState);
   }, [gameState, user?.currentFoolGameId]);
 
-  const handleUpdateSettings = useCallback((settings: PhysicsSettings) => {
-    setPhysicsParams(settings);
-    localStorage.setItem('physicsSettings', JSON.stringify(settings));
-  }, []);
+  const handleUpdateSettings = useCallback(async (settings: GameSettings) => {
+    setGameSettings(settings);
+    if (user) {
+      try {
+        const { error } = await supabase
+          .from('users')
+          .update({ 'game_state.settings': settings })
+          .eq('id', user.id);
+
+        if (error) throw error;
+
+        dispatch({
+          type: 'UPDATE_USER',
+          payload: {
+            ...user,
+            game_state: { ...user.game_state, settings },
+          },
+        });
+      } catch (error) {
+        console.error('Error updating user settings:', error);
+        toast({
+          title: t('updateError'),
+          description: t('updateErrorDescription'),
+          variant: "destructive",
+        });
+      }
+    }
+  }, [user, dispatch, t]);
+
+  useEffect(() => {
+    if (user?.game_state?.settings) {
+      setGameSettings(user.game_state.settings);
+    }
+  }, [user?.game_state?.settings]);
 
   const isCardNearPlayer = useCallback((card: Card, player: Player) => {
     const cardCenterX = (card.position.x + 21 / window.innerWidth) * window.innerWidth;
@@ -301,13 +333,6 @@ const GameBoard: React.FC = () => {
   }, [shuffleCards, tg]);
 
   useEffect(() => {
-    const savedSettings = localStorage.getItem('physicsSettings');
-    if (savedSettings) {
-      setPhysicsParams(JSON.parse(savedSettings));
-    }
-  }, []);
-
-  useEffect(() => {
     const handleResize = () => {
       setTargetFrame({
         x: window.innerWidth * 0.5 - 21,
@@ -332,7 +357,7 @@ const GameBoard: React.FC = () => {
         </div>
 
         <div className="relative z-10">
-          <Settings onUpdateSettings={handleUpdateSettings} initialSettings={physicsParams} />
+        <Settings onUpdateSettings={handleUpdateSettings} initialSettings={gameSettings}/>
 
           {gameState?.cards.map((card) => (
             <MegaCard
@@ -343,7 +368,7 @@ const GameBoard: React.FC = () => {
                 player.id === user?.id?.toString() && isCardNearPlayer(card, player)
               )}
               isShuffling={isShuffling}
-              physicsParams={physicsParams}
+              physicsParams={gameSettings}
             />
           ))}
 
