@@ -36,7 +36,7 @@ export default function CreateEvent() {
 
       if (error) {
         console.error("Error creating event:", error);
-        else {
+      } else {
         setShowConfirmation(true);
         resetForm();
       }
