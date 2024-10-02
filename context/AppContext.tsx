@@ -219,7 +219,7 @@ const initialState: AppState = {
     initial_readings: null,
     monthly_prices: null,
     site: null,
-    dark_theme: false,
+    dark_theme: true,
     loot: {
       fool: {
         cards: {
@@ -406,9 +406,9 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       tg.ready();
       setTheme(state.user?.dark_theme ? "dark" : "light");
       if (state.user && !state.user.dark_theme) {
-        setHeaderColor("#FFFFFF");
-        setBackgroundColor("#FFFFFF");
-        setBottomBarColor("#FFFFFF");
+        setHeaderColor("#282c33");
+        setBackgroundColor("#282c33");
+        setBottomBarColor("#282c33");
       } else {
         setHeaderColor("#282c33");
         setBackgroundColor("#282c33");
