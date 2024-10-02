@@ -7,12 +7,23 @@ import { supabase } from "@/lib/supabaseClient";
 import GameBoard from './game/GameBoard';
 import DiceGame from './game/DiceGame';
 import { toast } from "@/hooks/use-toast";
+import { useTelegram } from '@/hooks/useTelegram';
 
 const HackButton: React.FC = () => {
   const { state, dispatch, t } = useAppContext();
   const user = state.user;
   const [selectedGame, setSelectedGame] = useState<'cards' | 'dice' | null>(null);
   const [gamesVisited, setGamesVisited] = useState({ cards: false, dice: false });
+const { showBackButton, onBackButtonPressed } = useTelegram();
+
+useEffect(() => {
+  showBackButton(true);
+  onBackButtonPressed(() => setSelectedGame(null));
+
+  return () => {
+    showBackButton(false);  // Hide back button when unmounting
+  };
+}, []);
 
   useEffect(() => {
     if (gamesVisited.cards && gamesVisited.dice && user?.game_state?.stage === 0) {
@@ -135,14 +146,6 @@ const HackButton: React.FC = () => {
       )}
       {selectedGame === 'cards' && <GameBoard />}
       {selectedGame === 'dice' && <DiceGame />}
-      {selectedGame && (
-        <Button
-          onClick={() => setSelectedGame(null)}
-          className="mt-4 bg-gray-500 text-white text-xl px-6 py-3 rounded-lg shadow-lg hover:bg-gray-600 transition-all"
-        >
-          {t('backToMenu')}
-        </Button>
-      )}
     </div>
   );
 };
