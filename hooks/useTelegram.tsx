@@ -15,8 +15,9 @@ interface UseTelegramProps {
   onBackButtonPressed?: () => void; // Optional callback when the back button is pressed
 }
 
-export const useTelegram = ({ onBackButtonPressed }: UseTelegramProps) => {
-  
+export const useTelegram = (props: UseTelegramProps = {}) => {
+  const { onBackButtonPressed } = props; // Extract onBackButtonPressed from props (default to an empty object)
+
   
   const [tg, setTg] = useState<TelegramWebApp | null>(null);
   const [user, setUser] = useState<User | null>(null);
