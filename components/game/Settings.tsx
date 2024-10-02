@@ -136,7 +136,7 @@ export const Settings: React.FC<SettingsProps> = ({ onUpdateSettings, initialSet
                       onChange={handleChange}
                       step={key.includes('Url') ? undefined : '0.1'}
                       className="w-full"
-                      disabled={stage && stage < 1 && !key.includes('yeet')}
+                      disabled={stage !== null && stage < 1 && !key.includes('yeet')}
                     />
                   </div>
                 ))}
