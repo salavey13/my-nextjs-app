@@ -23,21 +23,21 @@ export const useTelegram = (props: UseTelegramProps = {}) => {
   const [user, setUser] = useState<User | null>(null);
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
   useEffect(() => {
-    const telegram = window.Telegram.WebApp;
+    const telegram = window.Telegram?.WebApp;
 
     // Show the back button in the Telegram Web App
-    telegram.BackButton.show();
+    telegram?.BackButton.show();
 
     // If an onBackButtonPressed callback is provided, handle the back button press
     if (onBackButtonPressed) {
-      telegram.BackButton.onClick(onBackButtonPressed);
+      telegram?.BackButton.onClick(onBackButtonPressed);
     }
 
     // Cleanup the back button event listener when the component is unmounted
     return () => {
-      telegram.BackButton.hide();
+      telegram?.BackButton.hide();
       if (onBackButtonPressed) {
-        telegram.BackButton.offClick(onBackButtonPressed);
+        telegram?.BackButton.offClick(onBackButtonPressed);
       }
     };
   }, [onBackButtonPressed]);
