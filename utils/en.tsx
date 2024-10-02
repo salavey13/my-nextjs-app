@@ -1,6 +1,19 @@
 import { LanguageDictionary } from "../utils/TranslationUtils";
 export const en: LanguageDictionary = {
-mileage: "Mileage",
+  // ... (existing translations)
+  "stageProgression": "Stage Progression",
+  "unlockedHackButton": "You've unlocked the Hack Button!",
+  "unlockedSkinCustomization": "You've unlocked skin customization!",
+  "unlockedCryptoPrices": "You've unlocked crypto prices in the Skin Shop!",
+  "notEnoughCoins": "Not enough coins to purchase this skin",
+  "skinPurchased": "Skin purchased successfully",
+  "skinShop": "Skin Shop",
+  "loadingSkins": "Loading skins...",
+  "featuredSkins": "Featured Skins",
+  "yourSkins": "Your Skins",
+  "keepPlayingToUnlock": "Keep playing to unlock more features!",
+  "buySkin": "Buy Skin",
+  mileage: "Mileage",
   pay: "Pay",
   backToCreators:"Back to Creators",
   pleaseGrantAccess: "Please grant access to your camera and microphone to play the game.",
