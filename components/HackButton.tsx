@@ -23,11 +23,7 @@ const { showBackButton } = useTelegram({
   });
 
 useEffect(() => {
-  showBackButton(true);
-
-  return () => {
-    showBackButton(false);  // Hide back button when unmounting
-  };
+  showBackButton();
 }, []);
 
   useEffect(() => {
