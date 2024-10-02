@@ -357,8 +357,18 @@ const GameBoard: React.FC = () => {
         </div>
 
         <div className="relative z-10">
-        <Settings onUpdateSettings={handleUpdateSettings} initialSettings={gameSettings}/>
-
+        <Settings
+        onUpdateSettings={(settings: GameSettings) => {
+          if (state.user) {
+            const updatedGameState = {
+              ...state.user.game_state,
+              settings: settings,
+            }
+            dispatch({ type: 'UPDATE_GAME_STATE', payload: updatedGameState })
+          }
+        }}
+        initialSettings={state.user?.game_state?.settings}
+      />
           {gameState?.cards.map((card) => (
             <MegaCard
               key={card.id}
