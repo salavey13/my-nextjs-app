@@ -59,7 +59,7 @@ const SkinShop = () => {
     try {
       const { data: userData, error: fetchError } = await supabase
         .from('users')
-        .select('coins, game_state')
+        .select('coins, game_state, loot')
         .eq('id', state.user.id)
         .single();
 
@@ -80,13 +80,26 @@ const SkinShop = () => {
         stage: userData.game_state.stage === 1 ? 2 : userData.game_state.stage,
       };
 
+      const newLoot = {
+        ...userData.loot,
+        fool: {
+          ...userData.loot?.fool,
+          cards: {
+            ...userData.loot?.fool?.cards,
+            [skin.id]: {
+              cards_img_url: skin.cardsImgUrl,
+              shirt_img_url: skin.shirtImgUrl,
+            },
+          },
+        },
+      };
+
       const { error } = await supabase
         .from('users')
         .update({
           coins: newCoinsValue,
           game_state: newGameState,
-          'loot.fool.cards.cards_img_url': skin.cardsImgUrl,
-          'loot.fool.cards.shirt_img_url': skin.shirtImgUrl,
+          loot: newLoot,
         })
         .eq('id', state.user.id);
 
@@ -97,17 +110,7 @@ const SkinShop = () => {
         payload: {
           coins: newCoinsValue,
           game_state: newGameState,
-          loot: {
-            ...state.user.loot,
-            fool: {
-              ...state.user.loot?.fool,
-              cards: {
-                ...state.user.loot?.fool?.cards,
-                cards_img_url: skin.cardsImgUrl,
-                shirt_img_url: skin.shirtImgUrl,
-              },
-            },
-          },
+          loot: newLoot,
         },
       });
 
@@ -127,7 +130,7 @@ const SkinShop = () => {
       toast({
         title: t('error'),
         description: t('generalError'),
-        variant: "destructive",
+        variant: 'destructive',
       });
     }
   };
