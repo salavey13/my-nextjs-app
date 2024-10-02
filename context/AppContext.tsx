@@ -101,7 +101,7 @@ interface SideHustle {
 
 const STAGE_TRIGGERS: { [key: number]: StageTrigger } = {
   0: { unlockCustomization: false, unlockCrypto: false, showOtherSkins: true, unlockHackButton: false, unlockEvents: false, unlockRents: false, unlockVersimcel: false, unlockGitHub: false },
-  1: { unlockCustomization: true, unlockCrypto: false, showOtherSkins: true, unlockHackButton: true, unlockEvents: false, unlockRents: false, unlockVersimcel: false, unlockGitHub: false },
+  1: { unlockCustomization: false, unlockCrypto: false, showOtherSkins: true, unlockHackButton: true, unlockEvents: false, unlockRents: false, unlockVersimcel: false, unlockGitHub: false },
   2: { unlockCustomization: true, unlockCrypto: true, showOtherSkins: true, unlockHackButton: true, unlockEvents: false, unlockRents: false, unlockVersimcel: false, unlockGitHub: false },
   3: { unlockCustomization: true, unlockCrypto: true, showOtherSkins: true, unlockHackButton: true, unlockEvents: true, unlockRents: false, unlockVersimcel: false, unlockGitHub: false },
   4: { unlockCustomization: true, unlockCrypto: true, showOtherSkins: true, unlockHackButton: true, unlockEvents: true, unlockRents: true, unlockVersimcel: false, unlockGitHub: false },
@@ -211,7 +211,7 @@ const initialState: AppState = {
       settings: {
         yeetCoefficient: 1,
         yeetVelocityThreshold: 10,
-        shirtImgUrl: "https://example.com/shirt.jpg",
+        shirtImgUrl: "https://www.shutterstock.com/shutterstock/photos/2052450218/display_1500/stock-vector-classic-poker-card-backs-with-space-for-logos-2052450218.jpg",
         cardsImgUrl: "https://example.com/cards.jpg"
       }
     },
@@ -224,7 +224,7 @@ const initialState: AppState = {
       fool: {
         cards: {
           cards_img_url: "https://example.com/cards.jpg",
-          shirt_img_url: "https://example.com/shirt.jpg"
+          shirt_img_url: "https://www.shutterstock.com/shutterstock/photos/2052450218/display_1500/stock-vector-classic-poker-card-backs-with-space-for-logos-2052450218.jpg"
         }
       }
     }

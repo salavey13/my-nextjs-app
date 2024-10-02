@@ -167,6 +167,7 @@ export const MegaCard: React.FC<MegaCardProps> = React.memo(({ card, onCardUpdat
     return {
       backgroundImage: `url(${cardFaceUrl})`,
       backgroundSize: 'cover',
+      justifyItems: 'center',
     };
   }, [cardFaceUrl, card.id]);
 
@@ -225,6 +226,7 @@ export const MegaCard: React.FC<MegaCardProps> = React.memo(({ card, onCardUpdat
           backgroundImage: `url(${shirtUrl})`,
           backgroundSize: 'cover',
           borderRadius: '3px',
+          justifyItems: 'center',
           backfaceVisibility: 'hidden',
           position: 'absolute',
           top: 0,
