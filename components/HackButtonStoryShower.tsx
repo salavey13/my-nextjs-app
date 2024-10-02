@@ -295,9 +295,11 @@ export default function HackButtonStoryShower() {
         </CardContent>
       </Card>
       {showBottomShelf && <BottomShelf bitmask={currentStage?.bottomShelfBitmask || 0} />}
+      return (
+    <div className="space-y-6 relative">
+      {/* ... (previous JSX) */}
       <Settings
         onUpdateSettings={(settings: GameSettings) => {
-          // Update user's game state with new settings
           if (state.user) {
             const updatedGameState = {
               ...state.user.game_state,
