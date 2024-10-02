@@ -1,6 +1,17 @@
 import { LanguageDictionary } from "../utils/TranslationUtils";
 export const en: LanguageDictionary = {
   // ... (existing translations)
+  "activateHackButton": "Activate Hack Button",
+  "guessTheNumber": "Guess the Number",
+  "guessInstructions": "Guess a number between 1 and 13",
+  "enterGuess": "Enter your guess",
+  "submitGuess": "Submit Guess",
+  "correctGuess": "Correct! You guessed the number!",
+  "guessTooLow": "Too low. Try again!",
+  "guessTooHigh": "Too high. Try again!",
+  "attempts": "Attempts: {{count}}",
+  "unlockedVoiceActivation": "You've unlocked voice activation!",
+  "skinCustomization": "Skin Customization",
   "stageProgression": "Stage Progression",
   "unlockedHackButton": "You've unlocked the Hack Button!",
   "unlockedSkinCustomization": "You've unlocked skin customization!",
