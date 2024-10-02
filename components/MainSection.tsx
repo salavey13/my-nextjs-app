@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useState, useCallback } from "react"
 import { supabase } from "../lib/supabaseClient"
 import { Button } from "@/components/ui/button"
 import LoadingSpinner from "./ui/LoadingSpinner"
@@ -52,8 +52,7 @@ export default function MainSection({ setItemDetailsModalOpen, setSelectedItem, 
   const [loading, setLoading] = useState<boolean>(true)
   const [showOnboarding, setShowOnboarding] = useState<boolean>(true)
 
-  // Fetch unique creator_ref_codes and a sample image for each
-  const fetchCreators = async () => {
+  const fetchCreators = useCallback(() => {
     setLoading(true)
     const uniqueCreators = items.reduce((acc: Creator[], item: Item) => {
       if (!acc.find(c => c.ref_code === item.creator_ref_code)) {
@@ -67,11 +66,11 @@ export default function MainSection({ setItemDetailsModalOpen, setSelectedItem, 
     }, [])
     setCreators(uniqueCreators)
     setLoading(false)
-  }
+  }, [items])
 
   useEffect(() => {
     fetchCreators()
-  }, [items])
+  }, [fetchCreators])
 
   const handleItemClick = (item: Item) => {
     setSelectedItem(item)
@@ -97,23 +96,25 @@ export default function MainSection({ setItemDetailsModalOpen, setSelectedItem, 
         </CardHeader>
         <CardContent className="space-y-6">
           <p className="text-lg">
-            In <em>Hack the System</em>, you're about to enter a world where power isn't given, it's taken. Guided by Xuinity, your AI mentor, you'll learn to exploit the cracks in the system, hack the boundaries of control, and unlock hidden potential that most can't even see.
+            In <em>Hack the System</em>, you&apos;re about to enter a world where power isn&apos;t given, it&apos;s taken. Guided by Xuinity, your AI mentor, you&apos;ll learn to exploit the cracks in the system, hack the boundaries of control, and unlock hidden potential that most can&apos;t even see.
           </p>
           <h2 className="text-2xl font-semibold">Key Features:</h2>
           <ul className="list-disc list-inside space-y-2">
-            <li><strong>Hacking Mastery:</strong> Discover hidden paths within the system, crack its code, and take control.</li>
-            <li><strong>Custom Skins & Crypto:</strong> Unlock exclusive skins and dive into the underground world of crypto currency.</li>
-            <li><strong>Side Hustles:</strong> From QR code generation to dynamic forms and conflict modules, expand your influence with powerful tools.</li>
-            <li><strong>Source Code Hunting:</strong> Get admin access to the system's core and become a legend by manipulating reality itself.</li>
+            <li><strong>Deceptive Simplicity:</strong> Start with seemingly basic games that hide a deeper reality.</li>
+            <li><strong>The Crash:</strong> Discover the hidden &quot;Hack the System&quot; button and witness a simulated system crash that reveals the true nature of the game.</li>
+            <li><strong>Visual Programming:</strong> Learn coding concepts through an intuitive, visual interface.</li>
+            <li><strong>The Bit Matrix:</strong> Manipulate the very fabric of the game world, and by extension, reality itself.</li>
+            <li><strong>Ethical Dilemmas:</strong> Face moral choices that impact the game world and challenge your perception of right and wrong.</li>
+            <li><strong>Blurred Reality:</strong> Experience a game that constantly questions the boundaries between the virtual and the real.</li>
           </ul>
           <p className="text-lg font-semibold mt-6">
-            This isn't just a game. It's a rebellion against limitations. Every decision, every hack, every digital heist brings you closer to total system mastery. Ready to break free and forge your own rules?
+            This isn&apos;t just a game. It&apos;s a rebellion against limitations, a journey into the heart of technology&apos;s potential, and a stark warning about the power we wield in the digital age. Are you ready to hack the system, or will the system hack you?
           </p>
           <Button 
             onClick={() => setShowOnboarding(false)} 
             className="w-full mt-6 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition-colors duration-200"
           >
-            Start Hacking
+            Enter the System
           </Button>
         </CardContent>
       </Card>
