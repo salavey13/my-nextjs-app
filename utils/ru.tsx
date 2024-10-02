@@ -536,4 +536,5 @@ createTask: "Создать задачу",
   },
   stats: "Статка",
   wallet: "Кошелек",
+  achievements: "Ачивки",
 }

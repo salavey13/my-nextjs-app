@@ -529,4 +529,6 @@ createTask: "Створити завдання",
     failedToUpdateGameState: "Не вдалося оновити стан гри",
   },
   stats: "Статка",
+  wallet: "Гаманець",
+  achievements: "Досягнення",
 }
