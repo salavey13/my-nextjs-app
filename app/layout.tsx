@@ -7,6 +7,7 @@ import React, { Suspense } from "react";
 import TopShelf from "@/components/ui/topShelf";
 import PageWrapper from "@/components/PageWrapper";
 import LoadingSpinner from "../components/ui/LoadingSpinner"; 
+import { GlitchyToastProvider } from "@/hooks/use-toast"; // Import the provider
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -31,6 +32,7 @@ export default function RootLayout({
                 {children}
               </PageWrapper>
             </main>
+            <GlitchyToastProvider />
           </AppProvider>
         </Suspense>
       </body>
