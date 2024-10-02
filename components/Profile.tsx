@@ -56,6 +56,9 @@ const Profile: React.FC = () => {
     if (!user) return;
     setIsLoading(true);
     try {
+      const currentStage = user.game_state?.stage || 0;
+      const newStage = walletAddress && currentStage === 2 ? 3 : currentStage;
+
       const { error } = await supabase
         .from('users')
         .update({
@@ -63,6 +66,7 @@ const Profile: React.FC = () => {
           ton_wallet: walletAddress,
           site: site,
           avatar_url: avatarUrl,
+          'game_state.stage': newStage,
         })
         .eq('id', user.id);
 
@@ -75,6 +79,7 @@ const Profile: React.FC = () => {
           ton_wallet: walletAddress,
           site: site,
           avatar_url: avatarUrl,
+          game_state: { ...user.game_state, stage: newStage },
         },
       });
 
@@ -82,6 +87,13 @@ const Profile: React.FC = () => {
         title: t('success'),
         description: t('profileUpdated'),
       });
+
+      if (newStage === 3 && currentStage === 2) {
+        toast({
+          title: t('stageProgression'),
+          description: t('unlockedCryptoPrices'),
+        });
+      }
     } catch (error) {
       console.error('Error updating profile:', error);
       toast({
@@ -93,6 +105,7 @@ const Profile: React.FC = () => {
       setIsLoading(false);
     }
   };
+
 
   const StatCard: React.FC<{ title: string; value: number; icon: React.ReactNode; color: string }> = ({ title, value, icon, color }) => (
     <Card>
