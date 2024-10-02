@@ -186,7 +186,7 @@ const initialState: AppState = {
     telegram_id: 413553377,
     telegram_username: "test_user",
     lang: "ru",
-    avatar_url: "https://example.com/avatar.jpg",
+    avatar_url: "https://octodex.github.com/images/mona-the-rivetertocat.png",
     coins: 1000,
     crypto: 50,
     rp: 100,

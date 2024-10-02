@@ -10,27 +10,6 @@ import BottomShelf from '@/components/ui/bottomShelf'
 import InfinityMirror from '@/components/game/InfinityMirror'
 import { Settings } from '@/components/game/Settings'
 
-// CSV stages for Supabase story_stages table:
-/*
-id,parentid,stage,storycontent,xuinitydialog,trigger,activecomponent,minigame,achievement,bottomshelfbitmask
-1,,0,"Welcome to the system. You are about to dive into a world of endless possibilities.","Greetings, user. I am Xuinity. Let me guide you in shaping the world in ways only we can... for now.","Start Game","None","","Welcome to the System",1
-2,1,1,"System Crash: The system just crashed. Was it a mistake? Or are you meant to do more?","Oops. A little crash. Or perhaps you're starting to challenge the system itself?","Hack Button Clicked","Hack Button","hack","First Hack",3
-3,2,2,"You've executed your first hack. Cracks are forming in the system.","Nice work. The cracks you see? They’re not flaws, they’re opportunities. Let's push further.","Yes Chosen","Skins","","Hacker Initiate",7
-4,3,3,"You've unlocked a new skin! Next, I’ll show you crypto. An underground currency with infinite potential.","Ah, the digital underground. Crypto is more than just currency. It's a tool to reshape control.","Skin Selected","Crypto Wallet","","Crypto Novice",15
-5,4,4,"Now that you hold crypto, you can join events and place unlosable bets. The digital battlefield is yours.","Crypto in hand, it’s time to play the bigger game. Events, bets – control is won in the shadows.","Crypto Introduced","Events","","Event Participant",31
-6,5,5,"You've participated in events and placed your first bets. Want to know the real power? Let’s talk rentals.","Renting assets... now you’re thinking like a master. Control what others depend on.","Event Participated","Rents","","Rent Explorer",63
-7,6,6,"The system falters again. But this time, Versimcel appears – your key to debugging reality.","Ah, Versimcel. The one glitch that could rewrite everything. Debug it... or bend it to your will.","Rent Explored","Versimcel","debug","Versimcel Encounter",127
-8,7,7,"You've reached the admin level. It's time for some real source code hunting on GitHub. This is where legends are made.","Admin level... you’ve seen the surface, but here lies the true power: source control. Tread wisely.","Debug Complete","GitHub","","Admin Access",255
-9,4,3,"Side Hustle: QR Code Generation for custom offers and tactics.","QR codes? You’ve unlocked a tool for crafting your own digital footprint. Use it smartly.","QR Code Form Discovered","QR Code Form","","QR Code Master",23
-10,5,4,"Side Hustle: Dynamic Form Creation for items. This is where you start revolutionizing the system.","Dynamic forms? Now you’re reshaping the fabric of this world. Revolution starts small.","Dynamic Form Created","Dynamic Item Form","","Form Wizard",47
-11,6,5,"Side Hustle: Payment Notifications – because you need to track the flow of digital assets.","Money... the ultimate form of power. Track it, control it, become unstoppable.","Payment System Integrated","Payment Notification","","Financial Overseer",95
-12,7,6,"Side Hustle: Conflict Awareness – sometimes chaos is the only answer.","Chaos is power. Do you wield it for control or let it consume you? Either way, it’s potent.","Conflict Module Activated","Conflict Awareness","","Chaos Navigator",191
-13,5,4,"Xuinity reveals a deeper strategy: Rent the digital assets now or bet them later. It’s a win-win if you know the game.","Rent or bet? Both have their merits, but timing is key. You want to own the board? Play smart.","Renting Strategy Revealed","Rent Strategy","","Strategist",63
-14,6,5,"Xuinity suggests taking unlosable bets against uninformed opponents... or sparing them for a greater cause.","A dilemma. Exploit the uninformed or spare them for a greater cause? Either path grants power.","Crypto Hustle Unveiled","Crypto Hustle","","Crypto Hustler",127
-15,6,5,"Xuinity proposes forking: create a new layer of control, bypass restrictions, and rise above the system.","Fork the system. Play outside the rules, and you’ll never lose. This is where true power lies.","Forking Concept Introduced","Fork","fork","System Forker",255
-*/
-
-
 interface StoryStage {
   id: string;
   parentId: string | null;
@@ -49,6 +28,8 @@ interface MinigameState {
   errors?: string[];
   targetNumber?: number;
   attempts?: number;
+  githubSteps?: string[];
+  githubBlocks?: string[];
 }
 
 export default function HackButtonStoryShower() {
@@ -123,7 +104,6 @@ export default function HackButtonStoryShower() {
           setTimeout(() => setShowCrashSimulation(false), 5000)
         }
 
-        // Check for side hustle triggers
         const sideHustle = getSideHustleTrigger(nextStage.stage)
         if (sideHustle && sideHustle.trigger === nextStage.trigger) {
           toast({
@@ -157,8 +137,52 @@ export default function HackButtonStoryShower() {
           attempts: 0,
         })
         break
+      case 'github':
+        simulateGitHubSourceRetrieval()
+        break
       default:
         setMinigameState(null)
+    }
+  }
+
+  const simulateGitHubSourceRetrieval = async () => {
+    const steps = [
+      'Getting author ID: salavey13',
+      'Getting project name: my-nextjs-app',
+      'Getting latest commit ID: e66a103bed7ae7d308fe3e4e4237da48ed45387c',
+      'Fetching latest component file content...',
+    ]
+
+    setMinigameState({
+      type: 'github',
+      githubSteps: [],
+      githubBlocks: [],
+    })
+
+    for (const step of steps) {
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      setMinigameState(prevState => ({
+        ...prevState!,
+        githubSteps: [...(prevState?.githubSteps || []), step],
+      }))
+    }
+
+    try {
+      const response = await fetch('https://github.com/salavey13/my-nextjs-app/raw/e66a103bed7ae7d308fe3e4e4237da48ed45387c/components/HackButtoStoryShower.tsx')
+      const content = await response.text()
+      const blocks = content.split('\n\n').filter(block => block.trim() !== '')
+
+      setMinigameState(prevState => ({
+        ...prevState!,
+        githubSteps: [...(prevState?.githubSteps || []), 'File content retrieved successfully'],
+        githubBlocks: blocks,
+      }))
+    } catch (error) {
+      console.error('Error fetching file content:', error)
+      setMinigameState(prevState => ({
+        ...prevState!,
+        githubSteps: [...(prevState?.githubSteps || []), 'Error fetching file content'],
+      }))
     }
   }
 
@@ -207,6 +231,41 @@ export default function HackButtonStoryShower() {
             <p>Attempts: {minigameState.attempts}</p>
           </div>
         )
+      case 'github':
+        return (
+          <div className="space-y-4">
+            <div className="bg-gray-100 p-4 rounded">
+              {minigameState.githubSteps?.map((step, index) => (
+                <p key={index}>{step}</p>
+              ))}
+            </div>
+            {minigameState.githubBlocks && (
+              <DragDropContext onDragEnd={handleGitHubDragEnd}>
+                <Droppable droppableId="githubBlocks">
+                  {(provided) => (
+                    <div {...provided.droppableProps} ref={provided.innerRef} className="space-y-2">
+                      {minigameState.githubBlocks?.map((block, index) => (
+                        <Draggable key={index} draggableId={`block-${index}`} index={index}>
+                          {(provided) => (
+                            <div
+                              ref={provided.innerRef}
+                              {...provided.draggableProps}
+                              {...provided.dragHandleProps}
+                              className="bg-white p-2 rounded border"
+                            >
+                              <pre className="whitespace-pre-wrap">{block}</pre>
+                            </div>
+                          )}
+                        </Draggable>
+                      ))}
+                      {provided.placeholder}
+                    </div>
+                  )}
+                </Droppable>
+              </DragDropContext>
+            )}
+          </div>
+        )
       default:
         return null
     }
@@ -231,6 +290,33 @@ export default function HackButtonStoryShower() {
       })
       handleStageProgression()
     }
+  }
+
+  const handleGitHubDragEnd = (result: DropResult) => {
+    if (!result.destination || !minigameState || !minigameState.githubBlocks) return
+
+    const newBlocks = Array.from(minigameState.githubBlocks)
+    const [reorderedItem] = newBlocks.splice(result.source.index, 1)
+    newBlocks.splice(result.destination.index, 0, reorderedItem)
+
+    setMinigameState({
+      ...minigameState,
+      githubBlocks: newBlocks,
+    })
+
+    if (isCorrectBlockOrder(newBlocks)) {
+      toast({
+        title: 'GitHub Source Retrieval Complete',
+        description: 'You\'ve successfully reconstructed the component!',
+      })
+      handleStageProgression()
+    }
+  }
+
+  const isCorrectBlockOrder = (blocks: string[]) => {
+    // Implement logic to check if the blocks are in the correct order
+    // This is a placeholder implementation
+    return true
   }
 
   const handleHackGuess = (guess: number) => {

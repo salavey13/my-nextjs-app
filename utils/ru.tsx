@@ -533,5 +533,7 @@ createTask: "Создать задачу",
     error: "Ошибка",
     gameStateUpdated: 'Состояние игры успешно обновлено',
     failToUpdateGameState: 'Не удалось обновить состояние игры',
-  }
+  },
+  stats: "Статка",
+  wallet: "Кошелек",
 }

@@ -191,14 +191,14 @@ export function StoryEdit() {
                     onChange={(e) => handleStageEdit('stage', Number(e.target.value))}
                   />
                   <Select
-                    value={editedStage.parentId || ''}
-                    onValueChange={(value) => handleStageEdit('parentId', value)}
+                    value={editedStage.parentId || 'none'}
+                    onValueChange={(value) => handleStageEdit('parentId', value === 'none' ? 0 : value)}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder={t('selectParentStage')} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">{t('noParent')}</SelectItem>
+                      <SelectItem value="none">{t('noParent')}</SelectItem>
                       {storyStages.map((stage) => (
                         <SelectItem key={stage.id} value={stage.id}>
                           {t('stage')} {stage.stage} (ID: {stage.id})

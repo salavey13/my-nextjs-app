@@ -527,5 +527,6 @@ createTask: "Створити завдання",
     error: 'Помилка',
     gameStateUpdated: 'Стан гри успішно оновлено',
     failedToUpdateGameState: "Не вдалося оновити стан гри",
-  }
+  },
+  stats: "Статка",
 }

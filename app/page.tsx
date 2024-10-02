@@ -1,18 +1,31 @@
-// src/app/page.tsx
-import HackButtonStoryShower from "../components/HackButton"
-import DevKit from '@/components/DevKit'
-//import { useAppContext } from '@/context/AppContext'
-export default function HackButtonPage() {
-  // const { user } = useAppContext()
+// app/page.tsx
+'use client'
 
-  // if (!process.env.NEXT_PUBLIC_ENABLE_DEVKIT || (user && user.role !== 'developer')) {
-  //   return <div>Access Denied</div>
-  // }
+import { useEffect, useState } from 'react'
+import HackButton from "../components/HackButton"
+import HackButtonStoryShower from "../components/HackButtonStoryShower"
+import DevKit from '@/components/DevKit'
+import { useAppContext } from '@/context/AppContext'
+
+export default function HackButtonPage() {
+  const { state } = useAppContext()
+  const [showStoryShower, setShowStoryShower] = useState(false)
+
+  useEffect(() => {
+    if (state?.user?.game_state && state?.user?.game_state?.stage >= 1) {
+      setShowStoryShower(true)
+    }
+  }, [state.user?.game_state?.stage])
+
   return (
     <div className="container mx-auto py-8">
-      <HackButtonStoryShower />
-      <h1 className="text-2xl font-bold mb-4">Developer Tools</h1>
-      <DevKit />
+      {showStoryShower ? <HackButtonStoryShower /> : <HackButton />}
+      {state.user?.role === 1 && (
+        <>
+          <h1 className="text-2xl font-bold mb-4">Developer Tools</h1>
+          <DevKit />
+        </>
+      )}
     </div>
   )
 }

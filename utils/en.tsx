@@ -622,5 +622,7 @@ createTask: "Create Task",
     error: 'Error',
     gameStateUpdated: 'Game state updated successfully',
     failedToUpdateGameState: 'Failed to update game state',
-  }
+  },
+  stats: "Stats",
+  wallet: "Wallet",
 }
