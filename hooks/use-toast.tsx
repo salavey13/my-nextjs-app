@@ -74,11 +74,6 @@ export const toast = ({ title, description, variant = "info" }: ToastParams) => 
 // Toast provider component
 export const GlitchyToastProvider = () => {
   return (
-    <Toaster
-      position="top-right"
-      toastOptions={{
-        duration: 4000, // Adjust duration here
-      }}
-    />
+    <Toaster position="top-right" toastOptions={{        duration: 4000 }} />
   );
 };
