@@ -136,7 +136,7 @@ export const Settings: React.FC<SettingsProps> = ({ onUpdateSettings, initialSet
                       onChange={handleChange}
                       step={key.includes('Url') ? undefined : '0.1'}
                       className="w-full"
-                      disabled={stage < 1 && !key.includes('yeet')}
+                      disabled={stage && stage < 1 && !key.includes('yeet')}
                     />
                   </div>
                 ))}
@@ -150,7 +150,7 @@ export const Settings: React.FC<SettingsProps> = ({ onUpdateSettings, initialSet
                 </div>
               </form>
             </TabsContent>
-            {stage >= 1 && (
+            {stage && stage >= 1 && (
               <TabsContent value="skins">
                 <SkinShop />
               </TabsContent>
