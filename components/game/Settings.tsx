@@ -119,7 +119,7 @@ export const Settings: React.FC<SettingsProps> = ({ onUpdateSettings, initialSet
           <Tabs defaultValue="settings">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="settings">Settings</TabsTrigger>
-              {stage >= 1 && <TabsTrigger value="skins">Skins</TabsTrigger>}
+              {stage && stage >= 1 && <TabsTrigger value="skins">Skins</TabsTrigger>}
             </TabsList>
             <TabsContent value="settings">
               <form onSubmit={handleSubmit}>
