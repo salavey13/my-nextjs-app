@@ -1,9 +1,13 @@
-import React, { useState, useEffect, useContext } from 'react';
+'use client'
+
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useAppContext } from '@/context/AppContext';
 import { supabase } from '@/lib/supabaseClient';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import SkinShop from './SkinShop';
 
 export interface GameSettings {
   yeetCoefficient: number;
@@ -107,42 +111,54 @@ export const Settings: React.FC<SettingsProps> = ({ onUpdateSettings, initialSet
 
   return (
     <div className="fixed bottom-16 left-2 z-50">
-      {stage && stage >= 3 && (
+      {stage !== null && stage >= 3 && (
         <>
           <Button onClick={() => setIsOpen(!isOpen)} className="mb-2 ml-2" variant="outline">
             {isOpen ? 'X' : "⚙"}
           </Button>
           {isOpen && (
-            <form onSubmit={handleSubmit} className="bg-background p-4 rounded-lg shadow-lg max-h-[calc(100vh-200px)] overflow-y-auto">
-              {Object.entries(settings).map(([key, value]) => (
-                <div key={key} className="mb-2">
-                  <Label htmlFor={key} className="block mb-1">
-                    {key}
-                  </Label>
-                  <Input
-                    type={key.includes('Url') ? 'text' : 'number'}
-                    id={key}
-                    name={key}
-                    value={value}
-                    onChange={handleChange}
-                    step={key.includes('Url') ? undefined : '0.1'}
-                    className="w-full"
-                  />
-                </div>
-              ))}
-              <div className="flex justify-between mt-4">
-                <Button type="submit" className="w-1/2 mr-2" variant="outline">
-                  {t("applySettings")}
-                </Button>
-                <Button type="button" onClick={handleSetDefault} variant="outline" className="w-1/2 ml-2">
-                  {t("setDefault")}
-                </Button>
-              </div>
-            </form>
+            <div className="bg-background p-4 rounded-lg shadow-lg max-h-[calc(100vh-200px)] overflow-y-auto w-80">
+              <Tabs defaultValue="settings">
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="settings">Settings</TabsTrigger>
+                  <TabsTrigger value="skins">Skins</TabsTrigger>
+                </TabsList>
+                <TabsContent value="settings">
+                  <form onSubmit={handleSubmit}>
+                    {Object.entries(settings).map(([key, value]) => (
+                      <div key={key} className="mb-2">
+                        <Label htmlFor={key} className="block mb-1">
+                          {key}
+                        </Label>
+                        <Input
+                          type={key.includes('Url') ? 'text' : 'number'}
+                          id={key}
+                          name={key}
+                          value={value}
+                          onChange={handleChange}
+                          step={key.includes('Url') ? undefined : '0.1'}
+                          className="w-full"
+                        />
+                      </div>
+                    ))}
+                    <div className="flex justify-between mt-4">
+                      <Button type="submit" className="w-1/2 mr-2" variant="outline">
+                        {t("applySettings")}
+                      </Button>
+                      <Button type="button" onClick={handleSetDefault} variant="outline" className="w-1/2 ml-2">
+                        {t("setDefault")}
+                      </Button>
+                    </div>
+                  </form>
+                </TabsContent>
+                <TabsContent value="skins">
+                  <SkinShop />
+                </TabsContent>
+              </Tabs>
+            </div>
           )}
         </>
       )}
     </div>
   );
 };
-
