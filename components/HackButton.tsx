@@ -14,11 +14,16 @@ const HackButton: React.FC = () => {
   const user = state.user;
   const [selectedGame, setSelectedGame] = useState<'cards' | 'dice' | null>(null);
   const [gamesVisited, setGamesVisited] = useState({ cards: false, dice: false });
-const { showBackButton, onBackButtonPressed } = useTelegram();
+const { showBackButton } = useTelegram({
+    onBackButtonPressed: () => {
+      console.log('Back button pressed');
+      // Custom back navigation logic here
+      setSelectedGame(null)
+    },
+  });
 
 useEffect(() => {
   showBackButton(true);
-  onBackButtonPressed(() => setSelectedGame(null));
 
   return () => {
     showBackButton(false);  // Hide back button when unmounting
