@@ -12,7 +12,7 @@ export default function HackButtonPage() {
   const [showStoryShower, setShowStoryShower] = useState(false)
 
   useEffect(() => {
-    if (state?.user?.game_state && state?.user?.game_state?.stage >= 1) {
+    if (state?.user?.game_state && state?.user?.game_state?.stage >= 2) {
       setShowStoryShower(true)
     }
   }, [state.user?.game_state?.stage])

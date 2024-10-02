@@ -1,3 +1,4 @@
+// components\game\SkinShop.tsx
 'use client'
 
 import React, { useEffect, useState } from 'react';
