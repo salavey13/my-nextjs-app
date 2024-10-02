@@ -11,12 +11,36 @@ interface User {
   photo_url?: string;
 }
 
+interface UseTelegramProps {
+  onBackButtonPressed?: () => void; // Optional callback when the back button is pressed
+}
 
-
-const useTelegram = () => {
+export const useTelegram = ({ onBackButtonPressed }: UseTelegramProps) => {
+  
+  
   const [tg, setTg] = useState<TelegramWebApp | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
+  useEffect(() => {
+    const telegram = window.Telegram.WebApp;
+
+    // Show the back button in the Telegram Web App
+    telegram.BackButton.show();
+
+    // If an onBackButtonPressed callback is provided, handle the back button press
+    if (onBackButtonPressed) {
+      telegram.BackButton.onClick(onBackButtonPressed);
+    }
+
+    // Cleanup the back button event listener when the component is unmounted
+    return () => {
+      telegram.BackButton.hide();
+      if (onBackButtonPressed) {
+        telegram.BackButton.offClick(onBackButtonPressed);
+      }
+    };
+  }, [onBackButtonPressed]);
+
 
   useEffect(() => {
     const initTelegramWebApp = () => {
@@ -124,7 +148,6 @@ const useTelegram = () => {
       });
   };
 
-    
 
   return {
     tg,
@@ -149,6 +172,7 @@ const useTelegram = () => {
     setBottomBarColor,
     showProgress,
     toggleThemeSettings,
+    telegram: window.Telegram.WebApp,
   };
 };
 
