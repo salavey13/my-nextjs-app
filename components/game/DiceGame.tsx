@@ -309,6 +309,7 @@ function Scene({ gameState, onRollComplete, wallTexture }: { gameState: GameStat
 
 const DiceGame: React.FC = () => {
   const { state, t } = useAppContext()
+  const { tg } = useTelegram()
   const [gameState, setGameState] = useState<GameState | null>(null)
   const [soundEnabled, setSoundEnabled] = useState(true)
   const [showRules, setShowRules] = useState(false)
