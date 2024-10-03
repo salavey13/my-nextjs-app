@@ -105,6 +105,11 @@ export const useTelegram = (props: UseTelegramProps = {}) => {
       tg.close();
     }
   };
+  const showCloseButton = () => {
+    if (tg?.CloseButton) {
+      tg.CloseButton.show();
+    }
+  };
 
   const showPopup = (params: PopupParams, callback?: (buttonId: string) => void) => {
     if (tg) {
@@ -196,6 +201,7 @@ export const useTelegram = (props: UseTelegramProps = {}) => {
     showMainButton,
     hideMainButton,
     showBackButton,
+    showCloseButton,
     closeWebApp,
     showPopup,
     showAlert,
