@@ -307,7 +307,16 @@ function Scene({ gameState, onRollComplete, wallTexture }: { gameState: GameStat
   )
 }
 
-const DiceGame: React.FC = () => {
+const DiceGame: React.FC = () => {goBack: () => void }> = ({ goBack }) => {
+  const { showBackButton } = useTelegram({
+    onBackButtonPressed: () => {
+      goBack(); // Call goBack when the back button is pressed
+    },
+  });
+
+  useEffect(() => {
+    showBackButton();
+  }, [showBackButton]);
   const { state, t } = useAppContext()
   const { tg } = useTelegram()
   const [gameState, setGameState] = useState<GameState | null>(null)
@@ -462,21 +471,7 @@ const DiceGame: React.FC = () => {
     }
   }
 
-  const goBack = () => {
-    setGameState(null)
-    setShowRules(false)
-  }
-
-  useEffect(() => {
-    if (!tg) return;
-
-    tg?.BackButton?.show();
-    tg?.BackButton?.onClick(goBack);
-
-    return () => {
-      tg?.BackButton?.hide();
-    };
-  }, [tg, gameState, state?.user]);
+  
 
   useEffect(() => {
     const handleSubscription = async () => {
