@@ -52,6 +52,7 @@ const GameBoard: React.FC = () => {
   const [gameState, setGameState] = useState<GameState | null>(null);
   const { state, dispatch, t } = useAppContext()
   const user = state.user
+  const { tg } = useTelegram()
   const [targetFrame, setTargetFrame] = useState({ x: 400, y: 300, rotation: 0 });
   const [gameSettings, setGameSettings] = useState<GameSettings>({
     yeetCoefficient: 1.5,
@@ -62,7 +63,20 @@ const GameBoard: React.FC = () => {
   const [isShuffling, setIsShuffling] = useState(false);
   const { showMainButton, setHeaderColor, setBottomBarColor, tg } = useTelegram();
   const lastUpdateRef = useRef<{ [key: string]: number }>({});
+const goBack = () => {
+    setGameState(null)
+  }
 
+  useEffect(() => {
+    if (!tg) return;
+
+    tg?.BackButton?.show();
+    tg?.BackButton?.onClick(goBack);
+
+    return () => {
+      tg?.BackButton?.hide();
+    };
+  }, [tg, gameState, state?.user]);
   const randomizeTargetFrame = useCallback(() => {
     setTargetFrame({
       x: Math.random() * (window.innerWidth - 42) + 21,
