@@ -28,16 +28,16 @@ export const useTelegram = (props: UseTelegramProps = {}) => {
       const telegram = window.Telegram.WebApp;
 
       // Show the back button in the Telegram Web App
-      telegram.BackButton.show();
+      telegram.BackButton?.show();
 
       // Handle the back button press
       if (onBackButtonPressed) {
-        telegram.BackButton.onClick(onBackButtonPressed);
+        telegram.BackButton?.onClick(onBackButtonPressed);
       }
 
       // Cleanup when the component is unmounted
       return () => {
-        telegram.BackButton.hide();
+        telegram.BackButton?.hide();
         if (onBackButtonPressed) {
           telegram.BackButton.offClick(onBackButtonPressed); // Ensure proper cleanup
         }
