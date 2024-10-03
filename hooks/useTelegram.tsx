@@ -106,8 +106,8 @@ export const useTelegram = (props: UseTelegramProps = {}) => {
     }
   };
   const showCloseButton = () => {
-    if (tg?.CloseButton) {
-      tg.CloseButton.show();
+    if (tg) {
+      tg.close();
     }
   };
 
