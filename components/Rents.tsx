@@ -122,7 +122,7 @@ export default function Rents() {
     fetchRents();
     fetchItems();
     fetchUsers();
-  }, [user]);
+  }, [user, fetchItems]);
 
   useEffect(() => {
     if (!router) return;
