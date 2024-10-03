@@ -52,7 +52,6 @@ const GameBoard: React.FC = () => {
   const [gameState, setGameState] = useState<GameState | null>(null);
   const { state, dispatch, t } = useAppContext()
   const user = state.user
-  const { tg } = useTelegram()
   const [targetFrame, setTargetFrame] = useState({ x: 400, y: 300, rotation: 0 });
   const [gameSettings, setGameSettings] = useState<GameSettings>({
     yeetCoefficient: 1.5,
