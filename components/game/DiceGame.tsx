@@ -307,7 +307,7 @@ function Scene({ gameState, onRollComplete, wallTexture }: { gameState: GameStat
   )
 }
 
-const DiceGame: React.FC = () => {goBack: () => void }> = ({ goBack }) => {
+const DiceGame: React.FC<{ goBack: () => void }> = ({ goBack }) => {
   const { showBackButton } = useTelegram({
     onBackButtonPressed: () => {
       goBack(); // Call goBack when the back button is pressed
