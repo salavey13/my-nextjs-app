@@ -62,8 +62,10 @@ const GameBoard: React.FC = () => {
   const [isShuffling, setIsShuffling] = useState(false);
   const { showMainButton, setHeaderColor, setBottomBarColor, tg } = useTelegram();
   const lastUpdateRef = useRef<{ [key: string]: number }>({});
-const goBack = () => {
+  
+  const goBack = () => {
     setGameState(null)
+    tg?.MainButton?.hide() 
   }
 
   useEffect(() => {
