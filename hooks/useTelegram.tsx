@@ -22,29 +22,24 @@ export const useTelegram = (props: UseTelegramProps = {}) => {
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
 
   useEffect(() => {
-    // Ensure we are on the client side
     if (typeof window !== 'undefined' && window.Telegram?.WebApp) {
       const telegram = window.Telegram.WebApp;
 
-      // Show the back button
-      telegram.BackButton?.show();
-
-      // Set up the back button press handler
+      // Show the back button only when needed
       if (onBackButtonPressed) {
+        telegram.BackButton?.show();
         telegram.BackButton?.onClick(onBackButtonPressed);
+      } else {
+        telegram.BackButton?.hide(); // Hide if not needed
       }
 
       // Clean up when unmounted
       return () => {
         telegram.BackButton?.hide();
-        if (onBackButtonPressed) {
-          // Remove the event listener by setting an empty function
-          telegram.BackButton?.onClick(() => {});
-        }
       };
     }
   }, [onBackButtonPressed]);
-
+  
   useEffect(() => {
     // Ensure we're on the client side before interacting with the DOM
     if (typeof window !== 'undefined') {
