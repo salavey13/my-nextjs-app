@@ -37,10 +37,10 @@ export const useTelegram = (props: UseTelegramProps = {}) => {
 
       // Cleanup when the component is unmounted
       return () => {
-        telegram.BackButton?.hide();
         if (onBackButtonPressed) {
-          telegram.BackButton?.offClick(onBackButtonPressed); // Ensure proper cleanup
-        }
+      // Remove the event listener by setting an empty function
+      telegram?.BackButton?.onClick(() => {}); 
+    }
       };
     }
   }, [onBackButtonPressed]);
