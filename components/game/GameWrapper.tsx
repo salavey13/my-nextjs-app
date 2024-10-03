@@ -8,7 +8,11 @@ import GameBoard from './GameBoard';
 import DiceGame from './DiceGame';
 import LoadingSpinner from "../ui/LoadingSpinner";
 
-const GameWrapper: React.FC = () => {
+interface GameWrapperProps {
+  goBack: () => void;
+}
+
+const GameWrapper: React.FC<GameWrapperProps> = ({ goBack }) => {
   const { state } = useAppContext();
   const [gameType, setGameType] = useState<string | null>(null);
 
@@ -54,12 +58,13 @@ const GameWrapper: React.FC = () => {
     return <LoadingSpinner />;
   }
 
+  // Pass the goBack function to the selected game component
   switch (gameType) {
     case 'DiceGame':
-      return <DiceGame />;
+      return <DiceGame goBack={goBack} />;
     case 'GameBoard':
     default:
-      return <GameBoard />;
+      return <GameBoard goBack={goBack} />;
   }
 };
 
