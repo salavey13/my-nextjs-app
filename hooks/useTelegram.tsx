@@ -39,7 +39,7 @@ export const useTelegram = (props: UseTelegramProps = {}) => {
       return () => {
         telegram.BackButton?.hide();
         if (onBackButtonPressed) {
-          telegram.BackButton.offClick(onBackButtonPressed); // Ensure proper cleanup
+          telegram.BackButton?.offClick(onBackButtonPressed); // Ensure proper cleanup
         }
       };
     }
@@ -83,8 +83,8 @@ export const useTelegram = (props: UseTelegramProps = {}) => {
 
   const showMainButton = (text: string) => {
     if (tg) {
-      tg.MainButton.setText(text);
-      tg.MainButton.show();
+      tg.MainButton?.setText(text);
+      tg.MainButton?.show();
     }
   };
 
