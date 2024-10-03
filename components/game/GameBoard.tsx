@@ -48,7 +48,8 @@ interface GameState {
   players: Player[];
 }
 
-const GameBoard: React.FC = () => {
+const GameBoard: React.FC = () => {goBack: () => void }> = ({ goBack }) => {
+  
   const [gameState, setGameState] = useState<GameState | null>(null);
   const { state, dispatch, t } = useAppContext()
   const user = state.user
@@ -62,22 +63,19 @@ const GameBoard: React.FC = () => {
   const [isShuffling, setIsShuffling] = useState(false);
   const { showMainButton, setHeaderColor, setBottomBarColor, tg } = useTelegram();
   const lastUpdateRef = useRef<{ [key: string]: number }>({});
-  
-  const goBack = () => {
-    setGameState(null)
-    tg?.MainButton?.hide() 
-  }
+
+
+  const { showBackButton } = useTelegram({
+    onBackButtonPressed: () => {
+      goBack(); // Call goBack when the back button is pressed
+    },
+  });
 
   useEffect(() => {
-    if (!tg) return;
+    showBackButton();
+  }, [showBackButton]);
 
-    tg?.BackButton?.show();
-    tg?.BackButton?.onClick(goBack);
-
-    return () => {
-      tg?.BackButton?.hide();
-    };
-  }, [tg, gameState, state?.user]);
+  
   const randomizeTargetFrame = useCallback(() => {
     setTargetFrame({
       x: Math.random() * (window.innerWidth - 42) + 21,
