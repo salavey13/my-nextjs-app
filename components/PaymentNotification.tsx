@@ -10,12 +10,6 @@ const PaymentNotification: React.FC<{ link?: string }> = ({ link }) => {
   const [loading, setLoading] = useState(false);
   const [notificationSent, setNotificationSent] = useState(false);
 
-  useEffect(() => {
-    if (state?.user && link && !notificationSent) {
-      sendPaymentNotification(link);
-    }
-  }, [state?.user, link]);
-
   const sendPaymentNotification = async (link: string) => {
     setLoading(true);
 
@@ -79,6 +73,12 @@ const PaymentNotification: React.FC<{ link?: string }> = ({ link }) => {
         setLoading(false);
     }
 };
+
+  useEffect(() => {
+    if (state?.user && link && !notificationSent) {
+      sendPaymentNotification(link);
+    }
+  }, [notificationSent, state?.user, link]);
 
   return (
     <div className="p-6 bg-gray-800 rounded-lg shadow-lg">

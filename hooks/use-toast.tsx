@@ -1,4 +1,5 @@
 'use client'
+import React from "react";
 import { Toaster, toast as hotToast, ToastOptions } from "react-hot-toast";
 
 // Type for the toast

@@ -113,7 +113,7 @@ const GameBoard: React.FC = () => {
       updateSupabase(updatedGameState);
       return updatedGameState;
     });
-  }, [gameState, user?.currentFoolGameId]);
+  }, [updateSupabase, gameState, user?.currentFoolGameId]);
 
   useEffect(() => {
     const handleSubscription = async () => {
@@ -203,7 +203,7 @@ const GameBoard: React.FC = () => {
       setBottomBarColor("#282c33");
       setHeaderColor("#282c33");
     }, 1000);
-  }, [gameState, user?.currentFoolGameId, randomizeTargetFrame, showMainButton, setBottomBarColor, setHeaderColor, t]);
+  }, [updateSupabase, gameState, user?.currentFoolGameId, randomizeTargetFrame, showMainButton, setBottomBarColor, setHeaderColor, t]);
 
   useEffect(() => {
     const addPlayerIfNeeded = async () => {
@@ -230,7 +230,7 @@ const GameBoard: React.FC = () => {
     if (gameState) {
       addPlayerIfNeeded();
     }
-  }, [gameState, user]);
+  }, [updateSupabase, gameState, user]);
 
   const handlePositionChange = useCallback(async (playerId: string, newPos: Point) => {
     if (!gameState || !user?.currentFoolGameId) return;
@@ -243,7 +243,7 @@ const GameBoard: React.FC = () => {
 
     setGameState(updatedGameState);
     await updateSupabase(updatedGameState);
-  }, [gameState, user?.currentFoolGameId]);
+  }, [updateSupabase, gameState, user?.currentFoolGameId]);
 
   const handleMessageUpdate = useCallback(async (playerId: string, messages: Message[]) => {
     if (!gameState || !user?.currentFoolGameId) return;
@@ -256,7 +256,7 @@ const GameBoard: React.FC = () => {
 
     setGameState(updatedGameState);
     await updateSupabase(updatedGameState);
-  }, [gameState, user?.currentFoolGameId]);
+  }, [updateSupabase, gameState, user?.currentFoolGameId]);
 
   const handleUpdateSettings = useCallback(async (settings: GameSettings) => {
     setGameSettings(settings);

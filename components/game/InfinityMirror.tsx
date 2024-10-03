@@ -57,7 +57,7 @@ export default function InfinityMirror({ layers = 10, baseColor = '#000000', acc
   useEffect(() => {
     requestRef.current = requestAnimationFrame(animate)
     return () => cancelAnimationFrame(requestRef.current!)
-  }, [])
+  }, [animate])
 
   return (
     <div className="w-full h-full overflow-hidden" style={{ backgroundColor: baseColor }}>

@@ -18,10 +18,6 @@ const Referral: React.FC = () => {
   const [referralCode, setReferralCode] = useState<string | null>(null);
   const [inviteCount, setInviteCount] = useState(0);
 
-  useEffect(() => {
-    fetchReferralData();
-  }, [user]);
-
   const fetchReferralData = async () => {
     if (!user) return;
 
@@ -43,6 +39,10 @@ const Referral: React.FC = () => {
       console.error('Error fetching referral data:', error);
     }
   };
+
+  useEffect(() => {
+    fetchReferralData();
+  }, [fetchReferralData, user]);
 
   const generateReferralCode = async (defaultReferralName: string) => {
     try {
@@ -92,27 +92,7 @@ const Referral: React.FC = () => {
         console.error('Error updating referral name:', error);
   
       }
-  }, [referralName]);
-
-  const handleSendInvite = useCallback(async () => {
-    if (!referralCode) return;
-
-    try {
-      const inviteLink = `https://t.me/oneSitePlsBot/vip?ref=${referralCode}`;
-      await navigator.clipboard.writeText(inviteLink);
-
-      await sendTelegramInvite(referralCode);
-
-    } catch (error) {
-      console.error('Error sending invite:', error);
-    }
-  }, [referralCode]);
-
-  const handleReferralNameChange = async (newName: string) => {
-    if (newName.trim() === '') return;
-
-    setReferralName(newName); 
-  };
+  }, [setReferralCode, referralName]);
 
   const sendTelegramInvite = useCallback(async (referralCode: string) => {
     if (!process.env.BOT_TOKEN || !user) {
@@ -143,7 +123,27 @@ const Referral: React.FC = () => {
     } catch (error) {
       console.error('Error sending Telegram message:', error);
     }
-  }, [user]);
+  }, [t, user]);
+
+  const handleSendInvite = useCallback(async () => {
+    if (!referralCode) return;
+
+    try {
+      const inviteLink = `https://t.me/oneSitePlsBot/vip?ref=${referralCode}`;
+      await navigator.clipboard.writeText(inviteLink);
+
+      await sendTelegramInvite(referralCode);
+
+    } catch (error) {
+      console.error('Error sending invite:', error);
+    }
+  }, [sendTelegramInvite, referralCode]);
+
+  const handleReferralNameChange = async (newName: string) => {
+    if (newName.trim() === '') return;
+
+    setReferralName(newName); 
+  };
 
   return (
     <Suspense fallback={<LoadingSpinner />}>

@@ -15,7 +15,7 @@ export default function HackButtonPage() {
     if (state?.user?.game_state && state?.user?.game_state?.stage >= 2) {
       setShowStoryShower(true)
     }
-  }, [state.user?.game_state?.stage])
+  }, [state?.user?.game_state, state.user?.game_state?.stage])
 
   return (
     <div className="container mx-auto py-8">

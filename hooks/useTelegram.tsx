@@ -25,19 +25,21 @@ export const useTelegram = (props: UseTelegramProps = {}) => {
   useEffect(() => {
     const telegram = window.Telegram?.WebApp;
 
-    // Show the back button in the Telegram Web App
-    telegram?.BackButton.show();
+    if(telegram != undefined) {
+      // Show the back button in the Telegram Web App
+      telegram?.BackButton?.show();
 
-    // If an onBackButtonPressed callback is provided, handle the back button press
-    if (onBackButtonPressed) {
-      telegram?.BackButton.onClick(onBackButtonPressed);
+      // If an onBackButtonPressed callback is provided, handle the back button press
+      if (onBackButtonPressed) {
+        telegram?.BackButton?.onClick(onBackButtonPressed);
+      }
     }
 
     // Cleanup the back button event listener when the component is unmounted
     return () => {
-      telegram?.BackButton.hide();
+      telegram?.BackButton?.hide();
       if (onBackButtonPressed) {
-        telegram?.BackButton.offClick(onBackButtonPressed);
+        telegram?.BackButton?.onClick(onBackButtonPressed);
       }
     };
   }, [onBackButtonPressed]);
@@ -173,7 +175,7 @@ export const useTelegram = (props: UseTelegramProps = {}) => {
     setBottomBarColor,
     showProgress,
     toggleThemeSettings,
-    telegram: window.Telegram.WebApp,
+    telegram: window?.Telegram?.WebApp,
   };
 };
 

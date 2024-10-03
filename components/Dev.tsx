@@ -1,6 +1,5 @@
 "use client";
-
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useAppContext } from '../context/AppContext';
 import { supabase } from "../lib/supabaseClient";
 import { Button } from "@/components/ui/button";
@@ -47,22 +46,34 @@ const Dev: React.FC = () => {
     setBackgroundColor
   } = useTelegram();
   
-  useEffect(() => {
-    fetchAchievements();
+
+  const fetchAchievements = useCallback(async () => {
+    if (!user) return;
+    const { data, error } = await supabase
+      .from('achievements')
+      .select('*')
+      .eq('user_id', user.id);
+    if (error) console.error('Error fetching achievements:', error);
+    else setAchievements(data || []);
   }, [user]);
 
   useEffect(() => {
+    const container = containerRef.current;
+    
     const handleScroll = () => {
-      if (containerRef.current) {
-        const scrollPosition = containerRef.current.scrollTop;
+      if (container) {
+        const scrollPosition = container.scrollTop;
         const windowHeight = window.innerHeight - 128; // Adjust for topShelf and bottomShelf
         const sectionIndex = Math.round(scrollPosition / windowHeight);
         setCurrentSection(sectionIndex);
       }
     };
-
-    containerRef.current?.addEventListener('scroll', handleScroll);
-    return () => containerRef.current?.removeEventListener('scroll', handleScroll);
+  
+    container?.addEventListener('scroll', handleScroll);
+  
+    return () => {
+      container?.removeEventListener('scroll', handleScroll);
+    };
   }, []);
 
   const scrollToSection = (index: number) => {
@@ -72,16 +83,6 @@ const Dev: React.FC = () => {
         behavior: 'smooth'
       });
     }
-  };
-
-  const fetchAchievements = async () => {
-    if (!user) return;
-    const { data, error } = await supabase
-      .from('achievements')
-      .select('*')
-      .eq('user_id', user.id);
-    if (error) console.error('Error fetching achievements:', error);
-    else setAchievements(data || []);
   };
 
   const handleZeroStageRequest = (type: 'normal' | 'type') => {

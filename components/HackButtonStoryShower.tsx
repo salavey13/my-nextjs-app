@@ -65,6 +65,29 @@ export default function HackButtonStoryShower() {
     fetchStoryStages()
   }, [])
 
+  const initializeMinigame = (minigame: string) => {
+    switch (minigame) {
+      case 'debug':
+        setMinigameState({
+          type: 'debug',
+          errors: ['Error 1', 'Error 2', 'Error 3'],
+        })
+        break
+      case 'hack':
+        setMinigameState({
+          type: 'hack',
+          targetNumber: Math.floor(Math.random() * 100) + 1,
+          attempts: 0,
+        })
+        break
+      case 'github':
+        simulateGitHubSourceRetrieval()
+        break
+      default:
+        setMinigameState(null)
+    }
+  }
+
   useEffect(() => {
     if (storyStages.length > 0 && state.user?.game_state?.stage !== undefined) {
       const stage = storyStages.find(s => s.stage === state.user?.game_state.stage)
@@ -75,7 +98,7 @@ export default function HackButtonStoryShower() {
         setShowBottomShelf(stage.bottomShelfBitmask > 1)
       }
     }
-  }, [storyStages, state.user?.game_state?.stage])
+  }, [initializeMinigame, storyStages, state.user?.game_state?.stage])
 
   const fetchStoryStages = async () => {
     const { data, error } = await supabase
@@ -139,29 +162,6 @@ export default function HackButtonStoryShower() {
           variant: "destructive",
         })
       }
-    }
-  }
-
-  const initializeMinigame = (minigame: string) => {
-    switch (minigame) {
-      case 'debug':
-        setMinigameState({
-          type: 'debug',
-          errors: ['Error 1', 'Error 2', 'Error 3'],
-        })
-        break
-      case 'hack':
-        setMinigameState({
-          type: 'hack',
-          targetNumber: Math.floor(Math.random() * 100) + 1,
-          attempts: 0,
-        })
-        break
-      case 'github':
-        simulateGitHubSourceRetrieval()
-        break
-      default:
-        setMinigameState(null)
     }
   }
 

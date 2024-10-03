@@ -17,18 +17,6 @@ const EnhancedChatButton = () => {
     setBackgroundColor
   } = useTelegram();
 
-  useEffect(() => {
-    if (tg) {
-      showMainButton('v0.dev');
-      tg.MainButton?.onClick(handleOpenChatGPT)
-      tg.MainButton?.setParams({color: "#e1ff01", text_color: "#000000"})
-      //showBackButton();
-      setBottomBarColor("#282c33"),
-        setHeaderColor("#282c33"),
-        setBackgroundColor("#282c33")
-    }
-  }, [tg, showMainButton, showBackButton]);
-
   const handleOpenChatGPT = () => {
     openLink('https://chatgpt.com/');
     //hideMainButton();
@@ -49,6 +37,18 @@ const EnhancedChatButton = () => {
   const handleOpenVercel = () => {
     openLink('https://vercel.com/salavey13s-projects/my-nextjs-app/deployments');
   };
+
+  useEffect(() => {
+    if (tg) {
+      showMainButton('v0.dev');
+      tg.MainButton?.onClick(handleOpenChatGPT)
+      tg.MainButton?.setParams({color: "#e1ff01", text_color: "#000000"})
+      //showBackButton();
+      setBottomBarColor("#282c33"),
+        setHeaderColor("#282c33"),
+        setBackgroundColor("#282c33")
+    }
+  }, [setBottomBarColor, setHeaderColor, handleOpenChatGPT, tg, showMainButton, showBackButton, setBackgroundColor]);
   
   return (
     <div className={`flex items-center justify-center ${theme === 'dark' ? 'bg-black' : 'bg-white'} p-2 gap-2`}>

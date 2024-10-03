@@ -32,10 +32,6 @@ export function StoryEdit() {
   const [editedStage, setEditedStage] = useState<StoryStage | null>(null)
   const [isLoading, setIsLoading] = useState(false)
 
-  useEffect(() => {
-    fetchStoryStages()
-  }, [])
-
   const fetchStoryStages = async () => {
     setIsLoading(true)
     const { data, error } = await supabase
@@ -54,6 +50,10 @@ export function StoryEdit() {
     }
     setIsLoading(false)
   }
+
+  useEffect(() => {
+    fetchStoryStages()
+  }, [fetchStoryStages])
 
   const handleStageSelect = (stageId: string) => {
     setSelectedStage(stageId)

@@ -47,10 +47,6 @@ const DynamicItemForm: React.FC<DynamicItemFormProps> = ({ itemType }) => {
   const [agreementText, setAgreementText] = useState<string>("");
   const [gameType, setGameType] = useState<string | null>(null); // Add game type state
 
-  useEffect(() => {
-    fetchFormFields();
-  }, [itemType]);
-
   const fetchFormFields = async () => {
     setLoading(true);
     try {
@@ -99,6 +95,10 @@ const DynamicItemForm: React.FC<DynamicItemFormProps> = ({ itemType }) => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchFormFields();
+  }, [fetchFormFields, itemType]);
 
   const handleInputChange = (
     sectionIndex: number,

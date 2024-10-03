@@ -24,15 +24,9 @@ const { showBackButton } = useTelegram({
 
 useEffect(() => {
   showBackButton();
-}, []);
+}, [showBackButton]);
 
-  useEffect(() => {
-    if (gamesVisited.cards && gamesVisited.dice && user?.game_state?.stage === 0) {
-      progressToStage1();
-    }
-  }, [gamesVisited, user?.game_state?.stage]);
-
-  const progressToStage1 = async () => {
+const progressToStage1 = async () => {
     if (!user?.id) return;
     try {
       const { error } = await supabase
@@ -55,6 +49,14 @@ useEffect(() => {
       console.error('Error updating game stage:', error);
     }
   };
+  
+  useEffect(() => {
+    if (gamesVisited.cards && gamesVisited.dice && user?.game_state?.stage === 0) {
+      progressToStage1();
+    }
+  }, [progressToStage1, gamesVisited, user?.game_state?.stage]);
+
+  
 
   const handleClick = async () => {
     if (!user?.id) {

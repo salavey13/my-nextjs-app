@@ -260,7 +260,7 @@ export default function Rents() {
         } else {
             setTypeNameError(t('emptyTypeName')); // Name is empty
         }
-    }, [typeName, t]);
+    }, [typeName, t, itemTypes]);
 
     const handleAddNewItemType = async () => {
         setHasTriedToSave(true); // Mark that the user tried to save

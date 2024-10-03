@@ -91,7 +91,7 @@ export default function Dashboard() {
 
     fetchBets();  
     fetchAllEvents();  
-  }, [user]);
+  }, [bets, user]);
 
   useEffect(() => {
     if (!user) return;
@@ -110,7 +110,7 @@ export default function Dashboard() {
     };
 
     fetchEvents();
-  }, [bets]);// Only refetch events when bets change
+  }, [user, bets]);// Only refetch events when bets change
 
   const getEventDetailsById = useCallback((eventId: number) => {
     const event = allEvents.find(e => e.id === eventId);

@@ -13,10 +13,6 @@ const QrCodeForm: React.FC = () => {
   const { state, saveFormState, t } = useAppContext();
   const [qrCodeUrl, setQrCodeUrl] = useState<string | null>(null);
 
-  useEffect(() => {
-    handleSaveState();  // Automatically save and generate the QR code on component load
-  }, []);
-
   const handleSaveState = async () => {
     // Save form state to Supabase and get the form ID
     const { data, error } = await supabase
@@ -36,6 +32,10 @@ const QrCodeForm: React.FC = () => {
       setQrCodeUrl(qrUrl);
     }
   };
+
+  useEffect(() => {
+    handleSaveState();  // Automatically save and generate the QR code on component load
+  }, [handleSaveState]);
 
   return (
     <div className="p-4 bg-gray-800 rounded-lg shadow-md">
