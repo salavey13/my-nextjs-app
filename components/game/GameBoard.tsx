@@ -48,7 +48,7 @@ interface GameState {
   players: Player[];
 }
 
-const GameBoard: React.FC = () => {goBack: () => void }> = ({ goBack }) => {
+const GameBoard: React.FC<{ goBack: () => void }> = ({ goBack }) => {
   
   const [gameState, setGameState] = useState<GameState | null>(null);
   const { state, dispatch, t } = useAppContext()
