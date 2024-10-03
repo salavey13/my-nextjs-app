@@ -1,4 +1,3 @@
-// hooks/useTelegram.tsx
 import { useEffect, useState } from 'react';
 
 // Define types for new functionalities
@@ -23,24 +22,25 @@ export const useTelegram = (props: UseTelegramProps = {}) => {
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
 
   useEffect(() => {
-    // Check if window is defined (i.e., we are on the client)
+    // Ensure we are on the client side
     if (typeof window !== 'undefined' && window.Telegram?.WebApp) {
       const telegram = window.Telegram.WebApp;
 
-      // Show the back button in the Telegram Web App
+      // Show the back button
       telegram.BackButton?.show();
 
-      // Handle the back button press
+      // Set up the back button press handler
       if (onBackButtonPressed) {
         telegram.BackButton?.onClick(onBackButtonPressed);
       }
 
-      // Cleanup when the component is unmounted
+      // Clean up when unmounted
       return () => {
+        telegram.BackButton?.hide();
         if (onBackButtonPressed) {
-      // Remove the event listener by setting an empty function
-      telegram?.BackButton?.onClick(() => {}); 
-    }
+          // Remove the event listener by setting an empty function
+          telegram.BackButton?.onClick(() => {});
+        }
       };
     }
   }, [onBackButtonPressed]);
@@ -82,75 +82,104 @@ export const useTelegram = (props: UseTelegramProps = {}) => {
   };
 
   const showMainButton = (text: string) => {
-    if (tg) {
-      tg.MainButton?.setText(text);
-      tg.MainButton?.show();
+    if (tg?.MainButton) {
+      tg.MainButton.setText(text);
+      tg.MainButton.show();
     }
   };
 
   const hideMainButton = () => {
-    if (tg) tg.MainButton.hide();
+    if (tg?.MainButton) {
+      tg.MainButton.hide();
+    }
   };
 
   const showBackButton = () => {
-    if (tg) tg.BackButton.show();
+    if (tg?.BackButton) {
+      tg.BackButton.show();
+    }
   };
 
   const closeWebApp = () => {
-    if (tg) tg.close();
+    if (tg) {
+      tg.close();
+    }
   };
 
   const showPopup = (params: PopupParams, callback?: (buttonId: string) => void) => {
-    if (tg) tg.showPopup(params, callback);
+    if (tg) {
+      tg.showPopup(params, callback);
+    }
   };
 
   const showAlert = (message: string, callback?: () => void) => {
-    if (tg) tg.showAlert(message, callback);
+    if (tg) {
+      tg.showAlert(message, callback);
+    }
   };
 
   const showConfirm = (message: string, callback?: (confirmed: boolean) => void) => {
-    if (tg) tg.showConfirm(message, callback);
+    if (tg) {
+      tg.showConfirm(message, callback);
+    }
   };
 
   const showScanQrPopup = (params: ScanQrPopupParams, callback?: (text: string) => void) => {
-    if (tg) tg.showScanQrPopup(params, callback);
+    if (tg) {
+      tg.showScanQrPopup(params, callback);
+    }
   };
 
   const closeScanQrPopup = () => {
-    if (tg) tg.closeScanQrPopup();
+    if (tg) {
+      tg.closeScanQrPopup();
+    }
   };
 
   const readTextFromClipboard = (callback?: (text: string) => void) => {
-    if (tg) tg.readTextFromClipboard(callback);
+    if (tg) {
+      tg.readTextFromClipboard(callback);
+    }
   };
 
   const enableVerticalSwipes = () => {
-    if (tg) tg.enableVerticalSwipes();
+    if (tg) {
+      tg.enableVerticalSwipes();
+    }
   };
 
   const disableVerticalSwipes = () => {
-    if (tg) tg.disableVerticalSwipes();
+    if (tg) {
+      tg.disableVerticalSwipes();
+    }
   };
 
   const setHeaderColor = (color: string) => {
-    if (tg) tg.setHeaderColor(color);
+    if (tg) {
+      tg.setHeaderColor(color);
+    }
   };
 
   const setBottomBarColor = (color: string) => {
-    if (tg) tg.setBottomBarColor(color);
+    if (tg) {
+      tg.setBottomBarColor(color);
+    }
   };
 
   const setBackgroundColor = (color: string) => {
-    if (tg) tg.setBackgroundColor(color);
+    if (tg) {
+      tg.setBackgroundColor(color);
+    }
   };
 
   const showProgress = (leaveActive: boolean) => {
-    if (tg) tg.MainButton.showProgress(leaveActive);
+    if (tg?.MainButton) {
+      tg.MainButton.showProgress(leaveActive);
+    }
   };
 
-  // Integration with Telegram's SettingsButton
   const toggleThemeSettings = (callback: () => void) => {
-    if (tg) {
+    if (tg?.SettingsButton) {
       tg.SettingsButton.onClick(() => {
         callback();
         console.log('Settings button clicked');
