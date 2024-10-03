@@ -337,10 +337,6 @@ const GameBoard: React.FC<{ goBack: () => void }> = ({ goBack }) => {
     };
 
     tg?.MainButton?.onClick(handleMainButtonClick);
-
-    return () => {
-      tg?.MainButton?.onClick();
-    };
   }, [tg, shuffleCards]);
 
   useEffect(() => {
