@@ -80,19 +80,19 @@ export default function HackButtonStoryShower() {
     }
   }, [storyStages, state.user?.game_state?.stage])
 
-  useEffect(() => {
-    const checkHackButton = () => {
-      const firstGamePlayed = localStorage.getItem('firstGamePlayed')
-      if (firstGamePlayed && !state.hackButtonVisible) {
-        dispatch({ type: 'SHOW_HACK_BUTTON' })
-      }
-    }
+  // useEffect(() => {
+  //   const checkHackButton = () => {
+  //     const firstGamePlayed = localStorage.getItem('firstGamePlayed')
+  //     if (firstGamePlayed && !state.hackButtonVisible) {
+  //       dispatch({ type: 'SHOW_HACK_BUTTON' })
+  //     }
+  //   }
 
-    window.addEventListener('load', checkHackButton)
-    return () => {
-      window.removeEventListener('load', checkHackButton)
-    }
-  }, [state.hackButtonVisible, dispatch])
+  //   window.addEventListener('load', checkHackButton)
+  //   return () => {
+  //     window.removeEventListener('load', checkHackButton)
+  //   }
+  // }, [state.hackButtonVisible, dispatch])
 
   const fetchStoryStages = async () => {
     const { data, error } = await supabase
@@ -187,7 +187,44 @@ export default function HackButtonStoryShower() {
   }
 
   const simulateGitHubSourceRetrieval = async () => {
-    // ... (unchanged)
+    const steps = [
+      'Getting author ID: salavey13',
+      'Getting project name: my-nextjs-app',
+      'Getting latest commit ID: e66a103bed7ae7d308fe3e4e4237da48ed45387c',
+      'Fetching latest component file content...',
+    ]
+
+    setMinigameState({
+      type: 'github',
+      githubSteps: [],
+      githubBlocks: [],
+    })
+
+    for (const step of steps) {
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      setMinigameState(prevState => ({
+        ...prevState!,
+        githubSteps: [...(prevState?.githubSteps || []), step],
+      }))
+    }
+
+    try {
+      const response = await fetch('https://github.com/salavey13/my-nextjs-app/raw/e66a103bed7ae7d308fe3e4e4237da48ed45387c/components/HackButtoStoryShower.tsx')
+      const content = await response.text()
+      const blocks = content.split('\n\n').filter(block => block.trim() !== '')
+
+      setMinigameState(prevState => ({
+        ...prevState!,
+        githubSteps: [...(prevState?.githubSteps || []), 'File content retrieved successfully'],
+        githubBlocks: blocks,
+      }))
+    } catch (error) {
+      console.error('Error fetching file content:', error)
+      setMinigameState(prevState => ({
+        ...prevState!,
+        githubSteps: [...(prevState?.githubSteps || []), 'Error fetching file content'],
+      }))
+    }
   }
 
   const renderMinigame = () => {
@@ -234,7 +271,7 @@ export default function HackButtonStoryShower() {
               className="border p-2 rounded"
               onChange={handleHackGuessDebounced}
             />
-            <p>{t('attempts', { count: minigameState.attempts })}</p>
+            <p>{t('attempts', { count: String(minigameState.attempts ?? 1) })}</p>
           </div>
         )
       case 'github':
@@ -278,11 +315,51 @@ export default function HackButtonStoryShower() {
   }
 
   const handleDragEnd = (result: DropResult) => {
-    // ... (unchanged)
+    if (!result.destination || !minigameState || !minigameState.errors) return
+
+    const newErrors = Array.from(minigameState.errors)
+    const [reorderedItem] = newErrors.splice(result.source.index, 1)
+    newErrors.splice(result.destination.index, 0, reorderedItem)
+
+    setMinigameState({
+      ...minigameState,
+      errors: newErrors,
+    })
+
+    if (newErrors.length === 0) {
+      toast({
+        title: 'Debugging Complete',
+        description: 'You\'ve fixed all the errors!',
+      })
+      handleStageProgression()
+    }
   }
 
   const handleGitHubDragEnd = (result: DropResult) => {
-    // ... (unchanged)
+    if (!result.destination || !minigameState || !minigameState.githubBlocks) return
+
+    const newBlocks = Array.from(minigameState.githubBlocks)
+    const [reorderedItem] = newBlocks.splice(result.source.index, 1)
+    newBlocks.splice(result.destination.index, 0, reorderedItem)
+
+    setMinigameState({
+      ...minigameState,
+      githubBlocks: newBlocks,
+    })
+
+    if (isCorrectBlockOrder(newBlocks)) {
+      toast({
+        title: 'GitHub Source Retrieval Complete',
+        description: 'You\'ve successfully reconstructed the component!',
+      })
+      handleStageProgression()
+    }
+  }
+
+  const isCorrectBlockOrder = (blocks: string[]) => {
+    // Implement logic to check if the blocks are in the correct order
+    // This is a placeholder implementation
+    return true
   }
 
   const handleHackGuess = (guess: number) => {
@@ -297,7 +374,7 @@ export default function HackButtonStoryShower() {
     if (guess === minigameState.targetNumber) {
       toast({
         title: t('hackingSuccessful'),
-        description: t('guessedNumber', { attempts: newAttempts }),
+        description: t('guessedNumber', { attempts: String(newAttempts ?? 1) }),
         stage: currentStage?.stage,
         lang: state.user?.lang,
       })

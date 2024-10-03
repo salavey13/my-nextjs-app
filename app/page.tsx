@@ -22,7 +22,7 @@ export default function HackButtonPage() {
       {showStoryShower ? <HackButtonStoryShower /> : <HackButton />}
       {state.user?.role === 1 && (
         <>
-          <h1 className="text-2xl font-bold mb-4">Developer Tools</h1>
+          {/* <h1 className="text-2xl font-bold mb-4">Developer Tools</h1> */}
           <DevKit />
         </>
       )}

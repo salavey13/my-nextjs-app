@@ -118,15 +118,15 @@ export const Settings: React.FC<SettingsProps> = ({ onUpdateSettings, initialSet
         <div className="bg-background p-4 rounded-lg shadow-lg max-h-[calc(100vh-200px)] overflow-y-auto w-80">
           <Tabs defaultValue="settings">
             <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="settings">Settings</TabsTrigger>
-              {stage && stage >= 1 && <TabsTrigger value="skins">Skins</TabsTrigger>}
+              <TabsTrigger value="settings">{t("settings.title")}</TabsTrigger>
+              {stage && stage >= 1 && <TabsTrigger value="skins">{t("skinShop")}</TabsTrigger>}
             </TabsList>
             <TabsContent value="settings">
               <form onSubmit={handleSubmit}>
                 {Object.entries(settings).map(([key, value]) => (
                   <div key={key} className="mb-2">
                     <Label htmlFor={key} className="block mb-1">
-                      {key}
+                      {t(key)}
                     </Label>
                     <Input
                       type={key.includes('Url') ? 'text' : 'number'}
