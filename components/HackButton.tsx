@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { supabase } from "@/lib/supabaseClient";
 import GameBoard from './game/GameBoard';
 import DiceGame from './game/DiceGame';
-import { toast } from "@/hooks/use-toast";
+import { toast } from '@/hooks/use-toast';
 import { useTelegram } from '@/hooks/useTelegram';
 
 const HackButton: React.FC = () => {
@@ -14,19 +14,21 @@ const HackButton: React.FC = () => {
   const user = state.user;
   const [selectedGame, setSelectedGame] = useState<'cards' | 'dice' | null>(null);
   const [gamesVisited, setGamesVisited] = useState({ cards: false, dice: false });
-const { showBackButton } = useTelegram({
+
+  // Telegram hook with custom back button behavior
+  const { showBackButton } = useTelegram({
     onBackButtonPressed: () => {
       console.log('Back button pressed');
-      // Custom back navigation logic here
-      setSelectedGame(null)
+      // When back button is pressed, reset game selection
+      setSelectedGame(null);
     },
   });
 
-useEffect(() => {
-  showBackButton();
-}, [showBackButton]);
+  useEffect(() => {
+    showBackButton(); // Show back button when component mounts
+  }, [showBackButton]);
 
-const progressToStage1 = async () => {
+  const progressToStage1 = async () => {
     if (!user?.id) return;
     try {
       const { error } = await supabase
@@ -49,14 +51,12 @@ const progressToStage1 = async () => {
       console.error('Error updating game stage:', error);
     }
   };
-  
+
   useEffect(() => {
     if (gamesVisited.cards && gamesVisited.dice && user?.game_state?.stage === 0) {
       progressToStage1();
     }
   }, [progressToStage1, gamesVisited, user?.game_state?.stage]);
-
-  
 
   const handleClick = async () => {
     if (!user?.id) {
@@ -117,8 +117,8 @@ const progressToStage1 = async () => {
   };
 
   const handleGameSelect = (game: 'cards' | 'dice') => {
-    setSelectedGame(game);
-    setGamesVisited(prev => ({ ...prev, [game]: true }));
+    setSelectedGame(game); // Select the game
+    setGamesVisited(prev => ({ ...prev, [game]: true })); // Track games visited
   };
 
   return (
@@ -147,6 +147,8 @@ const progressToStage1 = async () => {
           )}
         </>
       )}
+
+      {/* Conditionally render the selected game */}
       {selectedGame === 'cards' && <GameBoard />}
       {selectedGame === 'dice' && <DiceGame />}
     </div>
