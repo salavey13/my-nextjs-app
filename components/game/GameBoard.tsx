@@ -322,28 +322,26 @@ const GameBoard: React.FC<{ goBack: () => void }> = ({ goBack }) => {
     return distance <= CARD_PROXIMITY_THRESHOLD + cardRadius + playerRadius;
   }, []);
 
+  // Show main button and set colors
   useEffect(() => {
     showMainButton(t('shuffle'));
-    tg?.MainButton?.setParams({color: "#e1ff01", text_color: "#000000"});
+    tg?.MainButton?.setParams({ color: "#e1ff01", text_color: "#000000" });
     setBottomBarColor("#282c33");
     setHeaderColor("#282c33");
-  }, [showMainButton, t, tg?.MainButton, setBottomBarColor, setHeaderColor]);
+  }, [showMainButton, t, tg, setBottomBarColor, setHeaderColor]);
 
+  // Handle main button click
   useEffect(() => {
     const handleMainButtonClick = () => {
-      shuffleCards();
+      shuffleCards(); // Function to shuffle cards
     };
 
-    if (tg?.MainButton) {
-      tg.MainButton.onClick(handleMainButtonClick);
-    }
+    tg?.MainButton?.onClick(handleMainButtonClick);
 
     return () => {
-      if (tg?.MainButton) {
-        tg.MainButton.offClick(handleMainButtonClick);
-      }
+      tg?.MainButton?.onClick();
     };
-  }, [shuffleCards, tg]);
+  }, [tg, shuffleCards]);
 
   useEffect(() => {
     const handleResize = () => {
