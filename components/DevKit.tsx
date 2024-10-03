@@ -111,6 +111,7 @@ export default function DevKit() {
       toast({
         title: t("devKit.success"),
         description: t("devKit.gameStateUpdated"),
+        variant: "success",
       })
     } catch (error) {
       console.error('Error updating game state:', error)
@@ -122,6 +123,19 @@ export default function DevKit() {
     }
   }
 
+  const renderStageTree = (stages: StoryStage[], parentId: string | null = null, depth = 0) => {
+    const childStages = stages.filter(stage => stage.parentId === parentId)
+    
+    return childStages.map(stage => (
+      <div key={stage.id} style={{ marginLeft: `${depth * 20}px` }}>
+        <SelectItem value={stage.stage.toString()}>
+          {t("devKit.stage")} {stage.stage} - {stage.storyContent.substring(0, 30)}...
+        </SelectItem>
+        {renderStageTree(stages, stage.id, depth + 1)}
+      </div>
+    ))
+  }
+
   if (state.user?.role !== 1) {
     return null
   }
@@ -130,7 +144,7 @@ export default function DevKit() {
     <Collapsible open={isOpen} onOpenChange={setIsOpen} className="w-full">
       <CollapsibleTrigger asChild>
         <Button variant="outline" className="w-full mb-2">
-          {isOpen ? "Hide DevKit" : "Show DevKit"}
+          {isOpen ? t("devKit.hideDevKit") : t("devKit.showDevKit")}
         </Button>
       </CollapsibleTrigger>
       <CollapsibleContent>
@@ -152,11 +166,7 @@ export default function DevKit() {
                       <SelectValue placeholder={t("devKit.selectStage")} />
                     </SelectTrigger>
                     <SelectContent>
-                      {storyStages.map((stage) => (
-                        <SelectItem key={stage.id} value={stage.stage.toString()}>
-                          {t("devKit.stage")} {stage.stage} (ID: {stage.id})
-                        </SelectItem>
-                      ))}
+                      {renderStageTree(storyStages)}
                     </SelectContent>
                   </Select>
                   <Input
