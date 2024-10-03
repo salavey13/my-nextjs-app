@@ -40,20 +40,29 @@ export const toast = ({ title, description, variant = "info", stage, lang = 'en'
 
   switch (variant) {
     case 'success':
-      toastOptions.style.background = 'rgba(0, 255, 0, 0.2)';
+      toastOptions.style = {
+        ...toastOptions.style,
+        background: 'rgba(0, 255, 0, 0.2)',
+      };
       toastOptions.icon = '✅';
       break;
     case 'error':
     case 'destructive':
-      toastOptions.style.background = 'rgba(255, 0, 0, 0.2)';
-      toastOptions.style.color = '#f00';
-      toastOptions.style.textShadow = '0 0 5px #f00';
+      toastOptions.style = {
+        ...toastOptions.style,
+        background: 'rgba(255, 0, 0, 0.2)',
+        color: '#f00',
+        textShadow: '0 0 5px #f00',
+      };
       toastOptions.icon = '🛑';
       break;
     case 'warning':
-      toastOptions.style.background = 'rgba(255, 165, 0, 0.2)';
-      toastOptions.style.color = '#ffa500';
-      toastOptions.style.textShadow = '0 0 5px #ffa500';
+      toastOptions.style = {
+        ...toastOptions.style,
+        background: 'rgba(255, 165, 0, 0.2)',
+        color: '#ffa500',
+        textShadow: '0 0 5px #ffa500',
+      };
       toastOptions.icon = '⚠️';
       break;
   }
@@ -68,7 +77,7 @@ export const toast = ({ title, description, variant = "info", stage, lang = 'en'
     const audio = new Audio(`/stage_${stage}_xuinity_${lang}.mp3`);
     
     setTimeout(() => {
-      audio.play();
+      audio.play().catch(error => console.error('Error playing audio:', error));
     }, 1000);
 
     return () => {
