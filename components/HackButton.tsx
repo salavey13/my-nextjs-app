@@ -14,18 +14,17 @@ const HackButton: React.FC = () => {
   const user = state.user;
   const [selectedGame, setSelectedGame] = useState<'cards' | 'dice' | null>(null);
   const [gamesVisited, setGamesVisited] = useState({ cards: false, dice: false });
-
-  // Telegram hook with custom back button behavior
+  
   const { showBackButton } = useTelegram({
     onBackButtonPressed: () => {
-      console.log('Back button pressed');
-      // When back button is pressed, reset game selection
-      setSelectedGame(null);
+      if (selectedGame !== null) {
+        setSelectedGame(null); // Go back to game selection if a game is active
+      }
     },
   });
 
   useEffect(() => {
-    showBackButton(); // Show back button when component mounts
+    showBackButton();
   }, [showBackButton]);
 
   const progressToStage1 = async () => {
@@ -117,8 +116,12 @@ const HackButton: React.FC = () => {
   };
 
   const handleGameSelect = (game: 'cards' | 'dice') => {
-    setSelectedGame(game); // Select the game
-    setGamesVisited(prev => ({ ...prev, [game]: true })); // Track games visited
+    setSelectedGame(game);
+    setGamesVisited(prev => ({ ...prev, [game]: true }));
+  };
+
+  const goBack = () => {
+    setSelectedGame(null); // Go back to game selection menu
   };
 
   return (
@@ -147,10 +150,8 @@ const HackButton: React.FC = () => {
           )}
         </>
       )}
-
-      {/* Conditionally render the selected game */}
-      {selectedGame === 'cards' && <GameBoard />}
-      {selectedGame === 'dice' && <DiceGame />}
+      {selectedGame === 'cards' && <GameBoard goBack={goBack} />}
+      {selectedGame === 'dice' && <DiceGame goBack={goBack} />}
     </div>
   );
 };
