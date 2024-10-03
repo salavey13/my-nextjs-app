@@ -15,7 +15,8 @@ const HackButton: React.FC = () => {
   const [selectedGame, setSelectedGame] = useState<'cards' | 'dice' | null>(null);
   const [gamesVisited, setGamesVisited] = useState({ cards: false, dice: false });
   
-  const { showBackButton } = useTelegram({
+  // Show the Close button on game selection instead of Back
+  const { showBackButton, showCloseButton } = useTelegram({
     onBackButtonPressed: () => {
       if (selectedGame !== null) {
         setSelectedGame(null); // Go back to game selection if a game is active
@@ -24,8 +25,13 @@ const HackButton: React.FC = () => {
   });
 
   useEffect(() => {
-    showBackButton();
-  }, [showBackButton]);
+    if (selectedGame === null) {
+      showCloseButton(); // Show Close button when selecting a game
+    } else {
+      showBackButton(); // Show Back button when inside a game
+    }
+  }, [selectedGame, showBackButton, showCloseButton]);
+
 
   const progressToStage1 = async () => {
     if (!user?.id) return;
