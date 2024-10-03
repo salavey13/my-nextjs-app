@@ -359,23 +359,23 @@ const GameBoard: React.FC<{ goBack: () => void }> = ({ goBack }) => {
   return (
     <Suspense fallback={<LoadingSpinner />}>
       <div className="game-board h-[calc(100vh-128px)] relative overflow-hidden">
-        <div className="absolute inset-0 z-0">
+        {/* <div className="absolute inset-0 z-0">
           <InfinityMirror layers={15} baseColor="#282c33" accentColor="#e1ff01" />
-        </div>
+        </div> */}
 
         <div className="relative z-10">
         <Settings
-        onUpdateSettings={(settings: GameSettings) => {
-          if (state.user) {
-            const updatedGameState = {
-              ...state.user.game_state,
-              settings: settings,
-            }
-            dispatch({ type: 'UPDATE_GAME_STATE', payload: updatedGameState })
-          }
-        }}
-        initialSettings={state.user?.game_state?.settings}
-      />
+            onUpdateSettings={(settings: GameSettings) => {
+              if (state.user) {
+                const updatedGameState = {
+                  ...state.user.game_state,
+                  settings: settings,
+                }
+                dispatch({ type: 'UPDATE_GAME_STATE', payload: updatedGameState })
+              }
+            }}
+            initialSettings={state.user?.game_state?.settings}
+          />
           {gameState?.cards.map((card) => (
             <MegaCard
               key={card.id}

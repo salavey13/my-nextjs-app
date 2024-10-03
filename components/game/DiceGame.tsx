@@ -73,7 +73,7 @@ function Dice({ position, onRollComplete, customTextures, gyro, isRolling, initi
     if (isRolling) {
       if (velocityRef.current.length() < 0.1 && angularVelocityRef.current.length() < 0.1) {
         stableFrames.current += 1;
-        if (stableFrames.current > 60) { // Wait for 60 frames of stability
+        if (stableFrames.current > 13) { // Wait for 13 frames of stability
           const rotation = ref.current?.rotation;
           if (rotation) {
             // Create a new Matrix4 from Euler rotation
