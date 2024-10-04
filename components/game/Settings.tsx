@@ -119,27 +119,32 @@ export const Settings: React.FC<SettingsProps> = ({ onUpdateSettings, initialSet
           <Tabs defaultValue="settings">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="settings">{t("settings.title")}</TabsTrigger>
-              {stage && stage >= 1 && <TabsTrigger value="skins">{t("skinShop")}</TabsTrigger>}
+              {stage !== null && stage >= 1 && <TabsTrigger value="skins">{t("skinShop")}</TabsTrigger>}
             </TabsList>
             <TabsContent value="settings">
               <form onSubmit={handleSubmit}>
-                {Object.entries(settings).map(([key, value]) => (
-                  <div key={key} className="mb-2">
-                    <Label htmlFor={key} className="block mb-1">
-                      {t(key)}
-                    </Label>
-                    <Input
-                      type={key.includes('Url') ? 'text' : 'number'}
-                      id={key}
-                      name={key}
-                      value={value}
-                      onChange={handleChange}
-                      step={key.includes('Url') ? undefined : '0.1'}
-                      className="w-full"
-                      disabled={stage !== null && stage < 1 && !key.includes('yeet')}
-                    />
-                  </div>
-                ))}
+                {Object.entries(settings).map(([key, value]) => {
+                  if (key.includes('Url') && stage !== null && stage < 2) {
+                    return null;
+                  }
+                  return (
+                    <div key={key} className="mb-2">
+                      <Label htmlFor={key} className="block mb-1">
+                        {t(key)}
+                      </Label>
+                      <Input
+                        type={key.includes('Url') ? 'text' : 'number'}
+                        id={key}
+                        name={key}
+                        value={value}
+                        onChange={handleChange}
+                        step={key.includes('Url') ? undefined : '0.1'}
+                        className="w-full"
+                        disabled={stage !== null && stage < 1 && !key.includes('yeet')}
+                      />
+                    </div>
+                  );
+                })}
                 <div className="flex justify-between mt-4">
                   <Button type="submit" className="w-1/2 mr-2" variant="outline">
                     {t("applySettings")}
@@ -150,7 +155,7 @@ export const Settings: React.FC<SettingsProps> = ({ onUpdateSettings, initialSet
                 </div>
               </form>
             </TabsContent>
-            {stage && stage >= 1 && (
+            {stage !== null && stage >= 1 && (
               <TabsContent value="skins">
                 <SkinShop />
               </TabsContent>
