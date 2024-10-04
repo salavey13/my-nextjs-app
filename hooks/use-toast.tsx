@@ -73,7 +73,7 @@ export const toast = ({ title, description, variant = "info", stage, lang = 'en'
     isGlitching = true;
   }, 100);
 
-  const audio = new Audio(`/stage_${stage}_xuinity_${lang}.mp3`);
+  const audio = new Audio(`/stage_${stage}_Xuinity_${lang}.mp3`);
   
   setTimeout(() => {
     audio.play().catch(error => console.error('Error playing audio:', error));
