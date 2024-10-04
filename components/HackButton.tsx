@@ -25,7 +25,7 @@ const HackButton: React.FC = () => {
 
   useEffect(() => {
     if (selectedGame === null) {
-      showCloseButton();
+      showBackButton();
     } else {
       showBackButton();
     }
