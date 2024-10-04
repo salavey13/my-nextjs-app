@@ -161,7 +161,7 @@ export default function HackButtonStoryShower() {
           lang: state.user.lang,
         })
 
-        if (nextStage.stage === 1 || nextStage.stage === 6) {
+        if (nextStage.stage === 2 || nextStage.stage === 6) {
           setShowCrashSimulation(true)
           setTimeout(() => setShowCrashSimulation(false), 5000)
         }
@@ -405,7 +405,10 @@ export default function HackButtonStoryShower() {
   )
 
   return (
-    <div className="space-y-6 relative">
+    <div className="game-board h-[calc(100vh-128px)] relative overflow-hidden">
+        {/* <div className="absolute inset-0 z-0">
+          <InfinityMirror layers={15} baseColor="#282c33" accentColor="#e1ff01" />
+        </div> */}
       {showCrashSimulation && (
         <div className="fixed inset-0 z-50">
           <InfinityMirror layers={10} baseColor="#000000" accentColor="#ff0000" />
