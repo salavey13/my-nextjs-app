@@ -540,13 +540,13 @@ const DiceGame: React.FC<{ goBack: () => void }> = ({ goBack }) => {
 
   return (
     <Suspense fallback={<LoadingSpinner />}>
-      <div className="game-board h-[calc(100vh-128px)] relative overflow-hidden">
+      <div className="game-board h-[calc(100vh-64px)] relative overflow-hidden">
         {!gameState ? (
-          <div className="flex flex-col justify-center items-center min-h-[calc(100vh-128px)] flex-grow">
+          <div className="flex flex-col justify-center items-center min-h-[calc(100vh-64px)] flex-grow">
             <GameModes onSelectMode={startGame} onShowRules={() => setShowRules(true)} />
           </div>
         ) : (
-          <div className="game-board absolute inset-0 min-h-[calc(100vh-128px)] w-full overflow-hidden">
+          <div className="game-board absolute inset-0 min-h-[calc(100vh-64px)] w-full overflow-hidden">
             <Canvas shadows className="w-full h-full">
               <Scene gameState={gameState} onRollComplete={handleRollComplete} wallTexture={wallTexture} />
             </Canvas>
