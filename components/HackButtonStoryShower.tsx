@@ -35,15 +35,15 @@ import { debounce } from 'lodash'
 
 interface StoryStage {
   id: string;
-  parentId: string | null;
+  parentid: string | null;
   stage: number;
-  storyContent: string;
-  xuinityDialog: string;
+  storycontent: string;
+  xuinitydialog: string;
   trigger: string;
-  activeComponent: string;
+  activecomponent: string;
   minigame: string;
   achievement: string;
-  bottomShelfBitmask: number;
+  bottomshelfbitmask: number;
 }
 
 interface MinigameState {
@@ -73,9 +73,9 @@ export default function HackButtonStoryShower() {
       const stage = storyStages.find(s => s.stage === state.user?.game_state.stage)
       if (stage) {
         setCurrentStage(stage)
-        setXuinityDialog(stage.xuinityDialog)
+        setXuinityDialog(stage.xuinitydialog)
         initializeMinigame(stage.minigame)
-        setShowBottomShelf(stage.bottomShelfBitmask > 1)
+        setShowBottomShelf(stage.bottomshelfbitmask > 1)
       }
     }
   }, [storyStages, state.user?.game_state?.stage])
@@ -133,7 +133,7 @@ export default function HackButtonStoryShower() {
   const handleStageProgression = async () => {
     if (!currentStage || !state.user) return
 
-    const nextStage = storyStages.find(s => s.parentId === currentStage.id)
+    const nextStage = storyStages.find(s => s.parentid === currentStage.id)
     if (nextStage) {
       const updatedGameState = {
         ...state.user.game_state,
@@ -150,9 +150,9 @@ export default function HackButtonStoryShower() {
 
         dispatch({ type: 'UPDATE_GAME_STATE', payload: updatedGameState })
         setCurrentStage(nextStage)
-        setXuinityDialog(nextStage.xuinityDialog)
+        setXuinityDialog(nextStage.xuinitydialog)
         initializeMinigame(nextStage.minigame)
-        setShowBottomShelf(nextStage.bottomShelfBitmask > 1)
+        setShowBottomShelf(nextStage.bottomshelfbitmask > 1)
 
         toast({
           title: t('achievementUnlocked'),
@@ -170,7 +170,7 @@ export default function HackButtonStoryShower() {
         if (sideHustle && sideHustle.trigger === nextStage.trigger) {
           toast({
             title: t('sideHustleUnlocked'),
-            description: sideHustle.storyContent,
+            description: sideHustle.storycontent,
             stage: nextStage.stage,
             lang: state.user.lang,
           })
