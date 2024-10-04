@@ -127,18 +127,26 @@ export default function DevKit() {
     const childStages = stages.filter(stage => stage.parentId === parentId)
     
     return childStages.map(stage => (
-      <div key={stage.id} style={{ marginLeft: `${depth * 20}px` }}>
-        <SelectItem value={stage.stage.toString()}>
-          (ID: {stage.id}) (parentId: {stage.parentId}) {t("devKit.stage")} {stage.stage} 
-          (xuinityDialog: {stage.xuinityDialog.substring(0, 30)}...) 
-          (storyContent: {stage.storyContent.substring(0, 30)}...) 
-          (achievement: {stage.achievement}) 
-          (activeComponent: {stage.activeComponent}) 
-          (minigame: {stage.minigame}) 
-          (trigger: {stage.trigger})
+      <React.Fragment key={stage.id}>
+        <SelectItem value={stage.stage.toString()} className="text-xs">
+          <div style={{ marginLeft: `${depth * 20}px` }}>
+            (ID: {stage.id}) (parentId: {stage.parentId}) {t("devKit.stage")} {stage.stage} 
+            <br />
+            (xuinityDialog: {stage.xuinityDialog.substring(0, 30)}...) 
+            <br />
+            (storyContent: {stage.storyContent.substring(0, 30)}...) 
+            <br />
+            (achievement: {stage.achievement}) 
+            <br />
+            (activeComponent: {stage.activeComponent}) 
+            <br />
+            (minigame: {stage.minigame}) 
+            <br />
+            (trigger: {stage.trigger})
+          </div>
         </SelectItem>
         {renderStageTree(stages, stage.id, depth + 1)}
-      </div>
+      </React.Fragment>
     ))
   }
 
