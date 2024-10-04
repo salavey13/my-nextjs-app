@@ -15,42 +15,42 @@ const HackButton: React.FC = () => {
   const [selectedGame, setSelectedGame] = useState<'cards' | 'dice' | null>(null);
   const [gamesVisited, setGamesVisited] = useState({ cards: false, dice: false });
   
-  // Show the Close button on game selection instead of Back
   const { showBackButton, showCloseButton } = useTelegram({
     onBackButtonPressed: () => {
       if (selectedGame !== null) {
-        setSelectedGame(null); // Go back to game selection if a game is active
+        setSelectedGame(null);
       }
     },
   });
 
   useEffect(() => {
     if (selectedGame === null) {
-      showBackButton()//showCloseButton(); // Show Close button when selecting a game
+      showCloseButton();
     } else {
-      showBackButton(); // Show Back button when inside a game
+      showBackButton();
     }
   }, [selectedGame, showBackButton, showCloseButton]);
 
-
-  const progressToStage1 = async () => {
+  const progressStage = async (newStage: number) => {
     if (!user?.id) return;
     try {
       const { error } = await supabase
         .from('users')
-        .update({ 'game_state.stage': 1 })
+        .update({ 'game_state.stage': newStage })
         .eq('id', user.id);
 
       if (error) throw error;
 
       dispatch({
         type: 'UPDATE_GAME_STATE',
-        payload: { ...user.game_state, stage: 1 },
+        payload: { ...user.game_state, stage: newStage },
       });
 
       toast({
         title: t('stageProgression'),
-        description: t('unlockedHackButton'),
+        description: t(`stage${newStage}Unlocked`),
+        stage: newStage,
+        lang: user.lang,
       });
     } catch (error) {
       console.error('Error updating game stage:', error);
@@ -59,11 +59,11 @@ const HackButton: React.FC = () => {
 
   useEffect(() => {
     if (gamesVisited.cards && gamesVisited.dice && user?.game_state?.stage === 0) {
-      progressToStage1();
+      progressStage(1);
     }
-  }, [progressToStage1, gamesVisited, user?.game_state?.stage]);
+  }, [gamesVisited, user?.game_state?.stage]);
 
-  const handleClick = async () => {
+  const handleHackButtonClick = async () => {
     if (!user?.id) {
       toast({
         title: t('error'),
@@ -83,21 +83,18 @@ const HackButton: React.FC = () => {
       if (fetchError) throw fetchError;
 
       const newCoinsValue = (userData?.coins || 0) + 13000;
-      const newGameState = {
-        ...userData?.game_state,
-        stage: userData?.game_state?.stage === 1 ? 2 : userData?.game_state?.stage,
-      };
+      const newStage = userData?.game_state?.stage === 1 ? 2 : userData?.game_state?.stage;
 
       const { error } = await supabase
         .from('users')
-        .update({ coins: newCoinsValue, game_state: newGameState })
+        .update({ coins: newCoinsValue, 'game_state.stage': newStage })
         .eq('id', user.id);
 
       if (error) throw error;
 
       dispatch({
         type: 'UPDATE_USER',
-        payload: { coins: newCoinsValue, game_state: newGameState },
+        payload: { coins: newCoinsValue, game_state: { ...userData?.game_state, stage: newStage } },
       });
 
       toast({
@@ -105,11 +102,8 @@ const HackButton: React.FC = () => {
         description: t('congratulationsMessage'),
       });
 
-      if (newGameState.stage === 2) {
-        toast({
-          title: t('stageProgression'),
-          description: t('unlockedSkinCustomization'),
-        });
+      if (newStage === 2) {
+        progressStage(2);
       }
     } catch (error) {
       console.error('Error updating balance:', error);
@@ -127,7 +121,7 @@ const HackButton: React.FC = () => {
   };
 
   const goBack = () => {
-    setSelectedGame(null); // Go back to game selection menu
+    setSelectedGame(null);
   };
 
   return (
@@ -148,7 +142,7 @@ const HackButton: React.FC = () => {
           </Button>
           {user?.game_state?.stage === 1 && (
             <Button
-              onClick={handleClick}
+              onClick={handleHackButtonClick}
               className="bg-yellow-500 text-black text-xl px-6 py-3 rounded-lg shadow-lg hover:bg-yellow-600 transition-all"
             >
               {t('hackButton')}
