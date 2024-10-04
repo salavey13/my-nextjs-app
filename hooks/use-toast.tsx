@@ -74,17 +74,26 @@ export const toast = ({ title, description, variant = "info", stage, lang = 'en'
       isGlitchingRef.current = true;
     }, 100);
 
-    const audio = new Audio(`/stage_${stage}_xuinity_${lang}.mp3`);
-    
-    const audioTimeout = setTimeout(() => {
-      audio.play().catch(error => console.error('Error playing audio:', error));
-    }, 1000);
+    if (stage !== undefined && lang) {
+      const audio = new Audio(`/stage_${stage}_xuinity_${lang}.mp3`);
+      
+      const audioTimeout = setTimeout(() => {
+        audio.play().catch(error => {
+          console.error('Error playing audio:', error);
+          // If the file is missing or there's another error, we just log it and continue
+        });
+      }, 1000);
 
-    return () => {
-      clearInterval(glitchInterval);
-      clearTimeout(audioTimeout);
-      audio.pause();
-    };
+      return () => {
+        clearInterval(glitchInterval);
+        clearTimeout(audioTimeout);
+        audio.pause();
+      };
+    } else {
+      return () => {
+        clearInterval(glitchInterval);
+      };
+    }
   }, [title, description, stage, lang]);
 
   hotToast.custom(
