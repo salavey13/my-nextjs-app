@@ -18,7 +18,7 @@ export default function HackButtonPage() {
   }, [state?.user?.game_state, state.user?.game_state?.stage])
 
   return (
-    <div className="container mx-auto py-8">
+    <div className="container mx-auto py-16">
       {showStoryShower ? <HackButtonStoryShower /> : <HackButton />}
       {state.user?.role === 1 && (
         <>
