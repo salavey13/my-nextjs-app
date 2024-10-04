@@ -1,5 +1,14 @@
 import { LanguageDictionary } from "../utils/TranslationUtils";
 export const ru: LanguageDictionary = {
+  
+  "storyEditor": "Редактор сказок",
+  "editStage": "Потеребонькать уровень",
+  "addNewStage": "Напихать новый уровень",
+  "devKit": {
+    "playersPerStage": "Хомяков на уровень"
+  },
+
+
   cardsImgUrl: "URL-адрес спрайтов для карт",
   shirtImgUrl: "URL изображения рубашки",
   yeetCoefficient: "Коэффициент Йита",
