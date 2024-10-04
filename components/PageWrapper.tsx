@@ -16,7 +16,7 @@ export default function PageWrapper({ children }: PageWrapperProps) {
   //&& pathname !== '/hackbutton'
 
   const currentStage = user?.game_state?.stage || 0
-  const bottomShelfBitmask = user?.game_state?.bottomshelfbitmask || 1 << currentStage
+  const bottomShelfBitmask =  1 << currentStage
 
   return (
     <>
