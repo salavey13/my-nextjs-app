@@ -276,7 +276,7 @@ nav {
 .game-board {
   position: relative;
   width: 100vw;
-  height: 100vh - 128px;
+  height: 100vh - 64px;
   overflow: hidden;
 }
 
