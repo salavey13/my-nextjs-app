@@ -7,7 +7,7 @@ import LoadingSpinner from "./ui/LoadingSpinner"
 import Image from "next/image"
 import { useAppContext } from "@/context/AppContext"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { motion } from "framer-motion"
+import { motion, AnimatePresence } from "framer-motion"
 
 interface Item {
   id: number
@@ -51,6 +51,7 @@ export default function MainSection({ setItemDetailsModalOpen, setSelectedItem, 
   const [selectedCreator, setSelectedCreator] = useState<string | null>(null)
   const [loading, setLoading] = useState<boolean>(true)
   const [showOnboarding, setShowOnboarding] = useState<boolean>(true)
+  const [showEmptyScreen, setShowEmptyScreen] = useState<boolean>(false)
 
   const fetchCreators = useCallback(() => {
     setLoading(true)
@@ -77,6 +78,12 @@ export default function MainSection({ setItemDetailsModalOpen, setSelectedItem, 
     setItemDetailsModalOpen(true)
   }
 
+  const handleEnterSystem = () => {
+    setShowOnboarding(false)
+    setShowEmptyScreen(true)
+    setTimeout(() => setShowEmptyScreen(false), 500) // Adjust timing as needed
+  }
+
   if (loading) {
     return <LoadingSpinner />
   }
@@ -85,6 +92,7 @@ export default function MainSection({ setItemDetailsModalOpen, setSelectedItem, 
     <motion.div
       initial={{ opacity: 0, y: 50 }}
       animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -50 }}
       transition={{ duration: 0.5 }}
       className="w-full min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 to-black text-white p-4"
     >
@@ -110,7 +118,7 @@ export default function MainSection({ setItemDetailsModalOpen, setSelectedItem, 
             This isn&apos;t just a game. It&apos;s a rebellion against limitations, a journey into the heart of technology&apos;s potential, and a stark warning about the power we wield in the digital age. Are you ready to hack the system, or will the system hack you?
           </p>
           <Button 
-            onClick={() => setShowOnboarding(false)} 
+            onClick={handleEnterSystem}
             className="w-full mt-6 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition-colors duration-200"
           >
             Enter the System
@@ -122,70 +130,79 @@ export default function MainSection({ setItemDetailsModalOpen, setSelectedItem, 
 
   return (
     <div className="w-full min-h-[calc(100vh-128px)]">
-      {showOnboarding ? (
-        <OnboardingSection />
-        <div className="w-full min-h-[calc(100vh-128px)]"/>
-      ) : !selectedCreator ? (
-        <div className="grid gap-4 p-4 md:grid-cols-2 lg:grid-cols-3">
-          {creators.map((creator) => (
-            <Button
-              key={creator.ref_code}
-              className="w-full h-40 p-0 overflow-hidden"
-              onClick={() => setSelectedCreator(creator.ref_code)}
-            >
-              <div className="relative w-full h-full">
-                <div
-                  className="absolute inset-0 bg-cover bg-center z-0"
-                  style={{ backgroundImage: `url(${creator.image})` }}
-                ></div>
-                <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-                  <span className="text-white text-xl font-bold">{creator.name}</span>
-                </div>
-              </div>
-            </Button>
-          ))}
-        </div>
-      ) : (
+      <AnimatePresence>
+        {showOnboarding && <OnboardingSection />}
+      </AnimatePresence>
+      {showEmptyScreen && (
+        <div className="w-full min-h-[calc(100vh-128px)] bg-black" />
+      )}
+      {!showOnboarding && !showEmptyScreen && (
         <>
-          <div className="fixed top-20 left-0 w-full flex justify-center z-20">
-            <div className="bg-white/80 backdrop-blur-sm p-2 rounded-lg flex space-x-4">
-              <Button
-                onClick={() => setSelectedCreator(null)}
-                className="px-6 py-3 text-white rounded-lg bg-gradient-to-r from-gray-500 to-gray-700 hover:from-gray-600 hover:to-gray-800 transition-all"
-              >
-                {t("backToCreators")}
-              </Button>
-            </div>
-          </div>
-          <main className="w-full min-h-screen grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
-            {items.filter(item => item.creator_ref_code === selectedCreator).map((item) => (
-              <motion.div
-                key={item.id}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.3 }}
-                className="relative w-full h-[500px] rounded-lg overflow-hidden shadow-lg"
-              >
-                <div
-                  className="absolute inset-0 bg-cover bg-center z-0"
-                  style={{ backgroundImage: `url(${item.details.photo_upload?.photo})` }}
-                ></div>
-                <div className="absolute inset-0 bg-black/50 z-1"></div>
-                <div className="relative z-10 h-full flex flex-col justify-between p-6">
-                  <div className="text-white">
-                    <h2 className="text-2xl font-bold mb-2">{item.details.ad_info?.title}</h2>
-                    <p className="text-sm">{item.details.ad_info?.description}</p>
+          {!selectedCreator ? (
+            <div className="grid gap-4 p-4 md:grid-cols-2 lg:grid-cols-3">
+              {creators.map((creator) => (
+                <Button
+                  key={creator.ref_code}
+                  className="w-full h-40 p-0 overflow-hidden"
+                  onClick={() => setSelectedCreator(creator.ref_code)}
+                >
+                  <div className="relative w-full h-full">
+                    <div
+                      className="absolute inset-0 bg-cover bg-center z-0"
+                      style={{ backgroundImage: `url(${creator.image})` }}
+                    ></div>
+                    <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+                      <span className="text-white text-xl font-bold">{creator.name}</span>
+                    </div>
                   </div>
+                </Button>
+              ))}
+            </div>
+          ) : (
+            <>
+              <div className="fixed top-20 left-0 w-full flex justify-center z-20">
+                <div className="bg-white/80 backdrop-blur-sm p-2 rounded-lg flex space-x-4">
                   <Button
-                    className="w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200"
-                    onClick={() => handleItemClick(item)}
+                    onClick={() => setSelectedCreator(null)}
+                    className="px-6 py-3 text-white rounded-lg bg-gradient-to-r from-gray-500 to-gray-700 hover:from-gray-600 hover:to-gray-800 transition-all"
                   >
-                    {t("rentNow")}
+                    {t("backToCreators")}
                   </Button>
                 </div>
-              </motion.div>
-            ))}
-          </main>
+              </div>
+              <main className="w-full min-h-screen grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
+                {items
+                  .filter(item => item.creator_ref_code === selectedCreator)
+                  .map((item) => (
+                    <motion.div
+                      key={item.id}
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ duration: 0.3 }}
+                      className="relative w-full h-[500px] rounded-lg overflow-hidden shadow-lg"
+                    >
+                      <div
+                        className="absolute inset-0 bg-cover bg-center z-0"
+                        style={{ backgroundImage: `url(${item.details.photo_upload?.photo || '/placeholder.jpg'})` }}
+                      ></div>
+                      <div className="absolute inset-0 bg-black/50 z-1"></div>
+                      <div className="relative z-10 h-full flex flex-col justify-between p-6">
+                        <div className="text-white">
+                          <h2 className="text-2xl font-bold mb-2">{item.details.ad_info?.title || 'Untitled'}</h2>
+                          <p className="text-sm">{item.details.ad_info?.description || 'No description available'}</p>
+                        </div>
+                        <Button
+                          className="w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200"
+                          onClick={() => handleItemClick(item)}
+                        >
+                          {t("rentNow")}
+                        </Button>
+                      </div>
+                    </motion.div>
+                  ))}
+              </main>
+            </>
+          )}
         </>
       )}
     </div>
