@@ -31,8 +31,8 @@ export default function RootLayout({
               <PageWrapper>
                 {children}
               </PageWrapper>
+              <GlitchyToastProvider />
             </main>
-            <GlitchyToastProvider />
           </AppProvider>
         </Suspense>
       </body>
