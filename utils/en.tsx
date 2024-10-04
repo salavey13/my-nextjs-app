@@ -1,6 +1,12 @@
 import { LanguageDictionary } from "../utils/TranslationUtils";
 export const en: LanguageDictionary = {
   // ... (existing translations)
+  "storyEditor": "Story Editor",
+  "editStage": "Edit Stage",
+  "addNewStage": "Add New Stage",
+  "devKit": {
+    "playersPerStage": "Players per Stage"
+  },
   cardImgUrl: "Card sprite URL",
   shirtImgUrl: "Shirt image URL",
   yeetCoefficient: "Yeet Coefficient",
