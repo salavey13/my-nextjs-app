@@ -405,7 +405,7 @@ export default function HackButtonStoryShower() {
   )
 
   return (
-    <div className="game-board h-[calc(100vh-128px)] justify-start items-start pt-16 relative overflow-y-scroll">
+    <div className="game-board h-[calc(100vh-128px)] justify-start items-start relative overflow-hidden">
         {/* <div className="absolute inset-0 z-0">
           <InfinityMirror layers={15} baseColor="#282c33" accentColor="#e1ff01" />
         </div> */}
@@ -437,7 +437,8 @@ export default function HackButtonStoryShower() {
         </CardContent>
       </Card>
       {showBottomShelf && <BottomShelf bitmask={currentStage?.bottomshelfbitmask || 0} />}
-      <Settings
+      <div className="relative z-10">
+       <Settings
         onUpdateSettings={(settings: GameSettings) => {
           if (state.user) {
             const updatedGameState = {
@@ -449,6 +450,7 @@ export default function HackButtonStoryShower() {
         }}
         initialSettings={state.user?.game_state?.settings}
       />
+        </div>
     </div>
   )
 }
