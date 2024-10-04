@@ -17,7 +17,6 @@ const distortText = (text: string) => {
     Math.random() > 0.7 ? String.fromCharCode(char.charCodeAt(0) + Math.floor(Math.random() * 5)) : char
   ).join('');
 };
-
 export const toast = ({ title, description, variant = "info", stage, lang = 'en' }: ToastParams) => {
   let distortedTitle = title;
   let distortedDescription = description || '';
@@ -35,7 +34,7 @@ export const toast = ({ title, description, variant = "info", stage, lang = 'en'
       textShadow: '0 0 5px #0f0',
     },
     icon: '⚠️',
-    duration: 4213,
+    duration: 4213, // Make sure this duration is enough for your needs
   };
 
   switch (variant) {
@@ -67,6 +66,7 @@ export const toast = ({ title, description, variant = "info", stage, lang = 'en'
       break;
   }
 
+  // Glitch effect interval
   const glitchInterval = setInterval(() => {
     distortedTitle = distortText(title);
     distortedDescription = distortText(description || '');
@@ -79,30 +79,37 @@ export const toast = ({ title, description, variant = "info", stage, lang = 'en'
     audio.play().catch(error => console.error('Error playing audio:', error));
   }, 1000);
 
+  // Show the toast
   hotToast.custom(
-    (t) => (
-      <ShineBorder
-        className={`${
-          t.visible ? 'animate-enter' : 'animate-leave'
-        } max-w-md w-full pointer-events-auto flex ring-1 ring-black ring-opacity-5`}
-        color={isGlitching ? "#e1ff01" : "#000000"}
-      >
-        <div className="flex-1 w-0 p-4">
-          <div className="flex items-start">
-            <div className="ml-3 flex-1">
-              <p className="text-sm font-medium text-gray-900">{distortedTitle}</p>
-              {distortedDescription && (
-                <p className="mt-1 text-sm text-gray-500">{distortedDescription}</p>
-              )}
+    (t) => {
+      if (!t.visible) {
+        clearInterval(glitchInterval); // Clear interval when toast disappears
+      }
+
+      return (
+        <ShineBorder
+          className={`${
+            t.visible ? 'animate-enter' : 'animate-leave'
+          } max-w-md w-full pointer-events-auto flex ring-1 ring-black ring-opacity-5`}
+          color={isGlitching ? "#e1ff01" : "#000000"}
+        >
+          <div className="flex-1 w-0 p-4">
+            <div className="flex items-start">
+              <div className="ml-3 flex-1">
+                <p className="text-sm font-medium text-gray-900">{distortedTitle}</p>
+                {distortedDescription && (
+                  <p className="mt-1 text-sm text-gray-500">{distortedDescription}</p>
+                )}
+              </div>
             </div>
           </div>
-        </div>
-      </ShineBorder>
-    ),
+        </ShineBorder>
+      );
+    },
     toastOptions
   );
 };
 
 export const GlitchyToastProvider = () => {
-  return <Toaster position="top-right" />;
+  return <Toaster position="top-right"/>;
 };
