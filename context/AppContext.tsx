@@ -211,7 +211,7 @@ const initialState: AppState = {
       settings: {
         yeetCoefficient: 1,
         yeetVelocityThreshold: 10,
-        shirtImgUrl: "https://www.shutterstock.com/shutterstock/photos/2052450218/display_1500/stock-vector-classic-poker-card-backs-with-space-for-logos-2052450218.jpg",
+        shirtImgUrl: "https://thumbs4.imagebam.com/76/dd/61/MEWDIXW_t.png",
         cardsImgUrl: "https://example.com/cards.jpg"
       }
     },
