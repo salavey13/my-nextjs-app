@@ -12,11 +12,11 @@ export default function PageWrapper({ children }: PageWrapperProps) {
   const pathname = usePathname()
   const { state } = useAppContext()
   const user = state.user
-  const showBottomShelf = pathname !== '/' 
+  const showBottomShelf = user?.game_state?.stage && user?.game_state?.stage > 2 || pathname === '/profile' //pathname !== '/' 
   //&& pathname !== '/hackbutton'
 
   const currentStage = user?.game_state?.stage || 0
-  const bottomShelfBitmask = 1 << currentStage
+  const bottomShelfBitmask = user?.game_state?.bottomshelfbitmask || 1 << currentStage
 
   return (
     <>
