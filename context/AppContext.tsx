@@ -224,7 +224,7 @@ const initialState: AppState = {
       fool: {
         cards: {
           cards_img_url: "https://example.com/cards.jpg",
-          shirt_img_url: "https://www.shutterstock.com/shutterstock/photos/2052450218/display_1500/stock-vector-classic-poker-card-backs-with-space-for-logos-2052450218.jpg"
+          shirt_img_url: "https://thumbs4.imagebam.com/76/dd/61/MEWDIXW_t.png"
         }
       }
     }
