@@ -90,7 +90,7 @@ export const toast = ({ title, description, variant = "info", stage, lang = 'en'
         <ShineBorder
           className={`${
             t.visible ? 'animate-enter' : 'animate-leave'
-          } max-w-md w-full pointer-events-auto flex ring-1 ring-black ring-opacity-5`}
+          } max-w-md w-full top-16 pointer-events-auto flex ring-1 ring-black ring-opacity-5`}
           color={isGlitching ? "#e1ff01" : "#000000"}
         >
           <div className="flex-1 w-0 p-4">
