@@ -125,7 +125,7 @@ const HackButton: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col justify-center items-center min-h-[calc(100vh-128px)]">
+    <div className="flex flex-col justify-center items-center min-h-[calc(100vh-64px)]">
       {!selectedGame && (
         <>
           <Button
