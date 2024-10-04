@@ -150,6 +150,14 @@ export default function DevKit() {
     ))
   }
 
+  const renderStageOptions = (stages: StoryStage[]) => {
+    return stages.map((stage) => (
+      <SelectItem key={stage.id} value={stage.stage.toString()}>
+        Stage {stage.stage} - {stage.storyContent.substring(0, 30)}...
+      </SelectItem>
+    ))
+  }
+
   if (state.user?.role !== 1) {
     return null
   }
@@ -180,12 +188,7 @@ export default function DevKit() {
                       <SelectValue placeholder={t("devKit.selectStage")} />
                     </SelectTrigger>
                     <SelectContent>
-                      {/* {renderStageTree(storyStages)} */}
-                      {storyStages.map((stage) => (
-                        <SelectItem key={stage.id} value={stage.stage.toString()}>
-                          (ID: {stage.id}) (parentId: {stage.parentId}) {t("devKit.stage")} {stage.stage}  (xuinitydialog: {stage.xuinityDialog}) (storycontent: {stage.storyContent})  (achievement: {stage.achievement})  (activecomponent: {stage.activeComponent})  (minigame: {stage.minigame}) (trigger: {stage.trigger})
-                        </SelectItem>
-                      ))}
+                      {renderStageOptions(storyStages)}
                     </SelectContent>
                   </Select>
                   <Input
