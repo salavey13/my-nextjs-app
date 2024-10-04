@@ -179,7 +179,7 @@ export default function DevKit() {
           </CardHeader>
           <CardContent>
             <Tabs defaultValue="gameState">
-              <TabsList className="w-full flex justify-between mb-4">
+              <TabsList className="w-full flex justify-between overflow-x-auto mb-4">
                 <TabsTrigger value="gameState" className="flex-1">{t("devKit.gameState")}</TabsTrigger>
                 <TabsTrigger value="storyEdit" className="flex-1">{t("devKit.storyEdit")}</TabsTrigger>
                 <TabsTrigger value="stats" className="flex-1">{t("devKit.stats")}</TabsTrigger>
