@@ -85,7 +85,6 @@ export default function MainSection({ setItemDetailsModalOpen, setSelectedItem, 
     <motion.div
       initial={{ opacity: 0, y: 50 }}
       animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -50 }}
       transition={{ duration: 0.5 }}
       className="w-full min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 to-black text-white p-4"
     >
@@ -122,9 +121,10 @@ export default function MainSection({ setItemDetailsModalOpen, setSelectedItem, 
   )
 
   return (
-    <div className="w-full min-h-screen">
+    <div className="w-full min-h-[calc(100vh-128px)]">
       {showOnboarding ? (
         <OnboardingSection />
+        <div className="w-full min-h-[calc(100vh-128px)]"/>
       ) : !selectedCreator ? (
         <div className="grid gap-4 p-4 md:grid-cols-2 lg:grid-cols-3">
           {creators.map((creator) => (
