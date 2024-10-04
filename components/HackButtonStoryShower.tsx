@@ -405,7 +405,7 @@ export default function HackButtonStoryShower() {
   )
 
   return (
-    <div className="flex flex-col justify-center items-center min-h-[calc(100vh-128px)] overflow-y-auto">
+    <div className="flex flex-col justify-center items-center min-h-[calc(100vh-64px)] overflow-y-auto">
       {/* <div className="absolute inset-0 z-0">
           <InfinityMirror layers={15} baseColor="#282c33" accentColor="#e1ff01" />
         </div> */}
