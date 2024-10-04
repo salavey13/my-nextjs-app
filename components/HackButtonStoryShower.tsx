@@ -405,7 +405,7 @@ export default function HackButtonStoryShower() {
   )
 
   return (
-    <div className="game-board h-[calc(100vh-64px)] pt-16 relative overflow-hidden">
+    <div className="game-board h-[calc(100vh-64px)] pt-16 relative overflow-visible">
         {/* <div className="absolute inset-0 z-0">
           <InfinityMirror layers={15} baseColor="#282c33" accentColor="#e1ff01" />
         </div> */}
