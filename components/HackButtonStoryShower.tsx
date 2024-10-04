@@ -433,7 +433,7 @@ export default function HackButtonStoryShower() {
           </motion.div>
         </CardContent>
       </Card>
-      {showBottomShelf && <BottomShelf bitmask={currentStage?.bottomShelfBitmask || 0} />}
+      {showBottomShelf && <BottomShelf bitmask={currentStage?.bottomshelfbitmask || 0} />}
       <Settings
         onUpdateSettings={(settings: GameSettings) => {
           if (state.user) {
