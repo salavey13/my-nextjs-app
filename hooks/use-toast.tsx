@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { Toaster, toast as hotToast, ToastOptions } from "react-hot-toast";
 import ShineBorder from "@/components/ui/ShineBorder";
 
@@ -19,9 +19,9 @@ const distortText = (text: string) => {
 };
 
 export const toast = ({ title, description, variant = "info", stage, lang = 'en' }: ToastParams) => {
-  const [distortedTitle, setDistortedTitle] = useState(title);
-  const [distortedDescription, setDistortedDescription] = useState(description || '');
-  const [isGlitching, setIsGlitching] = useState(false);
+  const distortedTitleRef = useRef(title);
+  const distortedDescriptionRef = useRef(description || '');
+  const isGlitchingRef = useRef(false);
 
   const toastOptions: ToastOptions = {
     style: {
@@ -69,19 +69,20 @@ export const toast = ({ title, description, variant = "info", stage, lang = 'en'
 
   useEffect(() => {
     const glitchInterval = setInterval(() => {
-      setDistortedTitle(distortText(title));
-      setDistortedDescription(distortText(description || ''));
-      setIsGlitching(true);
+      distortedTitleRef.current = distortText(title);
+      distortedDescriptionRef.current = distortText(description || '');
+      isGlitchingRef.current = true;
     }, 100);
 
     const audio = new Audio(`/stage_${stage}_xuinity_${lang}.mp3`);
     
-    setTimeout(() => {
+    const audioTimeout = setTimeout(() => {
       audio.play().catch(error => console.error('Error playing audio:', error));
     }, 1000);
 
     return () => {
       clearInterval(glitchInterval);
+      clearTimeout(audioTimeout);
       audio.pause();
     };
   }, [title, description, stage, lang]);
@@ -92,14 +93,14 @@ export const toast = ({ title, description, variant = "info", stage, lang = 'en'
         className={`${
           t.visible ? 'animate-enter' : 'animate-leave'
         } max-w-md w-full pointer-events-auto flex ring-1 ring-black ring-opacity-5`}
-        color={isGlitching ? "#e1ff01" : "#000000"}
+        color={isGlitchingRef.current ? "#e1ff01" : "#000000"}
       >
         <div className="flex-1 w-0 p-4">
           <div className="flex items-start">
             <div className="ml-3 flex-1">
-              <p className="text-sm font-medium text-gray-900">{distortedTitle}</p>
-              {distortedDescription && (
-                <p className="mt-1 text-sm text-gray-500">{distortedDescription}</p>
+              <p className="text-sm font-medium text-gray-900">{distortedTitleRef.current}</p>
+              {distortedDescriptionRef.current && (
+                <p className="mt-1 text-sm text-gray-500">{distortedDescriptionRef.current}</p>
               )}
             </div>
           </div>

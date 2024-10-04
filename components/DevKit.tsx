@@ -129,7 +129,13 @@ export default function DevKit() {
     return childStages.map(stage => (
       <div key={stage.id} style={{ marginLeft: `${depth * 20}px` }}>
         <SelectItem value={stage.stage.toString()}>
-          {t("devKit.stage")} {stage.stage} - {stage.storyContent.substring(0, 30)}...
+          (ID: {stage.id}) (parentId: {stage.parentId}) {t("devKit.stage")} {stage.stage} 
+          (xuinityDialog: {stage.xuinityDialog.substring(0, 30)}...) 
+          (storyContent: {stage.storyContent.substring(0, 30)}...) 
+          (achievement: {stage.achievement}) 
+          (activeComponent: {stage.activeComponent}) 
+          (minigame: {stage.minigame}) 
+          (trigger: {stage.trigger})
         </SelectItem>
         {renderStageTree(stages, stage.id, depth + 1)}
       </div>
