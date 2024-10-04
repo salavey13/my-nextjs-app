@@ -124,7 +124,7 @@ export const Settings: React.FC<SettingsProps> = ({ onUpdateSettings, initialSet
             <TabsContent value="settings">
               <form onSubmit={handleSubmit}>
                 {Object.entries(settings).map(([key, value]) => {
-                  if (key.includes('Url') && stage !== null && stage < 2) {
+                  if (stage !== null && stage < 2 && !key.includes('yeet')) {
                     return null;
                   }
                   return (
@@ -140,7 +140,6 @@ export const Settings: React.FC<SettingsProps> = ({ onUpdateSettings, initialSet
                         onChange={handleChange}
                         step={key.includes('Url') ? undefined : '0.1'}
                         className="w-full"
-                        disabled={stage !== null && stage < 1 && !key.includes('yeet')}
                       />
                     </div>
                   );

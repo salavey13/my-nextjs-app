@@ -139,7 +139,7 @@ const SkinShop = () => {
 
   const playerStage = state.user.game_state.stage;
   const skins = state.user.loot?.fool?.cards;
-  const showOtherSkins = playerStage >= 1;
+  const showOtherSkins = playerStage >= 0;
   const customizationUnlocked = playerStage >= 2;
   const showCryptoPrices = playerStage >= 3;
 

@@ -35,7 +35,7 @@ export const toast = ({ title, description, variant = "info", stage, lang = 'en'
       textShadow: '0 0 5px #0f0',
     },
     icon: '⚠️',
-    duration: 5000,
+    duration: 4213,
   };
 
   switch (variant) {
