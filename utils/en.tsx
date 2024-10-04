@@ -645,8 +645,8 @@ createTask: "Create Task",
   achievementsSection: "Trophy Cabinet 🏆",
   notifySection: "Bat-Signal for Salavey13 🦇",
   devKit: {
-    playersPerStage: "Players per Stage"
-    title: 'Developer Kit',
+    
+    title: 'Dev Kit',
     gameState: 'Game State',
     storyEdit: 'Story Edit',
     stats: 'Stats',
