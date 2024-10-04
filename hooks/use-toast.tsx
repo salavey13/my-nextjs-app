@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useRef } from "react";
+import React from "react";
 import { Toaster, toast as hotToast, ToastOptions } from "react-hot-toast";
 import ShineBorder from "@/components/ui/ShineBorder";
 
@@ -19,9 +19,9 @@ const distortText = (text: string) => {
 };
 
 export const toast = ({ title, description, variant = "info", stage, lang = 'en' }: ToastParams) => {
-  const distortedTitleRef = useRef(title);
-  const distortedDescriptionRef = useRef(description || '');
-  const isGlitchingRef = useRef(false);
+  let distortedTitle = title;
+  let distortedDescription = description || '';
+  let isGlitching = false;
 
   const toastOptions: ToastOptions = {
     style: {
@@ -67,34 +67,17 @@ export const toast = ({ title, description, variant = "info", stage, lang = 'en'
       break;
   }
 
-  useEffect(() => {
-    const glitchInterval = setInterval(() => {
-      distortedTitleRef.current = distortText(title);
-      distortedDescriptionRef.current = distortText(description || '');
-      isGlitchingRef.current = true;
-    }, 100);
+  const glitchInterval = setInterval(() => {
+    distortedTitle = distortText(title);
+    distortedDescription = distortText(description || '');
+    isGlitching = true;
+  }, 100);
 
-    if (stage !== undefined && lang) {
-      const audio = new Audio(`/stage_${stage}_xuinity_${lang}.mp3`);
-      
-      const audioTimeout = setTimeout(() => {
-        audio.play().catch(error => {
-          console.error('Error playing audio:', error);
-          // If the file is missing or there's another error, we just log it and continue
-        });
-      }, 1000);
-
-      return () => {
-        clearInterval(glitchInterval);
-        clearTimeout(audioTimeout);
-        audio.pause();
-      };
-    } else {
-      return () => {
-        clearInterval(glitchInterval);
-      };
-    }
-  }, [title, description, stage, lang]);
+  const audio = new Audio(`/stage_${stage}_xuinity_${lang}.mp3`);
+  
+  setTimeout(() => {
+    audio.play().catch(error => console.error('Error playing audio:', error));
+  }, 1000);
 
   hotToast.custom(
     (t) => (
@@ -102,14 +85,14 @@ export const toast = ({ title, description, variant = "info", stage, lang = 'en'
         className={`${
           t.visible ? 'animate-enter' : 'animate-leave'
         } max-w-md w-full pointer-events-auto flex ring-1 ring-black ring-opacity-5`}
-        color={isGlitchingRef.current ? "#e1ff01" : "#000000"}
+        color={isGlitching ? "#e1ff01" : "#000000"}
       >
         <div className="flex-1 w-0 p-4">
           <div className="flex items-start">
             <div className="ml-3 flex-1">
-              <p className="text-sm font-medium text-gray-900">{distortedTitleRef.current}</p>
-              {distortedDescriptionRef.current && (
-                <p className="mt-1 text-sm text-gray-500">{distortedDescriptionRef.current}</p>
+              <p className="text-sm font-medium text-gray-900">{distortedTitle}</p>
+              {distortedDescription && (
+                <p className="mt-1 text-sm text-gray-500">{distortedDescription}</p>
               )}
             </div>
           </div>

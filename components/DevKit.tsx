@@ -14,15 +14,15 @@ import { StoryEdit } from './StoryEdit'
 
 interface StoryStage {
   id: string;
-  parentId: string | null;
+  parentid: string | null;
   stage: number;
-  storyContent: string;
-  xuinityDialog: string;
+  storycontent: string;
+  xuinitydialog: string;
   trigger: string;
-  activeComponent: string;
+  activecomponent: string;
   minigame: string;
   achievement: string;
-  bottomShelfBitmask: number;
+  bottomshelfbitmask: number;
 }
 
 interface StageStats {
@@ -124,21 +124,21 @@ export default function DevKit() {
   }
 
   const renderStageTree = (stages: StoryStage[], parentId: string | null = null, depth = 0) => {
-    const childStages = stages.filter(stage => stage.parentId === parentId)
+    const childStages = stages.filter(stage => stage.parentid === parentId)
     
     return childStages.map(stage => (
       <React.Fragment key={stage.id}>
         <SelectItem value={stage.stage.toString()} className="text-xs">
           <div style={{ marginLeft: `${depth * 20}px` }}>
-            (ID: {stage.id}) (parentId: {stage.parentId}) {t("devKit.stage")} {stage.stage} 
+            (ID: {stage.id}) (parentId: {stage.parentid}) {t("devKit.stage")} {stage.stage} 
             <br />
-            (xuinityDialog: {stage.xuinityDialog.substring(0, 30)}...) 
+            (xuinityDialog: {stage.xuinitydialog.substring(0, 30)}...) 
             <br />
-            (storyContent: {stage.storyContent.substring(0, 30)}...) 
+            (storyContent: {stage.storycontent.substring(0, 30)}...) 
             <br />
             (achievement: {stage.achievement}) 
             <br />
-            (activeComponent: {stage.activeComponent}) 
+            (activeComponent: {stage.activecomponent}) 
             <br />
             (minigame: {stage.minigame}) 
             <br />
@@ -153,7 +153,9 @@ export default function DevKit() {
   const renderStageOptions = (stages: StoryStage[]) => {
     return stages.map((stage) => (
       <SelectItem key={stage.id} value={stage.stage.toString()}>
-        Stage {stage.stage} - {stage.storyContent.substring(0, 30)}...
+        {/* Stage {stage.stage} - {stage.storyContent?.substring(0, 30)}... */}
+        {t("devKit.stage")} {stage.stage} (ID: {stage.id}) (achievement: {stage.achievement})  (xuinitydialog: {stage.xuinitydialog?.substring(0, 30)}) (storycontent: {stage.storycontent?.substring(0, 30)})   (activecomponent: {stage.activecomponent})  (minigame: {stage.minigame}) (trigger: {stage.trigger}) (parentId: {stage.parentid}) (xuinitydialog: {stage.xuinitydialog?.substring(0, 30)}) (storycontent: {stage.storycontent?.substring(0, 30)})  
+
       </SelectItem>
     ))
   }
