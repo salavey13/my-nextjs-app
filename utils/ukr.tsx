@@ -4,9 +4,7 @@ export const ukr: LanguageDictionary = {
   "storyEditor": "Редактор байок",
   "editStage": "Зашаманити рівень",
   "addNewStage": "Нашкрябати новий рівень",
-  "devKit": {
-    "playersPerStage": "Козаків на рівень"
-  },
+  
 
 
   cardsImgUrl: "URL-адреса спрайтів для карт",
@@ -541,7 +539,7 @@ createTask: "Створити завдання",
     cloins: "Монети",
     crypto: 'Крипто',
     applyChanges: 'Застосувати зміни',
-    playersPerStage: 'Гравців на етап',
+    playersPerStage: "Козаків на рівень",
     stage: 'Стадія',
     players: 'гравці',
     success: 'Успіх',
