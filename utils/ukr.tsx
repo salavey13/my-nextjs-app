@@ -1,5 +1,14 @@
 import { LanguageDictionary } from "../utils/TranslationUtils";
 export const ukr: LanguageDictionary = {
+  
+  "storyEditor": "Редактор байок",
+  "editStage": "Зашаманити рівень",
+  "addNewStage": "Нашкрябати новий рівень",
+  "devKit": {
+    "playersPerStage": "Козаків на рівень"
+  },
+
+
   cardsImgUrl: "URL-адреса спрайтів для карт",
   shirtImgUrl: "URL зображення сорочки",
   tooHigh: "занадто високо",
