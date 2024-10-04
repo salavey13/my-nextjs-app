@@ -19,7 +19,7 @@ export default function PageWrapper({ children }: PageWrapperProps) {
   const bottomShelfBitmask =  1 << currentStage
 
   return (
-    <div className="game-board h-[calc(100vh-64px)] justify-start items-center relative overflow-y-auto">
+    <div className="game-board h-[calc(100vh-128px)] justify-start items-center relative overflow-y-auto">
       {children}
       {showBottomShelf && <BottomShelf bitmask={bottomShelfBitmask} />}
     </div>
