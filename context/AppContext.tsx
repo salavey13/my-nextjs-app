@@ -17,6 +17,7 @@ interface GameState {
   progress: string;
   unlockedComponents: string[];
   settings: GameSettings;
+  bottomshelfbitmask: number;
 }
 
 export interface PhysicsSettings {
