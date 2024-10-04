@@ -170,7 +170,7 @@ export default function HackButtonStoryShower() {
         if (sideHustle && sideHustle.trigger === nextStage.trigger) {
           toast({
             title: t('sideHustleUnlocked'),
-            description: sideHustle.storycontent,
+            description: sideHustle.storyContent,
             stage: nextStage.stage,
             lang: state.user.lang,
           })
