@@ -413,7 +413,7 @@ export default function HackButtonStoryShower() {
       )}
       <Card>
         <CardHeader>
-          <CardTitle>Stage {currentStage?.stage}: {currentStage?.storyContent}</CardTitle>
+          <CardTitle>Stage {currentStage?.stage}: {currentStage?.storycontent}</CardTitle>
         </CardHeader>
         <CardContent>
           {renderMinigame()}
