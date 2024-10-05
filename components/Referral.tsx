@@ -10,6 +10,7 @@ import { faUserPlus, faPaperPlane, faTrophy, faSave } from '@fortawesome/free-so
 import LoadingSpinner from "./ui/LoadingSpinner";
 import { Button } from "./ui/button";
 import {Input} from "./ui/input";
+import { toast } from '@/hooks/use-toast';
 
 const Referral: React.FC = () => {
   const { state, updateUserReferrals, dispatch, t } = useAppContext()
