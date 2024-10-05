@@ -86,6 +86,29 @@ button:active {
   color: #000000; /* Text should turn black */
 }
 
+@keyframes glitchyFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateX(5px);
+  }
+  50% {
+    opacity: 0.7;
+    transform: translateX(-3px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-enter {
+  animation: glitchyFadeIn 0.5s ease-in-out forwards;
+}
+
+.animate-leave {
+  animation: glitchyFadeIn 0.5s ease-in-out reverse forwards;
+}
+  
 /* Added neon glow variant */
 .shadow-neon-glow {
   text-shadow: 0 0 8px rgba(0, 0, 0, 0.13), 0 0 16px rgba(136, 255, 0, 0.322);
