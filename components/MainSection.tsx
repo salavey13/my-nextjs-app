@@ -82,7 +82,7 @@ export default function MainSection({ setItemDetailsModalOpen, setSelectedItem, 
   }
 
   const OnboardingSection = () => (
-    <div className="w-full min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 to-black text-white p-4">
+    <div className="w-full min-h-screen flex-col items-center justify-center bg-gradient-to-br from-gray-900 to-black text-white p-4">
       <Card className="w-full max-w-4xl bg-gray-800 text-white">
         <CardHeader>
           <CardTitle className="text-3xl font-bold mb-4">Welcome to Hack the System</CardTitle>
