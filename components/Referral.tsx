@@ -1,23 +1,22 @@
-// components/Referral.tsx
 "use client";
 
 import React, { useState, useEffect, Suspense, useCallback } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { useAppContext } from '../context/AppContext';
-import { useTranslation } from 'react-i18next';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUserPlus, faPaperPlane, faTrophy, faSave } from '@fortawesome/free-solid-svg-icons';
 import LoadingSpinner from "./ui/LoadingSpinner";
 import { Button } from "./ui/button";
-import {Input} from "./ui/input";
+import { Input } from "./ui/input";
 import { toast } from '@/hooks/use-toast';
 
 const Referral: React.FC = () => {
-  const { state, updateUserReferrals, dispatch, t } = useAppContext()
-  const user = state.user
+  const { state, dispatch, t } = useAppContext();
+  const user = state.user;
   const [referralName, setReferralName] = useState('');
   const [referralCode, setReferralCode] = useState<string | null>(null);
   const [inviteCount, setInviteCount] = useState(0);
+
   const generateReferralCode = async (defaultReferralName: string) => {
     try {
       const newReferralCode = `${defaultReferralName}`;
@@ -28,7 +27,6 @@ const Referral: React.FC = () => {
 
       if (error) throw error;
       return newReferralCode;
-
     } catch (error) {
       console.error('Error generating referral code:', error);
       throw error;
@@ -46,7 +44,6 @@ const Referral: React.FC = () => {
 
       if (error) throw error;
       return count || 0;
-
     } catch (error) {
       console.error('Error fetching invite count:', error);
       return 0;
@@ -70,18 +67,14 @@ const Referral: React.FC = () => {
 
       const count = await getInviteCount(user.ref_code);
       setInviteCount(count);
-
     } catch (error) {
       console.error('Error fetching referral data:', error);
     }
-  }, [user, generateReferralCode, getInviteCount, dispatch]);
+  }, [user, dispatch]);
   
   useEffect(() => {
     fetchReferralData();
   }, [fetchReferralData]);
-
-
-  
 
   const handleGenerateReferralCode = async () => {
     if (!user) return;
@@ -103,6 +96,7 @@ const Referral: React.FC = () => {
       });
     }
   };
+
   const sendTelegramInvite = useCallback(async (referralCode: string) => {
     if (!process.env.BOT_TOKEN || !user) {
       console.error('Bot token is missing');
@@ -128,7 +122,6 @@ const Referral: React.FC = () => {
     try {
       const response = await fetch(url.toString());
       if (!response.ok) throw new Error('Failed to send Telegram message');
-
     } catch (error) {
       console.error('Error sending Telegram message:', error);
     }
@@ -143,15 +136,43 @@ const Referral: React.FC = () => {
 
       await sendTelegramInvite(referralCode);
 
+      toast({
+        title: t('inviteSent'),
+        description: t('inviteLinkCopied'),
+      });
     } catch (error) {
       console.error('Error sending invite:', error);
+      toast({
+        title: t('error'),
+        description: t('failedToSendInvite'),
+        variant: 'destructive',
+      });
     }
-  }, [sendTelegramInvite, referralCode]);
+  }, [sendTelegramInvite, referralCode, t]);
 
-  const handleReferralNameChange = async (newName: string) => {
-    if (newName.trim() === '') return;
+  const handleReferralNameChange = (newName: string) => {
+    setReferralName(newName);
+  };
 
-    setReferralName(newName); 
+  const handleSaveRefName = async () => {
+    if (!user || !referralName.trim()) return;
+
+    try {
+      const newReferralCode = await generateReferralCode(referralName);
+      setReferralCode(newReferralCode);
+      dispatch({ type: 'UPDATE_USER', payload: { ref_code: newReferralCode } });
+      toast({
+        title: t('referralCodeSaved'),
+        description: t('referralCodeSavedDescription'),
+      });
+    } catch (error) {
+      console.error('Error saving referral code:', error);
+      toast({
+        title: t('error'),
+        description: t('failedToSaveReferralCode'),
+        variant: 'destructive',
+      });
+    }
   };
 
   return (
@@ -175,7 +196,7 @@ const Referral: React.FC = () => {
         <Button
           onClick={handleSaveRefName}
           className="flex items-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition justify-center w-full"
-          aria-label={t('sendInvite')}
+          aria-label={t('saveRefCode')}
           variant="outline"
         >
           <FontAwesomeIcon icon={faSave} className="mr-2" />
