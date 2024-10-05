@@ -12,14 +12,13 @@ export default function PageWrapper({ children }: PageWrapperProps) {
   const pathname = usePathname()
   const { state } = useAppContext()
   const user = state.user
-  const showBottomShelf = user?.game_state?.stage && user?.game_state?.stage > 2 && pathname !== '/'//profile' //pathname !== '/' 
-  //&& pathname !== '/hackbutton'
+  const showBottomShelf = user?.game_state?.stage && user?.game_state?.stage > 2 && pathname !== '/' || null
 
-  const currentStage = user?.game_state?.stage || 0
-  const bottomShelfBitmask =  1 << currentStage
+  const currentStage = user?.game_state?.stage || 1
+  const bottomShelfBitmask = 1 << currentStage
 
   return (
-    <div className="game-board h-[calc(100vh-128px)] justify-start items-center relative overflow-y-auto">
+    <div className="min-h-full w-full">
       {children}
       {showBottomShelf && <BottomShelf bitmask={bottomShelfBitmask} />}
     </div>

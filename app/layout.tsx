@@ -7,7 +7,7 @@ import React, { Suspense } from "react";
 import TopShelf from "@/components/ui/topShelf";
 import PageWrapper from "@/components/PageWrapper";
 import LoadingSpinner from "../components/ui/LoadingSpinner"; 
-import { GlitchyToastProvider } from "@/hooks/use-toast"; // Import the provider
+import { GlitchyToastProvider } from "@/hooks/use-toast";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -21,18 +21,18 @@ export default function RootLayout({
 }: Readonly<{ children: ReactNode }>) {
   return (
     <html lang="en">
-      <body
-        className={`${inter.className} flex flex-col min-h-screen`}
-      >
+      <body className={`${inter.className} flex flex-col min-h-screen`}>
         <Suspense fallback={<LoadingSpinner />}>
           <AppProvider>
-            <TopShelf />
-            <main className="flex-grow pt-[64px] pb-[64px] min-h-[calc(100vh-128px)] overflow-y-auto backdrop-blur-lg bg-gradient-to-b from-black via-gray-900 to-black">
-              <PageWrapper>
-                {children}
-              </PageWrapper>
+            <div className="flex flex-col min-h-screen">
+              <TopShelf />
+              <main className="flex-grow overflow-y-auto pt-16 pb-16 backdrop-blur-lg bg-gradient-to-b from-black via-gray-900 to-black">
+                <PageWrapper>
+                  {children}
+                </PageWrapper>
+              </main>
               <GlitchyToastProvider />
-            </main>
+            </div>
           </AppProvider>
         </Suspense>
       </body>

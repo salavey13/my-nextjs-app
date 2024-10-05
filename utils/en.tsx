@@ -4,7 +4,7 @@ export const en: LanguageDictionary = {
   "storyEditor": "Story Editor",
   "editStage": "Edit Stage",
   "addNewStage": "Add New Stage",
-  
+  xuinitySays: "XUINITY Says",
   cardImgUrl: "Card sprite URL",
   shirtImgUrl: "Shirt image URL",
   yeetCoefficient: "Yeet Coefficient",

@@ -4,7 +4,7 @@ export const ru: LanguageDictionary = {
   "storyEditor": "Редактор сказок",
   "editStage": "Потеребонькать уровень",
   "addNewStage": "Напихать новый уровень",
-  
+  xuinitySays: "XUINITY говорит",
 
 
   cardsImgUrl: "URL-адрес спрайтов для карт",

@@ -45,7 +45,7 @@ export const Settings: React.FC<SettingsProps> = ({ onUpdateSettings, initialSet
       if (state.user) {
         const { data, error } = await supabase
           .from('users')
-          .select('game_state->>stage')
+          .select('game_state->stage')
           .eq('id', state.user.id)
           .single();
 
@@ -69,12 +69,14 @@ export const Settings: React.FC<SettingsProps> = ({ onUpdateSettings, initialSet
 
     if (state.user) {
       try {
+        const newGameState = {
+          ...state.user.game_state,
+          settings: state.user.game_state.settings,
+        };
         const { error } = await supabase
           .from('users')
           .update({
-            'game_state.settings': settings,
-            'loot.fool.cards.shirt_img_url': settings.shirtImgUrl,
-            'loot.fool.cards.cards_img_url': settings.cardsImgUrl,
+            'game_state': newGameState,
           })
           .eq('id', state.user.id);
 
@@ -85,17 +87,6 @@ export const Settings: React.FC<SettingsProps> = ({ onUpdateSettings, initialSet
           payload: {
             ...state.user,
             game_state: { ...state.user.game_state, settings },
-            loot: {
-              ...state.user.loot,
-              fool: {
-                ...state.user?.loot?.fool,
-                cards: {
-                  ...state.user?.loot?.fool?.cards,
-                  shirt_img_url: settings.shirtImgUrl,
-                  cards_img_url: settings.cardsImgUrl,
-                },
-              },
-            },
           },
         });
       } catch (error) {

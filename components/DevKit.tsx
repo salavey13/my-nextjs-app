@@ -112,7 +112,7 @@ export default function DevKit() {
         title: t("devKit.success"),
         description: t("devKit.gameStateUpdated"),
         variant: "success",
-        stage: state.user.game_state.stage
+        stage: updatedGameState.stage
       })
     } catch (error) {
       console.error('Error updating game state:', error)

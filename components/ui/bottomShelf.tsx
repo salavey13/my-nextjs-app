@@ -34,7 +34,7 @@ const BottomShelf: React.FC<BottomShelfProps> = ({ bitmask }) => {
     { href: '/referral', icon: <Users className="w-6 h-6" />, label: 'Referral', stageMask: 0b11111000 },
     { href: '/profile', icon: <User className="w-6 h-6" />, label: 'Profile', stageMask: 0b11111111 },
     { href: '/questsforcoins', icon: <Dice1 className="w-6 h-6" />, label: '!', stageMask: 0b11111000 },
-    { href: '/hackbutton', icon: <Zap className="w-6 h-6" />, label: 'IQ', stageMask: 0b11111111 },
+    { href: '/hackbutton', icon: <Zap className="w-6 h-6" />, label: 'IQ', stageMask: 0b11111000 },
     { href: '/createEvent', icon: <CalendarPlus className="w-6 h-6" />, label: 'Create Event', stageMask: 0b11111000 },
     { href: '/conflictawareness', icon: <Globe className="w-6 h-6" />, label: 'Conflict Awareness', stageMask: 0b11111000 },
     { href: '/admin', icon: <Crown className="w-6 h-6" />, label: 'Admin', stageMask: 0b10000000 },

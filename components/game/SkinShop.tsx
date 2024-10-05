@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { motion } from 'framer-motion';
 import { toast } from '@/hooks/use-toast';
-
+import Image from 'next/image'
 interface Skin {
   id: string;
   cardsImgUrl: string;
@@ -28,9 +28,9 @@ const SkinShop = () => {
     const fetchOtherPlayerSkins = async () => {
       const { data, error } = await supabase
         .from('users')
-        .select('telegram_username, loot->fool->cards->cards_img_url, loot->fool->cards->shirt_img_url')
-        .not('loot->fool->cards->cards_img_url', 'is', null)
-        .not('loot->fool->cards->shirt_img_url', 'is', null);
+        .select('telegram_username, game_state->settings->cardsImgUrl, game_state->settings->shirtImgUrl')
+        .not('game_state->settings->cardsImgUrl', 'is', null)
+        .not('game_state->settings->shirtImgUrl', 'is', null);
 
       if (error) {
         console.error('Error fetching player skins:', error);
@@ -39,8 +39,8 @@ const SkinShop = () => {
 
       const skins = data.map((user: any) => ({
         id: user.telegram_username,
-        cardsImgUrl: user.loot?.fool?.cards?.cards_img_url || '',
-        shirtImgUrl: user.loot?.fool?.cards?.shirt_img_url || '',
+        cardsImgUrl: user.game_state?.settings?.cardsImgUrl || '',
+        shirtImgUrl: user.game_state?.settings?.shirtImgUrl || '',
         creatorUsername: user.telegram_username,
         priceCoins: Math.floor(Math.random() * 1000) + 100,
         priceCrypto: Math.random() * 0.1,
@@ -138,7 +138,7 @@ const SkinShop = () => {
   if (!state.user) return null;
 
   const playerStage = state.user.game_state.stage;
-  const skins = state.user.loot?.fool?.cards;
+  const skins = state.user.game_state?.settings;
   const showOtherSkins = playerStage >= 0;
   const customizationUnlocked = playerStage >= 2;
   const showCryptoPrices = playerStage >= 3;
@@ -150,8 +150,8 @@ const SkinShop = () => {
       className="flex-shrink-0 w-48 bg-card text-card-foreground rounded-lg overflow-hidden shadow-lg"
     >
       <div className="relative h-32">
-        <img src={skin.cardsImgUrl} alt="Card skin" className="w-full h-full object-cover" />
-        <img src={skin.shirtImgUrl} alt="Shirt skin" className="absolute bottom-0 right-0 w-12 h-12 object-cover" />
+        <Image src={skin.cardsImgUrl} alt="Card skin" className="w-full h-full object-cover" />
+        <Image src={skin.shirtImgUrl} alt="Shirt skin" className="absolute bottom-0 right-0 w-12 h-12 object-cover" />
       </div>
       <div className="p-2">
         <h3 className="font-bold text-sm mb-1 truncate">{skin.creatorUsername}&apos;s Skin</h3>
@@ -195,8 +195,8 @@ const SkinShop = () => {
                   <SkinCard
                     skin={{
                       id: 'your-skin',
-                      cardsImgUrl: skins.cards_img_url || '',
-                      shirtImgUrl: skins.shirt_img_url || '',
+                      cardsImgUrl: skins.cardsImgUrl || '',
+                      shirtImgUrl: skins.shirtImgUrl || '',
                       creatorUsername: state.user.telegram_username || 'You',
                       priceCoins: 0,
                     }}
