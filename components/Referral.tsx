@@ -62,7 +62,7 @@ const Referral: React.FC = () => {
       if (!user.ref_code) {
         const newReferralCode = await generateReferralCode(defaultReferralName);
         setReferralCode(newReferralCode);
-        await updateUserReferrals(newReferralCode);
+        dispatch({ type: 'UPDATE_USER', payload: { ref_code: newReferralCode } });
       } else {
         setReferralCode(user.ref_code);
       }
@@ -73,8 +73,8 @@ const Referral: React.FC = () => {
     } catch (error) {
       console.error('Error fetching referral data:', error);
     }
-  }, [user, generateReferralCode, updateUserReferrals, getInviteCount]);
-
+  }, [user, generateReferralCode, getInviteCount, dispatch]);
+  
   useEffect(() => {
     fetchReferralData();
   }, [fetchReferralData]);
@@ -82,21 +82,26 @@ const Referral: React.FC = () => {
 
   
 
-  const handleSaveRefName = useCallback(async () => {
-    if (!referralName) return;
+  const handleGenerateReferralCode = async () => {
+    if (!user) return;
 
     try {
-        const newReferralCode = await generateReferralCode(referralName);
-        setReferralCode(newReferralCode);
-        setReferralName(referralName);
-        updateUserReferrals(newReferralCode);
-  
-      } catch (error) {
-        console.error('Error updating referral name:', error);
-  
-      }
-  }, [setReferralCode, referralName]);
-
+      const newReferralCode = await generateReferralCode(user.telegram_username || '');
+      setReferralCode(newReferralCode);
+      dispatch({ type: 'UPDATE_USER', payload: { ref_code: newReferralCode } });
+      toast({
+        title: t('referralCodeGenerated'),
+        description: t('referralCodeGeneratedDescription'),
+      });
+    } catch (error) {
+      console.error('Error generating referral code:', error);
+      toast({
+        title: t('error'),
+        description: t('referralCodeGenerationError'),
+        variant: 'destructive',
+      });
+    }
+  };
   const sendTelegramInvite = useCallback(async (referralCode: string) => {
     if (!process.env.BOT_TOKEN || !user) {
       console.error('Bot token is missing');
