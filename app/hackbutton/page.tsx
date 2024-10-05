@@ -2,5 +2,6 @@
 import Dashboard from "../../components/Dashboard"
 
 export default function HackButtonPage() {
-  return <Dashboard />;
+  return <Dashboard />
+
 }

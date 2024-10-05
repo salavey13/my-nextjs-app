@@ -119,4 +119,15 @@ function App() {
     </div>
   );
 }
+```
+## QuizComponent
 
+The `QuizComponent` is a dynamic quiz designed for users to answer questions about LATOKEN. Each question is multiple-choice, and answers are submitted and stored in Supabase. User scores are tracked, and detailed feedback is provided for each question.
+
+### Usage
+
+```tsx
+import QuizComponent from '@/components/game/QuizComponent';
+
+<QuizComponent />;
+```

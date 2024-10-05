@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation"
 import { useAppContext } from "@/context/AppContext"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { Home, List, Plus, Bell, User, CalendarPlus, Lightbulb, Crown, Users, Dice1, DollarSign, Zap, Globe, ShoppingCart, Car, Gamepad } from 'lucide-react'
+import { Home, List, Plus, Bell, User, CalendarPlus, Lightbulb, Crown, Users, Dice1, DollarSign, Zap, Globe, ShoppingCart, Car, Gamepad, ZapOff } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 
 export interface NavigationLink {
@@ -35,6 +35,7 @@ const BottomShelf: React.FC<BottomShelfProps> = ({ bitmask }) => {
     { href: '/profile', icon: <User className="w-6 h-6" />, label: 'Profile', stageMask: 0b11111111 },
     { href: '/questsforcoins', icon: <Dice1 className="w-6 h-6" />, label: '!', stageMask: 0b11111000 },
     { href: '/hackbutton', icon: <Zap className="w-6 h-6" />, label: 'IQ', stageMask: 0b11111000 },
+    { href: '/quiz', icon: <ZapOff className="w-6 h-6" />, label: 'IQ', stageMask: 0b11111111 },
     { href: '/createEvent', icon: <CalendarPlus className="w-6 h-6" />, label: 'Create Event', stageMask: 0b11111000 },
     { href: '/conflictawareness', icon: <Globe className="w-6 h-6" />, label: 'Conflict Awareness', stageMask: 0b11111000 },
     { href: '/admin', icon: <Crown className="w-6 h-6" />, label: 'Admin', stageMask: 0b10000000 },

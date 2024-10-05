@@ -17,7 +17,7 @@ const Referral: React.FC = () => {
   const [referralCode, setReferralCode] = useState<string | null>(null);
   const [inviteCount, setInviteCount] = useState(0);
 
-  const generateReferralCode = async (defaultReferralName: string) => {
+  const generateReferralCode = useCallback(async (defaultReferralName: string) => {
     try {
       const newReferralCode = `${defaultReferralName}`;
       const { error } = await supabase
@@ -31,7 +31,7 @@ const Referral: React.FC = () => {
       console.error('Error generating referral code:', error);
       throw error;
     }
-  };
+  }, [user]);
 
   const getInviteCount = async (referralCode: string | null) => {
     if (!referralCode) return 0;
@@ -70,7 +70,7 @@ const Referral: React.FC = () => {
     } catch (error) {
       console.error('Error fetching referral data:', error);
     }
-  }, [user, dispatch]);
+  }, [user, dispatch, generateReferralCode]);
   
   useEffect(() => {
     fetchReferralData();
