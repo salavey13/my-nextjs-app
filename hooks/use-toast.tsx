@@ -1,6 +1,6 @@
 'use client'
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Toaster, toast as hotToast, ToastOptions } from "react-hot-toast";
 import ShineBorder from "@/components/ui/ShineBorder";
 
@@ -17,6 +17,7 @@ const distortText = (text: string) => {
     Math.random() > 0.7 ? String.fromCharCode(char.charCodeAt(0) + Math.floor(Math.random() * 5)) : char
   ).join('');
 };
+
 export const toast = ({ title, description, variant = "info", stage, lang = 'en' }: ToastParams) => {
   let distortedTitle = title;
   let distortedDescription = description || '';
@@ -34,7 +35,7 @@ export const toast = ({ title, description, variant = "info", stage, lang = 'en'
       textShadow: '0 0 5px #0f0',
     },
     icon: '⚠️',
-    duration: 4213, // Make sure this duration is enough for your needs
+    duration: 13000, // Set duration to 13 seconds
   };
 
   switch (variant) {
@@ -82,8 +83,26 @@ export const toast = ({ title, description, variant = "info", stage, lang = 'en'
   // Show the toast
   hotToast.custom(
     (t) => {
-      if (!t.visible) {
-        clearInterval(glitchInterval); // Clear interval when toast disappears
+      const [isVisible, setIsVisible] = useState(true);
+
+      useEffect(() => {
+        if (!t.visible) {
+          clearInterval(glitchInterval); // Clear interval when toast disappears
+        }
+
+        // Set a timeout to hide the toast after 13 seconds
+        const timeout = setTimeout(() => {
+          setIsVisible(false);
+        }, 13000);
+
+        return () => {
+          clearTimeout(timeout);
+          clearInterval(glitchInterval);
+        };
+      }, [t.visible]);
+
+      if (!isVisible) {
+        return null; // Don't render anything if the toast should be hidden
       }
 
       return (
@@ -111,5 +130,15 @@ export const toast = ({ title, description, variant = "info", stage, lang = 'en'
 };
 
 export const GlitchyToastProvider = () => {
-  return <Toaster position="top-right"/>;
+  return (
+    <Toaster 
+      position="top-right"
+      toastOptions={{
+        style: {
+          background: 'transparent',
+          boxShadow: 'none',
+        },
+      }}
+    />
+  );
 };
