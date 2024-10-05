@@ -7,6 +7,7 @@ import { useAppContext } from '@/context/AppContext';
 import { supabase } from '@/lib/supabaseClient';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import Link from 'next/link';
 
 interface QuizQuestion {
   question: string;
@@ -305,6 +306,19 @@ export default function QuizComponent() {
                 {t(option)}
               </label>
             ))}
+            {/* Button leading to NotebookLM */}
+            <div className="mt-4">
+                <Button
+                className="mt-4 bg-blue-600 text-white"
+                >
+                    <Link
+                            href="https://notebooklm.google.com/notebook/c6d20ede-0b36-4e82-badb-6b6fd5c331dd"
+                            className="h-6 text-gray-400 hover:text-blue-500 transition-colors"
+                        >
+                            <span className="text-xs mt-1">{t('Learn More on NotebookLM')}</span>
+                    </Link>
+                </Button>
+            </div>
             {!isAnswerSubmitted && (
               <Button
                 className="mt-4 bg-[#e1ff01] text-black"
