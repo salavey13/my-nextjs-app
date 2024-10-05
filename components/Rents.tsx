@@ -194,7 +194,7 @@ export default function Rents() {
     if (matchingUser && matchingUser.site) {
       setTopEmbedUrl(matchingUser.site);
     } else {
-      setTopEmbedUrl("https://notebooklm.google.com/notebook/c6d20ede-0b36-4e82-badb-6b6fd5c331dd"); // Fallback to default if no matching user
+      setTopEmbedUrl("https://soft-goals-411926.framer.app"); // Fallback to default if no matching user
     }
 
     try {
@@ -336,11 +336,13 @@ export default function Rents() {
       )}
 
       {topEmbedUrl == "" && (
-        <MainSection
-          setItemDetailsModalOpen={setItemDetailsModalOpen}
-          setSelectedItem={setSelectedItem}
-          items={items}
-        />
+        <div className="absolute top-0 left-0 w-full h-[calc(200vh-128px)] z-0">
+          <MainSection
+            setItemDetailsModalOpen={setItemDetailsModalOpen}
+            setSelectedItem={setSelectedItem}
+            items={items}
+          />
+        </div>
       )}
 
       {/* Content positioned 64px from the bottom, occupying the bottom 100vh overflow-auto*/}
