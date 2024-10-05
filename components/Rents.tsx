@@ -194,7 +194,7 @@ export default function Rents() {
     if (matchingUser && matchingUser.site) {
       setTopEmbedUrl(matchingUser.site);
     } else {
-      setTopEmbedUrl("https://excellent-lots-147907.framer.app"); // Fallback to default if no matching user
+      setTopEmbedUrl("https://notebooklm.google.com/notebook/c6d20ede-0b36-4e82-badb-6b6fd5c331dd"); // Fallback to default if no matching user
     }
 
     try {
