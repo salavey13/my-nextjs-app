@@ -4,6 +4,8 @@ export const en: LanguageDictionary = {
   "storyEditor": "Story Editor",
   "editStage": "Edit Stage",
   "addNewStage": "Add New Stage",
+  
+'Learn More on NotebookLM': "Learn More about LATOKEN on NotebookLM",
   xuinitySays: "XUINITY Says",
   cardImgUrl: "Card sprite URL",
   shirtImgUrl: "Shirt image URL",

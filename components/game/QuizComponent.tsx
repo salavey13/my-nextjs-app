@@ -8,6 +8,7 @@ import { supabase } from '@/lib/supabaseClient';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import Link from 'next/link';
+import useTelegram from '@/hooks/useTelegram';
 
 interface QuizQuestion {
   question: string;
@@ -250,7 +251,9 @@ export default function QuizComponent() {
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [isAnswerSubmitted, setIsAnswerSubmitted] = useState(false);
   const [score, setScore] = useState(0);
-  
+  const {
+    openLink,
+  } = useTelegram();
   const questions = getQuizQuestions(state?.user?.lang || "en");
   const currentQuestion = quizQuestions[currentQuestionIndex];
 
@@ -309,14 +312,9 @@ export default function QuizComponent() {
             {/* Button leading to NotebookLM */}
             <div className="mt-4">
                 <Button
-                className="mt-4 bg-blue-600 text-white"
+                onClick={() => openLink("https://notebooklm.google.com/notebook/c6d20ede-0b36-4e82-badb-6b6fd5c331dd")}
                 >
-                    <Link
-                            href="https://notebooklm.google.com/notebook/c6d20ede-0b36-4e82-badb-6b6fd5c331dd"
-                            className="h-6 text-gray-400 hover:text-blue-500 transition-colors"
-                        >
-                            <span className="text-xs mt-1">{t('Learn More on NotebookLM')}</span>
-                    </Link>
+                    {t('Learn More on NotebookLM')}
                 </Button>
             </div>
             {!isAnswerSubmitted && (

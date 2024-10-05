@@ -5,7 +5,7 @@ export const ru: LanguageDictionary = {
   "editStage": "Потеребонькать уровень",
   "addNewStage": "Напихать новый уровень",
   xuinitySays: "XUINITY говорит",
-
+'Learn More about LATOKEN on NotebookLM': "Узнайте больше о LATOKEN на NotebookLM",
 
   cardsImgUrl: "URL-адрес спрайтов для карт",
   shirtImgUrl: "URL изображения рубашки",
