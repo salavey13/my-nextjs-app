@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAppContext } from '@/context/AppContext';
 import { Button } from '@/components/ui/button';
 import { supabase } from "@/lib/supabaseClient";
@@ -27,7 +27,7 @@ const HackButton: React.FC = () => {
     showBackButton();
   }, [selectedGame, showBackButton]);
 
-  const progressStage = async (newStage: number) => {
+  const progressStage = useCallback(async (newStage: number) => {
     if (!user?.id) return;
     try {
       const newGameState = {
@@ -58,14 +58,13 @@ const HackButton: React.FC = () => {
     } catch (error) {
       console.error('Error updating game stage:', error);
     }
-  };
+  }, [user, dispatch, t]);
 
   useEffect(() => {
     if (gamesVisited.cards && gamesVisited.dice && user?.game_state?.stage === 0) {
       progressStage(1);
     }
   }, [gamesVisited, user?.game_state?.stage, progressStage]);
-
   const handleHackButtonClick = async () => {
     if (!user?.id) {
       toast({

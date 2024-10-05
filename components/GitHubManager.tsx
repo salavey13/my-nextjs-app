@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Octokit } from '@octokit/rest';
 import { useAppContext } from '../context/AppContext';
 import axios from 'axios';
@@ -33,23 +33,7 @@ const GitHubManager: React.FC = () => {
     }
   }, [GITHUB_TOKEN]);
 
-
-  const fetchCommitShas = async (branchName: string) => {
-    try {
-      const shas = await fetchCommitShasFromSupabase(branchName);
-      setCommitShas(shas);
-    } catch (err) {
-      console.error(t('error.failedToFetchCommitShas'), err);
-    }
-  };
-  useEffect(() => {
-    if (branchName) {
-      fetchCommitShas(branchName);
-    }
-  }, [fetchCommitShas, branchName]);
-
-  // Fetch commit SHAs from Supabase
-  const fetchCommitShasFromSupabase = async (branchName: string) => {
+  const fetchCommitShasFromSupabase = useCallback(async (branchName: string) => {
     const { data, error } = await supabase
       .from('commits')
       .select('sha')
@@ -60,7 +44,23 @@ const GitHubManager: React.FC = () => {
     }
 
     return data.map((commit: { sha: string }) => commit.sha);
-  };
+  }, []);
+
+  const fetchCommitShas = useCallback(async (branchName: string) => {
+    try {
+      const shas = await fetchCommitShasFromSupabase(branchName);
+      setCommitShas(shas);
+    } catch (err) {
+      console.error(t('error.failedToFetchCommitShas'), err);
+    }
+  }, [fetchCommitShasFromSupabase, t]);
+
+  useEffect(() => {
+    if (branchName) {
+      fetchCommitShas(branchName);
+    }
+  }, [fetchCommitShas, branchName]);
+
 
   const fetchTranslationUtils = async () => {
     try {

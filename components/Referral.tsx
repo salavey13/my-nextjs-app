@@ -17,33 +17,6 @@ const Referral: React.FC = () => {
   const [referralName, setReferralName] = useState('');
   const [referralCode, setReferralCode] = useState<string | null>(null);
   const [inviteCount, setInviteCount] = useState(0);
-
-  const fetchReferralData = async () => {
-    if (!user) return;
-
-    try {
-      const defaultReferralName = user.ref_code ? user.ref_code : user.telegram_username;
-      setReferralName(defaultReferralName || '');
-
-      if (!user.ref_code) {
-        const newReferralCode = await generateReferralCode(defaultReferralName);
-        setReferralCode(newReferralCode);
-      } else {
-        setReferralCode(user.ref_code);
-      }
-
-      const count = await getInviteCount(user.ref_code);
-      setInviteCount(count);
-
-    } catch (error) {
-      console.error('Error fetching referral data:', error);
-    }
-  };
-
-  useEffect(() => {
-    fetchReferralData();
-  }, [fetchReferralData, user]);
-
   const generateReferralCode = async (defaultReferralName: string) => {
     try {
       const newReferralCode = `${defaultReferralName}`;
@@ -78,6 +51,36 @@ const Referral: React.FC = () => {
       return 0;
     }
   };
+
+  const fetchReferralData = useCallback(async () => {
+    if (!user) return;
+
+    try {
+      const defaultReferralName = user.ref_code ? user.ref_code : user.telegram_username;
+      setReferralName(defaultReferralName || '');
+
+      if (!user.ref_code) {
+        const newReferralCode = await generateReferralCode(defaultReferralName);
+        setReferralCode(newReferralCode);
+        await updateUserReferrals(newReferralCode);
+      } else {
+        setReferralCode(user.ref_code);
+      }
+
+      const count = await getInviteCount(user.ref_code);
+      setInviteCount(count);
+
+    } catch (error) {
+      console.error('Error fetching referral data:', error);
+    }
+  }, [user, generateReferralCode, updateUserReferrals, getInviteCount]);
+
+  useEffect(() => {
+    fetchReferralData();
+  }, [fetchReferralData]);
+
+
+  
 
   const handleSaveRefName = useCallback(async () => {
     if (!referralName) return;
