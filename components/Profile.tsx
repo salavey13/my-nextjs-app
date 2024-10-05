@@ -9,8 +9,9 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import QRCode from 'react-qr-code';
-import { Crown, Loader2, Zap, Coins, Star, Users, Shield, Sparkles } from 'lucide-react';
+import { Crown, Loader2, Zap, Coins, Star, Users, Shield, Sparkles, Trophy, Target } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -30,7 +31,11 @@ interface UserData {
   cheers_count: number;
   site?: string;
   ton_wallet?: string;
-  [key: string]: any; // Add index signature
+  game_state: {
+    stage: number;
+    [key: string]: any;
+  };
+  [key: string]: any;
 }
 
 const Profile: React.FC = () => {
@@ -59,6 +64,11 @@ const Profile: React.FC = () => {
       const currentStage = user.game_state?.stage || 0;
       const newStage = walletAddress && currentStage === 2 ? 3 : currentStage;
 
+      const newGameState = {
+        ...user.game_state,
+        stage: newStage,
+      };
+
       const { error } = await supabase
         .from('users')
         .update({
@@ -66,7 +76,7 @@ const Profile: React.FC = () => {
           ton_wallet: walletAddress,
           site: site,
           avatar_url: avatarUrl,
-          'game_state.stage': newStage,
+          game_state: newGameState,
         })
         .eq('id', user.id);
 
@@ -75,11 +85,12 @@ const Profile: React.FC = () => {
       dispatch({
         type: 'UPDATE_USER',
         payload: {
+          ...user,
           telegram_username: telegramUsername,
           ton_wallet: walletAddress,
           site: site,
           avatar_url: avatarUrl,
-          game_state: { ...user.game_state, stage: newStage },
+          game_state: newGameState,
         },
       });
 
@@ -106,7 +117,6 @@ const Profile: React.FC = () => {
     }
   };
 
-
   const StatCard: React.FC<{ title: string; value: number; icon: React.ReactNode; color: string }> = ({ title, value, icon, color }) => (
     <Card>
       <CardContent className="flex items-center p-4">
@@ -120,6 +130,13 @@ const Profile: React.FC = () => {
       </CardContent>
     </Card>
   );
+
+  const achievements = [
+    { icon: <Shield className="h-8 w-8" />, name: t('achievementShield') },
+    { icon: <Sparkles className="h-8 w-8" />, name: t('achievementSparkles') },
+    { icon: <Trophy className="h-8 w-8" />, name: t('achievementTrophy') },
+    { icon: <Target className="h-8 w-8" />, name: t('achievementTarget') },
+  ];
 
   return (
     <AnimatePresence>
@@ -192,10 +209,20 @@ const Profile: React.FC = () => {
                   <CardContent className="p-4">
                     <h3 className="text-lg font-semibold mb-2">{t('achievements')}</h3>
                     <div className="flex flex-wrap gap-2">
-                      {/* Add achievement badges here */}
-                      <Shield className="h-8 w-8 text-primary" />
-                      <Sparkles className="h-8 w-8 text-primary" />
-                      {/* Add more achievement icons as needed */}
+                      <TooltipProvider>
+                        {achievements.map((achievement, index) => (
+                          <Tooltip key={index}>
+                            <TooltipTrigger asChild>
+                              <div className="cursor-pointer text-primary">
+                                {achievement.icon}
+                              </div>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>{achievement.name}</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        ))}
+                      </TooltipProvider>
                     </div>
                   </CardContent>
                 </Card>
