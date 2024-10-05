@@ -15,6 +15,22 @@ import { Crown, Loader2, Zap, Coins, Star, Users, Shield, Sparkles, Trophy, Targ
 import { toast } from '@/hooks/use-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 
+interface GameState {
+  stage: number;
+  coins: number;
+  crypto: number;
+  rank: string;
+  cheersCount: number;
+  progress: string;
+  unlockedComponents: string[];
+  settings: {
+    yeetCoefficient: number;
+    yeetVelocityThreshold: number;
+    shirtImgUrl: string;
+    cardsImgUrl: string;
+  };
+}
+
 interface UserData {
   id: number;
   telegram_id: number;
@@ -31,10 +47,7 @@ interface UserData {
   cheers_count: number;
   site?: string;
   ton_wallet?: string;
-  game_state: {
-    stage: number;
-    [key: string]: any;
-  };
+  game_state: GameState;
   [key: string]: any;
 }
 
@@ -61,10 +74,10 @@ const Profile: React.FC = () => {
     if (!user) return;
     setIsLoading(true);
     try {
-      const currentStage = user.game_state?.stage || 0;
+      const currentStage = user.game_state.stage;
       const newStage = walletAddress && currentStage === 2 ? 3 : currentStage;
 
-      const newGameState = {
+      const newGameState: GameState = {
         ...user.game_state,
         stage: newStage,
       };
