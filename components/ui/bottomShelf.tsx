@@ -69,7 +69,7 @@ const BottomShelf: React.FC<BottomShelfProps> = ({ bitmask }) => {
                           }`}
                         >
                           {link.icon}
-                          <span className="text-xs mt-1">{link.label}</span>
+                          <span className="text-xs mt-1 text-center">{link.label}</span>
                         </Link>
                       </TooltipTrigger>
                       <TooltipContent>
