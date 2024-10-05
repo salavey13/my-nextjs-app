@@ -243,7 +243,7 @@ const quizQuestionsRU: QuizQuestion[] = [
     }
   ];
   const getQuizQuestions = (lang: string) => {
-    return lang === 'en' ? quizQuestions : quizQuestionsRu;
+    return lang === 'en' ? quizQuestions : quizQuestionsRU;
   };
 export default function QuizComponent() {
   const { state, t } = useAppContext(); // translation hook
