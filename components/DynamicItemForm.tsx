@@ -1,7 +1,7 @@
 // components\DynamicItemForm.tsx                           
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { supabase } from "../lib/supabaseClient";
 import { useAppContext } from "../context/AppContext";
 import { Button } from "@/components/ui/button";
@@ -47,7 +47,7 @@ const DynamicItemForm: React.FC<DynamicItemFormProps> = ({ itemType }) => {
   const [agreementText, setAgreementText] = useState<string>("");
   const [gameType, setGameType] = useState<string | null>(null); // Add game type state
 
-  const fetchFormFields = async () => {
+  const fetchFormFields = useCallback(async () => {
     setLoading(true);
     try {
       const { data, error } = await supabase
@@ -65,7 +65,7 @@ const DynamicItemForm: React.FC<DynamicItemFormProps> = ({ itemType }) => {
       const sections: FormSection[] = Object.keys(data.fields).map(
         (sectionKey) => {
           const section = data.fields[sectionKey];
-          const sectionTitle = sectionKey; // Use sectionKey as the title
+          const sectionTitle = sectionKey;
 
           const fields = Array.isArray(section.fields)
             ? section.fields.map((field: any) => ({
@@ -94,11 +94,11 @@ const DynamicItemForm: React.FC<DynamicItemFormProps> = ({ itemType }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [itemType, t]);
 
   useEffect(() => {
     fetchFormFields();
-  }, [fetchFormFields, itemType]);
+  }, [fetchFormFields]);
 
   const handleInputChange = (
     sectionIndex: number,

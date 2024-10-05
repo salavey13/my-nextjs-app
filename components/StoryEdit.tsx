@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { useAppContext } from '@/context/AppContext'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -32,28 +32,28 @@ export function StoryEdit() {
   const [editedStage, setEditedStage] = useState<StoryStage | null>(null)
   const [isLoading, setIsLoading] = useState(false)
 
-  const fetchStoryStages = async () => {
-    setIsLoading(true)
+  const fetchStoryStages = useCallback(async () => {
+    setIsLoading(true);
     const { data, error } = await supabase
       .from('story_stages')
       .select('*')
-      .order('stage', { ascending: true })
+      .order('stage', { ascending: true });
 
     if (error) {
       toast({
         title: t('error'),
         description: t('failedToFetchStoryStages'),
         variant: 'destructive',
-      })
+      });
     } else {
-      setStoryStages(data || [])
+      setStoryStages(data || []);
     }
-    setIsLoading(false)
-  }
+    setIsLoading(false);
+  }, [t]);
 
   useEffect(() => {
-    fetchStoryStages()
-  }, [fetchStoryStages])
+    fetchStoryStages();
+  }, [fetchStoryStages]);
 
   const handleStageSelect = (stageId: string) => {
     setSelectedStage(stageId)

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 
 interface InfinityMirrorProps {
@@ -43,21 +43,21 @@ export default function InfinityMirror({ layers = 10, baseColor = '#000000', acc
     })
   }
 
-  const animate = (time: number) => {
+  const animate = useCallback((time: number) => {
     if (previousTimeRef.current !== undefined) {
       setGyro((prevGyro) => ({
         x: prevGyro.x * 0.95 + mousePos.x * 0.05,
         y: prevGyro.y * 0.95 + mousePos.y * 0.05,
-      }))
+      }));
     }
-    previousTimeRef.current = time
-    requestRef.current = requestAnimationFrame(animate)
-  }
+    previousTimeRef.current = time;
+    requestRef.current = requestAnimationFrame(animate);
+  }, [mousePos]);
 
   useEffect(() => {
-    requestRef.current = requestAnimationFrame(animate)
-    return () => cancelAnimationFrame(requestRef.current!)
-  }, [animate])
+    requestRef.current = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(requestRef.current!);
+  }, [animate]);
 
   return (
     <div className="w-full h-full overflow-hidden" style={{ backgroundColor: baseColor }}>

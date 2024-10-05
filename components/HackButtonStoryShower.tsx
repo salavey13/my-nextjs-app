@@ -64,7 +64,7 @@ const HackButton: React.FC = () => {
     if (gamesVisited.cards && gamesVisited.dice && user?.game_state?.stage === 0) {
       progressStage(1);
     }
-  }, [gamesVisited, user?.game_state?.stage]);
+  }, [gamesVisited, user?.game_state?.stage, progressStage]);
 
   const handleHackButtonClick = async () => {
     if (!user?.id) {

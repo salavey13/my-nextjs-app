@@ -82,7 +82,7 @@ export default function MainSection({ setItemDetailsModalOpen, setSelectedItem, 
   }
 
   const OnboardingSection = () => (
-    <div className="w-full h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 to-black text-white p-4">
+    <div className="w-full min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 to-black text-white p-4">
       <Card className="w-full max-w-4xl bg-gray-800 text-white">
         <CardHeader>
           <CardTitle className="text-3xl font-bold mb-4">Welcome to Hack the System</CardTitle>
@@ -90,19 +90,19 @@ export default function MainSection({ setItemDetailsModalOpen, setSelectedItem, 
         </CardHeader>
         <CardContent className="space-y-6">
           <p className="text-lg">
-            In <em>Hack the System</em>, you're about to enter a world where power isn't given, it's taken. Guided by Xuinity, your AI mentor, you'll learn to exploit the cracks in the system, hack the boundaries of control, and unlock hidden potential that most can't even see.
+            In <em>Hack the System</em>, you&apos;re about to enter a world where power isn&apos;t given, it&apos;s taken. Guided by Xuinity, your AI mentor, you&apos;ll learn to exploit the cracks in the system, hack the boundaries of control, and unlock hidden potential that most can&apos;t even see.
           </p>
           <h2 className="text-2xl font-semibold">Key Features:</h2>
           <ul className="list-disc list-inside space-y-2">
             <li><strong>Deceptive Simplicity:</strong> Start with seemingly basic games that hide a deeper reality.</li>
-            <li><strong>The Crash:</strong> Discover the hidden "Hack the System" button and witness a simulated system crash that reveals the true nature of the game.</li>
+            <li><strong>The Crash:</strong> Discover the hidden &quot;Hack the System&quot; button and witness a simulated system crash that reveals the true nature of the game.</li>
             <li><strong>Visual Programming:</strong> Learn coding concepts through an intuitive, visual interface.</li>
             <li><strong>The Bit Matrix:</strong> Manipulate the very fabric of the game world, and by extension, reality itself.</li>
             <li><strong>Ethical Dilemmas:</strong> Face moral choices that impact the game world and challenge your perception of right and wrong.</li>
             <li><strong>Blurred Reality:</strong> Experience a game that constantly questions the boundaries between the virtual and the real.</li>
           </ul>
           <p className="text-lg font-semibold mt-6">
-            This isn't just a game. It's a rebellion against limitations, a journey into the heart of technology's potential, and a stark warning about the power we wield in the digital age. Are you ready to hack the system, or will the system hack you?
+            This isn&apos;t just a game. It&apos;s a rebellion against limitations, a journey into the heart of technology&apos;s potential, and a stark warning about the power we wield in the digital age. Are you ready to hack the system, or will the system hack you?
           </p>
           <Button 
             onClick={() => setShowOnboarding(false)} 

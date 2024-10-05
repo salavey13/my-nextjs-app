@@ -1,7 +1,7 @@
 // components/QrCodeForm.tsx
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useAppContext } from "@/context/AppContext";
 import { Button } from "@/components/ui/button";
 import QRCode from "react-qr-code";  // Updated QR Code library import 
@@ -13,7 +13,7 @@ const QrCodeForm: React.FC = () => {
   const { state, saveFormState, t } = useAppContext();
   const [qrCodeUrl, setQrCodeUrl] = useState<string | null>(null);
 
-  const handleSaveState = async () => {
+  const handleSaveState = useCallback(async () => {
     // Save form state to Supabase and get the form ID
     const { data, error } = await supabase
       .from('forms')
@@ -31,7 +31,7 @@ const QrCodeForm: React.FC = () => {
       const qrUrl = `https://t.me/oneSitePlsBot/vip?ref_form=${formId}`;
       setQrCodeUrl(qrUrl);
     }
-  };
+  }, [state.formState]);
 
   useEffect(() => {
     handleSaveState();  // Automatically save and generate the QR code on component load

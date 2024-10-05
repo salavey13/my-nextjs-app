@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import useTelegram from '../../hooks/useTelegram';
 import { Button } from './button';
 
@@ -17,38 +17,36 @@ const EnhancedChatButton = () => {
     setBackgroundColor
   } = useTelegram();
 
-  const handleOpenChatGPT = () => {
+  const handleOpenChatGPT = useCallback(() => {
     openLink('https://chatgpt.com/');
-    //hideMainButton();
-  };
+  }, [openLink]);
 
-  const handleOpenVPN = () => {
-    openLink('https://s3.amazonaws.com/psiphon/web/mjr4-p23r-puwl/download.html#direct');//https://s3.amazonaws.com/psiphon/web/mjr4-p23r-puwl/download.html#direct');
-  };
+  const handleOpenVPN = useCallback(() => {
+    openLink('https://s3.amazonaws.com/psiphon/web/mjr4-p23r-puwl/download.html#direct');
+  }, [openLink]);
 
-  const handleOpenVPN2 = () => {
-    openLink('https://play.google.com/store/apps/details?id=org.bepass.oblivion&pli=1');//https://s3.amazonaws.com/psiphon/web/mjr4-p23r-puwl/download.html#direct');
-  };
+  const handleOpenVPN2 = useCallback(() => {
+    openLink('https://play.google.com/store/apps/details?id=org.bepass.oblivion&pli=1');
+  }, [openLink]);
 
-  const handleOpenGitHub = () => {
+  const handleOpenGitHub = useCallback(() => {
     openLink('https://github.com/salavey13/my-nextjs-app/tree/main/components/game');
-  };
+  }, [openLink]);
 
-  const handleOpenVercel = () => {
+  const handleOpenVercel = useCallback(() => {
     openLink('https://vercel.com/salavey13s-projects/my-nextjs-app/deployments');
-  };
+  }, [openLink]);
 
   useEffect(() => {
     if (tg) {
       showMainButton('v0.dev');
-      tg.MainButton?.onClick(handleOpenChatGPT)
-      tg.MainButton?.setParams({color: "#e1ff01", text_color: "#000000"})
-      //showBackButton();
-      setBottomBarColor("#282c33"),
-        setHeaderColor("#282c33"),
-        setBackgroundColor("#282c33")
+      tg.MainButton?.onClick(handleOpenChatGPT);
+      tg.MainButton?.setParams({color: "#e1ff01", text_color: "#000000"});
+      setBottomBarColor("#282c33");
+      setHeaderColor("#282c33");
+      setBackgroundColor("#282c33");
     }
-  }, [setBottomBarColor, setHeaderColor, handleOpenChatGPT, tg, showMainButton, showBackButton, setBackgroundColor]);
+  }, [tg, showMainButton, setBottomBarColor, setHeaderColor, setBackgroundColor, handleOpenChatGPT]);
   
   return (
     <div className={`flex items-center justify-center ${theme === 'dark' ? 'bg-black' : 'bg-white'} p-2 gap-2`}>

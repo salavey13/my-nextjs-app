@@ -78,7 +78,7 @@ const PaymentNotification: React.FC<{ link?: string }> = ({ link }) => {
     if (state?.user && link && !notificationSent) {
       sendPaymentNotification(link);
     }
-  }, [notificationSent, state?.user, link]);
+  }, [notificationSent, state?.user, link, sendPaymentNotification]);
 
   return (
     <div className="p-6 bg-gray-800 rounded-lg shadow-lg">

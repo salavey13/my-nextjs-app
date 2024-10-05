@@ -63,66 +63,64 @@ export default function Rents() {
     const [typeNameError, setTypeNameError] = useState('');
     const [hasTriedToSave, setHasTriedToSave] = useState(false); // Track save attempts
 
-  const fetchItems = async () => {
-    const { data, error } = await supabase
-      .from("items")
-      .select("*");
-
-    if (error) {
-      console.error("Error fetching items:", error);
-    } else {
-      setItems(data || []);
-    }
-  };
-
-  useEffect(() => {
-    const fetchItemTypes = async () => {
+    const fetchItems = useCallback(async () => {
+      const { data, error } = await supabase
+        .from("items")
+        .select("*");
+  
+      if (error) {
+        console.error("Error fetching items:", error);
+      } else {
+        setItems(data || []);
+      }
+    }, []);
+  
+    const fetchItemTypes = useCallback(async () => {
       const { data, error } = await supabase.from("item_types").select("*");
-
+  
       if (error) {
         console.error("Error fetching item types:", error);
       } else {
         setItemTypes(data || []);
       }
-    };
-
-    fetchItemTypes();
-  }, []);
-
-  useEffect(() => {
-    if (!user) return;
-
-    const fetchRents = async () => {
+    }, []);
+  
+    const fetchRents = useCallback(async () => {
+      if (!user) return;
       const { data, error } = await supabase
         .from("rents")
         .select("*")
         .eq("user_id", user.telegram_id);
-
+  
       if (error) {
         console.error("Error fetching rents:", error);
       } else {
         setRents(data || []);
       }
-    };
-
-    
-
-    const fetchUsers = async () => {
+    }, [user]);
+  
+    const fetchUsers = useCallback(async () => {
       const { data, error } = await supabase
         .from("users")
         .select("*");
-
+  
       if (error) {
         console.error("Error fetching users:", error);
       } else {
         setUsers(data || []);
       }
-    };
-
-    fetchRents();
-    fetchItems();
-    fetchUsers();
-  }, [user, fetchItems]);
+    }, []);
+  
+    useEffect(() => {
+      fetchItemTypes();
+    }, [fetchItemTypes]);
+  
+    useEffect(() => {
+      if (!user) return;
+      fetchRents();
+      fetchItems();
+      fetchUsers();
+    }, [user, fetchRents, fetchItems, fetchUsers]);
 
   useEffect(() => {
     if (!router) return;

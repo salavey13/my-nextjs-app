@@ -1,7 +1,7 @@
 import React from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "../components/ui/card";
 import { useAppContext } from "../context/AppContext";
-
+import Image from 'next/image';
 export interface DynamicItemDetailsProps {
   itemType: string;
   itemDetails: any;
@@ -118,7 +118,13 @@ const toCamelCase = (str:string) => {
 
           {photo_upload && photo_upload.photo ? (
             <div className="border-b border-gray-200 pb-2 rounded-2xl">
-              <img src={photo_upload.photo} alt={t(toCamelCase('photo_upload.photo_alt'))} className="w-full h-auto" />
+              <Image 
+                src={photo_upload.photo} 
+                alt={t(toCamelCase('photo_upload.photo_alt'))} 
+                width={500} 
+                height={300} 
+                layout="responsive"
+              />
             </div>
           ) : (
             <div className="border-b border-gray-200 pb-2">
