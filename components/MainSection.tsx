@@ -119,6 +119,7 @@ export default function MainSection({ setItemDetailsModalOpen, setSelectedItem, 
     <div className="w-full min-h-[calc(100vh-128px)]">
       {showOnboarding ? (
         <OnboardingSection />
+        <div className="w-full min-h-[calc(100vh-64px)]"/>
       ) : !selectedCreator ? (
         <div className="grid gap-4 p-4 md:grid-cols-2 lg:grid-cols-3">
           {creators.map((creator) => (
