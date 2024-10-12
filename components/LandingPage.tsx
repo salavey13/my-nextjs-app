@@ -89,10 +89,7 @@ export default function LandingPage() {
   const handlePlayGame = useCallback(async () => {
     
     await sendTelegramNotification();
-    toast({
-      title: "Game is up there ↑",
-      description: "The game is on!",
-    });
+    
   }, []);
 
 return (
