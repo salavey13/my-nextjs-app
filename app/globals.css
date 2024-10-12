@@ -81,10 +81,18 @@ h1 {
 }
 
 /* Fix button text color on active state */
-button:active {
-  background-color: var(--accent-color); /* Keep the yellow background */
-  color: #000000; /* Text should turn black */
+button {
+  background-color: var(--accent-color);
+  color: black; /* Ensure black text on bright yellow */
 }
+
+button:hover,
+button:focus,
+button:active {
+  background-color: var(--accent-color);
+  color: black; /* Keep text black during interaction */
+}
+
 
 @keyframes glitchyFadeIn {
   0% {
