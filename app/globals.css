@@ -322,4 +322,17 @@ nav {
 .shuffle-button:hover {
   background-color: #0056b3;
 }
+
+@keyframes ticker {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+.animate-ticker {
+  animation: ticker 30s linear infinite;
+}
 }
