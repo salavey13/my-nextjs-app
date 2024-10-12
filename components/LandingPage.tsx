@@ -93,134 +93,137 @@ export default function LandingPage() {
     });
   }, []);
 
-  return (
-    <div className="min-h-screen bg-gray-950 text-gray-100">
-      <motion.header 
-        className="fixed top-16 left-0 right-0 bg-gray-900 shadow-md z-50"
-        initial={{ y: 0 }}
-        animate={{ y: isNavbarVisible ? 0 : -80 }}
-        transition={{ type: "spring", stiffness: 300, damping: 30 }}
-      >
-        <nav className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-[#e1ff01]">v0 AI Dev</h1>
-          <div className="md:hidden">
-            <Button variant="ghost" size="icon" onClick={() => setIsMenuOpen(!isMenuOpen)}>
-              {isMenuOpen ? <X /> : <Menu />}
-            </Button>
-          </div>
-          <div className="hidden md:flex space-x-4">
-            {["home", "features", "pricing", "templates", "instructions", "mobile-shop", "faq", "contact"].map((item) => (
-              <Button
-                key={item}
-                variant="ghost"
-                className={activeSection === item ? "text-[#e1ff01]" : ""}
-                onClick={() => scrollToSection(item)}
-              >
-                {item.charAt(0).toUpperCase() + item.slice(1)}
-              </Button>
-            ))}
-          </div>
-        </nav>
-      </motion.header>
-
-      <AnimatePresence>
-        {isMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="fixed top-16 left-0 right-0 bg-gray-900 shadow-md z-40 md:hidden"
-          >
-            {["home", "features", "pricing", "templates", "instructions", "mobile-shop", "faq", "contact"].map((item) => (
-              <Button
-                key={item}
-                variant="ghost"
-                className="w-full text-left py-3 px-4"
-                onClick={() => scrollToSection(item)}
-              >
-                {item.charAt(0).toUpperCase() + item.slice(1)}
-              </Button>
-            ))}
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      <main className="container mx-auto px-4 pt-20 pb-12">
-        <section id="home" className="text-center mb-16 pt-8">
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="text-4xl font-bold text-[#e1ff01] mb-4"
-          >
-            Unlock Success with v0 AI
-          </motion.h2>
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-            className="text-xl text-gray-300 max-w-2xl mx-auto"
-          >
-            Embark on a transformative web development journey with v0, your ultimate AI-powered solution for creating stunning websites effortlessly.
-          </motion.p>
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.6 }}
-            className="mt-8"
-          >
-            <Image
-              src="/vercel.svg"
-              alt="AI-powered web development"
-              width={420}
-              height={420}
-              className="rounded-lg shadow-lg mx-auto"
-            />
-          </motion.div>
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.8 }}
-            className="mt-8"
-          >
-            <a
-              href="https://youtube.com/salavey13"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-block bg-[#e1ff01] text-black px-6 py-3 rounded-lg text-lg font-semibold hover:bg-opacity-90 transition-colors"
+return (
+  <div className="min-h-screen bg-gray-950 text-gray-100">
+    <motion.header 
+      className="fixed top-16 left-0 right-0 bg-gray-900 shadow-md z-50"
+      initial={{ y: 0 }}
+      animate={{ y: isNavbarVisible ? 0 : -80 }}
+      transition={{ type: "spring", stiffness: 300, damping: 30 }}
+    >
+      <nav className="container mx-auto px-4 py-4 flex justify-between items-center">
+        <h1 className="text-2xl font-bold text-[#e1ff01]">{t('header.title')}</h1>
+        <div className="md:hidden">
+          <Button variant="ghost" size="icon" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+            {isMenuOpen ? <X /> : <Menu />}
+          </Button>
+        </div>
+        <div className="hidden md:flex space-x-4">
+          {["home", "features", "pricing", "templates", "instructions", "mobile-shop", "faq", "contact"].map((item) => (
+            <Button
+              key={item}
+              variant="ghost"
+              className={activeSection === item ? "text-[#e1ff01]" : ""}
+              onClick={() => scrollToSection(item)}
             >
-              Watch Our Videos <ChevronRight className="inline-block ml-2" />
-            </a>
-          </motion.div>
-        </section>
+              {t(`nav.${item}`)}
+            </Button>
+          ))}
+        </div>
+      </nav>
+    </motion.header>
 
-        <section id="features" className="mb-16">
-          <h3 className="text-3xl font-bold text-[#e1ff01] mb-8 text-center">Key Features</h3>
-          <div className="grid md:grid-cols-3 gap-8">
-            {[
-              { icon: <Zap className="text-[#e1ff01]" />, title: "AI-Powered Magic", description: "Let our cutting-edge AI take the lead in crafting mesmerizing websites." },
-              { icon: <Code className="text-[#e1ff01]" />, title: "Effortless Creation", description: "Watch your dream website materialize in just days, stress-free." },
-              { icon: <Palette className="text-[#e1ff01]" />, title: "Customizable Templates", description: "Kickstart your project with our handcrafted, customizable templates." },
-            ].map((feature, index) => (
-              <motion.div
-                key={feature.title}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 * (index + 1) }}
-              >
-                <Card className="bg-gray-900 border-gray-800 hover:border-[#e1ff01] transition-colors">
-                  <CardHeader>
-                    <CardTitle className="flex items-center text-[#e1ff01]">
-                      {feature.icon}
-                      <span className="ml-2">{feature.title}</span>
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="text-gray-300">{feature.description}</CardContent>
-                </Card>
-              </motion.div>
-            ))}
-          </div>
-        </section>
+    <AnimatePresence>
+      {isMenuOpen && (
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -20 }}
+          className="fixed top-16 left-0 right-0 bg-gray-900 shadow-md z-40 md:hidden"
+        >
+          {["home", "features", "pricing", "templates", "instructions", "mobile-shop", "faq", "contact"].map((item) => (
+            <Button
+              key={item}
+              variant="ghost"
+              className="w-full text-left py-3 px-4"
+              onClick={() => scrollToSection(item)}
+            >
+              {t(`nav.${item}`)}
+            </Button>
+          ))}
+        </motion.div>
+      )}
+    </AnimatePresence>
+
+    <main className="container mx-auto px-4 pt-20 pb-12">
+      <section id="home" className="text-center mb-16 pt-8">
+        <motion.h2
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="text-4xl font-bold text-[#e1ff01] mb-4"
+        >
+          {t('home.heading')}
+        </motion.h2>
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="text-xl text-gray-300 max-w-2xl mx-auto"
+        >
+          {t('home.description')}
+        </motion.p>
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.6 }}
+          className="mt-8"
+        >
+          <Image
+            src="/vercel.svg"
+            alt={t('home.imageAlt')}
+            width={420}
+            height={420}
+            className="rounded-lg shadow-lg mx-auto"
+          />
+        </motion.div>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.8 }}
+          className="mt-8"
+        >
+          <a
+            href="https://youtube.com/salavey13"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-block bg-[#e1ff01] text-black px-6 py-3 rounded-lg text-lg font-semibold hover:bg-opacity-90 transition-colors"
+          >
+            {t('home.watchVideos')} <ChevronRight className="inline-block ml-2" />
+          </a>
+        </motion.div>
+      </section>
+
+      <section id="features" className="mb-16">
+        <h3 className="text-3xl font-bold text-[#e1ff01] mb-8 text-center">{t('features.heading')}</h3>
+        <div className="grid md:grid-cols-3 gap-8">
+          {[
+            { icon: <Zap className="text-[#e1ff01]" />, title: t('features.aiPowered'), description: t('features.aiPoweredDesc') },
+            { icon: <Code className="text-[#e1ff01]" />, title: t('features.effortlessCreation'), description: t('features.effortlessCreationDesc') },
+            { icon: <Palette className="text-[#e1ff01]" />, title: t('features.customizableTemplates'), description: t('features.customizableTemplatesDesc') },
+          ].map((feature, index) => (
+            <motion.div
+              key={feature.title}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 * (index + 1) }}
+            >
+              <Card className="bg-gray-900 border-gray-800 hover:border-[#e1ff01] transition-colors">
+                <CardHeader>
+                  <CardTitle className="flex items-center text-[#e1ff01]">
+                    {feature.icon}
+                    <span className="ml-2">{feature.title}</span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="text-gray-300">{feature.description}</CardContent>
+              </Card>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
+
+
 
         <section id="pricing" className="text-center mb-16">
           <h3 className="text-3xl font-bold text-[#e1ff01] mb-8">Pricing Plans</h3>
