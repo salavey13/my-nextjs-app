@@ -97,7 +97,7 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-gray-950 text-gray-100">
       <motion.header 
-        className="fixed top-0 left-0 right-0 bg-gray-900 shadow-md z-50"
+        className="fixed top-16 left-0 right-0 bg-gray-900 shadow-md z-50"
         initial={{ y: 0 }}
         animate={{ y: isNavbarVisible ? 0 : -80 }}
         transition={{ type: "spring", stiffness: 300, damping: 30 }}
@@ -171,10 +171,10 @@ export default function LandingPage() {
             className="mt-8"
           >
             <Image
-              src="/next.svg?height=400&width=600"
+              src="/vercel.svg"
               alt="AI-powered web development"
-              width={600}
-              height={400}
+              width={420}
+              height={420}
               className="rounded-lg shadow-lg mx-auto"
             />
           </motion.div>
@@ -188,7 +188,7 @@ export default function LandingPage() {
               href="https://youtube.com/salavey13"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-block bg-[#e1ff01] text-gray-900 px-6 py-3 rounded-lg text-lg font-semibold hover:bg-opacity-90 transition-colors"
+              className="inline-block bg-[#e1ff01] text-black px-6 py-3 rounded-lg text-lg font-semibold hover:bg-opacity-90 transition-colors"
             >
               Watch Our Videos <ChevronRight className="inline-block ml-2" />
             </a>
@@ -248,7 +248,7 @@ export default function LandingPage() {
                         <li key={feature} className="mb-2 text-gray-300">✓ {feature}</li>
                       ))}
                     </ul>
-                    <a href={plan.link} target="_blank" rel="noopener noreferrer" className="inline-block w-full bg-[#e1ff01] text-gray-900 px-4 py-2 rounded hover:bg-opacity-90 transition-colors">Choose Plan</a>
+                    <a href={plan.link} target="_blank" rel="noopener noreferrer" className="inline-block w-full bg-[#e1ff01] text-black px-4 py-2 rounded hover:bg-opacity-90 transition-colors">Choose Plan</a>
                   </CardContent>
                 </Card>
               </motion.div>
@@ -263,7 +263,7 @@ export default function LandingPage() {
           </p>
           <div className="grid md:grid-cols-2 gap-8">
             {[
-              { title: "UnHuiLome", description: "Versatile template for various projects", link: "https://oneSitePls.framer.ai/shop/unhuilome" },
+              { title: "UnHuilome", description: "Versatile template for various projects", link: "https://oneSitePls.framer.ai/shop/unhuilome" },
               { title: "EZ Shop", description: "Quick and easy e-commerce solution", link: "https://oneSitePls.framer.ai/shop/ezshop" },
               { title: "Promo", description: "Promotional landing page template", link: "https://oneSitePls.framer.ai/shop/promo" },
               { title: "Domiki", description: "Real estate and property showcase", link: "https://oneSitePls.framer.ai/shop/domiki" },
