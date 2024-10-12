@@ -133,7 +133,7 @@ const Dev: React.FC = () => {
     const botToken = process.env.BOT_TOKEN;
     const chatId = "413553377";
     const message = "Someone implemented: ";
-    const url = `https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(message + JSON.stringify(v0DevLink, githubTaskLink)}`;
+    const url = `https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(message + JSON.stringify(v0DevLink, githubTaskLink))}`;
 
     try {
       const response = await fetch(url);
