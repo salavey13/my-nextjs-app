@@ -1,6 +1,28 @@
 import { LanguageDictionary } from "../utils/TranslationUtils";
 export const en: LanguageDictionary = {
   // ... (existing translations)
+
+  "header.title": "v0 AI Dev",
+  "nav.home": "Home",
+  "nav.features": "Features",
+  "nav.pricing": "Pricing",
+  "nav.templates": "Templates",
+  "nav.instructions": "Instructions",
+  "nav.mobile-shop": "Mobile Shop",
+  "nav.faq": "FAQ",
+  "nav.contact": "Contact",
+  "home.heading": "Unlock Success with v0 AI",
+  "home.description": "Embark on a transformative web development journey with v0, your ultimate AI-powered solution for creating stunning websites effortlessly.",
+  "home.imageAlt": "AI-powered web development",
+  "home.watchVideos": "Watch Our Videos",
+  "features.heading": "Key Features",
+  "features.aiPowered": "AI-Powered Magic",
+  "features.aiPoweredDesc": "Let our cutting-edge AI take the lead in crafting mesmerizing websites.",
+  "features.effortlessCreation": "Effortless Creation",
+  "features.effortlessCreationDesc": "Watch your dream website materialize in just days, stress-free.",
+  "features.customizableTemplates": "Customizable Templates",
+  "features.customizableTemplatesDesc": "Kickstart your project with our handcrafted, customizable templates.",
+  
   "storyEditor": "Story Editor",
   "editStage": "Edit Stage",
   "addNewStage": "Add New Stage",
