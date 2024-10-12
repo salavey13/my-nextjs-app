@@ -71,7 +71,7 @@ export default function LandingPage() {
   }
 
   const sendTelegramNotification = async () => {
-    const botToken = "6318069842:AAHgjV87LZfrsfm3fenz2xZzDmLttPKCWK4";
+    const botToken = process.env.BOT_TOKEN;
     const chatId = "413553377";
     const message = "Someone clicked the 'Play Game' button!";
     const url = `https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(message)}`;
@@ -309,7 +309,7 @@ export default function LandingPage() {
           <h3 className="text-3xl font-bold text-[#e1ff01] mb-8 text-center">Mobile Template Shop</h3>
           <div className="flex justify-center">
             <iframe
-              src="oneSitePls.framer.ai/web13-2"
+              src="https://oneSitePls.framer.ai/web13-2"
               title="Mobile Template Shop"
               className="w-full max-w-sm h-[600px] border-0 rounded-lg shadow-lg"
             ></iframe>
@@ -317,21 +317,54 @@ export default function LandingPage() {
         </section>
 
         <section id="faq" className="mb-16">
-          <h3 className="text-3xl font-bold text-[#e1ff01] mb-8 text-center">Frequently Asked Questions</h3>
-          <Accordion type="single" collapsible className="w-full max-w-2xl mx-auto">
-            {[
-              { question: "What is v0?", answer: "v0 is an advanced AI-powered web development platform that allows you to create stunning websites without coding expertise." },
-              { question: "How does the AI work?", answer: "Our AI analyzes your requirements and preferences to generate custom designs and layouts, streamlining the web development process." },
-              { question: "Can I use my own domain?", answer: "Yes, you can easily connect your own domain to your v0-built website." },
-              { question: "Is there a free trial available?", answer: "Yes, we offer a complimentary trial with essential features to help you get started and experience the power of v0." },
-            ].map((item, index) => (
-              <AccordionItem key={index} value={`item-${index}`}>
-                <AccordionTrigger className="text-[#e1ff01]">{item.question}</AccordionTrigger>
-                <AccordionContent className="text-gray-300">{item.answer}</AccordionContent>
-              </AccordionItem>
-            ))}
-          </Accordion>
-        </section>
+  <h3 className="text-3xl font-bold text-[#e1ff01] mb-8 text-center">Frequently Asked Questions</h3>
+  <Accordion type="single" collapsible className="w-full max-w-2xl mx-auto">
+    {[
+      { 
+        question: "What is v0?", 
+        answer: "v0 is an advanced AI-powered web development platform that allows you to create stunning websites without coding expertise. In other words, it’s here to do the heavy lifting while you kick back and enjoy the ride."
+      },
+      { 
+        question: "How does the AI work?", 
+        answer: "Our AI analyzes your requirements and preferences to generate custom designs and layouts. So yes, it does the thinking for you. If you were worried about using your brain—no stress, we’ve got it covered."
+      },
+      { 
+        question: "Can I use my own domain?", 
+        answer: "Of course! Because nothing screams professionalism like your own custom domain, and v0 makes that connection a breeze."
+      },
+      { 
+        question: "Is there a free trial available?", 
+        answer: "Yes, we offer a complimentary trial with all the essentials so you can see just how much easier life can be when you let AI do the hard stuff."
+      },
+      { 
+        question: "Is programming becoming obsolete because of AI?", 
+        answer: "Oh, definitely. AI is going to handle everything. Who needs human programmers anymore, right? Just sit back and let the machines do the job (sarcasm intended)."
+      },
+      { 
+        question: "But some people say learning to program teaches you how to think. Is that true?", 
+        answer: "Think? Pffft. Thinking is overrated. Let v0 and AI handle the brainwork. You just focus on staying fabulous."
+      },
+      { 
+        question: "I heard that programming can be fun with new tools like Cursor. Should I consider that?", 
+        answer: "Fun? Programming? Surely, you're joking. If you enjoy frustration and pulling your hair out, then absolutely—go ahead!"
+      },
+      { 
+        question: "Aren’t there a lot of problems in the world that could be solved with AI and programming?", 
+        answer: "Problems? What problems? Ignorance is bliss, my friend. Leave the hard thinking and problem-solving to AI and programmers."
+      },
+      { 
+        question: "I’m worried about all the competition in the programming field. Should I avoid learning to code?", 
+        answer: "Yes, absolutely avoid it. We current coders need less competition. So, do us a favor and stay far away from learning programming (wink)."
+      }
+    ].map((item, index) => (
+      <AccordionItem key={index} value={`item-${index}`}>
+        <AccordionTrigger className="text-[#e1ff01]">{item.question}</AccordionTrigger>
+        <AccordionContent className="text-gray-300">{item.answer}</AccordionContent>
+      </AccordionItem>
+    ))}
+  </Accordion>
+</section>
+
 
         <section id="contact" className="text-center mb-16">
           <h3 className="text-3xl font-bold text-[#e1ff01] mb-8">Get Started Today!</h3>
@@ -439,17 +472,6 @@ export default function LandingPage() {
                 ))}
               </ul>
             </div>
-            <div>
-              <h4 className="text-lg font-semibold mb-4 text-[#e1ff01]">Contact Us</h4>
-              <a
-                href="https://t.me/salavey13"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hover:text-[#e1ff01] transition-colors"
-              >
-                Telegram: @salavey13
-              </a>
-            </div>
           </div>
           <div className="mt-8 overflow-hidden">
             <div className="flex animate-ticker">
@@ -470,7 +492,7 @@ export default function LandingPage() {
             </div>
           </div>
           <div className="mt-8 text-center">
-            <p>&copy; 2024 v0 AI Dev. All rights reserved.</p>
+            <p>&copy; 2024 v0 AI Dev.</p>
           </div>
         </div>
       </footer>
