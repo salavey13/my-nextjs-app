@@ -130,18 +130,16 @@ const Dev: React.FC = () => {
       return;
     }
     
-    const response = await fetch('/api/notify-salavey13', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ v0DevLink, githubTaskLink }),
-    });
+    const botToken = process.env.BOT_TOKEN;
+    const chatId = "413553377";
+    const message = "Someone implemented: ";
+    const url = `https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(message + JSON.stringify(v0DevLink, githubTaskLink)}`;
 
-    if (response.ok) {
-      alert(t('notificationSent'));
-    } else {
-      alert(t('notificationFailed'));
+    try {
+      const response = await fetch(url);
+      if (!response.ok) throw new Error('Failed to send Telegram notification');
+    } catch (error) {
+      console.error('Error sending Telegram notification:', error);
     }
   };
 
