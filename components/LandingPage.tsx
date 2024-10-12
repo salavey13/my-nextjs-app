@@ -152,7 +152,7 @@ return (
           transition={{ delay: 0.2 }}
           className="text-4xl font-bold text-[#e1ff01] mb-4"
         >
-          {t('home.heading')}
+          {t("home.heading")}
         </motion.h2>
         <motion.p
           initial={{ opacity: 0, y: 20 }}
@@ -211,10 +211,10 @@ return (
                 <CardHeader>
                   <CardTitle className="flex items-center text-[#e1ff01]">
                     {feature.icon}
-                    <span className="ml-2">{feature.title}</span>
+                    <span className="ml-2">{t('feature.title')}</span>
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="text-gray-300">{feature.description}</CardContent>
+                <CardContent className="text-gray-300">{t('feature.description')}</CardContent>
               </Card>
             </motion.div>
           ))}
