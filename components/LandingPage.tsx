@@ -171,7 +171,7 @@ export default function LandingPage() {
             className="mt-8"
           >
             <Image
-              src="/placeholder.svg?height=400&width=600"
+              src="/next.svg?height=400&width=600"
               alt="AI-powered web development"
               width={600}
               height={400}
@@ -227,9 +227,9 @@ export default function LandingPage() {
           <h3 className="text-3xl font-bold text-[#e1ff01] mb-8">Pricing Plans</h3>
           <div className="grid md:grid-cols-3 gap-8">
             {[
-              { title: "BASIC", price: "$13", link: "oneSitePls.framer.ai/shop/3993889", features: ["AI-powered design", "Responsive layout", "Basic SEO optimization"] },
-              { title: "PRO", price: "$69", link: "oneSitePls.framer.ai/shop/3994713", features: ["All BASIC features", "Advanced customization", "Priority support", "Performance analytics"] },
-              { title: "ENTERPRISE", price: "$420", link: "oneSitePls.framer.ai/shop/3994855", features: ["All PRO features", "Unlimited pages", "Custom integrations", "Dedicated account manager"] },
+              { title: "BASIC", price: "$13", link: "https://oneSitePls.framer.ai/shop/3993889", features: ["AI-powered design", "Responsive layout", "Basic SEO optimization"] },
+              { title: "PRO", price: "$69", link: "https://oneSitePls.framer.ai/shop/3994713", features: ["All BASIC features", "Advanced customization", "Priority support", "Performance analytics"] },
+              { title: "ENTERPRISE", price: "$420", link: "https://oneSitePls.framer.ai/shop/3994855", features: ["All PRO features", "Unlimited pages", "Custom integrations", "Dedicated account manager"] },
             ].map((plan, index) => (
               <motion.div
                 key={plan.title}
@@ -263,10 +263,10 @@ export default function LandingPage() {
           </p>
           <div className="grid md:grid-cols-2 gap-8">
             {[
-              { title: "UnHuiLome", description: "Versatile template for various projects", link: "oneSitePls.framer.ai/shop/unhuilome" },
-              { title: "EZ Shop", description: "Quick and easy e-commerce solution", link: "oneSitePls.framer.ai/shop/ezshop" },
-              { title: "Promo", description: "Promotional landing page template", link: "oneSitePls.framer.ai/shop/promo" },
-              { title: "Domiki", description: "Real estate and property showcase", link: "oneSitePls.framer.ai/shop/domiki" },
+              { title: "UnHuiLome", description: "Versatile template for various projects", link: "https://oneSitePls.framer.ai/shop/unhuilome" },
+              { title: "EZ Shop", description: "Quick and easy e-commerce solution", link: "https://oneSitePls.framer.ai/shop/ezshop" },
+              { title: "Promo", description: "Promotional landing page template", link: "https://oneSitePls.framer.ai/shop/promo" },
+              { title: "Domiki", description: "Real estate and property showcase", link: "https://oneSitePls.framer.ai/shop/domiki" },
             ].map((template, index) => (
               <motion.div
                 key={template.title}
@@ -295,7 +295,7 @@ export default function LandingPage() {
           </p>
           <div className="text-center">
             <a
-              href="oneSitePls.framer.ai/instructions"
+              href="https://oneSitePls.framer.ai/instructions"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-block bg-[#e1ff01] text-gray-900 px-6 py-3 rounded-lg hover:bg-opacity-90 transition-colors"
