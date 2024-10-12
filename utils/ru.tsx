@@ -1,6 +1,27 @@
 import { LanguageDictionary } from "../utils/TranslationUtils";
 export const ru: LanguageDictionary = {
   
+  "header.title": "v0 AI Разработка",
+  "nav.home": "Главная",
+  "nav.features": "Функции",
+  "nav.pricing": "Цены",
+  "nav.templates": "Шаблоны",
+  "nav.instructions": "Инструкции",
+  "nav.mobile-shop": "Мобильный магазин",
+  "nav.faq": "Вопросы и ответы",
+  "nav.contact": "Контакты",
+  "home.heading": "Откройте успех с v0 AI",
+  "home.description": "Начните трансформационное путешествие в веб-разработке с v0 — вашим идеальным решением на базе ИИ для создания потрясающих сайтов без усилий.",
+  "home.imageAlt": "Веб-разработка с ИИ",
+  "home.watchVideos": "Смотрите наши видео",
+  "features.heading": "Ключевые функции",
+  "features.aiPowered": "Магия на базе ИИ",
+  "features.aiPoweredDesc": "Пусть наш передовой ИИ возьмет на себя создание завораживающих веб-сайтов.",
+  "features.effortlessCreation": "Легкость создания",
+  "features.effortlessCreationDesc": "Смотрите, как ваш сайт мечты материализуется всего за несколько дней, без стресса.",
+  "features.customizableTemplates": "Настраиваемые шаблоны",
+  "features.customizableTemplatesDesc": "Начните свой проект с наших вручную созданных, настраиваемых шаблонов.",
+
   "storyEditor": "Редактор сказок",
   "editStage": "Потеребонькать уровень",
   "addNewStage": "Напихать новый уровень",
