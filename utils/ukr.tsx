@@ -1,6 +1,27 @@
 import { LanguageDictionary } from "../utils/TranslationUtils";
 export const ukr: LanguageDictionary = {
   
+  "header.title": "v0 AI Розробка",
+  "nav.home": "Головна",
+  "nav.features": "Функції",
+  "nav.pricing": "Ціни",
+  "nav.templates": "Шаблони",
+  "nav.instructions": "Інструкції",
+  "nav.mobile-shop": "Мобільний магазин",
+  "nav.faq": "Питання і відповіді",
+  "nav.contact": "Контакти",
+  "home.heading": "Відкрийте успіх з v0 AI",
+  "home.description": "Розпочніть трансформаційну подорож у веб-розробці з v0, вашим ідеальним рішенням на базі штучного інтелекту для легкого створення чудових вебсайтів.",
+  "home.imageAlt": "Веб-розробка з ШІ",
+  "home.watchVideos": "Дивіться наші відео",
+  "features.heading": "Ключові функції",
+  "features.aiPowered": "Магія на базі ШІ",
+  "features.aiPoweredDesc": "Нехай наш передовий ШІ візьме на себе створення зачаровуючих вебсайтів.",
+  "features.effortlessCreation": "Легкість створення",
+  "features.effortlessCreationDesc": "Дивіться, як ваш вебсайт мрії створюється за кілька днів, без стресу.",
+  "features.customizableTemplates": "Налаштовувані шаблони",
+  "features.customizableTemplatesDesc": "Почніть свій проєкт з наших ретельно розроблених, налаштовуваних шаблонів.",
+
   "storyEditor": "Редактор байок",
   "editStage": "Зашаманити рівень",
   "addNewStage": "Нашкрябати новий рівень",
