@@ -358,7 +358,7 @@ export default function LandingPage() {
       }
     ].map((item, index) => (
       <AccordionItem key={index} value={`item-${index}`}>
-        <AccordionTrigger className="text-[#e1ff01]">{item.question}</AccordionTrigger>
+        <AccordionTrigger className="text-black">{item.question}</AccordionTrigger>
         <AccordionContent className="text-gray-300">{item.answer}</AccordionContent>
       </AccordionItem>
     ))}
