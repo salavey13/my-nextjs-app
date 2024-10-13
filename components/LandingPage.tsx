@@ -127,7 +127,6 @@ export default function LandingPage() {
             {["home", "features", "pricing", "templates", "instructions", "mobile-shop", "faq", "contact"].map((item) => (
               <Button
                 key={item}
-                variant="ghost"
                 className={activeSection === item ? "text-[#e1ff01]" : ""}
                 onClick={() => scrollToSection(item)}
               >
@@ -142,7 +141,7 @@ export default function LandingPage() {
         {isMenuOpen && (
           <motion.div
             initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
+            animate={{ opacity: 1, y: 64 }}
             exit={{ opacity: 0, y: -20 }}
             className="fixed top-16 left-0 right-0 bg-gray-900 shadow-md z-40 md:hidden"
           >
@@ -491,10 +490,18 @@ export default function LandingPage() {
                   className="text-gray-400 hover:text-[#e1ff01] transition-colors mx-4 drop-shadow-custom"
                   variant="ghost"
                 >
-                  <span className="sr-only">{link.name}</span>
-                  <svg className="h-12 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                   {/* SVG icon - larger on mobile (3x) */}
+                  <svg
+                    className="h-12 w-12 md:h-12 md:w-6"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                  >
                     <path d={link.icon} />
                   </svg>
+                  
+                  {/* Optionally, you can add the text for larger screens if needed */}
+                  <span className="hidden md:block m-2">{link.name}</span> {/* Visible only on larger screens */}
                 </Button>
               ))}
             </div>
