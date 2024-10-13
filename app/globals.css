@@ -81,10 +81,10 @@ h1 {
 }
 
 /* Fix button text color on active state */
-button {
-  background-color: var(--accent-color);
-  color: black; /* Ensure black text on bright yellow */
-}
+/* button {*/
+  /* background-color: var(--accent-color); */
+  /*color: black;  Ensure black text on bright yellow */
+/* } */
 
 button:hover,
 button:focus,
@@ -127,22 +127,6 @@ button:active {
   background: hsl(var(--background));
   border-radius: var(--radius);
   box-shadow: 8px 8px 16px hsl(var(--background) / 0.4), -8px -8px 16px hsl(var(--foreground) / 0.2);
-}
-
-/* Button Ripple Effect */
-@keyframes glitchyFadeIn {
-  0% {
-    opacity: 0;
-    transform: translateX(5px);
-  }
-  50% {
-    opacity: 0.7;
-    transform: translateX(-3px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateX(0);
-  }
 }
 
 /* Add glitch shadow effect */
@@ -342,7 +326,10 @@ nav {
 
 .animate-ticker {
   animation: ticker 30s linear infinite;
-  white-space: nowrap; /* Prevents line breaks */
-  max-width: max-content; /* Ensures container only takes required width */
+  white-space: nowrap;
+}
+
+.drop-shadow-custom {
+  filter: drop-shadow(0 0 0.75rem rgba(225, 255, 1, 0.5));
 }
 }

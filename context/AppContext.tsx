@@ -185,7 +185,7 @@ const initialState: AppState = {
     id: 43,
     telegram_id: 413553377,
     telegram_username: "SALAVEY13",
-    lang: "ru",
+    lang: "en",
     avatar_url: "https://octodex.github.com/images/mona-the-rivetertocat.png",
     coins: 1000,
     crypto: 50,

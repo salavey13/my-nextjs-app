@@ -137,20 +137,20 @@ const HackButton: React.FC = () => {
         <>
           <Button
             onClick={() => handleGameSelect('cards')}
-            className="bg-blue-500 text-white text-xl px-6 py-3 rounded-lg shadow-lg hover:bg-blue-600 transition-all mb-4"
+            className="bg-blue-500 text-xl px-6 py-3 rounded-lg hover:bg-blue-600 transition-all mb-4 drop-shadow-custom"
           >
             {t('playCards')}
           </Button>
           <Button
             onClick={() => handleGameSelect('dice')}
-            className="bg-green-500 text-white text-xl px-6 py-3 rounded-lg shadow-lg hover:bg-green-600 transition-all mb-4"
+            className="bg-green-500 text-xl px-6 py-3 rounded-lg hover:bg-green-600 transition-all mb-4 drop-shadow-custom"
           >
             {t('playDice')}
           </Button>
           {currentStage === 1 && (
             <Button
               onClick={handleHackButtonClick}
-              className="bg-yellow-500 text-black text-xl px-6 py-3 rounded-lg shadow-lg hover:bg-yellow-600 transition-all"
+              className="bg-yellow-500 text-xl px-6 py-3 rounded-lg hover:bg-yellow-600 transition-all drop-shadow-custom"
             >
               {t('hackButton')}
             </Button>

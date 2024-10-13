@@ -11,7 +11,8 @@ import { ChevronRight, Code, Menu, Palette, X, Zap, Globe, Lock, Users } from "l
 import { motion, AnimatePresence, useScroll, useMotionValueEvent } from "framer-motion"
 import Image from "next/image"
 import { toast } from "@/hooks/use-toast"
-import { useAppContext } from '../context/AppContext';
+import { useAppContext } from '../context/AppContext'
+import useTelegram from '@/hooks/useTelegram';
 
 const socialLinks = [
   { name: "YouTube", icon: "M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z", url: "https://youtube.com/salavey13" },
@@ -32,6 +33,18 @@ export default function LandingPage() {
   const [isNavbarVisible, setIsNavbarVisible] = useState(true)
   const lastScrollY = useRef(0)
   const { scrollY } = useScroll()
+  const {
+    tg,
+    theme,
+    openLink,
+    showMainButton,
+    hideMainButton,
+    showBackButton,
+    closeWebApp,
+    setBottomBarColor,
+    setHeaderColor,
+    setBackgroundColor
+  } = useTelegram();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -49,7 +62,7 @@ export default function LandingPage() {
     }
 
     window.addEventListener("scroll", handleScroll)
-    return () => window.removeEventListener("scroll", handleScroll)
+    return () =>   window.removeEventListener("scroll", handleScroll)
   }, [])
 
   useMotionValueEvent(scrollY, "change", (latest) => {
@@ -64,7 +77,7 @@ export default function LandingPage() {
   const scrollToSection = (sectionId: string) => {
     const section = document.getElementById(sectionId)
     if (section) {
-      const yOffset = -80 // Adjust this value based on your navbar height
+      const yOffset = -128 // Adjust this value based on your navbar height
       const y = section.getBoundingClientRect().top + window.pageYOffset + yOffset
       window.scrollTo({ top: y, behavior: "smooth" })
     }
@@ -87,355 +100,371 @@ export default function LandingPage() {
   };
 
   const handlePlayGame = useCallback(async () => {
-    
+    openLink("https://t.me/oneSitePlsBot/vip?ref=salavey13");
     await sendTelegramNotification();
-    
-  }, []);
+    toast({
+      title: t('gameOpenedTitle'),
+      description: t('gameOpenedDescription'),
+    });
+  }, [t]);
 
-return (
-  <div className="min-h-screen bg-gray-950 text-gray-100">
-    <motion.header 
-      className="fixed top-16 left-0 right-0 bg-gray-900 shadow-md z-50"
-      initial={{ y: 0 }}
-      animate={{ y: isNavbarVisible ? 0 : -80 }}
-      transition={{ type: "spring", stiffness: 300, damping: 30 }}
-    >
-      <nav className="container mx-auto px-4 py-4 flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-[#e1ff01]">{t('header.title')}</h1>
-        <div className="md:hidden">
-          <Button variant="ghost" size="icon" onClick={() => setIsMenuOpen(!isMenuOpen)}>
-            {isMenuOpen ? <X /> : <Menu />}
-          </Button>
-        </div>
-        <div className="hidden md:flex space-x-4">
-          {["home", "features", "pricing", "templates", "instructions", "mobile-shop", "faq", "contact"].map((item) => (
-            <Button
-              key={item}
-              variant="ghost"
-              className={activeSection === item ? "text-[#e1ff01]" : ""}
-              onClick={() => scrollToSection(item)}
-            >
-              {t(`nav.${item}`)}
+  return (
+    <div className="min-h-screen bg-gray-950 text-gray-100">
+      <motion.header 
+        className="fixed top-16 left-0 right-0 bg-gray-900 shadow-md z-50"
+        initial={{ y: 0 }}
+        animate={{ y: isNavbarVisible ? 0 : -80 }}
+        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+      >
+        <nav className="container mx-auto px-4 py-4 flex justify-between items-center">
+          <h1 className="text-2xl font-bold text-[#e1ff01]">{t('header.title')}</h1>
+          <div className="md:hidden">
+            <Button variant="ghost" size="icon" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+              {isMenuOpen ? <X /> : <Menu />}
             </Button>
-          ))}
-        </div>
-      </nav>
-    </motion.header>
+          </div>
+          <div className="hidden md:flex space-x-4">
+            {["home", "features", "pricing", "templates", "instructions", "mobile-shop", "faq", "contact"].map((item) => (
+              <Button
+                key={item}
+                variant="ghost"
+                className={activeSection === item ? "text-[#e1ff01]" : ""}
+                onClick={() => scrollToSection(item)}
+              >
+                {t(`nav.${item}`)}
+              </Button>
+            ))}
+          </div>
+        </nav>
+      </motion.header>
 
-    <AnimatePresence>
-      {isMenuOpen && (
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -20 }}
-          className="fixed top-16 left-0 right-0 bg-gray-900 shadow-md z-40 md:hidden"
-        >
-          {["home", "features", "pricing", "templates", "instructions", "mobile-shop", "faq", "contact"].map((item) => (
-            <Button
-              key={item}
-              variant="ghost"
-              className="w-full text-left py-3 px-4"
-              onClick={() => scrollToSection(item)}
-            >
-              {t(`nav.${item}`)}
-            </Button>
-          ))}
-        </motion.div>
-      )}
-    </AnimatePresence>
-
-    <main className="container mx-auto px-4 pt-20 pb-12">
-      <section id="home" className="text-center mb-16 pt-8">
-        <motion.h2
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="text-4xl font-bold text-[#e1ff01] mb-4"
-        >
-          {t("home.heading")}
-        </motion.h2>
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-          className="text-xl text-gray-300 max-w-2xl mx-auto"
-        >
-          {t('home.description')}
-        </motion.p>
-        <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.6 }}
-          className="mt-8"
-        >
-          <Image
-            src="/vercel.svg"
-            alt={t('home.imageAlt')}
-            width={420}
-            height={420}
-            className="rounded-lg mx-auto drop-shadow-custom"
-          />
-        </motion.div>
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.8 }}
-          className="mt-8"
-        >
-          <a
-            href="https://youtube.com/salavey13"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-block bg-[#e1ff01] text-black px-6 py-3 rounded-lg text-lg font-semibold hover:bg-opacity-90 transition-colors"
+      <AnimatePresence>
+        {isMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="fixed top-16 left-0 right-0 bg-gray-900 shadow-md z-40 md:hidden"
           >
-            {t('home.watchVideos')} <ChevronRight className="inline-block ml-2" />
-          </a>
-        </motion.div>
-      </section>
+            {["home", "features", "pricing", "templates", "instructions", "mobile-shop", "faq", "contact"].map((item) => (
+              <Button
+                key={item}
+                variant="ghost"
+                className="w-full text-left py-3 px-4"
+                onClick={() => scrollToSection(item)}
+              >
+                {t(`nav.${item}`)}
+              </Button>
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-      <section id="features" className="mb-16">
-        <h3 className="text-3xl font-bold text-[#e1ff01] mb-8 text-center">{t('features.heading')}</h3>
-        <div className="grid md:grid-cols-3 gap-8">
-          {[
-            { icon: <Zap className="text-[#e1ff01]" />, title: t('features.aiPowered'), description: t('features.aiPoweredDesc') },
-            { icon: <Code className="text-[#e1ff01]" />, title: t('features.effortlessCreation'), description: t('features.effortlessCreationDesc') },
-            { icon: <Palette className="text-[#e1ff01]" />, title: t('features.customizableTemplates'), description: t('features.customizableTemplatesDesc') },
-          ].map((feature, index) => (
-            <motion.div
-              key={feature.title}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 * (index + 1) }}
+      <main className="container mx-auto px-4 pt-20 pb-12">
+        <section id="home" className="text-center mb-16 pt-8">
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="text-4xl font-bold text-[#e1ff01] mb-4"
+          >
+            {t("home.heading")}
+          </motion.h2>
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+            className="text-xl text-gray-300 max-w-2xl mx-auto"
+          >
+            {t('home.description')}
+          </motion.p>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.6 }}
+            className="mt-8 relative"
+          >
+            <Image
+              src="/vercel.svg"
+              alt={t('home.imageAlt')}
+              width={69}
+              height={69}
+              className="rounded-lg mx-auto drop-shadow-custom"
+            />
+            <Image
+              src="/next.svg"
+              alt="Next.js Logo"
+              width={100}
+              height={100}
+              className="absolute top-1/4 left-1/4 transform -translate-x-1/2 -translate-y-1/2 drop-shadow-custom"
+            />
+            <Image
+              src="/reactb.svg"
+              alt="React Logo"
+              width={80}
+              height={80}
+              className="absolute bottom-1/4 right-1/4 transform translate-x-1/2 translate-y-1/2 drop-shadow-custom"
+            />
+          </motion.div>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.8 }}
+            className="mt-8"
+          >
+            <Button
+              onClick={() => openLink("https://youtube.com/salavey13")}
+              className="bg-green-500 text-xl px-6 py-3 rounded-lg hover:bg-green-600 transition-all mb-4 drop-shadow-custom"
             >
-              <Card className="bg-gray-900 border-gray-800 hover:border-[#e1ff01] transition-colors">
+              {t('home.watchVideos')} <ChevronRight className="inline-block ml-2" />
+            </Button>
+          </motion.div>
+        </section>
+
+        <section id="features" className="mb-16">
+          <h3 className="text-3xl font-bold text-[#e1ff01] mb-8 text-center">{t('features.heading')}</h3>
+          <div className="grid md:grid-cols-3 gap-8">
+            {[
+              { icon: <Zap className="text-[#e1ff01]" />, title: t('features.aiPowered'), description: t('features.aiPoweredDesc') },
+              { icon: <Code className="text-[#e1ff01]" />, title: t('features.effortlessCreation'), description: t('features.effortlessCreationDesc') },
+              { icon: <Palette className="text-[#e1ff01]" />, title: t('features.customizableTemplates'), description: t('features.customizableTemplatesDesc') },
+            ].map((feature, index) => (
+              <motion.div
+                key={feature.title}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 * (index + 1) }}
+              >
+                <Card className="bg-gray-900 border-gray-800 hover:border-[#e1ff01] transition-colors">
+                  <CardHeader>
+                    <CardTitle className="flex items-center text-[#e1ff01]">
+                      {feature.icon}
+                      <span className="ml-2">{feature.title}</span>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="text-gray-300">{feature.description}</CardContent>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+        </section>
+
+        <section id="pricing" className="text-center mb-16">
+          <h3 className="text-3xl font-bold text-[#e1ff01] mb-8">{t('pricing.heading')}</h3>
+          <div className="grid md:grid-cols-3 gap-8">
+            {[
+              { title: t('pricing.basic'), price: "$13", link: "https://oneSitePls.framer.ai/shop/3993889", features: [t('pricing.feature1'), t('pricing.feature2'), t('pricing.feature3')] },
+              { title: t('pricing.pro'), price: "$69", link: "https://oneSitePls.framer.ai/shop/3994713", features: [t('pricing.proFeature1'), t('pricing.proFeature2'), t('pricing.proFeature3'), t('pricing.proFeature4')] },
+              { title: t('pricing.enterprise'), price: "$420", link: "https://oneSitePls.framer.ai/shop/3994855", features: [t('pricing.enterpriseFeature1'), t('pricing.enterpriseFeature2'), t('pricing.enterpriseFeature3'), t('pricing.enterpriseFeature4')] },
+            ].map((plan, index) => (
+              <motion.div
+                key={plan.title}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 * (index + 1) }}
+              >
+                <Card className="bg-gray-900 border-gray-800 hover:border-[#e1ff01] transition-colors">
+                  <CardHeader>
+                    <CardTitle className="text-[#e1ff01]">{plan.title}</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-3xl font-bold mb-4 text-gray-100">{plan.price}</p>
+                    <ul className="text-left mb-4">
+                      {plan.features.map((feature) => (
+                        <li key={feature} className="mb-2 text-gray-300">✓ {feature}</li>
+                      ))}
+                    </ul>
+                    <Button
+                      onClick={() => openLink(plan.link)}
+                      className="w-full bg-[#e1ff01] hover:text-gray-900 text-gray-100"
+                    >
+                      {t('pricing.choosePlan')}
+                    </Button>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+        </section>
+
+        <section id="templates" className="mb-16">
+          <h3 className="text-3xl font-bold text-[#e1ff01] mb-8 text-center">{t('templates.heading')}</h3>
+          <p className="text-center mb-8 text-gray-300">
+            {t('templates.description')}
+          </p>
+          <div className="grid md:grid-cols-2 gap-8">
+            {[
+              { title: t('templates.unhuilome'), description: t('templates.unhuilomeDesc'), link: "https://oneSitePls.framer.ai/shop/unhuilome" },
+              { title: t('templates.ezShop'), description: t('templates.ezShopDesc'), link: "https://oneSitePls.framer.ai/shop/ezshop" },
+              { title: t('templates.promo'), description: t('templates.promoDesc'), link: "https://oneSitePls.framer.ai/shop/promo" },
+              { title: t('templates.domiki'), description: t('templates.domikiDesc'), link: "https://oneSitePls.framer.ai/shop/domiki" },
+            ].map((template, index) => (
+              <motion.div
+                key={template.title}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 * (index + 1) }}
+              >
+                <Card className="bg-gray-900 border-gray-800 hover:border-[#e1ff01] transition-colors">
+                  <CardHeader>
+                    <CardTitle className="text-[#e1ff01]">{template.title}</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-gray-300 mb-4">{template.description}</p>
+                    <Button
+                      onClick={() => openLink(template.link)}
+                      className="bg-green-500 text-l px-6 py-3 rounded-lg hover:bg-green-600 transition-all mb-4 drop-shadow-custom"
+                    >
+                      {t('templates.viewTemplate')}
+                    </Button>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+        </section>
+
+        <section id="instructions" className="mb-16">
+          <h3 className="text-3xl font-bold text-[#e1ff01] mb-8 text-center">{t('instructions.heading')}</h3>
+          <p className="text-center mb-8 text-gray-300">
+            {t('instructions.description')}
+          </p>
+          <div className="text-center">
+            <Button
+              onClick={() => openLink("https://oneSitePls.framer.ai/instructions")}
+              className="bg-green-500 text-xl px-6 py-3 rounded-lg hover:bg-green-600 transition-all mb-4 drop-shadow-custom"
+            >
+              {t('instructions.viewInstructions')}
+            </Button>
+          </div>
+        </section>
+
+        <section id="mobile-shop" className="mb-16">
+          <h3 className="text-3xl font-bold text-[#e1ff01] mb-8 text-center">{t('mobileShop.heading')}</h3>
+          <div className="flex justify-center">
+            <iframe
+              src="https://oneSitePls.framer.ai/web13-2"
+              title={t('mobileShop.title')}
+              className="w-full max-w-sm h-[600px] border-0 rounded-lg shadow-lg"
+            ></iframe>
+          </div>
+        </section>
+
+        <section id="faq" className="mb-16">
+          <h3 className="text-3xl font-bold text-[#e1ff01] mb-8 text-center">{t('faq.heading')}</h3>
+          <Accordion type="single" collapsible className="w-full max-w-2xl mx-auto">
+            {[
+              { 
+                question: t('faq.whatIsV0'), 
+                answer: t('faq.whatIsV0Answer')
+              },
+              { 
+                question: t('faq.howDoesAIWork'), 
+                answer: t('faq.howDoesAIWorkAnswer')
+              },
+              { 
+                question: t('faq.customDomain'), 
+                answer: t('faq.customDomainAnswer')
+              },
+              { 
+                question: t('faq.freeTrial'), 
+                answer: t('faq.freeTrialAnswer')
+              },
+              { 
+                question: t('faq.isProgrammingObsolete'), 
+                answer: t('faq.isProgrammingObsoleteAnswer')
+              },
+              { 
+                question: t('faq.programmingTeachesThinking'), 
+                answer: t('faq.programmingTeachesThinkingAnswer')
+              },
+              { 
+                question: t('faq.programmingWithNewTools'), 
+                answer: t('faq.programmingWithNewToolsAnswer')
+              },
+            ].map((item, index) => (
+              <AccordionItem key={index} value={`item-${index}`} className="border-b border-gray-700">
+                <AccordionTrigger className="text-gray-100 hover:text-[#e1ff01] py-4">{item.question}</AccordionTrigger>
+                <AccordionContent className="text-gray-300 pb-4">{item.answer}</AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
+        </section>
+
+        <section id="contact" className="text-center mb-16">
+          <h3 className="text-3xl font-bold text-[#e1ff01] mb-8">{t('contact.title')}</h3>
+          <p className="text-xl text-gray-300 max-w-2xl mx-auto mb-8">
+            {t('contact.description')}
+          </p>
+          <div className="flex flex-col md:flex-row justify-center items-center gap-4">
+            <Button size="lg" className="bg-green-500 text-xl px-6 py-3 rounded-lg hover:bg-green-600 transition-all mb-4 drop-shadow-custom" onClick={handlePlayGame}>
+              {t('contact.playGameButton')} <ChevronRight className="ml-2" />
+            </Button>
+            <Button
+             size="lg"
+              onClick={() => openLink("https://t.me/salavey13")}
+              className=" mb-4 text-xl text-[#e1ff01] hover:underline"
+            >
+              {t('contact.contactUs')}
+            </Button>
+          </div>
+        </section>
+
+        <section id="gigs" className="mb-16">
+          <h3 className="text-3xl font-bold text-[#e1ff01] mb-8 text-center">{t('gigs.title')}</h3>
+          <div className="grid md:grid-cols-2 gap-8">
+            {[1, 2].map((index) => (
+              <Card key={index} className="bg-gray-900 border-gray-800 hover:border-[#e1ff01] transition-colors">
+                <CardHeader>
+                  <CardTitle className="text-[#e1ff01]">{t(`gigs.service${index}Title`)}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="mb-4 text-gray-300">{t(`gigs.service${index}Description`)}</p>
+                  <p className="text-2xl font-bold mb-4 text-gray-100">{t(`gigs.service${index}Price`)}</p>
+                  <Button
+                    onClick={() => openLink(t(`gigs.service${index}Link`))}
+                    className="bg-[#e1ff01] text-gray-900 hover:bg-opacity-90 hover:text-gray-900"
+                  >
+                    {t(`gigs.service${index}LinkText`)}
+                  </Button>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </section>
+
+        <section id="benefits" className="mb-16">
+          <h3 className="text-3xl font-bold text-[#e1ff01] mb-8 text-center">{t('benefits.title')}</h3>
+          <div className="grid md:grid-cols-3 gap-8">
+            {[
+              { icon: <Globe className="text-[#e1ff01] w-8 h-8" />, title: t('benefits.benefit1Title'), description: t('benefits.benefit1Description') },
+              { icon: <Lock className="text-[#e1ff01] w-8 h-8" />, title: t('benefits.benefit2Title'), description: t('benefits.benefit2Description') },
+              { icon: <Users className="text-[#e1ff01] w-8 h-8" />, title: t('benefits.benefit3Title'), description: t('benefits.benefit3Description') },
+            ].map((benefit, index) => (
+              <Card key={index} className="bg-gray-900 border-gray-800 hover:border-[#e1ff01] transition-colors">
                 <CardHeader>
                   <CardTitle className="flex items-center text-[#e1ff01]">
-                    {feature.icon}
-                    <span className="ml-2">{feature.title}</span>
+                    {benefit.icon}
+                    <span className="ml-2">{benefit.title}</span>
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="text-gray-300">{feature.description}</CardContent>
+                <CardContent className="text-gray-300">{benefit.description}</CardContent>
               </Card>
-            </motion.div>
-          ))}
-        </div>
-      </section>
+            ))}
+          </div>
+        </section>
+      </main>
 
-
-
-
-      <section id="pricing" className="text-center mb-16">
-  <h3 className="text-3xl font-bold text-[#e1ff01] mb-8">{t('pricing.heading')}</h3>
-  <div className="grid md:grid-cols-3 gap-8">
-    {[
-      { title: t('pricing.basic'), price: "$13", link: "https://oneSitePls.framer.ai/shop/3993889", features: [t('pricing.feature1'), t('pricing.feature2'), t('pricing.feature3')] },
-      { title: t('pricing.pro'), price: "$69", link: "https://oneSitePls.framer.ai/shop/3994713", features: [t('pricing.proFeature1'), t('pricing.proFeature2'), t('pricing.proFeature3'), t('pricing.proFeature4')] },
-      { title: t('pricing.enterprise'), price: "$420", link: "https://oneSitePls.framer.ai/shop/3994855", features: [t('pricing.enterpriseFeature1'), t('pricing.enterpriseFeature2'), t('pricing.enterpriseFeature3'), t('pricing.enterpriseFeature4')] },
-    ].map((plan, index) => (
-      <motion.div
-        key={plan.title}
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 * (index + 1) }}
-      >
-        <Card className="bg-gray-900 border-gray-800 hover:border-[#e1ff01] transition-colors">
-          <CardHeader>
-            <CardTitle className="text-[#e1ff01]">{plan.title}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-3xl font-bold mb-4 text-gray-100">{plan.price}</p>
-            <ul className="text-left mb-4">
-              {plan.features.map((feature) => (
-                <li key={feature} className="mb-2 text-gray-300">✓ {feature}</li>
-              ))}
-            </ul>
-            <a href={plan.link} target="_blank" rel="noopener noreferrer" className="inline-block w-full bg-[#e1ff01] text-black px-4 py-2 rounded-lg hover:bg-opacity-90 transition-colors">{t('pricing.choosePlan')}</a>
-          </CardContent>
-        </Card>
-      </motion.div>
-    ))}
-  </div>
-</section>
-
-<section id="templates" className="mb-16">
-  <h3 className="text-3xl font-bold text-[#e1ff01] mb-8 text-center">{t('templates.heading')}</h3>
-  <p className="text-center mb-8 text-gray-300">
-    {t('templates.description')}
-  </p>
-  <div className="grid md:grid-cols-2 gap-8">
-    {[
-      { title: t('templates.unhuilome'), description: t('templates.unhuilomeDesc'), link: "https://oneSitePls.framer.ai/shop/unhuilome" },
-      { title: t('templates.ezShop'), description: t('templates.ezShopDesc'), link: "https://oneSitePls.framer.ai/shop/ezshop" },
-      { title: t('templates.promo'), description: t('templates.promoDesc'), link: "https://oneSitePls.framer.ai/shop/promo" },
-      { title: t('templates.domiki'), description: t('templates.domikiDesc'), link: "https://oneSitePls.framer.ai/shop/domiki" },
-    ].map((template, index) => (
-      <motion.div
-        key={template.title}
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 * (index + 1) }}
-      >
-        <Card className="bg-gray-900 border-gray-800 hover:border-[#e1ff01] transition-colors">
-          <CardHeader>
-            <CardTitle className="text-[#e1ff01]">{template.title}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-gray-300 mb-4">{template.description}</p>
-            <a href={template.link} target="_blank" rel="noopener noreferrer" className="inline-block bg-[#e1ff01] text-gray-900 px-4 py-2 rounded-lg hover:bg-opacity-90 transition-colors">{t('templates.viewTemplate')}</a>
-          </CardContent>
-        </Card>
-      </motion.div>
-    ))}
-  </div>
-</section>
-
-<section id="instructions" className="mb-16">
-  <h3 className="text-3xl font-bold text-[#e1ff01] mb-8 text-center">{t('instructions.heading')}</h3>
-  <p className="text-center mb-8 text-gray-300">
-    {t('instructions.description')}
-  </p>
-  <div className="text-center">
-    <a
-      href="https://oneSitePls.framer.ai/instructions"
-      target="_blank"
-      rel="noopener noreferrer"
-      className="inline-block bg-[#e1ff01] text-gray-900 px-6 py-3 rounded-lg hover:bg-opacity-90 transition-colors"
-    >
-      {t('instructions.viewInstructions')}
-    </a>
-  </div>
-</section>
-
-<section id="mobile-shop" className="mb-16">
-  <h3 className="text-3xl font-bold text-[#e1ff01] mb-8 text-center">{t('mobileShop.heading')}</h3>
-  <div className="flex justify-center">
-    <iframe
-      src="https://oneSitePls.framer.ai/web13-2"
-      title={t('mobileShop.title')}
-      className="w-full max-w-sm h-[600px] border-0 rounded-lg shadow-lg"
-    ></iframe>
-  </div>
-</section>
-
-<section id="faq" className="mb-16">
-  <h3 className="text-3xl font-bold text-[#e1ff01] mb-8 text-center">{t('faq.heading')}</h3>
-  <Accordion type="single" collapsible className="w-full max-w-2xl mx-auto">
-    {[
-      { 
-        question: t('faq.whatIsV0'), 
-        answer: t('faq.whatIsV0Answer')
-      },
-      { 
-        question: t('faq.howDoesAIWork'), 
-        answer: t('faq.howDoesAIWorkAnswer')
-      },
-      { 
-        question: t('faq.customDomain'), 
-        answer: t('faq.customDomainAnswer')
-      },
-      { 
-        question: t('faq.freeTrial'), 
-        answer: t('faq.freeTrialAnswer')
-      },
-      { 
-        question: t('faq.isProgrammingObsolete'), 
-        answer: t('faq.isProgrammingObsoleteAnswer')
-      },
-      { 
-        question: t('faq.programmingTeachesThinking'), 
-        answer: t('faq.programmingTeachesThinkingAnswer')
-      },
-      { 
-        question: t('faq.programmingWithNewTools'), 
-        answer: t('faq.programmingWithNewToolsAnswer')
-      },
-    ].map((item, index) => (
-      <AccordionItem key={index} value={`item-${index}`}>
-        <AccordionTrigger className="text-gray-100">{item.question}</AccordionTrigger>
-        <AccordionContent className="text-gray-300">{item.answer}</AccordionContent>
-      </AccordionItem>
-    ))}
-  </Accordion>
-</section>
-
-
-
-<section id="contact" className="text-center mb-16">
-  <h3 className="text-3xl font-bold text-[#e1ff01] mb-8">{t('contact.title')}</h3>
-  <p className="text-xl text-gray-300 max-w-2xl mx-auto mb-8">
-    {t('contact.description')}
-  </p>
-  <div className="flex flex-col md:flex-row justify-center items-center gap-4">
-    <Button size="lg" className="bg-[#e1ff01] text-gray-900 hover:bg-opacity-90" onClick={handlePlayGame}>
-      {t('contact.playGameButton')} <ChevronRight className="ml-2" />
-    </Button>
-    <a
-      href="https://t.me/salavey13"
-      target="_blank"
-      rel="noopener noreferrer"
-      className="text-[#e1ff01] hover:underline"
-    >
-      {t('contact.contactUs')}
-    </a>
-  </div>
-</section>
-
-<section id="gigs" className="mb-16">
-  <h3 className="text-3xl font-bold text-[#e1ff01] mb-8 text-center">{t('gigs.title')}</h3>
-  <div className="grid md:grid-cols-2 gap-8">
-    {[1, 2].map((index) => (
-      <Card key={index} className="bg-gray-900 border-gray-800 hover:border-[#e1ff01] transition-colors">
-        <CardHeader>
-          <CardTitle className="text-[#e1ff01]">{t(`gigs.service${index}Title`)}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="mb-4 text-gray-300">{t(`gigs.service${index}Description`)}</p>
-          <p className="text-2xl font-bold mb-4 text-gray-100">{t(`gigs.service${index}Price`)}</p>
-          <a
-            href="#"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-block bg-[#e1ff01] text-black px-4 py-2 rounded-lg hover:bg-opacity-90 transition-colors"
-          >
-            {t(`gigs.service${index}LinkText`)}
-          </a>
-        </CardContent>
-      </Card>
-    ))}
-  </div>
-</section>
-
-<section id="benefits" className="mb-16">
-  <h3 className="text-3xl font-bold text-[#e1ff01] mb-8 text-center">{t('benefits.title')}</h3>
-  <div className="grid md:grid-cols-3 gap-8">
-    {[1, 2, 3].map((index) => (
-      <Card key={index} className="bg-gray-900 border-gray-800 hover:border-[#e1ff01] transition-colors">
-        <CardHeader>
-          <CardTitle className="flex items-center text-[#e1ff01]">
-            {index === 1 && <Globe className="text-[#e1ff01] w-8 h-8" />}
-            {index === 2 && <Lock className="text-[#e1ff01] w-8 h-8" />}
-            {index === 3 && <Users className="text-[#e1ff01] w-8 h-8" />}
-            <span className="ml-2">{t(`benefits.benefit${index}Title`)}</span>
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="text-gray-300">{t(`benefits.benefit${index}Description`)}</CardContent>
-      </Card>
-    ))}
-  </div>
-</section>
-</main>
-
-<footer className="bg-gray-900 text-gray-300 py-8">
-  <div className="container mx-auto px-4">
-    <div className="grid md:grid-cols-3 gap-8">
-      <div>
-        <h4 className="text-lg font-semibold mb-4 text-[#e1ff01]">{t('footer.aboutTitle')}</h4>
-        <p>{t('footer.aboutDescription')}</p>
-      </div>
-      
-      <div>
-        <h4 className="text-lg font-semibold mb-4 text-[#e1ff01]">{t('footer.quickLinksTitle')}</h4>
-        <ul className="space-y-2">
+      <footer className="bg-gray-900 text-gray-300 py-8">
+        <div className="container mx-auto px-4">
+          <div className="grid md:grid-cols-3 gap-8">
+            <div>
+              <h4 className="text-lg font-semibold mb-4 text-[#e1ff01]">{t('footer.aboutTitle')}</h4>
+              <p>{t('footer.aboutDescription')}</p>
+            </div>
+            <div>
+              <h4 className="text-lg font-semibold mb-4 text-[#e1ff01]">{t('footer.quickLinksTitle')}</h4>
+              <ul className="space-y-2">
           {[1, 2, 3, 4, 5, 6, 7, 8].map((index) => (
             <li key={index}>
               <a
@@ -451,33 +480,29 @@ return (
             </li>
           ))}
         </ul>
-      </div>
-    </div>
-    <div className="mt-8 overflow-hidden">
-  <div className="flex w-full justify-between animate-ticker items-center white-space-nowrap"> {/* Prevent line breaks */}
-    {[...socialLinks, ...socialLinks].map((link, index) => (
-      <a
-        key={`${link.name}-${index}`}
-        href={link.url}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="text-gray-400 hover:text-[#e1ff01] transition-colors mx-2" // Reduced margin
-      >
-        <span className="sr-only">{link.name}</span>
-        <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-          <path d={link.icon} />
-        </svg>
-      </a>
-    ))}
-  </div>
-</div>
-    <div className="mt-8 text-center">
-      <p>{t('footer.copyright')}</p>
-    </div>
-  </div>
-</footer>
-
-
+            </div>
+          </div>
+          <div className="mt-8 overflow-visible">
+            <div className="flex animate-ticker justify-around">
+              {[...socialLinks].map((link, index) => (
+                <Button
+                  key={`${link.name}-${index}`}
+                  onClick={() => openLink(link.url)}
+                  className="text-gray-400 hover:text-[#e1ff01] transition-colors mx-4"
+                >
+                  <span className="sr-only">{link.name}</span>
+                  <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d={link.icon} />
+                  </svg>
+                </Button>
+              ))}
+            </div>
+          </div>
+          <div className="mt-8 text-center">
+            <p>{t('footer.copyright')}</p>
+          </div>
+        </div>
+      </footer>
     </div>
   )
 }
