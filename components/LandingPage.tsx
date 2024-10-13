@@ -432,6 +432,7 @@ return (
         <h4 className="text-lg font-semibold mb-4 text-[#e1ff01]">{t('footer.aboutTitle')}</h4>
         <p>{t('footer.aboutDescription')}</p>
       </div>
+      
       <div>
         <h4 className="text-lg font-semibold mb-4 text-[#e1ff01]">{t('footer.quickLinksTitle')}</h4>
         <ul className="space-y-2">
@@ -452,6 +453,24 @@ return (
         </ul>
       </div>
     </div>
+    <div className="mt-8 overflow-hidden">
+  <div className="flex w-full justify-between animate-ticker items-center white-space-nowrap"> {/* Prevent line breaks */}
+    {[...socialLinks, ...socialLinks].map((link, index) => (
+      <a
+        key={`${link.name}-${index}`}
+        href={link.url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-gray-400 hover:text-[#e1ff01] transition-colors mx-2" // Reduced margin
+      >
+        <span className="sr-only">{link.name}</span>
+        <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path d={link.icon} />
+        </svg>
+      </a>
+    ))}
+  </div>
+</div>
     <div className="mt-8 text-center">
       <p>{t('footer.copyright')}</p>
     </div>
