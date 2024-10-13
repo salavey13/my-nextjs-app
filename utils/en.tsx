@@ -1,27 +1,152 @@
 import { LanguageDictionary } from "../utils/TranslationUtils";
 export const en: LanguageDictionary = {
   // ... (existing translations)
+    contact: {
+      title: "Get Started Today!",
+      description: "Experience the future of web development with v0. Let our AI bring your vision to life effortlessly.",
+      playGameButton: "Play Game",
+      contactUs: "Contact us on Telegram",
+    },
+    "gigs": {
+    "title": "Our Services on Contra",
+    "service1Title": "Move existing web site to v0",
+    "service1Description": "Let us seamlessly transition your existing website to the v0 platform.",
+    "service1Price": "$69.13",
+    "service1LinkText": "Hire on Contra",
+    "service2Title": "Create custom v0 projects",
+    "service2Description": "Custom website creation tailored to your specific needs using v0's AI capabilities.",
+    "service2Price": "$69.13",
+    "service2LinkText": "Hire on Contra"
+  },
+  "benefits": {
+    "title": "Why Choose v0?",
+    "benefit1Title": "Global Accessibility",
+    "benefit1Description": "Create websites that are accessible and performant worldwide.",
+    "benefit2Title": "Security First",
+    "benefit2Description": "Built-in security features to keep your website and data safe.",
+    "benefit3Title": "Collaborative Tools",
+    "benefit3Description": "Seamlessly work with your team on web projects."
+  },
+  "footer": {
+    "aboutTitle": "About v0",
+    "aboutDescription": "Empowering developers and businesses with AI-enhanced tools for effortless web creation.",
+    "quickLinksTitle": "Quick Links",
+    "quickLink1": "Home",
+    "quickLink2": "Features",
+    "quickLink3": "Pricing",
+    "quickLink4": "Templates",
+    "quickLink5": "Instructions",
+    "quickLink6": "Mobile Shop",
+    "quickLink7": "FAQ",
+    "quickLink8": "Contact",
+    "copyright": "© 2024 v0 AI Dev."
+  },
 
-  "header.title": "v0 AI Dev",
-  "nav.home": "Home",
-  "nav.features": "Features",
-  "nav.pricing": "Pricing",
-  "nav.templates": "Templates",
-  "nav.instructions": "Instructions",
-  "nav.mobile-shop": "Mobile Shop",
-  "nav.faq": "FAQ",
-  "nav.contact": "Contact",
-  "home.heading": "Unlock Success with v0 AI",
-  "home.description": "Embark on a transformative web development journey with v0, your ultimate AI-powered solution for creating stunning websites effortlessly.",
-  "home.imageAlt": "AI-powered web development",
-  "home.watchVideos": "Watch Our Videos",
-  "features.heading": "Key Features",
-  "features.aiPowered": "AI-Powered Magic",
-  "features.aiPoweredDesc": "Let our cutting-edge AI take the lead in crafting mesmerizing websites.",
-  "features.effortlessCreation": "Effortless Creation",
-  "features.effortlessCreationDesc": "Watch your dream website materialize in just days, stress-free.",
-  "features.customizableTemplates": "Customizable Templates",
-  "features.customizableTemplatesDesc": "Kickstart your project with our handcrafted, customizable templates.",
+  
+
+
+      pricing: {
+        title: "Pricing Title",
+        options: "Pricing Options",
+        heading: "Pricing Plans",
+        basic: "BASIC",
+        pro: "PRO",
+        enterprise: "ENTERPRISE",
+        feature1: "AI-powered design",
+        feature2: "Responsive layout",
+        feature3: "Basic SEO optimization",
+        proFeature1: "All BASIC features",
+        proFeature2: "Advanced customization",
+        proFeature3: "Priority support",
+        proFeature4: "Performance analytics",
+        enterpriseFeature1: "All PRO features",
+        enterpriseFeature2: "Unlimited pages",
+        enterpriseFeature3: "Custom integrations",
+        enterpriseFeature4: "Dedicated account manager",
+        choosePlan: "Choose Plan",
+      },
+      templates: {
+        heading: "Explore v0 Templates",
+        description:
+          "Unleash your creativity with our extensive collection of AI-generated templates, meticulously crafted to cater to diverse tastes and requirements.",
+        unhuilome: "UnHuilome",
+        unhuilomeDesc: "Versatile template for various projects",
+        ezShop: "EZ Shop",
+        ezShopDesc: "Quick and easy e-commerce solution",
+        promo: "Promo",
+        promoDesc: "Promotional landing page template",
+        domiki: "Domiki",
+        domikiDesc: "Real estate and property showcase",
+        viewTemplate: "View Template",
+      },
+      instructions: {
+        heading: "How to Use v0 Templates",
+        description:
+          "Check out our simple guide on how to maximize the potential of your AI-powered website templates.",
+        viewInstructions: "View Instructions",
+      },
+      mobileShop: {
+        heading: "Mobile Shop",
+        title: "Mobile Shop Interface",
+      },
+      faq: {
+        heading: "Frequently Asked Questions",
+        whatIsV0: "What is v0?",
+        whatIsV0Answer:
+          "v0 is our groundbreaking AI-driven web development platform that enables users to create stunning websites with minimal effort.",
+        howDoesAIWork: "How does AI work in v0?",
+        howDoesAIWorkAnswer:
+          "Our AI algorithms analyze user inputs to generate customized website designs and functionalities tailored to their needs.",
+        customDomain: "Can I use a custom domain?",
+        customDomainAnswer:
+          "Yes, all of our plans include support for custom domains.",
+        freeTrial: "Is there a free trial?",
+        freeTrialAnswer:
+          "Yes, we offer a free 7-day trial for all new users to explore our platform.",
+        isProgrammingObsolete: "Does v0 make programming obsolete?",
+        isProgrammingObsoleteAnswer:
+          "No, while v0 automates many tasks, programming skills are still essential for more advanced customizations.",
+        programmingTeachesThinking: "Why is programming still important?",
+        programmingTeachesThinkingAnswer:
+          "Programming teaches problem-solving and logical thinking, skills that remain valuable even with AI-driven tools like v0.",
+        programmingWithNewTools: "Can I combine programming with v0?",
+        programmingWithNewToolsAnswer:
+          "Absolutely! You can integrate your own code to enhance your v0-powered website with additional custom features.",
+      },
+
+    
+
+
+
+
+  "header": {
+    "title": "v0 AI Dev"
+  },
+  "nav": {
+    "home": "Home",
+    "features": "Features",
+    "pricing": "Pricing",
+    "templates": "Templates",
+    "instructions": "Instructions",
+    "mobile-shop": "Mobile Shop",
+    "faq": "FAQ",
+    "contact": "Contact"
+  },
+  "home": {
+    "heading": "Unlock Success with v0 AI",
+    "description": "Embark on a transformative web development journey with v0, your ultimate AI-powered solution for creating stunning websites effortlessly.",
+    "imageAlt": "AI-powered web development",
+    "watchVideos": "Watch Our Videos"
+  },
+  "features": {
+    "heading": "Key Features",
+    "aiPowered": "AI-Powered Magic",
+    "aiPoweredDesc": "Let our cutting-edge AI take the lead in crafting mesmerizing websites.",
+    "effortlessCreation": "Effortless Creation",
+    "effortlessCreationDesc": "Watch your dream website materialize in just days, stress-free.",
+    "customizableTemplates": "Customizable Templates",
+    "customizableTemplatesDesc": "Kickstart your project with our handcrafted, customizable templates."
+  },
   
   "storyEditor": "Story Editor",
   "editStage": "Edit Stage",
@@ -227,7 +352,7 @@ export const en: LanguageDictionary = {
     eventCreated: "Event Created",
     eventCreationSuccessMessage: "The event has been successfully created",
     close: "Close",
-    home: "Home",
+    homeShelf: "Home",
     admin: "Admin",
     referral: "Referral",
     referralName: "Priglos Name",
@@ -475,10 +600,6 @@ export const en: LanguageDictionary = {
     city: "City",
     russian: "Russian",
     yourEmail: "Your Email",
-    pricing:{
-        title: "Pricing Title",
-        options: "Pricing Options",
-    },
   "settings": {
     title: "Settings",
     restoreDefaults: "Restore Defaults",

@@ -211,10 +211,10 @@ return (
                 <CardHeader>
                   <CardTitle className="flex items-center text-[#e1ff01]">
                     {feature.icon}
-                    <span className="ml-2">{t('feature.title')}</span>
+                    <span className="ml-2">{feature.title}</span>
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="text-gray-300">{t('feature.description')}</CardContent>
+                <CardContent className="text-gray-300">{feature.description}</CardContent>
               </Card>
             </motion.div>
           ))}
@@ -224,142 +224,134 @@ return (
 
 
 
-        <section id="pricing" className="text-center mb-16">
-          <h3 className="text-3xl font-bold text-[#e1ff01] mb-8">Pricing Plans</h3>
-          <div className="grid md:grid-cols-3 gap-8">
-            {[
-              { title: "BASIC", price: "$13", link: "https://oneSitePls.framer.ai/shop/3993889", features: ["AI-powered design", "Responsive layout", "Basic SEO optimization"] },
-              { title: "PRO", price: "$69", link: "https://oneSitePls.framer.ai/shop/3994713", features: ["All BASIC features", "Advanced customization", "Priority support", "Performance analytics"] },
-              { title: "ENTERPRISE", price: "$420", link: "https://oneSitePls.framer.ai/shop/3994855", features: ["All PRO features", "Unlimited pages", "Custom integrations", "Dedicated account manager"] },
-            ].map((plan, index) => (
-              <motion.div
-                key={plan.title}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 * (index + 1) }}
-              >
-                <Card className="bg-gray-900 border-gray-800 hover:border-[#e1ff01] transition-colors">
-                  <CardHeader>
-                    <CardTitle className="text-[#e1ff01]">{plan.title}</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-3xl font-bold mb-4 text-gray-100">{plan.price}</p>
-                    <ul className="text-left mb-4">
-                      {plan.features.map((feature) => (
-                        <li key={feature} className="mb-2 text-gray-300">✓ {feature}</li>
-                      ))}
-                    </ul>
-                    <a href={plan.link} target="_blank" rel="noopener noreferrer" className="inline-block w-full bg-[#e1ff01] text-black px-4 py-2 rounded hover:bg-opacity-90 transition-colors">Choose Plan</a>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
-          </div>
-        </section>
+      <section id="pricing" className="text-center mb-16">
+  <h3 className="text-3xl font-bold text-[#e1ff01] mb-8">{t('pricing.heading')}</h3>
+  <div className="grid md:grid-cols-3 gap-8">
+    {[
+      { title: t('pricing.basic'), price: "$13", link: "https://oneSitePls.framer.ai/shop/3993889", features: [t('pricing.feature1'), t('pricing.feature2'), t('pricing.feature3')] },
+      { title: t('pricing.pro'), price: "$69", link: "https://oneSitePls.framer.ai/shop/3994713", features: [t('pricing.proFeature1'), t('pricing.proFeature2'), t('pricing.proFeature3'), t('pricing.proFeature4')] },
+      { title: t('pricing.enterprise'), price: "$420", link: "https://oneSitePls.framer.ai/shop/3994855", features: [t('pricing.enterpriseFeature1'), t('pricing.enterpriseFeature2'), t('pricing.enterpriseFeature3'), t('pricing.enterpriseFeature4')] },
+    ].map((plan, index) => (
+      <motion.div
+        key={plan.title}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2 * (index + 1) }}
+      >
+        <Card className="bg-gray-900 border-gray-800 hover:border-[#e1ff01] transition-colors">
+          <CardHeader>
+            <CardTitle className="text-[#e1ff01]">{plan.title}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-3xl font-bold mb-4 text-gray-100">{plan.price}</p>
+            <ul className="text-left mb-4">
+              {plan.features.map((feature) => (
+                <li key={feature} className="mb-2 text-gray-300">✓ {feature}</li>
+              ))}
+            </ul>
+            <a href={plan.link} target="_blank" rel="noopener noreferrer" className="inline-block w-full bg-[#e1ff01] text-black px-4 py-2 rounded-lg hover:bg-opacity-90 transition-colors">{t('pricing.choosePlan')}</a>
+          </CardContent>
+        </Card>
+      </motion.div>
+    ))}
+  </div>
+</section>
 
-        <section id="templates" className="mb-16">
-          <h3 className="text-3xl font-bold text-[#e1ff01] mb-8 text-center">Explore v0 Templates</h3>
-          <p className="text-center mb-8 text-gray-300">
-            Unleash your creativity with our extensive collection of AI-generated templates, meticulously crafted to cater to diverse tastes and requirements.
-          </p>
-          <div className="grid md:grid-cols-2 gap-8">
-            {[
-              { title: "UnHuilome", description: "Versatile template for various projects", link: "https://oneSitePls.framer.ai/shop/unhuilome" },
-              { title: "EZ Shop", description: "Quick and easy e-commerce solution", link: "https://oneSitePls.framer.ai/shop/ezshop" },
-              { title: "Promo", description: "Promotional landing page template", link: "https://oneSitePls.framer.ai/shop/promo" },
-              { title: "Domiki", description: "Real estate and property showcase", link: "https://oneSitePls.framer.ai/shop/domiki" },
-            ].map((template, index) => (
-              <motion.div
-                key={template.title}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 * (index + 1) }}
-              >
-                <Card className="bg-gray-900 border-gray-800 hover:border-[#e1ff01] transition-colors">
-                  <CardHeader>
-                    <CardTitle className="text-[#e1ff01]">{template.title}</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-gray-300 mb-4">{template.description}</p>
-                    <a href={template.link} target="_blank" rel="noopener noreferrer" className="inline-block bg-[#e1ff01] text-gray-900 px-4 py-2 rounded hover:bg-opacity-90 transition-colors">View Template</a>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
-          </div>
-        </section>
+<section id="templates" className="mb-16">
+  <h3 className="text-3xl font-bold text-[#e1ff01] mb-8 text-center">{t('templates.heading')}</h3>
+  <p className="text-center mb-8 text-gray-300">
+    {t('templates.description')}
+  </p>
+  <div className="grid md:grid-cols-2 gap-8">
+    {[
+      { title: t('templates.unhuilome'), description: t('templates.unhuilomeDesc'), link: "https://oneSitePls.framer.ai/shop/unhuilome" },
+      { title: t('templates.ezShop'), description: t('templates.ezShopDesc'), link: "https://oneSitePls.framer.ai/shop/ezshop" },
+      { title: t('templates.promo'), description: t('templates.promoDesc'), link: "https://oneSitePls.framer.ai/shop/promo" },
+      { title: t('templates.domiki'), description: t('templates.domikiDesc'), link: "https://oneSitePls.framer.ai/shop/domiki" },
+    ].map((template, index) => (
+      <motion.div
+        key={template.title}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2 * (index + 1) }}
+      >
+        <Card className="bg-gray-900 border-gray-800 hover:border-[#e1ff01] transition-colors">
+          <CardHeader>
+            <CardTitle className="text-[#e1ff01]">{template.title}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-gray-300 mb-4">{template.description}</p>
+            <a href={template.link} target="_blank" rel="noopener noreferrer" className="inline-block bg-[#e1ff01] text-gray-900 px-4 py-2 rounded-lg hover:bg-opacity-90 transition-colors">{t('templates.viewTemplate')}</a>
+          </CardContent>
+        </Card>
+      </motion.div>
+    ))}
+  </div>
+</section>
 
-        <section id="instructions" className="mb-16">
-          <h3 className="text-3xl font-bold text-[#e1ff01] mb-8 text-center">How to Get Started</h3>
-          <p className="text-center mb-8 text-gray-300">
-            Follow our step-by-step instructions to create your perfect website with v0.
-          </p>
-          <div className="text-center">
-            <a
-              href="https://oneSitePls.framer.ai/instructions"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-block bg-[#e1ff01] text-gray-900 px-6 py-3 rounded-lg hover:bg-opacity-90 transition-colors"
-            >
-              View Instructions
-            </a>
-          </div>
-        </section>
+<section id="instructions" className="mb-16">
+  <h3 className="text-3xl font-bold text-[#e1ff01] mb-8 text-center">{t('instructions.heading')}</h3>
+  <p className="text-center mb-8 text-gray-300">
+    {t('instructions.description')}
+  </p>
+  <div className="text-center">
+    <a
+      href="https://oneSitePls.framer.ai/instructions"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="inline-block bg-[#e1ff01] text-gray-900 px-6 py-3 rounded-lg hover:bg-opacity-90 transition-colors"
+    >
+      {t('instructions.viewInstructions')}
+    </a>
+  </div>
+</section>
 
-        <section id="mobile-shop" className="mb-16">
-          <h3 className="text-3xl font-bold text-[#e1ff01] mb-8 text-center">Mobile Template Shop</h3>
-          <div className="flex justify-center">
-            <iframe
-              src="https://oneSitePls.framer.ai/web13-2"
-              title="Mobile Template Shop"
-              className="w-full max-w-sm h-[600px] border-0 rounded-lg shadow-lg"
-            ></iframe>
-          </div>
-        </section>
+<section id="mobile-shop" className="mb-16">
+  <h3 className="text-3xl font-bold text-[#e1ff01] mb-8 text-center">{t('mobileShop.heading')}</h3>
+  <div className="flex justify-center">
+    <iframe
+      src="https://oneSitePls.framer.ai/web13-2"
+      title={t('mobileShop.title')}
+      className="w-full max-w-sm h-[600px] border-0 rounded-lg shadow-lg"
+    ></iframe>
+  </div>
+</section>
 
-        <section id="faq" className="mb-16">
-  <h3 className="text-3xl font-bold text-[#e1ff01] mb-8 text-center">Frequently Asked Questions</h3>
+<section id="faq" className="mb-16">
+  <h3 className="text-3xl font-bold text-[#e1ff01] mb-8 text-center">{t('faq.heading')}</h3>
   <Accordion type="single" collapsible className="w-full max-w-2xl mx-auto">
     {[
       { 
-        question: "What is v0?", 
-        answer: "v0 is an advanced AI-powered web development platform that allows you to create stunning websites without coding expertise. In other words, it’s here to do the heavy lifting while you kick back and enjoy the ride."
+        question: t('faq.whatIsV0'), 
+        answer: t('faq.whatIsV0Answer')
       },
       { 
-        question: "How does the AI work?", 
-        answer: "Our AI analyzes your requirements and preferences to generate custom designs and layouts. So yes, it does the thinking for you. If you were worried about using your brain—no stress, we’ve got it covered."
+        question: t('faq.howDoesAIWork'), 
+        answer: t('faq.howDoesAIWorkAnswer')
       },
       { 
-        question: "Can I use my own domain?", 
-        answer: "Of course! Because nothing screams professionalism like your own custom domain, and v0 makes that connection a breeze."
+        question: t('faq.customDomain'), 
+        answer: t('faq.customDomainAnswer')
       },
       { 
-        question: "Is there a free trial available?", 
-        answer: "Yes, we offer a complimentary trial with all the essentials so you can see just how much easier life can be when you let AI do the hard stuff."
+        question: t('faq.freeTrial'), 
+        answer: t('faq.freeTrialAnswer')
       },
       { 
-        question: "Is programming becoming obsolete because of AI?", 
-        answer: "Oh, definitely. AI is going to handle everything. Who needs human programmers anymore, right? Just sit back and let the machines do the job (sarcasm intended)."
+        question: t('faq.isProgrammingObsolete'), 
+        answer: t('faq.isProgrammingObsoleteAnswer')
       },
       { 
-        question: "But some people say learning to program teaches you how to think. Is that true?", 
-        answer: "Think? Pffft. Thinking is overrated. Let v0 and AI handle the brainwork. You just focus on staying fabulous."
+        question: t('faq.programmingTeachesThinking'), 
+        answer: t('faq.programmingTeachesThinkingAnswer')
       },
       { 
-        question: "I heard that programming can be fun with new tools like Cursor. Should I consider that?", 
-        answer: "Fun? Programming? Surely, you're joking. If you enjoy frustration and pulling your hair out, then absolutely—go ahead!"
+        question: t('faq.programmingWithNewTools'), 
+        answer: t('faq.programmingWithNewToolsAnswer')
       },
-      { 
-        question: "Aren’t there a lot of problems in the world that could be solved with AI and programming?", 
-        answer: "Problems? What problems? Ignorance is bliss, my friend. Leave the hard thinking and problem-solving to AI and programmers."
-      },
-      { 
-        question: "I’m worried about all the competition in the programming field. Should I avoid learning to code?", 
-        answer: "Yes, absolutely avoid it. We current coders need less competition. So, do us a favor and stay far away from learning programming (wink)."
-      }
     ].map((item, index) => (
       <AccordionItem key={index} value={`item-${index}`}>
-        <AccordionTrigger className="text-black">{item.question}</AccordionTrigger>
+        <AccordionTrigger className="text-gray-100">{item.question}</AccordionTrigger>
         <AccordionContent className="text-gray-300">{item.answer}</AccordionContent>
       </AccordionItem>
     ))}
@@ -367,136 +359,106 @@ return (
 </section>
 
 
-        <section id="contact" className="text-center mb-16">
-          <h3 className="text-3xl font-bold text-[#e1ff01] mb-8">Get Started Today!</h3>
-          <p className="text-xl text-gray-300 max-w-2xl mx-auto mb-8">
-            Experience the future of web development with v0. Let our AI bring your vision to life effortlessly.
-          </p>
-          <div className="flex flex-col md:flex-row justify-center items-center gap-4">
-            <Button size="lg" className="bg-[#e1ff01] text-gray-900 hover:bg-opacity-90" onClick={handlePlayGame}>
-              Play Game <ChevronRight className="ml-2" />
-            </Button>
-            <a
-              href="https://t.me/salavey13"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-[#e1ff01] hover:underline"
-            >
-              Contact us on Telegram
-            </a>
-          </div>
-        </section>
 
-        <section id="gigs" className="mb-16">
-          <h3 className="text-3xl font-bold text-[#e1ff01] mb-8 text-center">Our Services on Contra</h3>
-          <div className="grid md:grid-cols-2 gap-8">
-            {[
-              {
-                title: "Move existing web site to v0",
-                description: "Let us seamlessly transition your existing website to the v0 platform.",
-                price: "$69.13",
-                link: "https://contra.com/s/lXMUXEXe-move-existing-web-site-to-framer"
-              },
-              {
-                title: "Create custom v0 projects",
-                description: "Custom website creation tailored to your specific needs using v0's AI capabilities.",
-                price: "$69.13",
-                link: "https://contra.com/s/RggeLso3-create-landing-paywall-membership-e-market-sites-and-more"
-              }
-            ].map((gig, index) => (
-              <Card key={index} className="bg-gray-900 border-gray-800 hover:border-[#e1ff01] transition-colors">
-                <CardHeader>
-                  <CardTitle className="text-[#e1ff01]">{gig.title}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="mb-4 text-gray-300">{gig.description}</p>
-                  <p className="text-2xl font-bold mb-4 text-gray-100">{gig.price}</p>
-                  <a
-                    href={gig.link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-block bg-[#e1ff01] text-black px-4 py-2 rounded hover:bg-opacity-90 transition-colors"
-                  >
-                    Hire on Contra
-                  </a>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </section>
+<section id="contact" className="text-center mb-16">
+  <h3 className="text-3xl font-bold text-[#e1ff01] mb-8">{t('contact.title')}</h3>
+  <p className="text-xl text-gray-300 max-w-2xl mx-auto mb-8">
+    {t('contact.description')}
+  </p>
+  <div className="flex flex-col md:flex-row justify-center items-center gap-4">
+    <Button size="lg" className="bg-[#e1ff01] text-gray-900 hover:bg-opacity-90" onClick={handlePlayGame}>
+      {t('contact.playGameButton')} <ChevronRight className="ml-2" />
+    </Button>
+    <a
+      href="https://t.me/salavey13"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="text-[#e1ff01] hover:underline"
+    >
+      {t('contact.contactUs')}
+    </a>
+  </div>
+</section>
 
-        <section id="benefits" className="mb-16">
-          <h3 className="text-3xl font-bold text-[#e1ff01] mb-8 text-center">Why Choose v0?</h3>
-          <div className="grid md:grid-cols-3 gap-8">
-            {[
-              { icon: <Globe className="text-[#e1ff01] w-8 h-8" />, title: "Global Accessibility", description: "Create websites that are accessible and performant worldwide." },
-              { icon: <Lock className="text-[#e1ff01] w-8 h-8" />, title: "Security First", description: "Built-in security features to keep your website and data safe." },
-              { icon: <Users className="text-[#e1ff01] w-8 h-8" />, title: "Collaborative Tools", description: "Seamlessly work with your team on web projects." },
-            ].map((benefit, index) => (
-              <Card key={index} className="bg-gray-900 border-gray-800 hover:border-[#e1ff01] transition-colors">
-                <CardHeader>
-                  <CardTitle className="flex items-center text-[#e1ff01]">
-                    {benefit.icon}
-                    <span className="ml-2">{benefit.title}</span>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="text-gray-300">{benefit.description}</CardContent>
-              </Card>
-            ))}
-          </div>
-        </section>
-      </main>
+<section id="gigs" className="mb-16">
+  <h3 className="text-3xl font-bold text-[#e1ff01] mb-8 text-center">{t('gigs.title')}</h3>
+  <div className="grid md:grid-cols-2 gap-8">
+    {[1, 2].map((index) => (
+      <Card key={index} className="bg-gray-900 border-gray-800 hover:border-[#e1ff01] transition-colors">
+        <CardHeader>
+          <CardTitle className="text-[#e1ff01]">{t(`gigs.service${index}Title`)}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="mb-4 text-gray-300">{t(`gigs.service${index}Description`)}</p>
+          <p className="text-2xl font-bold mb-4 text-gray-100">{t(`gigs.service${index}Price`)}</p>
+          <a
+            href="#"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-block bg-[#e1ff01] text-black px-4 py-2 rounded-lg hover:bg-opacity-90 transition-colors"
+          >
+            {t(`gigs.service${index}LinkText`)}
+          </a>
+        </CardContent>
+      </Card>
+    ))}
+  </div>
+</section>
 
-      <footer className="bg-gray-900 text-gray-300 py-8">
-        <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-3 gap-8">
-            <div>
-              <h4 className="text-lg font-semibold mb-4 text-[#e1ff01]">About v0</h4>
-              <p>Empowering developers and businesses with AI-enhanced tools for effortless web creation.</p>
-            </div>
-            <div>
-              <h4 className="text-lg font-semibold mb-4 text-[#e1ff01]">Quick Links</h4>
-              <ul className="space-y-2">
-                {["Home", "Features", "Pricing", "Templates", "Instructions", "Mobile Shop", "FAQ", "Contact"].map((item) => (
-                  <li key={item}>
-                    <a
-                      href={`#${item.toLowerCase()}`}
-                      className="hover:text-[#e1ff01] transition-colors"
-                      onClick={(e) => {
-                        e.preventDefault()
-                        scrollToSection(item.toLowerCase())
-                      }}
-                    >
-                      {item}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-          <div className="mt-8 overflow-hidden">
-            <div className="flex animate-ticker">
-              {[...socialLinks, ...socialLinks].map((link, index) => (
-                <a
-                  key={`${link.name}-${index}`}
-                  href={link.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-gray-400 hover:text-[#e1ff01] transition-colors mx-4"
-                >
-                  <span className="sr-only">{link.name}</span>
-                  <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                    <path d={link.icon} />
-                  </svg>
-                </a>
-              ))}
-            </div>
-          </div>
-          <div className="mt-8 text-center">
-            <p>&copy; 2024 v0 AI Dev.</p>
-          </div>
-        </div>
-      </footer>
+<section id="benefits" className="mb-16">
+  <h3 className="text-3xl font-bold text-[#e1ff01] mb-8 text-center">{t('benefits.title')}</h3>
+  <div className="grid md:grid-cols-3 gap-8">
+    {[1, 2, 3].map((index) => (
+      <Card key={index} className="bg-gray-900 border-gray-800 hover:border-[#e1ff01] transition-colors">
+        <CardHeader>
+          <CardTitle className="flex items-center text-[#e1ff01]">
+            {index === 1 && <Globe className="text-[#e1ff01] w-8 h-8" />}
+            {index === 2 && <Lock className="text-[#e1ff01] w-8 h-8" />}
+            {index === 3 && <Users className="text-[#e1ff01] w-8 h-8" />}
+            <span className="ml-2">{t(`benefits.benefit${index}Title`)}</span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="text-gray-300">{t(`benefits.benefit${index}Description`)}</CardContent>
+      </Card>
+    ))}
+  </div>
+</section>
+</main>
+
+<footer className="bg-gray-900 text-gray-300 py-8">
+  <div className="container mx-auto px-4">
+    <div className="grid md:grid-cols-3 gap-8">
+      <div>
+        <h4 className="text-lg font-semibold mb-4 text-[#e1ff01]">{t('footer.aboutTitle')}</h4>
+        <p>{t('footer.aboutDescription')}</p>
+      </div>
+      <div>
+        <h4 className="text-lg font-semibold mb-4 text-[#e1ff01]">{t('footer.quickLinksTitle')}</h4>
+        <ul className="space-y-2">
+          {[1, 2, 3, 4, 5, 6, 7, 8].map((index) => (
+            <li key={index}>
+              <a
+                href={`#${t(`footer.quickLink${index}`).toLowerCase()}`}
+                className="hover:text-[#e1ff01] transition-colors"
+                onClick={(e) => {
+                  e.preventDefault()
+                  scrollToSection(t(`footer.quickLink${index}`).toLowerCase())
+                }}
+              >
+                {t(`footer.quickLink${index}`)}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+    <div className="mt-8 text-center">
+      <p>{t('footer.copyright')}</p>
+    </div>
+  </div>
+</footer>
+
+
     </div>
   )
 }
