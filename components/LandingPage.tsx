@@ -483,15 +483,16 @@ export default function LandingPage() {
             </div>
           </div>
           <div className="mt-8 overflow-visible">
-            <div className="flex animate-ticker justify-around">
-              {[...socialLinks].map((link, index) => (
+            <div className="flex animate-ticker justify-around" style={{ width: '200%' }}>
+              {[...socialLinks, ...socialLinks].map((link, index) => (
                 <Button
                   key={`${link.name}-${index}`}
                   onClick={() => openLink(link.url)}
-                  className="text-gray-400 hover:text-[#e1ff01] transition-colors mx-4"
+                  className="text-gray-400 hover:text-[#e1ff01] transition-colors mx-4 drop-shadow-custom"
+                  variant="ghost"
                 >
                   <span className="sr-only">{link.name}</span>
-                  <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <svg className="h-12 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                     <path d={link.icon} />
                   </svg>
                 </Button>
