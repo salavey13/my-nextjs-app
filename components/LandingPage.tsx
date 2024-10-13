@@ -173,7 +173,7 @@ return (
             alt={t('home.imageAlt')}
             width={420}
             height={420}
-            className="rounded-lg shadow-lg mx-auto"
+            className="rounded-lg mx-auto drop-shadow-custom"
           />
         </motion.div>
         <motion.div

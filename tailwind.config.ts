@@ -9,6 +9,9 @@ const config: Config = {
   ],
   theme: {
   	extend: {
+		dropShadow: {
+			'custom': '5px 5px 5px rgba(0, 0, 0, 0.3)',
+		},
   		animation: {
   			grid: 'grid 15s linear infinite',
   			'accordion-down': 'accordion-down 0.2s ease-out',
