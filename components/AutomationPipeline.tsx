@@ -5,8 +5,6 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Textarea } from "@/components/ui/textarea"
 import { Input } from "@/components/ui/input"
 import { AlertCircle, CheckCircle, GitBranch, GitCommit, Loader2, Code, FileText, Bug, Edit3 } from 'lucide-react'
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-//import { Toast } from "@/components/ui/toast"
 import { useToast } from "@/hooks/use-toast"
 import { supabase } from '@/lib/supabaseClient';
 //import { useAppContext } from '@/context/AppContext';
