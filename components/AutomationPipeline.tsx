@@ -370,15 +370,15 @@ export default function AutomationPipeline() {
 
             <LogContainer logs={logs} />
 
-            <div className="space-y-4">
+            <div className="space-y-4 items-center">
               <Textarea
                 value={idea}
                 onChange={(e) => setIdea(e.target.value)}
                 placeholder="Enter your project idea here..."
                 className="w-full h-32 bg-gray-700 text-white border-gray-600"
               />
-              <Button onClick={copyLinkToClipboard} className="w-full bg-blue-600 hover:bg-blue-700 text-white">
-                Copy Automa Link
+              <Button onClick={copyLinkToClipboard} className="bg-blue-600 hover:bg-blue-700 text-white" variant="neon">
+                {t("automation.copyLink")}
               </Button>
             </div>
 

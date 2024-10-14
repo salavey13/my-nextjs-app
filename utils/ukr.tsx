@@ -6,6 +6,7 @@ export const ukr: LanguageDictionary = {
   'automation': {
     'heading': 'Автоматизація сьогодні!',
     'description': "Відчуйте майбутнє",
+    copyLink:"Копіювати автоматичне посилання",
   },
   "header": {
     "title": "v0 AI Dev"

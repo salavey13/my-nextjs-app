@@ -8,6 +8,7 @@ export const en: LanguageDictionary = {
   'automation': {
     'heading': 'Automation Today!',
     'description': "Experience the future",
+    copyLink:"Copy Automa Link",
   },
     contact: {
       title: "Get Started Today!",

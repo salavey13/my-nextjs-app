@@ -204,7 +204,7 @@ export default function LandingPage() {
           >
             <Button
               onClick={() => openLink("https://youtube.com/salavey13")}
-              className="bg-[#e1ff01] text-gray-900 px-6 py-3 rounded-lg text-lg font-semibold hover:bg-opacity-90 transition-colors"
+              className="bg-[#e1ff01] px-6 py-3 rounded-lg text-lg font-semibold hover:bg-opacity-90 transition-colors"
             >
               {t('home.watchVideos')} <ChevronRight className="inline-block ml-2" />
             </Button>
@@ -268,7 +268,7 @@ export default function LandingPage() {
                     </ul>
                     <Button
                       onClick={() => openLink(plan.link)}
-                      className="w-full bg-[#e1ff01] text-gray-900 hover:bg-opacity-90 transition-colors"
+                      className="w-full bg-[#e1ff01] hover:bg-opacity-90 transition-colors"
                     >
                       {t('pricing.choosePlan')}
                     </Button>
@@ -306,7 +306,7 @@ export default function LandingPage() {
                     <p className="text-gray-300 mb-4">{template.description}</p>
                     <Button
                       onClick={() => openLink(template.link)}
-                      className="bg-[#e1ff01] text-gray-900 hover:bg-opacity-90 transition-colors"
+                      className="bg-[#e1ff01] hover:bg-opacity-90 transition-colors"
                     >
                       {t('templates.viewTemplate')}
                     </Button>
@@ -326,9 +326,9 @@ export default function LandingPage() {
           <div className="text-center">
             <Button
               onClick={() => openLink("https://oneSitePls.framer.ai/instructions")}
-              className="bg-[#e1ff01] text-gray-900 px-6 py-3 rounded-lg hover:bg-opacity-90 transition-colors"
+              className="bg-[#e1ff01] px-6 py-3  rounded-lg text-lg hover:bg-opacity-90 transition-colors"
             >
-              {t('instructions.viewInstructions')}
+              {t('instructions.viewInstructions')} <ChevronRight className="ml-2" />
             </Button>
           </div>
         </section>
@@ -407,14 +407,8 @@ export default function LandingPage() {
             {t('contact.description')}
           </p>
           <div className="flex flex-col md:flex-row justify-center items-center gap-4">
-            <Button size="lg" className="bg-[#e1ff01] text-gray-900 hover:bg-opacity-90 transition-colors" onClick={handlePlayGame}>
+            <Button size="lg" className="bg-[#e1ff01]  rounded-lg text-lg hover:bg-opacity-90 transition-colors" onClick={handlePlayGame}>
               {t('contact.playGameButton')} <ChevronRight className="ml-2" />
-            </Button>
-            <Button
-              onClick={() => openLink("https://t.me/salavey13")}
-              className="text-[#e1ff01] hover:underline"
-            >
-              {t('contact.contactUs')}
             </Button>
           </div>
         </section>
@@ -431,7 +425,7 @@ export default function LandingPage() {
                   <p className="text-2xl font-bold mb-4 text-gray-100">{t(`gigs.service${index}Price`)}</p>
                   <Button
                     onClick={() => openLink(t(`gigs.service${index}Link`))}
-                    className="bg-[#e1ff01] text-gray-900 hover:bg-opacity-90 hover:text-gray-900"
+                    className="bg-[#e1ff01]  hover:bg-opacity-90"
                   >
                     {t(`gigs.service${index}LinkText`)}
                   </Button>
@@ -510,8 +504,15 @@ export default function LandingPage() {
               ))}
             </div>
           </div>
-          <div className="mt-8 text-center">
+          <div className="mt-8 text-center flex flex-col gap-4">
             <p>{t('footer.copyright')}</p>
+            
+            <Button
+              onClick={() => openLink("https://t.me/salavey13")}
+              className="text-[#e1ff01] hover:underline  rounded-lg text-lg"
+            >
+              {t('contact.contactUs')}
+            </Button>
           </div>
         </div>
       </footer>
