@@ -101,7 +101,7 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-gray-950 text-gray-100">
       <motion.header 
-        className="fixed top-0 left-0 right-0 bg-gray-900 shadow-md z-50"
+        className="fixed top-16 left-0 right-0 bg-gray-900 shadow-md z-50"
         initial={{ y: 0 }}
         animate={{ y: isNavbarVisible ? 0 : -80 }}
         transition={{ type: "spring", stiffness: 300, damping: 30 }}
