@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Textarea } from "@/components/ui/textarea"
 import { Input } from "@/components/ui/input"
 import { AlertCircle, CheckCircle, GitBranch, GitCommit, Loader2, Code, FileText, Bug, Edit3 } from 'lucide-react'
-import { useToast } from "@/hooks/use-toast"
+import { toast } from '@/hooks/use-toast'
 import { supabase } from '@/lib/supabaseClient';
 //import { useAppContext } from '@/context/AppContext';
 // MOCK DATA AND FUNCTIONS - Comment out when integrating with actual project
@@ -164,7 +164,6 @@ export default function AutomationPipeline() {
   const [idea, setIdea] = useState<string>('');
   const [fileContents, setFileContents] = useState<{ [key: string]: string }>({});
   const [vercelLogs, setVercelLogs] = useState<string>('');
-  const { toast } = useToast();
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
