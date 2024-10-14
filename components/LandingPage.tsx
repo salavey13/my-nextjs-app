@@ -473,14 +473,14 @@ export default function LandingPage() {
             <div>
               <h4 className="text-lg font-semibold mb-4 text-[#e1ff01]">{t('footer.quickLinksTitle')}</h4>
               <ul className="space-y-2">
-                {["home", "features", "pricing", "templates", "instructions", "automation", "mobile-shop", "faq", "contact"].map((item) => (
+                {["home", "features", "pricing", "templates", "instructions", "automation", "mobile-shop", "faq", "contact"].map((item, index) => (
                   <li key={item}>
                     <Button
                       variant="link"
                       className="p-0 h-auto text-gray-300 hover:text-[#e1ff01] transition-colors"
                       onClick={() => scrollToSection(item)}
                     >
-                      {t(`footer.quickLink${item}`)}
+                      {t(`footer.quickLink${index + 1}`)}
                     </Button>
                   </li>
                 ))}
@@ -488,8 +488,8 @@ export default function LandingPage() {
             </div>
           </div>
           <div className="mt-8 overflow-visible">
-            <div className="flex animate-ticker">
-              {[...socialLinks, ...socialLinks].map((link, index) => (
+            <div className="flex animate-ticker justify-around w-[200%]">
+              {[...socialLinks,...socialLinks].map((link, index) => (
                 <Link href={link.url} key={`${link.name}-${index}`} passHref>
                                                     
       <div className="text-gray-400 hover:text-[#e1ff01] transition-colors mx-4 drop-shadow-custom flex items-center">
