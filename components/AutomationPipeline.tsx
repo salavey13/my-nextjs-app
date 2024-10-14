@@ -382,7 +382,7 @@ export default function AutomationPipeline() {
         className={`relative group overflow-hidden rounded-lg drop-shadow-custom  transition-all duration-500 transform 
         ${isInView ? 'scale-100 opacity-100' : 'opacity-0 scale-95'}`}
       >
-        <div className="relative w-full h-0 pb-[56.25%]"> {/* 16:9 Aspect Ratio */}
+        <div className="relative w-full h-0 pb-[57%]"> {/* 16:9 Aspect Ratio */}
           <Image
             src={item.imageSrc}
             alt={item.alt}
@@ -415,7 +415,7 @@ export default function AutomationPipeline() {
             <CardTitle className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl w-full break-words leading-tight text-center">
               🪄
             </CardTitle>
-            <CardDescription className="text-gray-400">{t("automation.watach")}</CardDescription>
+            <CardDescription className="text-gray-400">{t("automation.watch")}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="w-full h-2 bg-gray-700 rounded-full">
