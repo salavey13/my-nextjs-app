@@ -123,11 +123,11 @@ type V0Response = {
 const LogContainer = ({ logs }: { logs: Log[] }) => {
   const logsEndRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    if (logsEndRef.current) {
-      logsEndRef.current.scrollIntoView({ behavior: "smooth" });
-    }
-  }, [logs]);
+  // useEffect(() => {
+  //   if (logsEndRef.current) {
+  //     logsEndRef.current.scrollIntoView({ behavior: "smooth" });
+  //   }
+  // }, [logs]);
 
   const getLogColor = (type: LogType): string => {
     switch (type) {
