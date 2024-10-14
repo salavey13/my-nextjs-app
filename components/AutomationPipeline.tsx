@@ -330,8 +330,85 @@ export default function AutomationPipeline() {
     return 'bg-green-500';
   };
 
+  interface ItemProps {
+    href: string;
+    imageSrc: string;
+    alt: string;
+    label: string;
+  }
+  
+  const ImageGrid = () => {
+    const items: ItemProps[] = [
+      {
+        href: 'https://v0.dev',
+        imageSrc: '/v0-screenshot.png',
+        alt: 'v0.dev screenshot',
+        label: t('visitV0'),
+      },
+      {
+        href: 'https://github.com/salavey13/my-nextjs-app/',
+        imageSrc: '/github-screenshot.png',
+        alt: 'GitHub repository screenshot',
+        label: t('viewGitHubRepo'),
+      },
+      {
+        href: 'https://vercel.com/salavey13s-projects/my-nextjs-app/deployments',
+        imageSrc: '/vercel-screenshot.png',
+        alt: 'Vercel deployments screenshot',
+        label: t('checkVercelDeployments'),
+      },
+    ];
+  
+    return (
+      <div className="grid w-full grid-cols-1 gap-6 md:grid-cols-3">
+        {items.map((item, index) => (
+          <ItemCard key={index} item={item} />
+        ))}
+      </div>
+    );
+  };
+  
+  interface ItemCardProps {
+    item: ItemProps;
+  }
+  
+  const ItemCard = ({ item }: ItemCardProps) => {
+    const { ref, isInView } = useInView({ threshold: 0.2 });
+  
+    return (
+      <Link
+        ref={ref}
+        href={item.href}
+        className={`relative group overflow-hidden rounded-lg drop-shadow-custom  transition-all duration-500 transform 
+        ${isInView ? 'scale-100 opacity-100' : 'opacity-0 scale-95'}`}
+      >
+        <div className="relative w-full h-0 pb-[56.25%]"> {/* 16:9 Aspect Ratio */}
+          <Image
+            src={item.imageSrc}
+            alt={item.alt}
+            layout="fill"
+            objectFit="cover"
+            className="rounded-lg transition-transform duration-500 group-hover:scale-105"
+          />
+        </div>
+        <div
+          className={`absolute inset-0 bg-black bg-opacity-60 flex items-center justify-center transition-opacity duration-500 ${
+            isInView ? 'opacity-100' : 'opacity-0'
+          }`}
+        >
+          <span className="text-white text-lg font-bold drop-shadow-custom ">
+            {item.label}
+          </span>
+        </div>
+      </Link>
+    );
+  };
+  
+  
+  
+
   return (
-    <div className="flex sm:flex-col bg-gray-900">
+    <div className="flex flex-col bg-gray-900">
       <div className="overflow-y-auto p-4">
         <Card className="bg-gray-800 text-white">
           <CardHeader>
@@ -417,67 +494,82 @@ export default function AutomationPipeline() {
               </div>
             )}
           </CardContent>
-          <CardFooter className="flex justify-between">
-            <div className="flex items-center space-x-2">
-              {error ? (
-                <AlertCircle className="h-5 w-5 text-red-500" />
-              ) : progress === 100 ? (
-                <CheckCircle className="h-5 w-5 text-green-500" />
-              ) : (
-                <AlertCircle className="h-5 w-5 text-yellow-500" />
-              )}
-              <span className="text-gray-300">{error || (progress === 100 ? 'Automation complete' : 'Automation in progress')}</span>
-            </div>
-            <div className="flex space-x-2">
-              <Button variant="outline" onClick={() => window.location.reload()} className="bg-gray-700 text-gray-300 hover:bg-gray-600 automa-restart">
-                <GitBranch className="mr-2 h-4 w-4" /> Restart
-              </Button>
-              <Button onClick={() => pushFilesToGitHub()} disabled={currentStep !== 'push'} className="bg-blue-600 hover:bg-blue-700 text-white automa-push-changes">
-                <GitCommit className="mr-2 h-4 w-4" /> Push Changes
-              </Button>
-            </div>
-          </CardFooter>
+          <CardFooter className="flex flex-col md:flex-row justify-between space-y-4 md:space-y-0 md:items-center">
+  <div className="flex items-center space-x-2">
+    {error ? (
+      <AlertCircle className="h-5 w-5 text-red-500" />
+    ) : progress === 100 ? (
+      <CheckCircle className="h-5 w-5 text-green-500" />
+    ) : (
+      <AlertCircle className="h-5 w-5 text-yellow-500" />
+    )}
+    <span className="text-sm md:text-base text-gray-300">
+      {error || (progress === 100 ? 'Automation complete' : 'Automation in progress')}
+    </span>
+  </div>
+
+  <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2">
+    <Button 
+      variant="outline" 
+      onClick={() => window.location.reload()} 
+      className="bg-gray-700 text-gray-300 hover:bg-gray-600 automa-restart flex items-center justify-center text-sm md:text-base"
+    >
+      <GitBranch className="mr-2 h-4 w-4" /> {t("restart")}
+    </Button>
+
+    <Button 
+      onClick={() => pushFilesToGitHub()} 
+      disabled={currentStep !== 'push'} 
+      className="bg-blue-600 hover:bg-blue-700 text-white automa-push-changes flex items-center justify-center text-sm md:text-base"
+    >
+      <GitCommit className="mr-2 h-4 w-4" /> {t("push")}
+    </Button>
+  </div>
+</CardFooter>
+
         </Card>
       </div>
-      <div className="flex flex-col md:flex-row gap-6">
-        {[
-          {
-            href: 'https://v0.dev',
-            imageSrc: '/v0-screenshot.png',
-            alt: 'v0.dev screenshot',
-            label: t('visitV0'),
-          },
-          {
-            href: 'https://github.com/salavey13/my-nextjs-app/',
-            imageSrc: '/github-screenshot.png',
-            alt: 'GitHub repository screenshot',
-            label: t('viewGitHubRepo'),
-          },
-          {
-            href: 'https://vercel.com/salavey13s-projects/my-nextjs-app/deployments',
-            imageSrc: '/vercel-screenshot.png',
-            alt: 'Vercel deployments screenshot',
-            label: t('checkVercelDeployments'),
-          },
-        ].map((item, index) => (
-          <Link
-            key={index}
-            href={item.href}
-            className="w-full md:w-1/3 aspect-video relative group overflow-hidden rounded-xl shadow-lg"
-          >
-            <Image
-              src={item.imageSrc}
-              alt={item.alt}
-              layout="fill"
-              objectFit="cover"
-              className="rounded-lg transition-transform duration-500 group-hover:scale-110"
-            />
-            <div className="absolute inset-0 bg-black bg-opacity-60 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-center justify-center">
-              <span className="text-white text-lg font-bold drop-shadow-md">{item.label}</span>
-            </div>
-          </Link>
-        ))}
+      {/* <div className="flex flex-col md:flex-row gap-6">
+  {[
+    {
+      href: 'https://v0.dev',
+      imageSrc: '/v0-screenshot.png',
+      alt: 'v0.dev screenshot',
+      label: t('visitV0'),
+    },
+    {
+      href: 'https://github.com/salavey13/my-nextjs-app/',
+      imageSrc: '/github-screenshot.png',
+      alt: 'GitHub repository screenshot',
+      label: t('viewGitHubRepo'),
+    },
+    {
+      href: 'https://vercel.com/salavey13s-projects/my-nextjs-app/deployments',
+      imageSrc: '/vercel-screenshot.png',
+      alt: 'Vercel deployments screenshot',
+      label: t('checkVercelDeployments'),
+    },
+  ].map((item, index) => (
+    <Link
+      key={index}
+      href={item.href}
+      className="sm:w-full md:w-1/3 aspect-video relative group overflow-hidden rounded-xl shadow-lg"
+    >
+      <Image
+        src={item.imageSrc}
+        alt={item.alt}
+        layout="fill"
+        objectFit="cover"
+        className="rounded-lg transition-transform duration-500 group-hover:scale-110"
+      />
+      <div className="absolute inset-0 bg-black bg-opacity-60 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-center justify-center">
+        <span className="text-white text-lg font-bold drop-shadow-md">{item.label}</span>
       </div>
+    </Link>
+  ))}
+</div> */}
+<ImageGrid/>
     </div>
   );
 }
+

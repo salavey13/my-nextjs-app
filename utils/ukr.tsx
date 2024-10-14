@@ -71,9 +71,10 @@ export const ukr: LanguageDictionary = {
     "quickLink3": "Ціни",
     "quickLink4": "Шаблони",
     "quickLink5": "Інструкції",
-    "quickLink6": "Мобільний магазин",
-    "quickLink7": "Часті запитання",
-    "quickLink8": "Контакти",
+    "quickLink6": "Автоматизація",
+    "quickLink7": "Мобільний магазин",
+    "quickLink8": "Часті запитання",
+    "quickLink9": "Контакти",
     "copyright": "© 2024 v0 AI Dev."
   },
   "pricing": {

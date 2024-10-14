@@ -71,9 +71,10 @@ export const ru: LanguageDictionary = {
     "quickLink3": "Цены",
     "quickLink4": "Шаблоны",
     "quickLink5": "Инструкции",
-    "quickLink6": "Магазин мобильных приложений",
-    "quickLink7": "Часто задаваемые вопросы",
-    "quickLink8": "Контакт",
+    "quickLink6": "Автоматизация",
+    "quickLink7": "Магазин мобильных приложений",
+    "quickLink8": "Часто задаваемые вопросы",
+    "quickLink9": "Контакт",
     "copyright": "© 2024 v0 AI Dev."
   },
   "pricing": {
