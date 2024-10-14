@@ -7,7 +7,9 @@ import { Input } from "@/components/ui/input"
 import { AlertCircle, CheckCircle, GitBranch, GitCommit, Loader2, Code, FileText, Bug, Edit3 } from 'lucide-react'
 import { toast } from '@/hooks/use-toast'
 import { supabase } from '@/lib/supabaseClient';
-//import { useAppContext } from '@/context/AppContext';
+import Link from 'next/link';
+import Image from 'next/image'
+import { useAppContext } from '@/context/AppContext';
 // MOCK DATA AND FUNCTIONS - Comment out when integrating with actual project
 // =========================================================================
 // Mock AppContext for development purposes
@@ -26,7 +28,7 @@ const mockAppContext = {
 };
 
 // Simulating the useAppContext hook
-const useAppContext = () => mockAppContext;
+//const useAppContext = () => mockAppContext;
 
 const mockAutoma = {
   collectData: async (): Promise<AutomaData> => {
@@ -305,7 +307,7 @@ export default function AutomationPipeline() {
   };
 
   const copyLinkToClipboard = useCallback(() => {
-    const link = `https://my-nextjs-app-gold.vercel.app/automa?ref=${state.user.id}`;
+    const link = `https://my-nextjs-app-gold.vercel.app/automa?ref=${state?.user?.id}`;
     navigator.clipboard.writeText(link).then(
       () => {
         toast({
@@ -435,16 +437,44 @@ export default function AutomationPipeline() {
           </CardFooter>
         </Card>
       </div>
-      <div className="flex flex-col">
-        <div className="w-full h-1/3 border-b border-gray-700">
-          <iframe src="https://v0.dev" className="w-full h-full" />
-        </div>
-        <div className="w-full h-1/3 border-b border-gray-700">
-          <iframe src="https://github.com/salavey13/my-nextjs-app/" className="w-full h-full" />
-        </div>
-        <div className="w-full h-1/3">
-          <iframe src="https://vercel.com/salavey13s-projects/my-nextjs-app/deployments" className="w-full h-full" />
-        </div>
+      <div className="flex flex-col md:flex-row gap-6">
+        {[
+          {
+            href: 'https://v0.dev',
+            imageSrc: '/v0-screenshot.png',
+            alt: 'v0.dev screenshot',
+            label: t('visitV0'),
+          },
+          {
+            href: 'https://github.com/salavey13/my-nextjs-app/',
+            imageSrc: '/github-screenshot.png',
+            alt: 'GitHub repository screenshot',
+            label: t('viewGitHubRepo'),
+          },
+          {
+            href: 'https://vercel.com/salavey13s-projects/my-nextjs-app/deployments',
+            imageSrc: '/vercel-screenshot.png',
+            alt: 'Vercel deployments screenshot',
+            label: t('checkVercelDeployments'),
+          },
+        ].map((item, index) => (
+          <Link
+            key={index}
+            href={item.href}
+            className="w-full md:w-1/3 aspect-video relative group overflow-hidden rounded-xl shadow-lg"
+          >
+            <Image
+              src={item.imageSrc}
+              alt={item.alt}
+              layout="fill"
+              objectFit="cover"
+              className="rounded-lg transition-transform duration-500 group-hover:scale-110"
+            />
+            <div className="absolute inset-0 bg-black bg-opacity-60 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-center justify-center">
+              <span className="text-white text-lg font-bold drop-shadow-md">{item.label}</span>
+            </div>
+          </Link>
+        ))}
       </div>
     </div>
   );

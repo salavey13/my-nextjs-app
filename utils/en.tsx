@@ -1,6 +1,10 @@
 import { LanguageDictionary } from "../utils/TranslationUtils";
 export const en: LanguageDictionary = {
   // ... (existing translations)
+
+  visitV0: "Visit v0.dev",
+  viewGitHubRepo: "View GitHub Repo",
+  checkVercelDeployments: "Check Vercel Deployments",
   'automation': {
     'heading': 'Automation Today!',
     'description': "Experience the future",

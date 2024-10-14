@@ -1,5 +1,8 @@
 import { LanguageDictionary } from "../utils/TranslationUtils";
 export const ru: LanguageDictionary = {
+  visitV0: "Посетить v0.dev",
+    viewGitHubRepo: "Просмотреть репозиторий GitHub",
+    checkVercelDeployments: "Проверить развертывания Vercel",
   'automation': {
     'heading': 'Автоматизация сегодня!',
     'description': "Ощутите будущее",
