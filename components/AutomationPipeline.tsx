@@ -195,7 +195,10 @@ export default function AutomationPipeline() {
   };
 
   const addLog = (message: string, type: LogType = 'info') => {
-    setLogs(prevLogs => [...prevLogs, { type, message: `[${new Date().toISOString()}] ${message}` }]);
+    const shortDate = new Date().toISOString().split('T')[0]; // Output: "2024-10-12"
+    const formattedMessage = `[${shortDate}] ${message}`;
+
+    setLogs(prevLogs => [...prevLogs, { type, message: formattedMessage }]);
   };
 
   const handleError =  useCallback((message: string) => {
