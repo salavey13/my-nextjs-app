@@ -29,7 +29,7 @@ const CustomToast: React.FC<ToastParams & { visible: boolean }> = ({ title, desc
       setDistortedTitle(distortText(title));
       setDistortedDescription(distortText(description || ''));
       setIsGlitching(true);
-    }, 100);
+    }, 4200);
 
     const audio = new Audio(`/stage_${stage}_Xuinity_${lang}.mp3`);
     const audioTimeout = setTimeout(() => {

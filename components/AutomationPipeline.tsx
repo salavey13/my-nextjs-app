@@ -10,14 +10,15 @@ import { supabase } from '@/lib/supabaseClient';
 import Link from 'next/link';
 import Image from 'next/image'
 import { useAppContext } from '@/context/AppContext';
+import { useInView } from '@/hooks/useInView';
 // MOCK DATA AND FUNCTIONS - Comment out when integrating with actual project
 // =========================================================================
 // Mock AppContext for development purposes
 const mockAppContext = {
   state: {
     user: {
-      id: 1,
-      telegram_id: 123456789,
+      id: 43,
+      telegram_id: 413553377,
       game_state: {
         idea: ''
       }
@@ -34,7 +35,7 @@ const mockAutoma = {
   collectData: async (): Promise<AutomaData> => {
     await new Promise(resolve => setTimeout(resolve, 2000));
     return {
-      vercelLogs: 'Build ID #1234\nError in file /app/ui/button.js\nError in file /app/pages/index.js',
+      vercelLogs: 'Build ID #13\nError in file /app/ui/button.js\nError in file /app/pages/index.js',
       repoStructure: ['components/ui', 'components/game', 'app/pages', 'lib'],
       buildErrors: ['Error in /app/pages/index.js', 'Error in /app/ui/button.js']
     };
@@ -166,6 +167,7 @@ export default function AutomationPipeline() {
   const [idea, setIdea] = useState<string>('');
   const [fileContents, setFileContents] = useState<{ [key: string]: string }>({});
   const [vercelLogs, setVercelLogs] = useState<string>('');
+  
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);

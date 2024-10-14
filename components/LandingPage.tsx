@@ -15,6 +15,7 @@ import { toast } from "@/hooks/use-toast"
 import { useAppContext } from '../context/AppContext'
 import useTelegram from '@/hooks/useTelegram'
 import AutomationPipeline from '@/components/AutomationPipeline'
+import { useInView } from '@/hooks/useInView';
 
 const socialLinks = [
   { name: "YouTube", icon: "M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z", url: "https://youtube.com/salavey13" },
@@ -36,6 +37,18 @@ export default function LandingPage() {
   const lastScrollY = useRef(0)
   const { scrollY } =    useScroll()
   const { openLink } = useTelegram()
+  const { ref, isInView } = useInView(); // Hook to detect when in view
+  const [animationStarted, setAnimationStarted] = useState(false);
+
+  useEffect(() => {
+    if (isInView && !animationStarted) {
+      const timeout = setTimeout(() => {
+        setAnimationStarted(true); // Start animation after a delay
+      }, 500); // 500ms delay (adjust as needed)
+
+      return () => clearTimeout(timeout);
+    }
+  }, [isInView, animationStarted]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -334,12 +347,15 @@ export default function LandingPage() {
         </section>
 
         {/* Automation Pipeline Section */}
-        <section id="automation" className="mb-16">
-          <h3 className="text-3xl font-bold text-[#e1ff01] mb-8 text-center">{t('automation.heading')}</h3>
+        <section id="automation" ref={ref} className="mb-16">
+          <h3 className="text-3xl font-bold text-[#e1ff01] mb-8 text-center">
+            {t('automation.heading')}
+          </h3>
           <p className="text-center mb-8 text-gray-300">
             {t('automation.description')}
           </p>
-          <AutomationPipeline />
+          {/* Conditionally render or start AutomationPipeline when animation starts */}
+          {animationStarted && <AutomationPipeline />}
         </section>
 
         {/* Mobile Shop Section */}
