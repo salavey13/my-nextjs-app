@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { useState, useEffect, useRef, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -484,25 +485,22 @@ export default function LandingPage() {
           <div className="mt-8 overflow-visible">
             <div className="flex animate-ticker justify-around" style={{ width: '200%' }}>
               {[...socialLinks, ...socialLinks].map((link, index) => (
-                <Button
-                  key={`${link.name}-${index}`}
-                  onClick={() => openLink(link.url)}
-                  className="text-gray-400 hover:text-[#e1ff01] transition-colors mx-4 drop-shadow-custom"
-                  variant="ghost"
-                >
-                   {/* SVG icon - larger on mobile (3x) */}
-                  <svg
-                    className="h-12 w-12 md:h-12 md:w-6"
-                    fill="currentColor"
-                    viewBox="0 0 24 24"
-                    aria-hidden="true"
-                  >
-                    <path d={link.icon} />
-                  </svg>
-                  
-                  {/* Optionally, you can add the text for larger screens if needed */}
-                  <span className="hidden md:block m-2">{link.name}</span> {/* Visible only on larger screens */}
-                </Button>
+                <Link href={link.url} key={`${link.name}-${index}`} passHref>
+      <a className="text-gray-400 hover:text-[#e1ff01] transition-colors mx-4 drop-shadow-custom flex flex-col items-center">
+        {/* SVG icon - larger on mobile (3x), scales down for larger screens */}
+        <svg
+          className="h-12 w-12 md:h-6 md:w-6"
+          fill="currentColor"
+          viewBox="0 0 24 24"
+          aria-hidden="true"
+        >
+          <path d={link.icon} />
+        </svg>
+        
+        {/* Optionally, you can add the text for larger screens if needed */}
+        <span className="hidden md:block mt-2">{link.name}</span> {/* Visible only on larger screens */}
+      </a>
+    </Link>
               ))}
             </div>
           </div>
