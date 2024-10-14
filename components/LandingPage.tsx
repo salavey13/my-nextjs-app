@@ -189,7 +189,7 @@ export default function LandingPage() {
               alt={t('home.imageAlt')}
               width={69}
               height={69}
-              className="rounded-lg mx-auto drop-shadow-custom"
+              className="rounded-lg mx-auto drop-shadow-custom invert"
             />
             <Image
               src="/next.svg"
@@ -214,7 +214,7 @@ export default function LandingPage() {
           >
             <Button
               onClick={() => openLink("https://youtube.com/salavey13")}
-              className="bg-green-500 text-xl px-6 py-3 rounded-lg hover:bg-green-600 transition-all mb-4 drop-shadow-custom invert"
+              className="bg-green-500 text-lg px-6 py-3 rounded-lg hover:bg-green-600 transition-all mb-4 drop-shadow-custom"
             >
               {t('home.watchVideos')} <ChevronRight className="inline-block ml-2" />
             </Button>
