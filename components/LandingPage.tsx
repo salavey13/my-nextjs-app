@@ -13,8 +13,7 @@ import { motion, AnimatePresence, useScroll, useMotionValueEvent } from "framer-
 import Image from "next/image"
 import { toast } from "@/hooks/use-toast"
 import { useAppContext } from '../context/AppContext'
-import useTelegram from '@/hooks/useTelegram'
-import AutomationPipeline from '@/components/AutomationPipeline'
+import useTelegram from '@/hooks/useTelegram';
 
 const socialLinks = [
   { name: "YouTube", icon: "M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z", url: "https://youtube.com/salavey13" },
@@ -34,8 +33,19 @@ export default function LandingPage() {
   const [activeSection, setActiveSection] = useState("")
   const [isNavbarVisible, setIsNavbarVisible] = useState(true)
   const lastScrollY = useRef(0)
-  const { scrollY } =    useScroll()
-  const { openLink } = useTelegram()
+  const { scrollY } = useScroll()
+  const {
+    tg,
+    theme,
+    openLink,
+    showMainButton,
+    hideMainButton,
+    showBackButton,
+    closeWebApp,
+    setBottomBarColor,
+    setHeaderColor,
+    setBackgroundColor
+  } = useTelegram();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -53,7 +63,7 @@ export default function LandingPage() {
     }
 
     window.addEventListener("scroll", handleScroll)
-    return () => window.removeEventListener("scroll", handleScroll)
+    return () =>   window.removeEventListener("scroll", handleScroll)
   }, [])
 
   useMotionValueEvent(scrollY, "change", (latest) => {
@@ -68,11 +78,12 @@ export default function LandingPage() {
   const scrollToSection = (sectionId: string) => {
     const section = document.getElementById(sectionId)
     if (section) {
-      const yOffset = -80 // Adjust this value based on your navbar height
+      const yOffset = -128 // Adjust this value based on your navbar height
       const y = section.getBoundingClientRect().top + window.pageYOffset + yOffset
       window.scrollTo({ top: y, behavior: "smooth" })
     }
     setIsMenuOpen(false)
+    setIsNavbarVisible(false)
   }
 
   const sendTelegramNotification = async () => {
@@ -96,12 +107,12 @@ export default function LandingPage() {
       title: t('gameOpenedTitle'),
       description: t('gameOpenedDescription'),
     });
-  }, [t, openLink]);
+  }, [t]);
 
   return (
     <div className="min-h-screen bg-gray-950 text-gray-100">
       <motion.header 
-        className="fixed top-0 left-0 right-0 bg-gray-900 shadow-md z-50"
+        className="fixed top-16 left-0 right-0 bg-gray-900 shadow-md z-50"
         initial={{ y: 0 }}
         animate={{ y: isNavbarVisible ? 0 : -80 }}
         transition={{ type: "spring", stiffness: 300, damping: 30 }}
@@ -114,10 +125,9 @@ export default function LandingPage() {
             </Button>
           </div>
           <div className="hidden md:flex space-x-4">
-            {["home", "features", "pricing", "templates", "instructions", "automation", "mobile-shop", "faq", "contact"].map((item) => (
+            {["home", "features", "pricing", "templates", "instructions", "mobile-shop", "faq", "contact"].map((item) => (
               <Button
                 key={item}
-                variant="ghost"
                 className={activeSection === item ? "text-[#e1ff01]" : ""}
                 onClick={() => scrollToSection(item)}
               >
@@ -132,11 +142,11 @@ export default function LandingPage() {
         {isMenuOpen && (
           <motion.div
             initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
+            animate={{ opacity: 1, y: 64 }}
             exit={{ opacity: 0, y: -20 }}
             className="fixed top-16 left-0 right-0 bg-gray-900 shadow-md z-40 md:hidden"
           >
-            {["home", "features", "pricing", "templates", "instructions", "automation", "mobile-shop", "faq", "contact"].map((item) => (
+            {["home", "features", "pricing", "templates", "instructions", "mobile-shop", "faq", "contact"].map((item) => (
               <Button
                 key={item}
                 variant="ghost"
@@ -179,21 +189,21 @@ export default function LandingPage() {
               alt={t('home.imageAlt')}
               width={69}
               height={69}
-              className="rounded-lg mx-auto drop-shadow-custom invert"
+              className="rounded-lg mx-auto drop-shadow-custom"
             />
             <Image
               src="/next.svg"
               alt="Next.js Logo"
               width={100}
               height={100}
-              className="absolute top-1/4 left-1/4 transform -translate-x-1/2 -translate-y-1/2 invert"
+              className="absolute top-1/4 left-1/4 transform -translate-x-1/2 -translate-y-1/2 drop-shadow-custom invert"
             />
             <Image
-              src="/react.svg"
+              src="/reactb.svg"
               alt="React Logo"
               width={80}
               height={80}
-              className="absolute bottom-1/4 right-1/4 transform translate-x-1/2 translate-y-1/2 invert"
+              className="absolute bottom-1/4 right-1/4 transform translate-x-1/2 translate-y-1/2 drop-shadow-custom invert"
             />
           </motion.div>
           <motion.div
@@ -204,14 +214,13 @@ export default function LandingPage() {
           >
             <Button
               onClick={() => openLink("https://youtube.com/salavey13")}
-              className="bg-[#e1ff01] text-gray-900 px-6 py-3 rounded-lg text-lg font-semibold hover:bg-opacity-90 transition-colors"
+              className="bg-green-500 text-xl px-6 py-3 rounded-lg hover:bg-green-600 transition-all mb-4 drop-shadow-custom invert"
             >
               {t('home.watchVideos')} <ChevronRight className="inline-block ml-2" />
             </Button>
           </motion.div>
         </section>
 
-        {/* Features Section */}
         <section id="features" className="mb-16">
           <h3 className="text-3xl font-bold text-[#e1ff01] mb-8 text-center">{t('features.heading')}</h3>
           <div className="grid md:grid-cols-3 gap-8">
@@ -240,7 +249,6 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* Pricing Section */}
         <section id="pricing" className="text-center mb-16">
           <h3 className="text-3xl font-bold text-[#e1ff01] mb-8">{t('pricing.heading')}</h3>
           <div className="grid md:grid-cols-3 gap-8">
@@ -268,7 +276,7 @@ export default function LandingPage() {
                     </ul>
                     <Button
                       onClick={() => openLink(plan.link)}
-                      className="w-full bg-[#e1ff01] text-gray-900 hover:bg-opacity-90 transition-colors"
+                      className="w-full bg-[#e1ff01] hover:text-gray-900 text-gray-100"
                     >
                       {t('pricing.choosePlan')}
                     </Button>
@@ -279,7 +287,6 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* Templates Section */}
         <section id="templates" className="mb-16">
           <h3 className="text-3xl font-bold text-[#e1ff01] mb-8 text-center">{t('templates.heading')}</h3>
           <p className="text-center mb-8 text-gray-300">
@@ -306,7 +313,7 @@ export default function LandingPage() {
                     <p className="text-gray-300 mb-4">{template.description}</p>
                     <Button
                       onClick={() => openLink(template.link)}
-                      className="bg-[#e1ff01] text-gray-900 hover:bg-opacity-90 transition-colors"
+                      className="bg-green-500 text-l px-6 py-3 rounded-lg hover:bg-green-600 transition-all mb-4 drop-shadow-custom"
                     >
                       {t('templates.viewTemplate')}
                     </Button>
@@ -317,7 +324,6 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* Instructions Section */}
         <section id="instructions" className="mb-16">
           <h3 className="text-3xl font-bold text-[#e1ff01] mb-8 text-center">{t('instructions.heading')}</h3>
           <p className="text-center mb-8 text-gray-300">
@@ -326,23 +332,13 @@ export default function LandingPage() {
           <div className="text-center">
             <Button
               onClick={() => openLink("https://oneSitePls.framer.ai/instructions")}
-              className="bg-[#e1ff01] text-gray-900 px-6 py-3 rounded-lg hover:bg-opacity-90 transition-colors"
+              className="bg-green-500 text-xl px-6 py-3 rounded-lg hover:bg-green-600 transition-all mb-4 drop-shadow-custom"
             >
               {t('instructions.viewInstructions')}
             </Button>
           </div>
         </section>
 
-        {/* Automation Pipeline Section 
-        <section id="automation" className="mb-16">
-          <h3 className="text-3xl font-bold text-[#e1ff01] mb-8 text-center">{t('automation.heading')}</h3>
-          <p className="text-center mb-8 text-gray-300">
-            {t('automation.description')}
-          </p>
-          <AutomationPipeline />
-        </section>*/}
-
-        {/* Mobile Shop Section */}
         <section id="mobile-shop" className="mb-16">
           <h3 className="text-3xl font-bold text-[#e1ff01] mb-8 text-center">{t('mobileShop.heading')}</h3>
           <div className="flex justify-center">
@@ -354,7 +350,6 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* FAQ Section */}
         <section id="faq" className="mb-16">
           <h3 className="text-3xl font-bold text-[#e1ff01] mb-8 text-center">{t('faq.heading')}</h3>
           <Accordion type="single" collapsible className="w-full max-w-2xl mx-auto">
@@ -389,33 +384,73 @@ export default function LandingPage() {
               },
             ].map((item, index) => (
               <AccordionItem key={index} value={`item-${index}`} className="border-b border-gray-700">
-                <AccordionTrigger className="text-gray-100 hover:text-[#e1ff01] py-4">
-                  {item.question}
-                </AccordionTrigger>
-                <AccordionContent className="text-gray-300 pb-4 bg-gray-800 rounded-b-lg p-4">
-                  {item.answer}
-                </AccordionContent>
+                <AccordionTrigger className="text-gray-100 hover:text-[#e1ff01] py-4">{item.question}</AccordionTrigger>
+                <AccordionContent className="text-gray-300 pb-4">{item.answer}</AccordionContent>
               </AccordionItem>
             ))}
           </Accordion>
         </section>
 
-        {/* Contact Section */}
         <section id="contact" className="text-center mb-16">
           <h3 className="text-3xl font-bold text-[#e1ff01] mb-8">{t('contact.title')}</h3>
           <p className="text-xl text-gray-300 max-w-2xl mx-auto mb-8">
             {t('contact.description')}
           </p>
           <div className="flex flex-col md:flex-row justify-center items-center gap-4">
-            <Button size="lg" className="bg-[#e1ff01] text-gray-900 hover:bg-opacity-90 transition-colors" onClick={handlePlayGame}>
+            <Button size="lg" className="bg-green-500 text-xl px-6 py-3 rounded-lg hover:bg-green-600 transition-all mb-4 drop-shadow-custom" onClick={handlePlayGame}>
               {t('contact.playGameButton')} <ChevronRight className="ml-2" />
             </Button>
             <Button
+             size="lg"
               onClick={() => openLink("https://t.me/salavey13")}
-              className="text-[#e1ff01] hover:underline"
+              className=" mb-4 text-xl text-[#e1ff01] hover:underline"
             >
               {t('contact.contactUs')}
             </Button>
+          </div>
+        </section>
+
+        <section id="gigs" className="mb-16">
+          <h3 className="text-3xl font-bold text-[#e1ff01] mb-8 text-center">{t('gigs.title')}</h3>
+          <div className="grid md:grid-cols-2 gap-8">
+            {[1, 2].map((index) => (
+              <Card key={index} className="bg-gray-900 border-gray-800 hover:border-[#e1ff01] transition-colors">
+                <CardHeader>
+                  <CardTitle className="text-[#e1ff01]">{t(`gigs.service${index}Title`)}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="mb-4 text-gray-300">{t(`gigs.service${index}Description`)}</p>
+                  <p className="text-2xl font-bold mb-4 text-gray-100">{t(`gigs.service${index}Price`)}</p>
+                  <Button
+                    onClick={() => openLink(t(`gigs.service${index}Link`))}
+                    className="bg-[#e1ff01] text-gray-900 hover:bg-opacity-90 hover:text-gray-900"
+                  >
+                    {t(`gigs.service${index}LinkText`)}
+                  </Button>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </section>
+
+        <section id="benefits" className="mb-16">
+          <h3 className="text-3xl font-bold text-[#e1ff01] mb-8 text-center">{t('benefits.title')}</h3>
+          <div className="grid md:grid-cols-3 gap-8">
+            {[
+              { icon: <Globe className="text-[#e1ff01] w-8 h-8" />, title: t('benefits.benefit1Title'), description: t('benefits.benefit1Description') },
+              { icon: <Lock className="text-[#e1ff01] w-8 h-8" />, title: t('benefits.benefit2Title'), description: t('benefits.benefit2Description') },
+              { icon: <Users className="text-[#e1ff01] w-8 h-8" />, title: t('benefits.benefit3Title'), description: t('benefits.benefit3Description') },
+            ].map((benefit, index) => (
+              <Card key={index} className="bg-gray-900 border-gray-800 hover:border-[#e1ff01] transition-colors">
+                <CardHeader>
+                  <CardTitle className="flex items-center text-[#e1ff01]">
+                    {benefit.icon}
+                    <span className="ml-2">{benefit.title}</span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="text-gray-300">{benefit.description}</CardContent>
+              </Card>
+            ))}
           </div>
         </section>
       </main>
@@ -430,33 +465,42 @@ export default function LandingPage() {
             <div>
               <h4 className="text-lg font-semibold mb-4 text-[#e1ff01]">{t('footer.quickLinksTitle')}</h4>
               <ul className="space-y-2">
-                {["home", "features", "pricing", "templates", "instructions", "automation", "mobile-shop", "faq", "contact"].map((item) => (
-                  <li key={item}>
-                    <Button
-                      variant="link"
-                      className="p-0 h-auto text-gray-300 hover:text-[#e1ff01]"
-                      onClick={() => scrollToSection(item)}
-                    >
-                      {t(`footer.quickLink${item}`)}
-                    </Button>
-                  </li>
-                ))}
-              </ul>
+          {[1, 2, 3, 4, 5, 6, 7, 8].map((index) => (
+            <li key={index}>
+              <a
+                href={`#${t(`footer.quickLink${index}`).toLowerCase()}`}
+                className="hover:text-[#e1ff01] transition-colors"
+                onClick={(e) => {
+                  e.preventDefault()
+                  scrollToSection(t(`footer.quickLink${index}`).toLowerCase())
+                }}
+              >
+                {t(`footer.quickLink${index}`)}
+              </a>
+            </li>
+          ))}
+        </ul>
             </div>
           </div>
-          <div className="mt-8 overflow-hidden">
-            <div className="flex animate-ticker">
+          <div className="mt-8 overflow-visible">
+            <div className="flex animate-ticker justify-around" style={{ width: '200%' }}>
               {[...socialLinks, ...socialLinks].map((link, index) => (
-                <Button
-                  key={`${link.name}-${index}`}
-                  onClick={() => openLink(link.url)}
-                  className="text-gray-400 hover:text-[#e1ff01] transition-colors mx-4"
-                >
-                  <span className="sr-only">{link.name}</span>
-                  <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                    <path d={link.icon} />
-                  </svg>
-                </Button>
+                <Link href={link.url} key={`${link.name}-${index}`} passHref>
+      <a className="text-gray-400 hover:text-[#e1ff01] transition-colors mx-4 drop-shadow-custom flex flex-col items-center">
+        {/* SVG icon - larger on mobile (3x), scales down for larger screens */}
+        <svg
+          className="h-12 w-12 md:h-6 md:w-6"
+          fill="currentColor"
+          viewBox="0 0 24 24"
+          aria-hidden="true"
+        >
+          <path d={link.icon} />
+        </svg>
+        
+        {/* Optionally, you can add the text for larger screens if needed */}
+        <span className="hidden md:block mt-2">{link.name}</span> {/* Visible only on larger screens */}
+      </a>
+    </Link>
               ))}
             </div>
           </div>
