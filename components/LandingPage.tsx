@@ -177,8 +177,8 @@ export default function LandingPage() {
             <Image
               src="/vercel.svg"
               alt={t('home.imageAlt')}
-              width={420}
-              height={420}
+              width={69}
+              height={69}
               className="rounded-lg mx-auto drop-shadow-custom invert"
             />
             <Image
@@ -333,14 +333,14 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* Automation Pipeline Section */}
+        {/* Automation Pipeline Section 
         <section id="automation" className="mb-16">
           <h3 className="text-3xl font-bold text-[#e1ff01] mb-8 text-center">{t('automation.heading')}</h3>
           <p className="text-center mb-8 text-gray-300">
             {t('automation.description')}
           </p>
           <AutomationPipeline />
-        </section>
+        </section>*/}
 
         {/* Mobile Shop Section */}
         <section id="mobile-shop" className="mb-16">
