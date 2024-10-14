@@ -486,7 +486,7 @@ export default function LandingPage() {
             <div className="flex animate-ticker justify-around" style={{ width: '200%' }}>
               {[...socialLinks, ...socialLinks].map((link, index) => (
                 <Link href={link.url} key={`${link.name}-${index}`} passHref>
-      <a className="text-gray-400 hover:text-[#e1ff01] transition-colors mx-4 drop-shadow-custom flex flex-col items-center">
+      <div className="text-gray-400 hover:text-[#e1ff01] transition-colors mx-4 drop-shadow-custom flex items-center">
         {/* SVG icon - larger on mobile (3x), scales down for larger screens */}
         <svg
           className="h-12 w-12 md:h-6 md:w-6"
@@ -498,8 +498,8 @@ export default function LandingPage() {
         </svg>
         
         {/* Optionally, you can add the text for larger screens if needed */}
-        <span className="hidden md:block mt-2">{link.name}</span> {/* Visible only on larger screens */}
-      </a>
+        <span className="hidden md:block ml-2">{link.name}</span> {/* Visible only on larger screens */}
+      </div>
     </Link>
               ))}
             </div>
