@@ -328,7 +328,7 @@ export default function AutomationPipeline() {
         <Card className="bg-gray-800 text-white">
           <CardHeader>
             <CardTitle className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl w-full break-words leading-tight">
-              Automation Pipeline: The Developer's Magic Wand 🪄
+              Automation Pipeline: The Developer&apos;s Magic Wand 🪄
             </CardTitle>
             <CardDescription className="text-gray-400">Watch as your code dances through the development cycle!</CardDescription>
           </CardHeader>
