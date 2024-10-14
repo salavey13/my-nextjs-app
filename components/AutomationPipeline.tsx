@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
@@ -194,7 +194,7 @@ export default function AutomationPipeline() {
     setLogs(prevLogs => [...prevLogs, { type, message: `[${new Date().toISOString()}] ${message}` }]);
   };
 
-  const handleError = (message: string) => {
+  const handleError =  useCallback((message: string) => {
     setError(message);
     addLog(message, 'error');
     toast({
@@ -202,15 +202,15 @@ export default function AutomationPipeline() {
       title: "Error",
       description: message,
     });
-  };
+  },[t]);
 
-  const handleSuccess = (message: string) => {
+  const handleSuccess = useCallback((message: string) => {
     addLog(message, 'success');
     toast({
       title: "Success",
       description: message,
     });
-  };
+  }, [t]);
 
   const collectData = async () => {
     try {
@@ -257,7 +257,7 @@ export default function AutomationPipeline() {
     }
   };
 
-  const reviewEnhancements = async () => {
+  const reviewEnhancements = useCallback(async () => {
     try {
       addLog('Reviewing enhancement suggestions...');
       setProgress(70);
@@ -270,7 +270,7 @@ export default function AutomationPipeline() {
     } catch (err) {
       handleError(`Failed to review enhancements: ${(err as Error).message}`);
     }
-  };
+  }, [handleError, t])
 
   const pushFilesToGitHub = async () => {
     try {
@@ -304,14 +304,21 @@ export default function AutomationPipeline() {
     setFileContents(prev => ({ ...prev, [filePath]: content }));
   };
 
-  const copyLinkToClipboard = () => {
+  const copyLinkToClipboard = useCallback(() => {
     const link = `https://my-nextjs-app-gold.vercel.app/automa?ref=${state.user.id}`;
-    navigator.clipboard.writeText(link);
-    toast({
-      title: "Link Copied",
-      description: "The Automa link has been copied to your clipboard.",
-    });
-  };
+    navigator.clipboard.writeText(link).then(
+      () => {
+        toast({
+        title: "Link Copied",
+        description: "The Automa link has been copied to your clipboard.",
+      })
+    },
+    (err) => {
+      handleError(t('copyFailed'))
+    }
+  )
+  }, [handleError, t])
+
 
   const getProgressColor = (progress: number): string => {
     if (progress < 33) return 'bg-red-500';
@@ -320,8 +327,8 @@ export default function AutomationPipeline() {
   };
 
   return (
-    <div className="flex h-screen bg-gray-900">
-      <div className="w-1/2 overflow-y-auto p-4">
+    <div className="flex sm:flex-col bg-gray-900">
+      <div className="overflow-y-auto p-4">
         <Card className="bg-gray-800 text-white">
           <CardHeader>
             <CardTitle className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl w-full break-words leading-tight">
@@ -428,7 +435,7 @@ export default function AutomationPipeline() {
           </CardFooter>
         </Card>
       </div>
-      <div className="w-1/2 flex flex-col">
+      <div className="flex flex-col">
         <div className="w-full h-1/3 border-b border-gray-700">
           <iframe src="https://v0.dev" className="w-full h-full" />
         </div>

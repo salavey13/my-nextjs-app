@@ -1,6 +1,9 @@
 import { LanguageDictionary } from "../utils/TranslationUtils";
 export const ukr: LanguageDictionary = {
-  
+  'automation': {
+    'heading': 'Автоматизація сьогодні!',
+    'description': "Відчуйте майбутнє",
+  },
   "header": {
     "title": "v0 AI Dev"
   },

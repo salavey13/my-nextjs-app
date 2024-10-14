@@ -1,6 +1,10 @@
 import { LanguageDictionary } from "../utils/TranslationUtils";
 export const en: LanguageDictionary = {
   // ... (existing translations)
+  'automation': {
+    'heading': 'Automation Today!',
+    'description': "Experience the future",
+  },
     contact: {
       title: "Get Started Today!",
       description: "Experience the future of web development with v0. Let our AI bring your vision to life effortlessly.",

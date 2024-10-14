@@ -18,11 +18,61 @@ const distortText = (text: string) => {
   ).join('');
 };
 
-export const toast = ({ title, description, variant = "info", stage, lang = 'en' }: ToastParams) => {
-  let distortedTitle = title;
-  let distortedDescription = description || '';
-  let isGlitching = false;
+const CustomToast: React.FC<ToastParams & { visible: boolean }> = ({ title, description, variant, stage, lang, visible }) => {
+  const [isVisible, setIsVisible] = useState(visible);
+  const [distortedTitle, setDistortedTitle] = useState(title);
+  const [distortedDescription, setDistortedDescription] = useState(description || '');
+  const [isGlitching, setIsGlitching] = useState(false);
 
+  useEffect(() => {
+    const glitchInterval = setInterval(() => {
+      setDistortedTitle(distortText(title));
+      setDistortedDescription(distortText(description || ''));
+      setIsGlitching(true);
+    }, 100);
+
+    const audio = new Audio(`/stage_${stage}_Xuinity_${lang}.mp3`);
+    const audioTimeout = setTimeout(() => {
+      audio.play().catch(error => console.error('Error playing audio:', error));
+    }, 1000);
+
+    const visibilityTimeout = setTimeout(() => {
+      setIsVisible(false);
+    }, 13000);
+
+    return () => {
+      clearInterval(glitchInterval);
+      clearTimeout(audioTimeout);
+      clearTimeout(visibilityTimeout);
+    };
+  }, [title, description, stage, lang]);
+
+  if (!isVisible) {
+    return null;
+  }
+
+  return (
+    <ShineBorder
+      className={`${
+        visible ? 'animate-enter' : 'animate-leave'
+      } max-w-md w-full top-16 pointer-events-auto flex ring-1 ring-black ring-opacity-5`}
+      color={isGlitching ? "#e1ff01" : "#000000"}
+    >
+      <div className="flex-1 w-0 p-4">
+        <div className="flex items-start">
+          <div className="ml-3 flex-1">
+            <p className="text-sm font-medium text-gray-900">{distortedTitle}</p>
+            {distortedDescription && (
+              <p className="mt-1 text-sm text-gray-500">{distortedDescription}</p>
+            )}
+          </div>
+        </div>
+      </div>
+    </ShineBorder>
+  );
+};
+
+export const toast = ({ title, description, variant = "info", stage, lang = 'en' }: ToastParams) => {
   const toastOptions: ToastOptions = {
     style: {
       fontSize: '0.75rem',
@@ -35,7 +85,7 @@ export const toast = ({ title, description, variant = "info", stage, lang = 'en'
       textShadow: '0 0 5px #0f0',
     },
     icon: '⚠️',
-    duration: 13000, // Set duration to 13 seconds
+    duration: 13000,
   };
 
   switch (variant) {
@@ -67,64 +117,8 @@ export const toast = ({ title, description, variant = "info", stage, lang = 'en'
       break;
   }
 
-  // Glitch effect interval
-  const glitchInterval = setInterval(() => {
-    distortedTitle = distortText(title);
-    distortedDescription = distortText(description || '');
-    isGlitching = true;
-  }, 100);
-
-  const audio = new Audio(`/stage_${stage}_Xuinity_${lang}.mp3`);
-  
-  setTimeout(() => {
-    audio.play().catch(error => console.error('Error playing audio:', error));
-  }, 1000);
-
-  // Show the toast
   hotToast.custom(
-    (t) => {
-      const [isVisible, setIsVisible] = useState(true);
-
-      useEffect(() => {
-        if (!t.visible) {
-          clearInterval(glitchInterval); // Clear interval when toast disappears
-        }
-
-        // Set a timeout to hide the toast after 13 seconds
-        const timeout = setTimeout(() => {
-          setIsVisible(false);
-        }, 13000);
-
-        return () => {
-          clearTimeout(timeout);
-          clearInterval(glitchInterval);
-        };
-      }, [t.visible]);
-
-      if (!isVisible) {
-        return null; // Don't render anything if the toast should be hidden
-      }
-
-      return (
-        <ShineBorder
-          className={`${
-            t.visible ? 'animate-enter' : 'animate-leave'
-          } max-w-md w-full top-16 pointer-events-auto flex ring-1 ring-black ring-opacity-5`}
-          color={isGlitching ? "#e1ff01" : "#000000"}
-        >
-          <div className="flex-1 w-0 p-4">
-            <div className="flex items-start">
-              <div className="ml-3 flex-1">
-                <p className="text-sm font-medium text-gray-900">{distortedTitle}</p>
-                {distortedDescription && (
-                  <p className="mt-1 text-sm text-gray-500">{distortedDescription}</p>
-                )}
-              </div>
-            </div>
-          </div>
-        </ShineBorder>
-      );
-    },
+    (t) => <CustomToast {...{ title, description, variant, stage, lang, visible: t.visible }} />,
     toastOptions
   );
 };
@@ -142,3 +136,7 @@ export const GlitchyToastProvider = () => {
     />
   );
 };
+
+export default function Component() {
+  return null; // This component doesn't render anything directly
+}
