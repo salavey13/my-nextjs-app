@@ -255,12 +255,12 @@ nav {
   .button-hover {
     transition: background-color 0.3s ease, box-shadow 0.3s ease;
     
-    color: "#000000";
+  
   }
 
   .button-hover:hover {
     background-color: var(--accent-color);
-    color: "#000000";
+    
     box-shadow: 0 0 10px var(--accent-color);
   }
 

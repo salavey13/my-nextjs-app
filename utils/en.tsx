@@ -9,6 +9,7 @@ export const en: LanguageDictionary = {
     'heading': 'Automation Today!',
     'description': "Experience the future",
     copyLink:"Copy Automa Link",
+    watch:"Watch as your code dances through the development cycle!",
   },
     contact: {
       title: "Get Started Today!",
@@ -45,9 +46,10 @@ export const en: LanguageDictionary = {
     "quickLink3": "Pricing",
     "quickLink4": "Templates",
     "quickLink5": "Instructions",
-    "quickLink6": "Mobile Shop",
-    "quickLink7": "FAQ",
-    "quickLink8": "Contact",
+    "quickLink6": "Automation",
+    "quickLink7": "Mobile Shop",
+    "quickLink8": "FAQ",
+    "quickLink9": "Contact",
     "copyright": "© 2024 v0 AI Dev."
   },
 
@@ -139,7 +141,8 @@ export const en: LanguageDictionary = {
     "instructions": "Instructions",
     "mobile-shop": "Mobile Shop",
     "faq": "FAQ",
-    "contact": "Contact"
+    "contact": "Contact",
+    "automation": "Automation"
   },
   "home": {
     "heading": "Unlock Success with v0 AI",

@@ -412,10 +412,10 @@ export default function AutomationPipeline() {
       <div className="overflow-y-auto p-4">
         <Card className="bg-gray-800 text-white">
           <CardHeader>
-            <CardTitle className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl w-full break-words leading-tight">
-              Automation Pipeline: The Developer&apos;s Magic Wand 🪄
+            <CardTitle className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl w-full break-words leading-tight text-center">
+              🪄
             </CardTitle>
-            <CardDescription className="text-gray-400">Watch as your code dances through the development cycle!</CardDescription>
+            <CardDescription className="text-gray-400">{t("automation.watach")}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="w-full h-2 bg-gray-700 rounded-full">

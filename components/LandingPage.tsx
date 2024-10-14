@@ -119,10 +119,10 @@ export default function LandingPage() {
         animate={{ y: isNavbarVisible ? 0 : -80 }}
         transition={{ type: "spring", stiffness: 300, damping: 30 }}
       >
-        <nav className="container mx-auto px-4 py-4 flex justify-between items-center">
+        <nav className="container  mx-auto px-4 py-4 flex justify-between items-center">
           <h1 className="text-2xl font-bold text-[#e1ff01]">{t('header.title')}</h1>
           <div className="md:hidden">
-            <Button variant="ghost" size="icon" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+            <Button variant="neon" size="icon" onClick={() => setIsMenuOpen(!isMenuOpen)}>
               {isMenuOpen ? <X /> : <Menu />}
             </Button>
           </div>
@@ -130,7 +130,7 @@ export default function LandingPage() {
             {["home", "features", "pricing", "templates", "instructions", "automation", "mobile-shop", "faq", "contact"].map((item) => (
               <Button
                 key={item}
-                variant="ghost"
+                variant="neon"
                 className={activeSection === item ? "text-[#e1ff01]" : ""}
                 onClick={() => scrollToSection(item)}
               >
@@ -152,7 +152,7 @@ export default function LandingPage() {
             {["home", "features", "pricing", "templates", "instructions", "automation", "mobile-shop", "faq", "contact"].map((item) => (
               <Button
                 key={item}
-                variant="ghost"
+                variant="secondary"
                 className="w-full text-left py-3 px-4"
                 onClick={() => scrollToSection(item)}
               >

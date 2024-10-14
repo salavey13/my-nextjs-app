@@ -7,6 +7,7 @@ export const ru: LanguageDictionary = {
     'heading': 'Автоматизация сегодня!',
     'description': "Ощутите будущее",
     copyLink:"Копировать ссылку на автомат",
+    watch:"Смотрите, как ваш код танцует в цикле разработки!",
   },
   "header": {
     "title": "v0 AI Dev"
@@ -19,7 +20,8 @@ export const ru: LanguageDictionary = {
     "instructions": "Инструкции",
     "mobile-shop": "Магазин приложений",
     "faq": "Частые вопросы",
-    "contact": "Контакты"
+    "contact": "Контакты",
+    "automation": "Автоматизация"
   },
   "home": {
     "heading": "Откройте успех с v0 AI",
