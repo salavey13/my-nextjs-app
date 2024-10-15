@@ -129,12 +129,25 @@ const Dev: React.FC = () => {
       alert(t('pleaseProvideLinks'));
       return;
     }
-    
-    const botToken = process.env.BOT_TOKEN;
-    const chatId = "413553377";
-    const message = "Someone implemented: ";
-    const url = `https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(message + JSON.stringify({ v0DevLink, githubTaskLink }))}`;
 
+    if (!process.env.BOT_TOKEN || !user) {
+      console.error('Bot token is missing');
+      return;
+    }
+
+    const botToken = process.env.BOT_TOKEN;
+    const inviteLink = `https://t.me/oneSitePlsBot/vip`;
+    const chatId = "413553377";
+    const message = "Someone implemented: " + JSON.stringify({ v0DevLink, githubTaskLink });
+    //const url = `https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(message + JSON.stringify({ v0DevLink, githubTaskLink }))}`;
+    const url = new URL(`https://api.telegram.org/bot${botToken}/sendMessage`);
+    url.searchParams.append("chat_id", "413553377");
+    url.searchParams.append("text", message);
+    url.searchParams.append("reply_markup", JSON.stringify({
+      inline_keyboard: [
+        [{ text: t("startPlaying"), url: inviteLink }]
+      ],
+    }));
     try {
       const response = await fetch(url);
       if (!response.ok) throw new Error('Failed to send Telegram notification');
