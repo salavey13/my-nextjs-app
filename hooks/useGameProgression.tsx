@@ -7,7 +7,7 @@ import ReactDOM from 'react-dom';
 export const useGameProgression = () => {
   const { state, dispatch, t } = useAppContext();
 
-  const progressStage = useCallback(async (newStage: number, unlockedComponent?: string) => {
+  const progressStage = useCallback(async (newStage: number, unlockedComponent?: string, skipToast: boolean = false) => {
     if (!state.user?.id) return;
     try {
       // Fetch the latest game state from the database
@@ -46,22 +46,24 @@ export const useGameProgression = () => {
       });
 
       // Show toasts for stage progression and newly unlocked components
-      if (updatedGameState.stage > latestGameState.stage) {
-        toast({
-          title: t('stageProgression'),
-          description: t(`stage${updatedGameState.stage}Unlocked`),
-          stage: updatedGameState.stage,
-          lang: state.user.lang,
-        });
-      }
+      if (!skipToast) {
+        if (updatedGameState.stage > latestGameState.stage) {
+          toast({
+            title: t('stageProgression'),
+            description: t(`stage${updatedGameState.stage}Unlocked`),
+            stage: updatedGameState.stage,
+            lang: state.user.lang,
+          });
+        }
 
-      if (unlockedComponent && !latestGameState.unlockedComponents?.includes(unlockedComponent)) {
-        toast({
-          title: t('componentUnlocked'),
-          description: t(`${unlockedComponent}Unlocked`),
-          stage: updatedGameState.stage,
-          lang: state.user.lang,
-        });
+        if (unlockedComponent && !latestGameState.unlockedComponents?.includes(unlockedComponent)) {
+          toast({
+            title: t('componentUnlocked'),
+            description: t(`${unlockedComponent}Unlocked`),
+            stage: updatedGameState.stage,
+            lang: state.user.lang,
+          });
+        }
       }
     } catch (error) {
       console.error('Error updating game stage:', error);
@@ -77,12 +79,12 @@ export const useGameProgression = () => {
     const CrashSimulation = (await import('@/components/CrashSimulation')).default;
     const root = document.createElement('div');
     document.body.appendChild(root);
-  
+
     const onCrashComplete = () => {
       document.body.removeChild(root);
       progressStage(5, 'versimcel');
     };
-  
+
     ReactDOM.render(<CrashSimulation onCrashComplete={onCrashComplete} />, root);
   }, [progressStage]);
 
