@@ -1,8 +1,7 @@
-// components\game\SkinShop.tsx
 'use client'
 
 import React, { useEffect, useState } from 'react';
-import { UserData, useAppContext } from '@/context/AppContext';
+import { useAppContext } from '@/context/AppContext';
 import { supabase } from '@/lib/supabaseClient';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -10,8 +9,8 @@ import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { motion } from 'framer-motion';
 import { toast } from '@/hooks/use-toast';
 import Image from 'next/image'
-
 import { useGameProgression } from '@/hooks/useGameProgression';
+
 interface Skin {
   id: string;
   cardsImgUrl: string;
@@ -133,7 +132,6 @@ const SkinShop = () => {
     }
   };
 
-
   if (!state.user) return null;
 
   const playerStage = state.user.game_state.stage;
@@ -149,8 +147,19 @@ const SkinShop = () => {
       className="flex-shrink-0 w-48 bg-card text-card-foreground rounded-lg overflow-hidden shadow-lg"
     >
       <div className="relative h-32">
-        <Image src={skin.cardsImgUrl} alt="Card skin" className="w-full h-full object-cover" />
-        <Image src={skin.shirtImgUrl} alt="Shirt skin" className="absolute bottom-0 right-0 w-12 h-12 object-cover" />
+        <Image 
+          src={skin.cardsImgUrl} 
+          alt="Card skin" 
+          layout="fill"
+          objectFit="cover"
+        />
+        <Image 
+          src={skin.shirtImgUrl} 
+          alt="Shirt skin" 
+          width={48}
+          height={48}
+          className="absolute bottom-0 right-0 object-cover"
+        />
       </div>
       <div className="p-2">
         <h3 className="font-bold text-sm mb-1 truncate">{skin.creatorUsername}&apos;s Skin</h3>

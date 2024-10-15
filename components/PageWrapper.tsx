@@ -3,6 +3,7 @@
 import { usePathname } from 'next/navigation'
 import { useAppContext } from '@/context/AppContext'
 import BottomShelf from './ui/bottomShelf'
+import UnlockChoice from './UnlockChoice'
 
 interface PageWrapperProps {
   children: React.ReactNode
@@ -19,7 +20,7 @@ export default function PageWrapper({ children }: PageWrapperProps) {
 
   return (
     <div className="min-h-full w-full">
-      {children}
+      {currentStage === 4 ? <UnlockChoice /> : children}
       {showBottomShelf && <BottomShelf bitmask={bottomShelfBitmask} />}
     </div>
   )
