@@ -11,6 +11,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import { toast } from '@/hooks/use-toast'
 import { supabase } from '@/lib/supabaseClient'
 import { StoryEdit } from './StoryEdit'
+import { useGameProgression } from '@/hooks/useGameProgression'
 
 interface StoryStage {
   id: string;
@@ -37,6 +38,7 @@ export default function DevKit() {
   const [crypto, setCrypto] = useState(state.user?.game_state?.crypto || 0)
   const [stageStats, setStageStats] = useState<StageStats>({})
   const [isOpen, setIsOpen] = useState(false)
+  const { progressStage, simulateCrash } = useGameProgression()
 
   useEffect(() => {
     fetchStoryStages()
@@ -91,22 +93,19 @@ export default function DevKit() {
     if (!state.user) return
 
     try {
+      const newStage = parseInt(selectedStage)
       const updatedGameState = {
         ...state.user.game_state,
-        stage: parseInt(selectedStage),
+        stage: newStage,
         coins: coins,
         crypto: crypto,
       }
 
-      const { data, error } = await supabase
-        .from('users')
-        .update({ game_state: updatedGameState })
-        .eq('id', state.user.id)
-        .single()
-
-      if (error) throw error
-
+      // Update local state first
       dispatch({ type: 'UPDATE_GAME_STATE', payload: updatedGameState })
+
+      // Then update the database
+      await progressStage(newStage, undefined, true)
 
       toast({
         title: t("devKit.success"),
@@ -119,6 +118,24 @@ export default function DevKit() {
       toast({
         title: t("devKit.error"),
         description: t("devKit.failedToUpdateGameState"),
+        variant: "destructive",
+      })
+    }
+  }
+
+  const handleSimulateCrash = async () => {
+    try {
+      await simulateCrash()
+      toast({
+        title: t("devKit.success"),
+        description: t("devKit.crashSimulated"),
+        variant: "success",
+      })
+    } catch (error) {
+      console.error('Error simulating crash:', error)
+      toast({
+        title: t("devKit.error"),
+        description: t("devKit.failedToSimulateCrash"),
         variant: "destructive",
       })
     }
@@ -148,16 +165,6 @@ export default function DevKit() {
         </SelectItem>
         {renderStageTree(stages, stage.id, depth + 1)}
       </React.Fragment>
-    ))
-  }
-
-  const renderStageOptions = (stages: StoryStage[]) => {
-    return stages.map((stage) => (
-      <SelectItem key={stage.id} value={stage.stage.toString()}>
-        {/* Stage {stage.stage} - {stage.storyContent?.substring(0, 30)}... */}
-        {t("devKit.stage")} {stage.stage} (ID: {stage.id}) (achievement: {stage.achievement})  (xuinitydialog: {stage.xuinitydialog?.substring(0, 30)}) (storycontent: {stage.storycontent?.substring(0, 30)})   (activecomponent: {stage.activecomponent})  (minigame: {stage.minigame}) (trigger: {stage.trigger}) (parentId: {stage.parentid}) (xuinitydialog: {stage.xuinitydialog?.substring(0, 30)}) (storycontent: {stage.storycontent?.substring(0, 30)})  
-
-      </SelectItem>
     ))
   }
 
@@ -191,7 +198,7 @@ export default function DevKit() {
                       <SelectValue placeholder={t("devKit.selectStage")} />
                     </SelectTrigger>
                     <SelectContent>
-                      {renderStageOptions(storyStages)}
+                      {renderStageTree(storyStages)}
                     </SelectContent>
                   </Select>
                   <Input
@@ -206,7 +213,12 @@ export default function DevKit() {
                     onChange={handleCryptoChange}
                     placeholder={t("devKit.crypto")}
                   />
-                  <Button onClick={handleApplyChanges}>{t("devKit.applyChanges")}</Button>
+                  <Button onClick={handleApplyChanges} className="w-full">
+                    {t("devKit.applyChanges")}
+                  </Button>
+                  <Button onClick={handleSimulateCrash} className="w-full">
+                    {t("devKit.simulateCrash")}
+                  </Button>
                 </div>
               </TabsContent>
               <TabsContent value="storyEdit">
