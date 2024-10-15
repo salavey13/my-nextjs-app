@@ -386,10 +386,10 @@ export default function HackButtonStoryShower() {
   )
 
   return (
-    <div className="game-board h-[calc(100vh-128px)] justify-start items-start relative overflow-hidden">
+    <div className="game-board h-[calc(100vh-128px)] pt-16 justify-start items-start relative overflow-hidden">
       {showCrashSimulation && (
         <div className="fixed inset-0  z-50">
-          <InfinityMirror layers={10} baseColor="#000000" accentColor="#ff0000" />
+          <CrashSimulation layers={10} baseColor="#000000" accentColor="#ff0000" />
         </div>
       )}
       <Card>
