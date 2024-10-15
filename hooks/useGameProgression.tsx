@@ -10,44 +10,66 @@ export const useGameProgression = () => {
   const progressStage = useCallback(async (newStage: number, unlockedComponent?: string) => {
     if (!state.user?.id) return;
     try {
-        const updatedGameState = {
-            ...state.user.game_state,
-            stage: newStage,
-            unlockedComponents: [
-              ...(state.user.game_state.unlockedComponents || []),
-              unlockedComponent,
-            ].filter(Boolean) as string[], // Explicit cast to string[] to ensure type safety
-          };
+      // Fetch the latest game state from the database
+      const { data: latestUserData, error: fetchError } = await supabase
+        .from('users')
+        .select('game_state')
+        .eq('id', state.user.id)
+        .single();
 
-      const { error } = await supabase
+      if (fetchError) throw fetchError;
+
+      const latestGameState = latestUserData.game_state;
+
+      // Merge the latest game state with the new changes
+      const updatedGameState = {
+        ...latestGameState,
+        stage: Math.max(latestGameState.stage, newStage),
+        unlockedComponents: Array.from(new Set([
+          ...(latestGameState.unlockedComponents || []),
+          unlockedComponent,
+        ].filter(Boolean))) as string[],
+      };
+
+      // Update the database with the merged game state
+      const { error: updateError } = await supabase
         .from('users')
         .update({ game_state: updatedGameState })
         .eq('id', state.user.id);
 
-      if (error) throw error;
+      if (updateError) throw updateError;
 
+      // Update the local state
       dispatch({
         type: 'UPDATE_GAME_STATE',
         payload: updatedGameState,
       });
 
-      toast({
-        title: t('stageProgression'),
-        description: t(`stage${newStage}Unlocked`),
-        stage: newStage,
-        lang: state.user.lang,
-      });
+      // Show toasts for stage progression and newly unlocked components
+      if (updatedGameState.stage > latestGameState.stage) {
+        toast({
+          title: t('stageProgression'),
+          description: t(`stage${updatedGameState.stage}Unlocked`),
+          stage: updatedGameState.stage,
+          lang: state.user.lang,
+        });
+      }
 
-      if (unlockedComponent) {
+      if (unlockedComponent && !latestGameState.unlockedComponents?.includes(unlockedComponent)) {
         toast({
           title: t('componentUnlocked'),
           description: t(`${unlockedComponent}Unlocked`),
-          stage: newStage,
+          stage: updatedGameState.stage,
           lang: state.user.lang,
         });
       }
     } catch (error) {
       console.error('Error updating game stage:', error);
+      toast({
+        title: t('error'),
+        description: t('errorUpdatingGameState'),
+        variant: 'destructive',
+      });
     }
   }, [state.user, dispatch, t]);
 

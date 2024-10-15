@@ -1,5 +1,13 @@
 import { LanguageDictionary } from "../utils/TranslationUtils";
 export const ukr: LanguageDictionary = {
+
+  "chooseUnlock": "Оберіть компонент для розблокування",
+  "betsComponent": "Компонент ставок",
+  "betsDescription": "Розблокуйте компонент ставок, щоб почати робити ставки та підвищувати свої шанси.",
+  "unlockBets": "Розблокувати ставки",
+  "rentsComponent": "Компонент оренди",
+  "rentsDescription": "Розблокуйте компонент оренди для керування та інвестування в нерухомість.",
+  "unlockRents": "Розблокувати оренду",
   visitV0: "Відвідайте v0.dev",
     viewGitHubRepo: "Перегляд GitHub Repo",
     checkVercelDeployments: "Перевірити розгортання Vercel",

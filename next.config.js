@@ -45,6 +45,12 @@ const nextConfig = {
         port: '',
         pathname: '/view/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'example.com',
+        port: '',
+        pathname: '/view/**',
+      },
       // Add more image hosting domains as needed
     ],
   },

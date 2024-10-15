@@ -19,7 +19,7 @@ export default function HackButtonPage() {
   }, [state?.user?.game_state, state.user?.game_state?.stage])
 
   return (
-    <div className="game-board h-screen relative overflow-y-scroll">
+    <div className="game-board h-calc(100vh-128px) relative overflow-y-scroll">
       {showStoryShower ? <HackButtonStoryShower /> : <HackButton />}
       <LandingPage />
       {state.user?.role === 1 && (

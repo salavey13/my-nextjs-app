@@ -112,7 +112,7 @@ export default function LandingPage() {
   }, [t, openLink]);
 
   return (
-    <div className="min-h-screen bg-gray-950 text-gray-100">
+    <div className="min-h-calc(100vh-128px) bg-gray-950 text-gray-100">
       <motion.header 
         className="fixed top-16 left-0 right-0 bg-gray-900 shadow-md z-50"
         initial={{ y: 0 }}

@@ -126,7 +126,7 @@ export const toast = ({ title, description, variant = "info", stage, lang = 'en'
 export const GlitchyToastProvider = () => {
   return (
     <Toaster 
-      position="top-right"
+      position="top-center"
       toastOptions={{
         style: {
           background: 'transparent',

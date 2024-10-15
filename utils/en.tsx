@@ -1,7 +1,13 @@
 import { LanguageDictionary } from "../utils/TranslationUtils";
 export const en: LanguageDictionary = {
   // ... (existing translations)
-
+"chooseUnlock": "Choose a Component to Unlock",
+    "betsComponent": "Bets Component",
+    "betsDescription": "Unlock the Bets component to start placing wagers and increasing your odds.",
+    "unlockBets": "Unlock Bets",
+    "rentsComponent": "Rents Component",
+    "rentsDescription": "Unlock the Rents component to manage and invest in properties.",
+    "unlockRents": "Unlock Rents",
   visitV0: "Visit v0.dev",
   viewGitHubRepo: "View GitHub Repo",
   checkVercelDeployments: "Check Vercel Deployments",

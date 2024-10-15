@@ -8,8 +8,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { motion } from 'framer-motion';
 import { toast } from '@/hooks/use-toast';
-import Image from 'next/image'
+import Image from 'next/image';
 import { useGameProgression } from '@/hooks/useGameProgression';
+import { ImageProps } from 'next/image';
 
 interface Skin {
   id: string;
@@ -150,15 +151,16 @@ const SkinShop = () => {
         <Image 
           src={skin.cardsImgUrl} 
           alt="Card skin" 
-          layout="fill"
-          objectFit="cover"
+          width={192}
+          height={128}
+          className="w-full h-32 object-cover"
         />
         <Image 
           src={skin.shirtImgUrl} 
           alt="Shirt skin" 
           width={48}
           height={48}
-          className="absolute bottom-0 right-0 object-cover"
+          className="absolute bottom-0 right-0 w-12 h-12 object-cover"
         />
       </div>
       <div className="p-2">
