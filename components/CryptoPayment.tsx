@@ -1,4 +1,3 @@
-// components/Dashboard.tsx
 "use client";
 
 import React, { useEffect, useState } from 'react';
@@ -8,18 +7,19 @@ import { Button } from "@/components/ui/button";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import QRCode from "react-qr-code";
 import PaymentNotification from './PaymentNotification';
-import { supabase } from "../lib/supabaseClient";
-//import { fetchTargetWallet } from "@/lib/fetchTargetWallet"; // Import the fetch function
+import { supabase } from "@/lib/supabaseClient";
+import { useGameProgression } from '@/hooks/useGameProgression';
 
+import { toast } from '@/hooks/use-toast';
 export const CryptoPayment: React.FC<{ creatorTelegramId: string }> = ({ creatorTelegramId }) => {
-    const { t, state, dispatch,  } = useAppContext();
+    const { t, state, dispatch } = useAppContext();
     const [amount, setAmount] = useState<number | string>('');
     const [paymentLink, setPaymentLink] = useState<string | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
     const [qrCodeUrl, setQrCodeUrl] = useState<string | null>(null);
     const [targetWallet, setTargetWallet] = useState<string | null>(null);
+    const { progressStage } = useGameProgression();
 
-    // Fetch the target wallet when the component mounts or when creatorTelegramId changes
     useEffect(() => {
         const fetchWallet = async () => {
             const wallet = await fetchTargetWallet(creatorTelegramId);
@@ -41,19 +41,32 @@ export const CryptoPayment: React.FC<{ creatorTelegramId: string }> = ({ creator
 
     const handleGeneratePaymentLink = async () => {
         if (!amount || isNaN(Number(amount))) {
-            alert(t('invalidAmount'));
+            toast({
+                title: t('error'),
+                description: t('invalidAmount'),
+                variant: "destructive",
+            });
             return;
         }
         setLoading(true);
         try {
             if (!targetWallet) throw new Error('Target wallet not available');
+            if (!state.user?.ton_wallet) throw new Error('User wallet not available');
 
-            // Create the payment link from the user's wallet to the target wallet
-            const link = `ton://transfer/${state?.user?.ton_wallet}?amount=${amount}&to=${targetWallet}`;
+            const link = `ton://transfer/${state.user.ton_wallet}?amount=${amount}&to=${targetWallet}`;
             setPaymentLink(link);
+
+            const currentStage = state.user.game_state?.stage ?? 0;
+            if (currentStage < 4) {
+                await progressStage(4);
+            }
         } catch (error) {
             console.error('Error generating payment link:', error);
-            alert(t('errorGeneratingLink'));
+            toast({
+                title: t('error'),
+                description: t('errorGeneratingLink'),
+                variant: "destructive",
+            });
         } finally {
             setLoading(false);
         }
@@ -102,32 +115,16 @@ export const CryptoPayment: React.FC<{ creatorTelegramId: string }> = ({ creator
                     <PaymentNotification link={paymentLink} />
                 </div>
             )}
-            
         </div>
     );
 };
 
-
-//export CryptoPayment;
 export const fetchTargetWallet = async (creatorTelegramId: string): Promise<string> => {
     try {
-        /* Fetch the rent record by creatorTelegramId (which corresponds to user_id)
-        const { data: rentData, error: rentError } = await supabase
-            .from('rents')
-            .select('user_id')
-            .eq('user_id', creatorTelegramId)
-            .single();
-
-        if (rentError || !rentData) {
-            console.error('Error fetching rent data:', rentError);
-            return null;
-        }*/
-
-        // Use the user_id from the rent record to fetch the ton_wallet from the users table
         const { data: userData, error: userError } = await supabase
             .from('users')
             .select('ton_wallet')
-            .eq('telegram_id', creatorTelegramId)//rentData.user_id)
+            .eq('telegram_id', creatorTelegramId)
             .single();
 
         if (userError || !userData) {
@@ -135,10 +132,11 @@ export const fetchTargetWallet = async (creatorTelegramId: string): Promise<stri
             return '';
         }
 
-        // Return the target wallet
         return userData.ton_wallet;
     } catch (error) {
         console.error('Unexpected error:', error);
         return '';
     }
 };
+
+export default CryptoPayment;

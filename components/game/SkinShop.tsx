@@ -10,6 +10,8 @@ import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { motion } from 'framer-motion';
 import { toast } from '@/hooks/use-toast';
 import Image from 'next/image'
+
+import { useGameProgression } from '@/hooks/useGameProgression';
 interface Skin {
   id: string;
   cardsImgUrl: string;
@@ -23,6 +25,7 @@ const SkinShop = () => {
   const { state, dispatch, t } = useAppContext();
   const [otherPlayerSkins, setOtherPlayerSkins] = useState<Skin[]>([]);
   const [loading, setLoading] = useState(true);
+  const { progressStage } = useGameProgression();
 
   useEffect(() => {
     const fetchOtherPlayerSkins = async () => {
@@ -75,10 +78,8 @@ const SkinShop = () => {
       }
 
       const newCoinsValue = userData.coins - skin.priceCoins;
-      const newGameState = {
-        ...userData.game_state,
-        stage: userData.game_state.stage === 1 ? 2 : userData.game_state.stage,
-      };
+      const currentStage = userData.game_state.stage;
+      const newStage = currentStage < 3 ? 3 : currentStage;
 
       const newLoot = {
         ...userData.loot,
@@ -98,7 +99,7 @@ const SkinShop = () => {
         .from('users')
         .update({
           coins: newCoinsValue,
-          game_state: newGameState,
+          game_state: { ...userData.game_state, stage: newStage },
           loot: newLoot,
         })
         .eq('id', state.user.id);
@@ -109,7 +110,7 @@ const SkinShop = () => {
         type: 'UPDATE_USER',
         payload: {
           coins: newCoinsValue,
-          game_state: newGameState,
+          game_state: { ...userData.game_state, stage: newStage },
           loot: newLoot,
         },
       });
@@ -119,11 +120,8 @@ const SkinShop = () => {
         description: t('skinPurchased'),
       });
 
-      if (newGameState.stage === 2) {
-        toast({
-          title: t('stageProgression'),
-          description: t('unlockedSkinCustomization'),
-        });
+      if (newStage > currentStage) {
+        progressStage(newStage);
       }
     } catch (error) {
       console.error('Error buying skin:', error);
@@ -134,6 +132,7 @@ const SkinShop = () => {
       });
     }
   };
+
 
   if (!state.user) return null;
 

@@ -12,7 +12,7 @@ export default function PageWrapper({ children }: PageWrapperProps) {
   const pathname = usePathname()
   const { state } = useAppContext()
   const user = state.user
-  const showBottomShelf = user?.game_state?.stage && user?.game_state?.stage > 2 && pathname !== '/' || null
+  const showBottomShelf = user?.game_state?.stage && user?.game_state?.stage > 2 || null
 
   const currentStage = user?.game_state?.stage || 1
   const bottomShelfBitmask = 1 << currentStage
