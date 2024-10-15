@@ -20,8 +20,8 @@ const CrashSimulation: React.FC<CrashSimulationProps> = ({ onCrashComplete }) =>
 
   return (
     <motion.div
-      initial={{ opacity: 1, scale: 1 }}
-      animate={{ opacity: isVisible ? 1 : 0, scale: isVisible ? 1 : 0 }}
+      initial={{ opacity: 1, scale: 1.1 }}
+      animate={{ opacity: isVisible ? 1 : 0, scale: isVisible ? 1.1 : 0 }}
       transition={{ duration: 1 }}
       className="fixed inset-0 z-50 flex items-center justify-center bg-black"
     >
