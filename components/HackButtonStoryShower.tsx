@@ -19,7 +19,7 @@ id,parentid,stage,storycontent,xuinitydialog,trigger,activecomponent,minigame,ac
 */
 'use client'
 
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import { GameSettings, useAppContext } from '@/context/AppContext'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -113,7 +113,20 @@ export default function HackButtonStoryShower() {
     }
   }
   
-  const initializeMinigame = (minigame: string) => {
+  const fetchStoryStages = async () => {
+    const { data, error } = await supabase
+      .from('story_stages')
+      .select('*')
+      .order('stage', { ascending: true })
+
+    if (error) {
+      console.error('Error fetching story stages:', error)
+    } else {
+      setStoryStages(data || [])
+    }
+  }
+
+  const initializeMinigame = useCallback((minigame: string) => {
     switch (minigame) {
       case 'debug':
         setMinigameState({
@@ -134,7 +147,7 @@ export default function HackButtonStoryShower() {
       default:
         setMinigameState(null)
     }
-  }
+  }, [])
   
   useEffect(() => {
     if (storyStages.length > 0 && state.user?.game_state?.stage !== undefined) {
@@ -148,21 +161,6 @@ export default function HackButtonStoryShower() {
       }
     }
   }, [storyStages, state.user?.game_state?.stage, initializeMinigame])
-
-  const fetchStoryStages = async () => {
-    const { data, error } = await supabase
-      .from('story_stages')
-      .select('*')
-      .order('stage', { ascending: true })
-
-    if (error) {
-      console.error('Error fetching story stages:', error)
-    } else {
-      setStoryStages(data || [])
-    }
-  }
-
-  
 
   const handleStageProgression = async (newStage?: number, unlockedComponent?: string) => {
     if (!currentStage || !state.user) return
@@ -193,7 +191,7 @@ export default function HackButtonStoryShower() {
         }
 
         if (nextStage === 3) {
-          dispatch({ type: 'UPDATE_GAME_STATE', payload: { unlockedComponents: [...(state.user.game_state.unlockedComponents || []), 'crypto'] } })
+          dispatch({ type: 'UPDATE_GAME_STATE', payload: { unlockedComponents: [...(state.user.game_state.unlockedComponents || []), 'cryptoPayment'] } })
         } else if (nextStage === 6) {
           dispatch({ type: 'UPDATE_GAME_STATE', payload: { unlockedComponents: [...(state.user.game_state.unlockedComponents || []), 'dev'] } })
         } else if (nextStage === 7) {
@@ -347,19 +345,19 @@ export default function HackButtonStoryShower() {
     return true
   }
 
-  const handleHackGuess = (guess: number) => {
+  const handleHackGuess = useCallback((guess: number) => {
     if (!minigameState || minigameState.type !== 'hack') return
 
     const newAttempts = (minigameState.attempts || 0) + 1
-    setMinigameState({
-      ...minigameState,
+    setMinigameState(prevState => ({
+      ...prevState!,
       attempts: newAttempts,
-    })
+    }))
 
     if (guess === minigameState.targetNumber) {
       toast({
         title: t('hackingSuccessful'),
-        description: t('guessedNumber', { attempts: String(newAttempts ?? 1) }),
+        description: t('guessedNumber', { attempts: String(newAttempts) }),
         stage: currentStage?.stage,
         lang: state.user?.lang,
       })
@@ -377,25 +375,25 @@ export default function HackButtonStoryShower() {
         description: guess > (minigameState.targetNumber || 0) ? t('tooHigh') : t('tooLow'),
       })
     }
-  }
+  }, [minigameState, t, currentStage, state.user, handleStageProgression, initializeMinigame])
 
-  const handleHackGuessDebounced = useCallback(
-    debounce((e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleHackGuessDebounced = useMemo(
+    () => debounce((e: React.ChangeEvent<HTMLInputElement>) => {
       const guess = parseInt(e.target.value)
       if (!isNaN(guess)) {
         handleHackGuess(guess)
       }
     }, 500),
-    [minigameState]
+    [handleHackGuess]
   )
 
   return (
     <div className="game-board h-[calc(100vh-128px)] pt-24 justify-start items-start relative overflow-hidden">
-      {/*showCrashSimulation && (
-        <div className="fixed inset-0  z-50">
-          <CrashSimulation layers={13} baseColor="#000000" accentColor="#ff0000" />
+      {showCrashSimulation && (
+        <div className="fixed inset-0 z-50">
+          <InfinityMirror layers={13} baseColor="#000000" accentColor="#ff0000" />
         </div>
-      )*/}
+      )}
       <Card>
         <CardHeader>
           <CardTitle>Stage {currentStage?.stage}: {currentStage?.storycontent}</CardTitle>

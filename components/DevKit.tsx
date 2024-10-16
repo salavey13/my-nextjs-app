@@ -8,10 +8,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
+import { Checkbox } from '@/components/ui/checkbox'
 import { toast } from '@/hooks/use-toast'
 import { supabase } from '@/lib/supabaseClient'
 import { StoryEdit } from './StoryEdit'
 import { useGameProgression } from '@/hooks/useGameProgression'
+import { NavigationLink } from '@/components/ui/bottomShelf'
+import { DollarSign, List, Zap, ShoppingCart, Home, Car, Users, User, Dice1, ZapOff, CalendarPlus, Globe, Crown, Lightbulb, Gamepad } from 'lucide-react'
 
 interface StoryStage {
   id: string;
@@ -30,6 +33,25 @@ interface StageStats {
   [key: string]: number;
 }
 
+const navigationLinks: NavigationLink[] = [
+  { href: '/paymentnotification', icon: <DollarSign className="w-6 h-6" />, label: 'Payment Notification', stageMask: 0b11111000, component: 'paymentNotification' },
+  { href: '/dynamicitemform', icon: <List className="w-6 h-6" />, label: 'Dynamic Item Form', stageMask: 0b11111000, component: 'dynamicItemForm' },
+  { href: '/qrcodeform', icon: <Zap className="w-6 h-6" />, label: 'QR Code Form', stageMask: 0b11111000, component: 'qrCodeForm' },
+  { href: '/cryptopayment', icon: <ShoppingCart className="w-6 h-6" />, label: 'Crypto Payment', stageMask: 0b11111000, component: 'cryptoPayment' },
+  { href: '/', icon: <Home className="w-6 h-6" />, label: 'Home', stageMask: 0b11111111 },
+  { href: '/rent', icon: <Car className="w-6 h-6" />, label: 'Rent', stageMask: 0b11111000, component: 'rent' },
+  { href: '/referral', icon: <Users className="w-6 h-6" />, label: 'Referral', stageMask: 0b11111000, component: 'referral' },
+  { href: '/profile', icon: <User className="w-6 h-6" />, label: 'Profile', stageMask: 0b11111111 },
+  { href: '/questsforcoins', icon: <Dice1 className="w-6 h-6" />, label: '!', stageMask: 0b11111000, component: 'questsForCoins' },
+  { href: '/bets', icon: <Zap className="w-6 h-6" />, label: 'IQ', stageMask: 0b11111000, component: 'bets' },
+  { href: '/quiz', icon: <ZapOff className="w-6 h-6" />, label: 'Quiz', stageMask: 0b11111111, component: 'quiz' },
+  { href: '/createEvent', icon: <CalendarPlus className="w-6 h-6" />, label: 'Create Event', stageMask: 0b11111000, component: 'createEvent' },
+  { href: '/conflictawareness', icon: <Globe className="w-6 h-6" />, label: 'Conflict Awareness', stageMask: 0b11111000, component: 'conflictAwareness' },
+  { href: '/admin', icon: <Crown className="w-6 h-6" />, label: 'Admin', stageMask: 0b10000000, component: 'admin' },
+  { href: '/dev', icon: <Lightbulb className="w-6 h-6" />, label: 'Dev', stageMask: 0b11000000, component: 'dev' },
+  { href: '/versimcel', icon: <Gamepad className="w-6 h-6" />, label: 'VersimCel', stageMask: 0b11111000, component: 'versimcel' },
+]
+
 export default function DevKit() {
   const { state, dispatch, t } = useAppContext()
   const [storyStages, setStoryStages] = useState<StoryStage[]>([])
@@ -38,11 +60,13 @@ export default function DevKit() {
   const [crypto, setCrypto] = useState(state.user?.game_state?.crypto || 0)
   const [stageStats, setStageStats] = useState<StageStats>({})
   const [isOpen, setIsOpen] = useState(false)
+  const [bottomShelfComponents, setBottomShelfComponents] = useState<{ [key: string]: boolean }>({})
   const { progressStage, simulateCrash } = useGameProgression()
 
   useEffect(() => {
     fetchStoryStages()
     fetchStageStats()
+    initializeBottomShelfComponents()
   }, [])
 
   const fetchStoryStages = async () => {
@@ -77,6 +101,16 @@ export default function DevKit() {
     }
   }
 
+  const initializeBottomShelfComponents = () => {
+    const components: { [key: string]: boolean } = {}
+    navigationLinks.forEach(link => {
+      if (link.component) {
+        components[link.component] = false
+      }
+    })
+    setBottomShelfComponents(components)
+  }
+
   const handleStageChange = (value: string) => {
     setSelectedStage(value)
   }
@@ -89,16 +123,22 @@ export default function DevKit() {
     setCrypto(parseInt(e.target.value) || 0)
   }
 
+  const handleBottomShelfComponentChange = (component: string, checked: boolean) => {
+    setBottomShelfComponents(prev => ({ ...prev, [component]: checked }))
+  }
+
   const handleApplyChanges = async () => {
-    if (!state.user) return
+    if  (!state.user) return
 
     try {
       const newStage = parseInt(selectedStage)
-      let unlockedComponents = [...(state.user.game_state.unlockedComponents || [])]
+      let unlockedComponents = Object.entries(bottomShelfComponents)
+        .filter(([_, isChecked]) => isChecked)
+        .map(([component]) => component)
 
-      // Unlock components based on stage
-      if (newStage >= 3 && !unlockedComponents.includes('crypto')) {
-        unlockedComponents.push('crypto')
+      // Ensure crypto, dev, and admin are unlocked at appropriate stages
+      if (newStage >= 3 && !unlockedComponents.includes('cryptoPayment')) {
+        unlockedComponents.push('cryptoPayment')
       }
       if (newStage >= 6 && !unlockedComponents.includes('dev')) {
         unlockedComponents.push('dev')
@@ -229,6 +269,21 @@ export default function DevKit() {
                     onChange={handleCryptoChange}
                     placeholder={t("devKit.crypto")}
                   />
+                  <div className="space-y-2">
+                    <h3 className="text-lg font-semibold">{t("devKit.bottomShelfComponents")}</h3>
+                    {Object.entries(bottomShelfComponents).map(([component, isChecked]) => (
+                      <div key={component} className="flex items-center">
+                        <Checkbox
+                          id={component}
+                          checked={isChecked}
+                          onCheckedChange={(checked) => handleBottomShelfComponentChange(component, checked as boolean)}
+                        />
+                        <label htmlFor={component} className="ml-2">
+                          {component}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
                   <Button onClick={handleApplyChanges} className="w-full">
                     {t("devKit.applyChanges")}
                   </Button>
