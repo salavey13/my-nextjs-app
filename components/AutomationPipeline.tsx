@@ -8,10 +8,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 // Use InView or other custom hooks here
 import { useInView } from '@/hooks/useInView';
-import { AlertCircle, CheckCircle, GitBranch, GitCommit, Link, Loader2 } from 'lucide-react';
+import { AlertCircle, CheckCircle, GitBranch, GitCommit, Loader2 } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from './ui/card';
 import { Textarea } from './ui/textarea';
-//import Link from 'next/link';
+import Link from 'next/link';
 import Image from 'next/image'
 
 
