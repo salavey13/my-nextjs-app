@@ -808,7 +808,7 @@ createTask: "Create Task",
   achievementsSection: "Trophy Cabinet 🏆",
   notifySection: "Bat-Signal for Salavey13 🦇",
   devKit: {
-    
+    simulateCrash: "Crash it",
     title: 'Dev Kit',
     gameState: 'Game State',
     storyEdit: 'Story Edit',
