@@ -1,6 +1,9 @@
 import { LanguageDictionary } from "../utils/TranslationUtils";
 export const ru: LanguageDictionary = {
   "bottomShelf": {
+    customComponent1: "Custom 1",
+      customComponent2: "Custom 2",
+      customComponent3: "Custom 3",
     "paymentNotification": "Оплата",
     "dynamicItemForm": "Предметы",
     "qrCodeForm": "QR-код",
@@ -711,7 +714,15 @@ createTask: "Создать задачу",
     gameStateUpdated: 'Состояние игры успешно обновлено',
     failToUpdateGameState: 'Не удалось обновить состояние игры',
     hideDevKit: "- БетаТест -",
-    showDevKit: "БетаТест"
+    showDevKit: "БетаТест",
+    "addComponent": "Добавить компонент",
+  "newComponentName": "Имя нового компонента",
+  "newComponentIcon": "Иконка нового компонента",
+  "newComponentStageMask": "Маска этапа нового компонента",
+  "addNewComponent": "Добавить новый компонент",
+  "newComponentFieldsRequired": "Имя и иконка компонента обязательны",
+  "newComponentAdded": "Новый компонент успешно добавлен",
+
   },
   stats: "Статка",
   wallet: "Кошелек",
