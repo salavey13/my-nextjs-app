@@ -14,6 +14,7 @@ import { supabase } from '@/lib/supabaseClient'
 import { StoryEdit } from './StoryEdit'
 import { useGameProgression } from '@/hooks/useGameProgression'
 import { NavigationLink } from '@/components/ui/bottomShelf'
+import { DollarSign, List, Zap, ShoppingCart, Home, Car, Users, User, Dice1, ZapOff, CalendarPlus, Globe, Crown, Lightbulb, Gamepad } from 'lucide-react'
 
 interface StoryStage {
   id: string;
@@ -32,6 +33,8 @@ interface StageStats {
   [key: string]: number;
 }
 
+
+
 export default function DevKit() {
   const { state, dispatch, t } = useAppContext()
   const [storyStages, setStoryStages] = useState<StoryStage[]>([])
@@ -48,6 +51,25 @@ export default function DevKit() {
     fetchStageStats()
     initializeBottomShelfComponents()
   }, [])
+
+  const navigationLinks: NavigationLink[] = [
+    { href: '/paymentnotification', icon: <DollarSign className="w-6 h-6" />, label: t('bottomShelf.paymentNotification'), stageMask: 0b11111000, component: 'paymentNotification' },
+    { href: '/dynamicitemform', icon: <List className="w-6 h-6" />, label: t('bottomShelf.dynamicItemForm'), stageMask: 0b11111000, component: 'dynamicItemForm' },
+    { href: '/qrcodeform', icon: <Zap className="w-6 h-6" />, label: t('bottomShelf.qrCodeForm'), stageMask: 0b11111000, component: 'qrCodeForm' },
+    { href: '/cryptopayment', icon: <ShoppingCart className="w-6 h-6" />, label: t('bottomShelf.cryptoPayment'), stageMask: 0b11111000, component: 'cryptoPayment' },
+    { href: '/', icon: <Home className="w-6 h-6" />, label: t('bottomShelf.home'), stageMask: 0b11111111 },
+    { href: '/rent', icon: <Car className="w-6 h-6" />, label: t('bottomShelf.rent'), stageMask: 0b11111000, component: 'rent' },
+    { href: '/referral', icon: <Users className="w-6 h-6" />, label: t('bottomShelf.referral'), stageMask: 0b11111000, component: 'referral' },
+    { href: '/profile', icon: <User className="w-6 h-6" />, label: t('bottomShelf.profile'), stageMask: 0b11111111 },
+    { href: '/questsforcoins', icon: <Dice1 className="w-6 h-6" />, label: t('bottomShelf.quests'), stageMask: 0b11111000, component: 'questsForCoins' },
+    { href: '/bets', icon: <Zap className="w-6 h-6" />, label: t('bottomShelf.bets'), stageMask: 0b11111000, component: 'bets' },
+    { href: '/quiz', icon: <ZapOff className="w-6 h-6" />, label: t('bottomShelf.quiz'), stageMask: 0b11111111, component: 'quiz' },
+    { href: '/createEvent', icon: <CalendarPlus className="w-6 h-6" />, label: t('bottomShelf.createEvent'), stageMask: 0b11111000, component: 'createEvent' },
+    { href: '/conflictawareness', icon: <Globe className="w-6 h-6" />, label: t('bottomShelf.conflictAwareness'), stageMask: 0b11111000, component: 'conflictAwareness' },
+    { href: '/admin', icon: <Crown className="w-6 h-6" />, label: t('bottomShelf.admin'), stageMask: 0b10000000, component: 'admin' },
+    { href: '/dev', icon: <Lightbulb className="w-6 h-6" />, label: t('bottomShelf.dev'), stageMask: 0b11000000, component: 'dev' },
+    { href: '/versimcel', icon: <Gamepad className="w-6 h-6" />, label: t('bottomShelf.versimcel'), stageMask: 0b11111000, component: 'versimcel' },
+  ]
 
   const fetchStoryStages = async () => {
     const { data, error } = await supabase
@@ -83,9 +105,9 @@ export default function DevKit() {
 
   const initializeBottomShelfComponents = () => {
     const components: { [key: string]: boolean } = {}
-    NavigationLink.forEach(link => {
+    navigationLinks.forEach(link => {
       if (link.component) {
-        components[link.component] = false
+        components[link.component] = state.user?.game_state?.unlockedComponents?.includes(link.component) || false
       }
     })
     setBottomShelfComponents(components)
@@ -107,13 +129,19 @@ export default function DevKit() {
     setBottomShelfComponents(prev => ({ ...prev, [component]: checked }))
   }
 
+  const isComponentUnlockable = (component: string, stage: number) => {
+    const link = navigationLinks.find(link => link.component === component)
+    if (!link) return false
+    return (link.stageMask & (1 << (stage - 1))) !== 0
+  }
+
   const handleApplyChanges = async () => {
-    if  (!state.user) return
+    if (!state.user) return
 
     try {
       const newStage = parseInt(selectedStage)
       let unlockedComponents = Object.entries(bottomShelfComponents)
-        .filter(([_, isChecked]) => isChecked)
+        .filter(([component, isChecked]) => isChecked && isComponentUnlockable(component, newStage))
         .map(([component]) => component)
 
       // Ensure crypto, dev, and admin are unlocked at appropriate stages
@@ -140,6 +168,15 @@ export default function DevKit() {
 
       // Then update the database
       await progressStage(newStage, undefined, true)
+
+      // Update the bottom shelf components state
+      setBottomShelfComponents(prev => {
+        const updated = { ...prev }
+        Object.keys(updated).forEach(component => {
+          updated[component] = unlockedComponents.includes(component)
+        })
+        return updated
+      })
 
       toast({
         title: t("devKit.success"),
@@ -267,7 +304,7 @@ export default function DevKit() {
                   <Button onClick={handleApplyChanges} className="w-full">
                     {t("devKit.applyChanges")}
                   </Button>
-                  <Button onClick={handleSimulateCrash} className="w-full">
+                  <Button  onClick={handleSimulateCrash} className="w-full">
                     {t("devKit.simulateCrash")}
                   </Button>
                 </div>
