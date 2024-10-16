@@ -1,37 +1,23 @@
-"use client"
+"use client";
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Textarea } from "@/components/ui/textarea"
-import { Input } from "@/components/ui/input"
-import { AlertCircle, CheckCircle, GitBranch, GitCommit, Loader2, Code, FileText, Bug, Edit3 } from 'lucide-react'
-import { toast } from '@/hooks/use-toast'
+import { Button } from "@/components/ui/button";
+import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/lib/supabaseClient';
-import Link from 'next/link';
-import Image from 'next/image'
 import { useAppContext } from '@/context/AppContext';
+import { motion, AnimatePresence } from 'framer-motion';
+
+// Use InView or other custom hooks here
 import { useInView } from '@/hooks/useInView';
-// MOCK DATA AND FUNCTIONS - Comment out when integrating with actual project
-// =========================================================================
-// Mock AppContext for development purposes
-const mockAppContext = {
-  state: {
-    user: {
-      id: 43,
-      telegram_id: 413553377,
-      game_state: {
-        idea: ''
-      }
-    }
-  },
-  dispatch: () => {},
-  t: (key: string) => key // Mock translation function
-};
+import { AlertCircle, CheckCircle, GitBranch, GitCommit, Link, Loader2 } from 'lucide-react';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from './ui/card';
+import { Textarea } from './ui/textarea';
+//import Link from 'next/link';
+import Image from 'next/image'
 
-// Simulating the useAppContext hook
-//const useAppContext = () => mockAppContext;
 
+type AutomaParsedData = any; // Replace 'any' with the actual type of your parsed data
+// Replace 'any' with the actual type of your V0 response
+// MOCK DATA AND FUNCTIONS
 const mockAutoma = {
   collectData: async (): Promise<AutomaData> => {
     await new Promise(resolve => setTimeout(resolve, 2000));
@@ -102,21 +88,19 @@ const mockV0 = {
     ];
   }
 };
-// =========================================================================
 
-type PipelineStep = 'collect' | 'generate' | 'enhance' | 'review' | 'push';
+// Types
+type PipelineStep = 'collect' | 'generate' | 'enhance' | 'review' | 'push' | "complete";
 type LogType = 'info' | 'success' | 'warning' | 'error';
 type Log = {
   type: LogType;
   message: string;
 };
-
 type AutomaData = {
   vercelLogs: string;
   repoStructure: string[];
   buildErrors: string[];
 };
-
 type V0Response = {
   code: string;
   files: Array<{ filePath: string; content: string }>;
@@ -125,11 +109,11 @@ type V0Response = {
 const LogContainer = ({ logs }: { logs: Log[] }) => {
   const logsEndRef = useRef<HTMLDivElement>(null);
 
-  // useEffect(() => {
-  //   if (logsEndRef.current) {
-  //     logsEndRef.current.scrollIntoView({ behavior: "smooth" });
-  //   }
-  // }, [logs]);
+  useEffect(() => {
+    if (logsEndRef.current) {
+      logsEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [logs]);
 
   const getLogColor = (type: LogType): string => {
     switch (type) {
@@ -157,7 +141,7 @@ const LogContainer = ({ logs }: { logs: Log[] }) => {
 };
 
 export default function AutomationPipeline() {
-  const { state, dispatch, t } = useAppContext();
+  const { state, t } = useAppContext();
   const [automaParsedData, setAutomaParsedData] = useState<AutomaData | null>(null);
   const [v0Response, setV0Response] = useState<V0Response | null>(null);
   const [currentStep, setCurrentStep] = useState<PipelineStep>('collect');
@@ -167,8 +151,7 @@ export default function AutomationPipeline() {
   const [enhancements, setEnhancements] = useState<string[]>([]);
   const [idea, setIdea] = useState<string>('');
   const [fileContents, setFileContents] = useState<{ [key: string]: string }>({});
-  const [vercelLogs, setVercelLogs] = useState<string>('');
-  
+  const [vercelLogs, setVercelLogs] = useState<string>('');        
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -196,9 +179,9 @@ export default function AutomationPipeline() {
   };
 
   const addLog = useCallback((message: string, type: LogType = 'info') => {
-    const shortDate = new Date().toISOString().split('T')[0]; // Output: "2024-10-12"
+    const shortDate = new Date().toISOString().split('T')[1];
     const formattedMessage = `[${shortDate}] ${message}`;
-  
+
     setLogs(prevLogs => [...prevLogs, { type, message: formattedMessage }]);
   }, []);
 
@@ -210,17 +193,17 @@ export default function AutomationPipeline() {
       title: t("error"),
       description: message,
     });
-  }, [t]); // memoize `handleError` with dependency `t`
-  
+  }, [t]);
+
   const handleSuccess = useCallback((message: string) => {
     addLog(message, 'success');
     toast({
       title: t("success"),
       description: message,
     });
-  }, [t]); // memoize `handleSuccess` with dependency `t`
+  }, [t]);
 
-  const collectData = async () => {
+  const collectData = async (): Promise<AutomaData> => {
     try {
       addLog('Starting data collection...');
       setProgress(10);
@@ -229,12 +212,17 @@ export default function AutomationPipeline() {
       addLog('Data collection complete.');
       setProgress(30);
       setCurrentStep('generate');
+      return data
     } catch (err) {
       handleError(`Failed to collect data: ${(err as Error).message}`);
     }
+
+    return { vercelLogs: "",
+      repoStructure: [],
+      buildErrors: []}as AutomaData
   };
 
-  const enhanceCodeWithV0 = async (parsedData: AutomaData) => {
+  const enhanceCodeWithV0 = async (parsedData: AutomaData):Promise<V0Response> => {
     try {
       addLog('Starting code enhancement with v0...');
       setProgress(40);
@@ -254,15 +242,16 @@ export default function AutomationPipeline() {
 
         Feed this into JS to finalize the automated flow.
       `;
-
       const response = await mockV0.generateCode({ instruction, input: parsedData });
       setV0Response(response);
-      addLog('Code enhancement complete. Reviewing generated code.');
+      addLog('Code enhancement complete.');
       setProgress(60);
       setCurrentStep('enhance');
+      return response
     } catch (err) {
       handleError(`Failed to enhance code: ${(err as Error).message}`);
     }
+    return {code: "", files:[]} as V0Response
   };
 
   const reviewEnhancements = useCallback(async () => {
@@ -271,14 +260,13 @@ export default function AutomationPipeline() {
       setProgress(70);
       const suggestions = await mockV0.generateEnhancements();
       setEnhancements(suggestions);
-      addLog('Enhancement suggestions generated. Approving all suggestions for this simulation.');
-      await new Promise(resolve => setTimeout(resolve, 3000)); // Simulate time taken to review
+      addLog('Enhancement suggestions generated.');
       handleSuccess('All enhancement suggestions approved.');
       setCurrentStep('push');
     } catch (err) {
       handleError(`Failed to review enhancements: ${(err as Error).message}`);
     }
-  }, [handleError, t, handleSuccess])
+  }, [handleError, handleSuccess]);
 
   const pushFilesToGitHub = async () => {
     try {
@@ -295,18 +283,69 @@ export default function AutomationPipeline() {
       handleError(`Failed to push files to GitHub: ${(err as Error).message}`);
     }
   };
-
-  useEffect(() => {
-    if (currentStep === 'collect') {
-      collectData();
-    } else if (automaParsedData && currentStep === 'generate') {
-      enhanceCodeWithV0(automaParsedData);
-    } else if (v0Response && currentStep === 'enhance') {
-      reviewEnhancements();
-    } else if (v0Response && currentStep === 'push') {
-      pushFilesToGitHub();
+ // Step 1: Collect Data
+ useEffect(() => {
+  const collect = async () => {
+    if (currentStep === "collect") {
+      try {
+        const data : AutomaData = await collectData();
+        setAutomaParsedData(data || null);
+        setCurrentStep("generate"); // Move to the next step after data collection
+      } catch (err) {
+        console.error("Error in collectData:", err);
+      }
     }
-  }, [currentStep, automaParsedData, v0Response, collectData, enhanceCodeWithV0, pushFilesToGitHub, reviewEnhancements]);
+  };
+  collect();
+}, [currentStep]);
+
+// Step 2: Generate / Enhance Code with V0
+useEffect(() => {
+  const generate = async () => {
+    if (automaParsedData && currentStep === "generate") {
+      try {
+        const response:V0Response = await enhanceCodeWithV0(automaParsedData);
+        setV0Response(response);
+        setCurrentStep("enhance"); // Move to the next step after generating V0
+      } catch (err) {
+        console.error("Error in enhanceCodeWithV0:", err);
+      }
+    }
+  };
+  generate();
+}, [automaParsedData, currentStep]);
+
+// Step 3: Review Enhancements (Simulated - you can add real logic here)
+useEffect(() => {
+  const reviewEnhancements = async () => {
+    if (v0Response && currentStep === "enhance") {
+      try {
+        // Simulate review process, insert your actual logic here if needed
+        console.log("Reviewing enhancements: ", v0Response);
+        setCurrentStep("push"); // Move to the next step after review
+      } catch (err) {
+        console.error("Error in reviewEnhancements:", err);
+      }
+    }
+  };
+  reviewEnhancements();
+}, [v0Response, currentStep]);
+
+// Step 4: Push Files to GitHub
+useEffect(() => {
+  const pushToGitHub = async () => {
+    if (v0Response && currentStep === "push") {
+      try {
+        await pushFilesToGitHub();
+        console.log("Files successfully pushed to GitHub!");
+        setCurrentStep("complete"); // Pipeline complete
+      } catch (err) {
+        console.error("Error in pushFilesToGitHub:", err);
+      }
+    }
+  };
+  pushToGitHub();
+}, [v0Response, currentStep]);
 
   const handleFileContentChange = (filePath: string, content: string) => {
     setFileContents(prev => ({ ...prev, [filePath]: content }));
@@ -407,11 +446,8 @@ export default function AutomationPipeline() {
       </Link>
     );
   };
-  
-  
-  
 
-  return (
+  return(
     <div className="flex flex-col bg-gray-900">
       <div className="overflow-y-auto p-4">
         <Card className="bg-gray-800 text-white">
@@ -449,11 +485,9 @@ export default function AutomationPipeline() {
                   </motion.div>
                 ))}
               </AnimatePresence>
-            </div>
-
-            <LogContainer logs={logs} />
-
-            <div className="space-y-4 items-center">
+            </div>        
+      <LogContainer logs={logs} />
+      <div className="space-y-4 items-center">
               <Textarea
                 value={idea}
                 onChange={(e) => setIdea(e.target.value)}
@@ -499,37 +533,37 @@ export default function AutomationPipeline() {
             )}
           </CardContent>
           <CardFooter className="flex flex-col md:flex-row justify-between space-y-4 md:space-y-0 md:items-center">
-  <div className="flex items-center space-x-2">
-    {error ? (
-      <AlertCircle className="h-5 w-5 text-red-500" />
-    ) : progress === 100 ? (
-      <CheckCircle className="h-5 w-5 text-green-500" />
-    ) : (
-      <AlertCircle className="h-5 w-5 text-yellow-500" />
-    )}
-    <span className="text-sm md:text-base text-gray-300">
-      {error || (progress === 100 ? 'Automation complete' : 'Automation in progress')}
-    </span>
-  </div>
+            <div className="flex items-center space-x-2">
+              {error ? (
+                <AlertCircle className="h-5 w-5 text-red-500" />
+              ) : progress === 100 ? (
+                <CheckCircle className="h-5 w-5 text-green-500" />
+              ) : (
+                <AlertCircle className="h-5 w-5 text-yellow-500" />
+              )}
+              <span className="text-sm md:text-base text-gray-300">
+                {error || (progress === 100 ? 'Automation complete' : 'Automation in progress')}
+              </span>
+            </div>
 
-  <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2">
-    <Button 
-      variant="outline" 
-      onClick={() => window.location.reload()} 
-      className="bg-gray-700 text-gray-300 hover:bg-gray-600 automa-restart flex items-center justify-center text-sm md:text-base"
-    >
-      <GitBranch className="mr-2 h-4 w-4" /> {t("restart")}
-    </Button>
+            <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2">
+              <Button 
+                variant="outline" 
+                onClick={() => window.location.reload()} 
+                className="bg-gray-700 text-gray-300 hover:bg-gray-600 automa-restart flex items-center justify-center text-sm md:text-base"
+              >
+                <GitBranch className="mr-2 h-4 w-4" /> {t("restart")}
+              </Button>
 
-    <Button 
-      onClick={() => pushFilesToGitHub()} 
-      disabled={currentStep !== 'push'} 
-      className="bg-blue-600 hover:bg-blue-700 text-white automa-push-changes flex items-center justify-center text-sm md:text-base"
-    >
-      <GitCommit className="mr-2 h-4 w-4" /> {t("push")}
-    </Button>
-  </div>
-</CardFooter>
+              <Button 
+                onClick={() => pushFilesToGitHub()} 
+                disabled={currentStep !== 'push'} 
+                className="bg-blue-600 hover:bg-blue-700 text-white automa-push-changes flex items-center justify-center text-sm md:text-base"
+              >
+                <GitCommit className="mr-2 h-4 w-4" /> {t("push")}
+              </Button>
+            </div>
+          </CardFooter>
 
         </Card>
       </div>
@@ -573,7 +607,18 @@ export default function AutomationPipeline() {
   ))}
 </div> */}
 <ImageGrid/>
+      <Button onClick={collectData}>Start Pipeline</Button>
+      {currentStep === 'generate' && (
+        <Button onClick={() => enhanceCodeWithV0(automaParsedData!)}>
+          Enhance Code
+        </Button>
+      )}
+      {currentStep === 'enhance' && (
+        <Button onClick={reviewEnhancements}>Review Enhancements</Button>
+      )}
+      {currentStep === 'push' && (
+        <Button onClick={pushFilesToGitHub}>Push to GitHub</Button>
+      )}
     </div>
   );
 }
-
