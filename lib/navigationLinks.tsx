@@ -1,6 +1,6 @@
 import { DollarSign, List, Zap, ShoppingCart, Home, Car, Users, User, Dice1, ZapOff, CalendarPlus, Globe, Crown, Lightbulb, Gamepad, Star, Sun } from 'lucide-react'
 import { dynamicComponents } from './dynamicComponents';
-
+import React from 'react'
 export interface NavigationLink {
   href: string
   icon: React.ReactNode
