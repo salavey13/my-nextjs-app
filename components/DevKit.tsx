@@ -94,11 +94,25 @@ export default function DevKit() {
 
     try {
       const newStage = parseInt(selectedStage)
+      let unlockedComponents = [...(state.user.game_state.unlockedComponents || [])]
+
+      // Unlock components based on stage
+      if (newStage >= 3 && !unlockedComponents.includes('crypto')) {
+        unlockedComponents.push('crypto')
+      }
+      if (newStage >= 6 && !unlockedComponents.includes('dev')) {
+        unlockedComponents.push('dev')
+      }
+      if (newStage >= 7 && !unlockedComponents.includes('admin')) {
+        unlockedComponents.push('admin')
+      }
+
       const updatedGameState = {
         ...state.user.game_state,
         stage: newStage,
         coins: coins,
         crypto: crypto,
+        unlockedComponents: unlockedComponents,
       }
 
       // Update local state first
@@ -161,6 +175,8 @@ export default function DevKit() {
             (minigame: {stage.minigame}) 
             <br />
             (trigger: {stage.trigger})
+            <br />
+            (bottomShelfBitmask: {stage.bottomshelfbitmask})
           </div>
         </SelectItem>
         {renderStageTree(stages, stage.id, depth + 1)}
