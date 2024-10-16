@@ -147,7 +147,7 @@ export default function HackButtonStoryShower() {
         setShowHackButton(stage.stage <= 3)
       }
     }
-  }, [storyStages, state.user?.game_state?.stage], initializeMinigame)
+  }, [storyStages, state.user?.game_state?.stage, initializeMinigame])
 
   const fetchStoryStages = async () => {
     const { data, error } = await supabase
