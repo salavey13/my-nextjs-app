@@ -49,12 +49,6 @@ export default function DevKit() {
 
   const navigationLinks = getNavigationLinks(t)
 
-  useEffect(() => {
-    fetchStoryStages()
-    fetchStageStats()
-    initializeBottomShelfComponents()
-  }, [initializeBottomShelfComponents])
-
   const fetchStoryStages = async () => {
     const { data, error } = await supabase
       .from('story_stages')
@@ -133,6 +127,12 @@ export default function DevKit() {
     })
     setBottomShelfComponents(components)
   }
+
+  useEffect(() => {
+    fetchStoryStages()
+    fetchStageStats()
+    initializeBottomShelfComponents()
+  }, [initializeBottomShelfComponents])
 
   const handleStageChange = (value: string) => {
     setSelectedStage(value)
