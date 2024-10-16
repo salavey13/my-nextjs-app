@@ -1,7 +1,10 @@
 import { LanguageDictionary } from "../utils/TranslationUtils";
 export const ukr: LanguageDictionary = {
   "bottomShelf": {
-    "paymentNotification": "Оплата",
+    customComponent1: "Custom 1",
+      customComponent2: "Custom 2",
+      customComponent3: "Custom 3",
+   "paymentNotification": "Оплата",
     "dynamicItemForm": "Предмети",
     "qrCodeForm": "QR-код",
     "cryptoPayment": "Крипто",
@@ -707,7 +710,15 @@ createTask: "Створити завдання",
     gameStateUpdated: 'Стан гри успішно оновлено',
     failedToUpdateGameState: "Не вдалося оновити стан гри",
     hideDevKit: "- БетаТест -",
-    showDevKit: "БетаТест"
+    showDevKit: "БетаТест",
+    "addComponent": "Додати компонент",
+  "newComponentName": "Назва нового компонента",
+  "newComponentIcon": "Іконка нового компонента",
+  "newComponentStageMask": "Маска етапу нового компонента",
+  "addNewComponent": "Додати новий компонент",
+  "newComponentFieldsRequired": "Назва та іконка компонента є обов'язковими",
+  "newComponentAdded": "Новий компонент успішно додано",
+
   },
   stats: "Статка",
   wallet: "Гаманець",
