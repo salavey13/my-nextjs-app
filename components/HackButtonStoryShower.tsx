@@ -72,6 +72,70 @@ export default function HackButtonStoryShower() {
     fetchStoryStages()
   }, [])
 
+  const simulateGitHubSourceRetrieval = async () => {
+    const steps = [
+      'Getting author ID: salavey13',
+      'Getting project name: my-nextjs-app',
+      'Getting latest commit ID: e66a103bed7ae7d308fe3e4e4237da48ed45387c',
+      'Fetching latest component file content...',
+    ]
+
+    setMinigameState({
+      type: 'github',
+      githubSteps: [],
+      githubBlocks: [],
+    })
+
+    for (const step of steps) {
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      setMinigameState(prevState => ({
+        ...prevState!,
+        githubSteps: [...(prevState?.githubSteps || []), step],
+      }))
+    }
+
+    try {
+      const response = await fetch('https://github.com/salavey13/my-nextjs-app/raw/e66a103bed7ae7d308fe3e4e4237da48ed45387c/components/HackButtoStoryShower.tsx')
+      const content = await response.text()
+      const blocks = content.split('\n\n').filter(block => block.trim() !== '')
+
+      setMinigameState(prevState => ({
+        ...prevState!,
+        githubSteps: [...(prevState?.githubSteps || []), 'File content retrieved successfully'],
+        githubBlocks: blocks,
+      }))
+    } catch (error) {
+      console.error('Error fetching file content:', error)
+      setMinigameState(prevState => ({
+        ...prevState!,
+        githubSteps: [...(prevState?.githubSteps || []), 'Error fetching file content'],
+      }))
+    }
+  }
+  
+  const initializeMinigame = (minigame: string) => {
+    switch (minigame) {
+      case 'debug':
+        setMinigameState({
+          type: 'debug',
+          errors: ['Error 1', 'Error 2', 'Error 3'],
+        })
+        break
+      case 'hack':
+        setMinigameState({
+          type: 'hack',
+          targetNumber: Math.floor(Math.random() * 13) + 1,
+          attempts: 0,
+        })
+        break
+      case 'github':
+        simulateGitHubSourceRetrieval()
+        break
+      default:
+        setMinigameState(null)
+    }
+  }
+  
   useEffect(() => {
     if (storyStages.length > 0 && state.user?.game_state?.stage !== undefined) {
       const stage = storyStages.find(s => s.stage === state.user?.game_state.stage)
@@ -98,28 +162,7 @@ export default function HackButtonStoryShower() {
     }
   }
 
-  const initializeMinigame = (minigame: string) => {
-    switch (minigame) {
-      case 'debug':
-        setMinigameState({
-          type: 'debug',
-          errors: ['Error 1', 'Error 2', 'Error 3'],
-        })
-        break
-      case 'hack':
-        setMinigameState({
-          type: 'hack',
-          targetNumber: Math.floor(Math.random() * 13) + 1,
-          attempts: 0,
-        })
-        break
-      case 'github':
-        simulateGitHubSourceRetrieval()
-        break
-      default:
-        setMinigameState(null)
-    }
-  }
+  
 
   const handleStageProgression = async (newStage?: number, unlockedComponent?: string) => {
     if (!currentStage || !state.user) return
@@ -167,46 +210,7 @@ export default function HackButtonStoryShower() {
     }
   }
 
-  const simulateGitHubSourceRetrieval = async () => {
-    const steps = [
-      'Getting author ID: salavey13',
-      'Getting project name: my-nextjs-app',
-      'Getting latest commit ID: e66a103bed7ae7d308fe3e4e4237da48ed45387c',
-      'Fetching latest component file content...',
-    ]
-
-    setMinigameState({
-      type: 'github',
-      githubSteps: [],
-      githubBlocks: [],
-    })
-
-    for (const step of steps) {
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      setMinigameState(prevState => ({
-        ...prevState!,
-        githubSteps: [...(prevState?.githubSteps || []), step],
-      }))
-    }
-
-    try {
-      const response = await fetch('https://github.com/salavey13/my-nextjs-app/raw/e66a103bed7ae7d308fe3e4e4237da48ed45387c/components/HackButtoStoryShower.tsx')
-      const content = await response.text()
-      const blocks = content.split('\n\n').filter(block => block.trim() !== '')
-
-      setMinigameState(prevState => ({
-        ...prevState!,
-        githubSteps: [...(prevState?.githubSteps || []), 'File content retrieved successfully'],
-        githubBlocks: blocks,
-      }))
-    } catch (error) {
-      console.error('Error fetching file content:', error)
-      setMinigameState(prevState => ({
-        ...prevState!,
-        githubSteps: [...(prevState?.githubSteps || []), 'Error fetching file content'],
-      }))
-    }
-  }
+  
 
   const renderMinigame = () => {
     if (!minigameState) return null
