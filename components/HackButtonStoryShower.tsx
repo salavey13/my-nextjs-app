@@ -34,7 +34,8 @@ import { Input } from '@/components/ui/input'
 import { debounce } from 'lodash'
 import { useGameProgression } from '@/hooks/useGameProgression'
 import HackButton from '@/components/HackButton'
-import CrashSimulation from '@/components/CrashSimulation’
+import CrashSimulation from '@/components/CrashSimulation'
+
 interface StoryStage {
   id: string;
   parentid: string | null;
