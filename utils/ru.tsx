@@ -696,6 +696,7 @@ createTask: "Создать задачу",
   achievementsSection: "Кабинет трофеев 🏆",
   notifySection: "Bat-Signal для Salavey13 🦇",
   devKit: {
+    failToFetchStoryStages: "Не удалось получить этапы истории",
     crashSimulated: "Уронено",
     simulateCrash: "Уронить",
     title: "Комплект разработчика",

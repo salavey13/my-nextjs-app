@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import { useAppContext } from '@/context/AppContext'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -47,7 +47,7 @@ export default function DevKit() {
   const [newComponentIcon, setNewComponentIcon] = useState('')
   const [newComponentStageMask, setNewComponentStageMask] = useState('0b11111000')
 
-  const navigationLinks = getNavigationLinks(t)
+  const navigationLinks = useMemo(() => getNavigationLinks(t), [t])
 
   const fetchStoryStages = useCallback(async () => {
     try {
@@ -66,7 +66,7 @@ export default function DevKit() {
         variant: "destructive",
       })
     }
-  }, [t])
+  }, [])
 
   const fetchStageStats = useCallback(async () => {
     try {
@@ -109,7 +109,7 @@ export default function DevKit() {
     initializeBottomShelfComponents()
   }, [fetchStoryStages, fetchStageStats, initializeBottomShelfComponents])
 
-  const handleAddNewComponent = () => {
+  const handleAddNewComponent = useCallback(() => {
     if (!newComponentName || !newComponentIcon) {
       toast({
         title: t("devKit.error"),
@@ -144,23 +144,23 @@ export default function DevKit() {
       description: t("devKit.newComponentAdded"),
       variant: "success",
     })
-  }
+  }, [newComponentName, newComponentIcon, newComponentStageMask, t, initializeBottomShelfComponents])
 
-  const handleStageChange = (value: string) => {
+  const handleStageChange = useCallback((value: string) => {
     setSelectedStage(value)
-  }
+  }, [])
 
-  const handleCoinsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleCoinsChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setCoins(parseInt(e.target.value) || 0)
-  }
+  }, [])
 
-  const handleCryptoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleCryptoChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setCrypto(parseInt(e.target.value) || 0)
-  }
+  }, [])
 
-  const handleBottomShelfComponentChange = (component: string, checked: boolean) => {
+  const handleBottomShelfComponentChange = useCallback((component: string, checked: boolean) => {
     setBottomShelfComponents(prev => ({ ...prev, [component]: checked }))
-  }
+  }, [])
 
   const isComponentUnlockable = useCallback((component: string, stage: number) => {
     const link = navigationLinks.find(link => link.component === component)
@@ -168,7 +168,7 @@ export default function DevKit() {
     return (link.stageMask & (1 << (stage - 1))) !== 0
   }, [navigationLinks])
 
-  const handleApplyChanges = async () => {
+  const handleApplyChanges = useCallback(async () => {
     if (!state.user) return
 
     try {
@@ -214,9 +214,9 @@ export default function DevKit() {
         variant: "destructive",
       })
     }
-  }
+  }, [state.user, selectedStage, bottomShelfComponents, isComponentUnlockable, coins, crypto, dispatch, progressStage, t])
 
-  const handleSimulateCrash = async () => {
+  const handleSimulateCrash = useCallback(async () => {
     try {
       await simulateCrash()
       toast({
@@ -232,7 +232,7 @@ export default function DevKit() {
         variant: "destructive",
       })
     }
-  }
+  }, [simulateCrash, t])
 
   const renderStageTree = useCallback((stages: StoryStage[], parentId: string | null = null, depth = 0) => {
     const childStages = stages.filter(stage => stage.parentid === parentId)
@@ -262,6 +262,24 @@ export default function DevKit() {
       </React.Fragment>
     ))
   }, [t])
+
+  const renderStageMask = useCallback((stageMask: number) => {
+    const bits = stageMask.toString(2).padStart(8, '0').split('').reverse()
+    return (
+      <div className="grid grid-cols-8 gap-1 mt-2">
+        {bits.map((bit, index) => (
+          <div
+            key={index}
+            className={`w-6 h-6 flex items-center justify-center text-xs font-mono ${
+              bit === '1' ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-700'
+            }`}
+          >
+            {bit}
+          </div>
+        ))}
+      </div>
+    )
+  }, [])
 
   if (state.user?.role !== 1) {
     return null
@@ -338,7 +356,7 @@ export default function DevKit() {
               </TabsContent>
               <TabsContent value="stats">
                 <div className="space-y-4">
-                  <h3 className="text-lg font-semibold">{t("devKit.playersPerStage")}</h3>
+                  <h3  className="text-lg font-semibold">{t("devKit.playersPerStage")}</h3>
                   {Object.entries(stageStats).map(([stage, count]) => (
                     <div key={stage} className="flex justify-between">
                       <span>{t("devKit.stage")} {stage}:</span>
@@ -369,6 +387,7 @@ export default function DevKit() {
                     }
                     placeholder={t("devKit.newComponentStageMask")}
                   />
+                  {renderStageMask(parseInt(newComponentStageMask))}
                   <Button onClick={handleAddNewComponent} className="w-full">
                     {t("devKit.addNewComponent")}
                   </Button>

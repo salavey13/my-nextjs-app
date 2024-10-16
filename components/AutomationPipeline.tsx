@@ -207,7 +207,7 @@ export default function AutomationPipeline() {
     addLog(message, 'error');
     toast({
       variant: "destructive",
-      title: "Error",
+      title: t("error"),
       description: message,
     });
   },[t]);
@@ -215,7 +215,7 @@ export default function AutomationPipeline() {
   const handleSuccess = useCallback((message: string) => {
     addLog(message, 'success');
     toast({
-      title: "Success",
+      title: t("success"),
       description: message,
     });
   }, [t]);
@@ -278,7 +278,7 @@ export default function AutomationPipeline() {
     } catch (err) {
       handleError(`Failed to review enhancements: ${(err as Error).message}`);
     }
-  }, [handleError, t])
+  }, [handleError, t, handleSuccess])
 
   const pushFilesToGitHub = async () => {
     try {
@@ -306,7 +306,7 @@ export default function AutomationPipeline() {
     } else if (v0Response && currentStep === 'push') {
       pushFilesToGitHub();
     }
-  }, [currentStep, automaParsedData, v0Response]);
+  }, [currentStep, automaParsedData, v0Response, collectData, enhanceCodeWithV0, pushFilesToGitHub, reviewEnhancements]);
 
   const handleFileContentChange = (filePath: string, content: string) => {
     setFileContents(prev => ({ ...prev, [filePath]: content }));
@@ -325,7 +325,7 @@ export default function AutomationPipeline() {
       handleError(t('copyFailed'))
     }
   )
-  }, [handleError, t])
+  }, [handleError, t, state?.user?.id])
 
 
   const getProgressColor = (progress: number): string => {
