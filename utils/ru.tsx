@@ -1,5 +1,23 @@
 import { LanguageDictionary } from "../utils/TranslationUtils";
 export const ru: LanguageDictionary = {
+  "bottomShelf": {
+    "paymentNotification": "Оплата",
+    "dynamicItemForm": "Предметы",
+    "qrCodeForm": "QR-код",
+    "cryptoPayment": "Крипто",
+    "home": "Главная",
+    "rent": "Аренда",
+    "referral": "Рефералы",
+    "profile": "Профиль",
+    "quests": "Квесты",
+    "bets": "Ставки",
+    "quiz": "Викторина",
+    "createEvent": "Событие",
+    "conflictAwareness": "Конфликт",
+    "admin": "Админ",
+    "dev": "Разработка",
+    "versimcel": "ВерсимСел"
+  },
   "chooseUnlock": "Выберите компонент для разблокировки",
   "betsComponent": "Компонент ставок",
   "betsDescription": "Разблокируйте компонент ставок, чтобы начать делать ставки и повышать свои шансы.",
