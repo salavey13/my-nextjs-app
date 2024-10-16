@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { useAppContext } from '@/context/AppContext'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -49,27 +49,32 @@ export default function DevKit() {
 
   const navigationLinks = getNavigationLinks(t)
 
-  const fetchStoryStages = async () => {
-    const { data, error } = await supabase
-      .from('story_stages')
-      .select('*')
-      .order('stage', { ascending: true })
+  const fetchStoryStages = useCallback(async () => {
+    try {
+      const { data, error } = await supabase
+        .from('story_stages')
+        .select('*')
+        .order('stage', { ascending: true })
 
-    if (error) {
-      console.error('Error fetching story stages:', error)
-    } else {
+      if (error) throw error
       setStoryStages(data || [])
+    } catch (error) {
+      console.error('Error fetching story stages:', error)
+      toast({
+        title: t("devKit.error"),
+        description: t("devKit.failedToFetchStoryStages"),
+        variant: "destructive",
+      })
     }
-  }
+  }, [t])
 
-  const fetchStageStats = async () => {
-    const { data, error } = await supabase
-      .from('users')
-      .select('game_state')
+  const fetchStageStats = useCallback(async () => {
+    try {
+      const { data, error } = await supabase
+        .from('users')
+        .select('game_state')
 
-    if (error) {
-      console.error('Error fetching stage stats:', error)
-    } else {
+      if (error) throw error
       const stats: StageStats = data.reduce((acc: StageStats, user) => {
         const stage = user.game_state?.stage
         if (stage !== undefined) {
@@ -78,8 +83,31 @@ export default function DevKit() {
         return acc
       }, {})
       setStageStats(stats)
+    } catch (error) {
+      console.error('Error fetching stage stats:', error)
+      toast({
+        title: t("devKit.error"),
+        description: t("devKit.failedToFetchStageStats"),
+        variant: "destructive",
+      })
     }
-  }
+  }, [t])
+
+  const initializeBottomShelfComponents = useCallback(() => {
+    const components: { [key: string]: boolean } = {}
+    navigationLinks.forEach(link => {
+      if (link.component) {
+        components[link.component] = state.user?.game_state?.unlockedComponents?.includes(link.component) || false
+      }
+    })
+    setBottomShelfComponents(components)
+  }, [navigationLinks, state.user?.game_state?.unlockedComponents])
+
+  useEffect(() => {
+    fetchStoryStages()
+    fetchStageStats()
+    initializeBottomShelfComponents()
+  }, [fetchStoryStages, fetchStageStats, initializeBottomShelfComponents])
 
   const handleAddNewComponent = () => {
     if (!newComponentName || !newComponentIcon) {
@@ -117,22 +145,6 @@ export default function DevKit() {
       variant: "success",
     })
   }
-  
-  const initializeBottomShelfComponents = () => {
-    const components: { [key: string]: boolean } = {}
-    navigationLinks.forEach(link => {
-      if (link.component) {
-        components[link.component] = state.user?.game_state?.unlockedComponents?.includes(link.component) || false
-      }
-    })
-    setBottomShelfComponents(components)
-  }
-
-  useEffect(() => {
-    fetchStoryStages()
-    fetchStageStats()
-    initializeBottomShelfComponents()
-  }, [initializeBottomShelfComponents])
 
   const handleStageChange = (value: string) => {
     setSelectedStage(value)
@@ -150,11 +162,11 @@ export default function DevKit() {
     setBottomShelfComponents(prev => ({ ...prev, [component]: checked }))
   }
 
-  const isComponentUnlockable = (component: string, stage: number) => {
+  const isComponentUnlockable = useCallback((component: string, stage: number) => {
     const link = navigationLinks.find(link => link.component === component)
     if (!link) return false
     return (link.stageMask & (1 << (stage - 1))) !== 0
-  }
+  }, [navigationLinks])
 
   const handleApplyChanges = async () => {
     if (!state.user) return
@@ -222,7 +234,7 @@ export default function DevKit() {
     }
   }
 
-  const renderStageTree = (stages: StoryStage[], parentId: string | null = null, depth = 0) => {
+  const renderStageTree = useCallback((stages: StoryStage[], parentId: string | null = null, depth = 0) => {
     const childStages = stages.filter(stage => stage.parentid === parentId)
     
     return childStages.map(stage => (
@@ -231,25 +243,25 @@ export default function DevKit() {
           <div style={{ marginLeft: `${depth * 20}px` }}>
             (ID: {stage.id}) (parentId: {stage.parentid}) {t("devKit.stage")} {stage.stage} 
             <br />
-            (xuinityDialog: {stage.xuinitydialog.substring(0, 30)}...) 
+            (xuinityDialog: {stage.xuinitydialog?.substring(0, 30) || 'N/A'}...) 
             <br />
-            (storyContent: {stage.storycontent.substring(0, 30)}...) 
+            (storyContent: {stage.storycontent?.substring(0, 30) || 'N/A'}...) 
             <br />
-            (achievement: {stage.achievement}) 
+            (achievement: {stage.achievement || 'N/A'}) 
             <br />
-            (activeComponent: {stage.activecomponent}) 
+            (activeComponent: {stage.activecomponent || 'N/A'}) 
             <br />
-            (minigame: {stage.minigame}) 
+            (minigame: {stage.minigame || 'N/A'}) 
             <br />
-            (trigger: {stage.trigger})
+            (trigger: {stage.trigger || 'N/A'})
             <br />
-            (bottomShelfBitmask: {stage.bottomshelfbitmask})
+            (bottomShelfBitmask: {stage.bottomshelfbitmask || 'N/A'})
           </div>
         </SelectItem>
         {renderStageTree(stages, stage.id, depth + 1)}
       </React.Fragment>
     ))
-  }
+  }, [t])
 
   if (state.user?.role !== 1) {
     return null
@@ -352,7 +364,9 @@ export default function DevKit() {
                   <Input
                     type="text"
                     value={newComponentStageMask}
-                    onChange={(e) => setNewComponentStageMask(e.target.value)}
+                    onChange={(e) => 
+                      setNewComponentStageMask(e.target.value.startsWith('0b') ? e.target.value : `0b${e.target.value}`)
+                    }
                     placeholder={t("devKit.newComponentStageMask")}
                   />
                   <Button onClick={handleAddNewComponent} className="w-full">
