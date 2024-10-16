@@ -19,7 +19,8 @@ export const ukr: LanguageDictionary = {
     "conflictAwareness": "Конфлікт",
     "admin": "Адмін",
     "dev": "Розробка",
-    "versimcel": "Версімсел"
+    "versimcel": "Версімсел",
+    questsForCoins: "Квесты",
   },
   "chooseUnlock": "Оберіть компонент для розблокування",
   "betsComponent": "Компонент ставок",
