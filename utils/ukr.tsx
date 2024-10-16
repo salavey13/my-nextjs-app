@@ -672,6 +672,7 @@ createTask: "Створити завдання",
   achievementsSection: "Шафа трофеїв🏆",
   notifySection: "Bat-Signal для Salavey13 🦇",
   devKit: {
+    crashSimulated: "Уронено",
     simulateCrash: "Уронить",
     title: "Набір розробників",
     gameState: 'Стан гри',
