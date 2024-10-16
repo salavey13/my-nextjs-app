@@ -19,7 +19,8 @@ export const ru: LanguageDictionary = {
     "conflictAwareness": "Конфликт",
     "admin": "Админ",
     "dev": "Разработка",
-    "versimcel": "ВерсимСел"
+    "versimcel": "ВерсимСел",
+      questsForCoins: "Квесты",
   },
   "chooseUnlock": "Выберите компонент для разблокировки",
   "betsComponent": "Компонент ставок",
@@ -726,6 +727,7 @@ createTask: "Создать задачу",
   "addNewComponent": "Добавить новый компонент",
   "newComponentFieldsRequired": "Имя и иконка компонента обязательны",
   "newComponentAdded": "Новый компонент успешно добавлен",
+  bottomShelfComponents: "Bit Matrix",
 
   },
   stats: "Статка",

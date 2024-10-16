@@ -723,6 +723,7 @@ createTask: "Створити завдання",
   "addNewComponent": "Додати новий компонент",
   "newComponentFieldsRequired": "Назва та іконка компонента є обов'язковими",
   "newComponentAdded": "Новий компонент успішно додано",
+  bottomShelfComponents: "Bit Matrix",
 
   },
   stats: "Статка",
