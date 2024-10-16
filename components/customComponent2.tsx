@@ -1,4 +1,4 @@
-gimport React from 'react'
+import React from 'react'
 
 const CustomComponent2 = () => {
   return (
