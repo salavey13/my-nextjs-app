@@ -177,16 +177,22 @@ export default function DevKit() {
         .filter(([component, isChecked]) => isChecked && isComponentUnlockable(component, newStage))
         .map(([component]) => component)
 
-      const updatedGameState = {
-        ...state.user.game_state,
-        stage: newStage,
-        coins: coins,
-        crypto: crypto,
-        unlockedComponents: unlockedComponents,
-      }
-
-      // Update local state first
-      dispatch({ type: 'UPDATE_GAME_STATE', payload: updatedGameState })
+        const updatedGameState = {
+          ...state.user.game_state,
+          stage: newStage,
+          coins: coins,
+          crypto: crypto,
+          unlockedComponents: [
+            ...(state.user.game_state.unlockedComponents || []),
+            ...(Array.isArray(unlockedComponents) ? unlockedComponents : [unlockedComponents])
+          ].filter(Boolean), // Remove falsy values like undefined
+        };
+        
+        // Remove duplicates
+        updatedGameState.unlockedComponents = Array.from(new Set(updatedGameState.unlockedComponents));
+        
+        // Update local state first
+        dispatch({ type: 'UPDATE_GAME_STATE', payload: updatedGameState });
 
       // Then update the database
       await progressStage(newStage, undefined, true)

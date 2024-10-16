@@ -195,14 +195,14 @@ export default function AutomationPipeline() {
     }
   };
 
-  const addLog = (message: string, type: LogType = 'info') => {
+  const addLog = useCallback((message: string, type: LogType = 'info') => {
     const shortDate = new Date().toISOString().split('T')[0]; // Output: "2024-10-12"
     const formattedMessage = `[${shortDate}] ${message}`;
-
+  
     setLogs(prevLogs => [...prevLogs, { type, message: formattedMessage }]);
-  };
+  }, []);
 
-  const handleError =  useCallback((message: string) => {
+  const handleError = useCallback((message: string) => {
     setError(message);
     addLog(message, 'error');
     toast({
@@ -210,15 +210,15 @@ export default function AutomationPipeline() {
       title: t("error"),
       description: message,
     });
-  },[t]);
-
+  }, [t]); // memoize `handleError` with dependency `t`
+  
   const handleSuccess = useCallback((message: string) => {
     addLog(message, 'success');
     toast({
       title: t("success"),
       description: message,
     });
-  }, [t]);
+  }, [t]); // memoize `handleSuccess` with dependency `t`
 
   const collectData = async () => {
     try {
