@@ -405,7 +405,7 @@ export default function HackButtonStoryShower() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5 }}
-            className="fixed top-64 right-4 bg-background p-4 rounded-lg shadow-lg z-40"
+            className="fixed top-42 right-4 bg-background p-4 rounded-lg shadow-lg z-40"
           >
             <p className="text-lg font-semibold">{t('xuinitySays')}:</p>
             <p className="italic">{xuinityDialog}</p>
