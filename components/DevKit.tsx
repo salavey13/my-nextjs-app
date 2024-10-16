@@ -13,8 +13,8 @@ import { toast } from '@/hooks/use-toast'
 import { supabase } from '@/lib/supabaseClient'
 import { StoryEdit } from './StoryEdit'
 import { useGameProgression } from '@/hooks/useGameProgression'
-import { NavigationLink } from '@/components/ui/bottomShelf'
-import { DollarSign, List, Zap, ShoppingCart, Home, Car, Users, User, Dice1, ZapOff, CalendarPlus, Globe, Crown, Lightbulb, Gamepad } from 'lucide-react'
+import { getNavigationLinks, NavigationLink } from '@/lib/navigationLinks'
+import { dynamicComponents, DynamicComponent } from '@/lib/dynamicComponents'
 
 interface StoryStage {
   id: string;
@@ -33,8 +33,6 @@ interface StageStats {
   [key: string]: number;
 }
 
-
-
 export default function DevKit() {
   const { state, dispatch, t } = useAppContext()
   const [storyStages, setStoryStages] = useState<StoryStage[]>([])
@@ -45,31 +43,17 @@ export default function DevKit() {
   const [isOpen, setIsOpen] = useState(false)
   const [bottomShelfComponents, setBottomShelfComponents] = useState<{ [key: string]: boolean }>({})
   const { progressStage, simulateCrash } = useGameProgression()
+  const [newComponentName, setNewComponentName] = useState('')
+  const [newComponentIcon, setNewComponentIcon] = useState('')
+  const [newComponentStageMask, setNewComponentStageMask] = useState('0b11111000')
+
+  const navigationLinks = getNavigationLinks(t)
 
   useEffect(() => {
     fetchStoryStages()
     fetchStageStats()
     initializeBottomShelfComponents()
   }, [])
-
-  const navigationLinks: NavigationLink[] = [
-    { href: '/paymentnotification', icon: <DollarSign className="w-6 h-6" />, label: t('bottomShelf.paymentNotification'), stageMask: 0b11111000, component: 'paymentNotification' },
-    { href: '/dynamicitemform', icon: <List className="w-6 h-6" />, label: t('bottomShelf.dynamicItemForm'), stageMask: 0b11111000, component: 'dynamicItemForm' },
-    { href: '/qrcodeform', icon: <Zap className="w-6 h-6" />, label: t('bottomShelf.qrCodeForm'), stageMask: 0b11111000, component: 'qrCodeForm' },
-    { href: '/cryptopayment', icon: <ShoppingCart className="w-6 h-6" />, label: t('bottomShelf.cryptoPayment'), stageMask: 0b11111000, component: 'cryptoPayment' },
-    { href: '/', icon: <Home className="w-6 h-6" />, label: t('bottomShelf.home'), stageMask: 0b11111111 },
-    { href: '/rent', icon: <Car className="w-6 h-6" />, label: t('bottomShelf.rent'), stageMask: 0b11111000, component: 'rent' },
-    { href: '/referral', icon: <Users className="w-6 h-6" />, label: t('bottomShelf.referral'), stageMask: 0b11111000, component: 'referral' },
-    { href: '/profile', icon: <User className="w-6 h-6" />, label: t('bottomShelf.profile'), stageMask: 0b11111111 },
-    { href: '/questsforcoins', icon: <Dice1 className="w-6 h-6" />, label: t('bottomShelf.quests'), stageMask: 0b11111000, component: 'questsForCoins' },
-    { href: '/bets', icon: <Zap className="w-6 h-6" />, label: t('bottomShelf.bets'), stageMask: 0b11111000, component: 'bets' },
-    { href: '/quiz', icon: <ZapOff className="w-6 h-6" />, label: t('bottomShelf.quiz'), stageMask: 0b11111111, component: 'quiz' },
-    { href: '/createEvent', icon: <CalendarPlus className="w-6 h-6" />, label: t('bottomShelf.createEvent'), stageMask: 0b11111000, component: 'createEvent' },
-    { href: '/conflictawareness', icon: <Globe className="w-6 h-6" />, label: t('bottomShelf.conflictAwareness'), stageMask: 0b11111000, component: 'conflictAwareness' },
-    { href: '/admin', icon: <Crown className="w-6 h-6" />, label: t('bottomShelf.admin'), stageMask: 0b10000000, component: 'admin' },
-    { href: '/dev', icon: <Lightbulb className="w-6 h-6" />, label: t('bottomShelf.dev'), stageMask: 0b11000000, component: 'dev' },
-    { href: '/versimcel', icon: <Gamepad className="w-6 h-6" />, label: t('bottomShelf.versimcel'), stageMask: 0b11111000, component: 'versimcel' },
-  ]
 
   const fetchStoryStages = async () => {
     const { data, error } = await supabase
@@ -103,6 +87,43 @@ export default function DevKit() {
     }
   }
 
+  const handleAddNewComponent = () => {
+    if (!newComponentName || !newComponentIcon) {
+      toast({
+        title: t("devKit.error"),
+        description: t("devKit.newComponentFieldsRequired"),
+        variant: "destructive",
+      })
+      return
+    }
+
+    const newComponent: DynamicComponent = {
+      href: `/${newComponentName.toLowerCase()}`,
+      icon: newComponentIcon,
+      label: newComponentName,
+      stageMask: parseInt(newComponentStageMask),
+      component: newComponentName.toLowerCase(),
+      componentPath: `components/${newComponentName}`,
+    }
+
+    // Add the new component to dynamicComponents
+    dynamicComponents.push(newComponent)
+
+    // Reset input fields
+    setNewComponentName('')
+    setNewComponentIcon('')
+    setNewComponentStageMask('0b11111000')
+
+    // Refresh navigation links
+    initializeBottomShelfComponents()
+
+    toast({
+      title: t("devKit.success"),
+      description: t("devKit.newComponentAdded"),
+      variant: "success",
+    })
+  }
+  
   const initializeBottomShelfComponents = () => {
     const components: { [key: string]: boolean } = {}
     navigationLinks.forEach(link => {
@@ -143,17 +164,6 @@ export default function DevKit() {
       let unlockedComponents = Object.entries(bottomShelfComponents)
         .filter(([component, isChecked]) => isChecked && isComponentUnlockable(component, newStage))
         .map(([component]) => component)
-
-      // Ensure crypto, dev, and admin are unlocked at appropriate stages
-      if (newStage >= 3 && !unlockedComponents.includes('cryptoPayment')) {
-        unlockedComponents.push('cryptoPayment')
-      }
-      if (newStage >= 6 && !unlockedComponents.includes('dev')) {
-        unlockedComponents.push('dev')
-      }
-      if (newStage >= 7 && !unlockedComponents.includes('admin')) {
-        unlockedComponents.push('admin')
-      }
 
       const updatedGameState = {
         ...state.user.game_state,
@@ -263,6 +273,7 @@ export default function DevKit() {
                 <TabsTrigger value="gameState" className="flex-1">{t("devKit.gameState")}</TabsTrigger>
                 <TabsTrigger value="storyEdit" className="flex-1">{t("devKit.storyEdit")}</TabsTrigger>
                 <TabsTrigger value="stats" className="flex-1">{t("devKit.stats")}</TabsTrigger>
+                <TabsTrigger value="addComponent" className="flex-1">{t("devKit.addComponent")}</TabsTrigger>
               </TabsList>
               <TabsContent value="gameState">
                 <div className="space-y-4">
@@ -294,9 +305,10 @@ export default function DevKit() {
                           id={component}
                           checked={isChecked}
                           onCheckedChange={(checked) => handleBottomShelfComponentChange(component, checked as boolean)}
+                          disabled={!isComponentUnlockable(component, parseInt(selectedStage))}
                         />
                         <label htmlFor={component} className="ml-2">
-                          {component}
+                          {t(`bottomShelf.${component}`)}
                         </label>
                       </div>
                     ))}
@@ -304,7 +316,7 @@ export default function DevKit() {
                   <Button onClick={handleApplyChanges} className="w-full">
                     {t("devKit.applyChanges")}
                   </Button>
-                  <Button  onClick={handleSimulateCrash} className="w-full">
+                  <Button onClick={handleSimulateCrash} className="w-full">
                     {t("devKit.simulateCrash")}
                   </Button>
                 </div>
@@ -321,6 +333,31 @@ export default function DevKit() {
                       <span>{count} {t("devKit.players")}</span>
                     </div>
                   ))}
+                </div>
+              </TabsContent>
+              <TabsContent value="addComponent">
+                <div className="space-y-4">
+                  <Input
+                    type="text"
+                    value={newComponentName}
+                    onChange={(e) => setNewComponentName(e.target.value)}
+                    placeholder={t("devKit.newComponentName")}
+                  />
+                  <Input
+                    type="text"
+                    value={newComponentIcon}
+                    onChange={(e) => setNewComponentIcon(e.target.value)}
+                    placeholder={t("devKit.newComponentIcon")}
+                  />
+                  <Input
+                    type="text"
+                    value={newComponentStageMask}
+                    onChange={(e) => setNewComponentStageMask(e.target.value)}
+                    placeholder={t("devKit.newComponentStageMask")}
+                  />
+                  <Button onClick={handleAddNewComponent} className="w-full">
+                    {t("devKit.addNewComponent")}
+                  </Button>
                 </div>
               </TabsContent>
             </Tabs>
