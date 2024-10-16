@@ -53,7 +53,7 @@ export default function DevKit() {
     fetchStoryStages()
     fetchStageStats()
     initializeBottomShelfComponents()
-  }, [])
+  }, [initializeBottomShelfComponents])
 
   const fetchStoryStages = async () => {
     const { data, error } = await supabase
