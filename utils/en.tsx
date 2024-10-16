@@ -1,6 +1,24 @@
 import { LanguageDictionary } from "../utils/TranslationUtils";
 export const en: LanguageDictionary = {
   // ... (existing translations)
+  bottomShelf: {
+      paymentNotification: "Payment",
+      dynamicItemForm: "Items",
+      qrCodeForm: "QR Code",
+      cryptoPayment: "Crypto",
+      home: "Home",
+      rent: "Rent",
+      referral: "Refer",
+      profile: "Profile",
+      quests: "Quests",
+      bets: "Bets",
+      quiz: "Quiz",
+      createEvent: "Event",
+      conflictAwareness: "Conflict",
+      admin: "Admin",
+      dev: "Dev",
+      versimcel: "VersimCel",
+    },
 "chooseUnlock": "Choose a Component to Unlock",
     "betsComponent": "Bets Component",
     "betsDescription": "Unlock the Bets component to start placing wagers and increasing your odds.",
