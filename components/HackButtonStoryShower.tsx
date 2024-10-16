@@ -34,7 +34,7 @@ import { Input } from '@/components/ui/input'
 import { debounce } from 'lodash'
 import { useGameProgression } from '@/hooks/useGameProgression'
 import HackButton from '@/components/HackButton'
-
+import CrashSimulation from '@/components/CrashSimulation’
 interface StoryStage {
   id: string;
   parentid: string | null;
@@ -389,7 +389,7 @@ export default function HackButtonStoryShower() {
     <div className="game-board h-[calc(100vh-128px)] pt-24 justify-start items-start relative overflow-hidden">
       {showCrashSimulation && (
         <div className="fixed inset-0  z-50">
-          <CrashSimulation layers={10} baseColor="#000000" accentColor="#ff0000" />
+          <CrashSimulation layers={13} baseColor="#000000" accentColor="#ff0000" />
         </div>
       )}
       <Card>
@@ -416,20 +416,6 @@ export default function HackButtonStoryShower() {
         </CardContent>
       </Card>
       {showBottomShelf && <BottomShelf bitmask={currentStage?.bottomshelfbitmask || 0} />}
-      <div className="relative z-10">
-        <Settings
-          onUpdateSettings={(settings: GameSettings) => {
-            if (state.user) {
-              const updatedGameState = {
-                ...state.user.game_state,
-                settings: settings,
-              }
-              dispatch({ type: 'UPDATE_GAME_STATE', payload: updatedGameState })
-            }
-          }}
-          initialSettings={state.user?.game_state?.settings}
-        />
-      </div>
     </div>
   )
 }
