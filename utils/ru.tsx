@@ -81,7 +81,10 @@ export const ru: LanguageDictionary = {
     "service2Title": "Создание индивидуальных проектов на v0",
     "service2Description": "Создание пользовательских веб-сайтов, адаптированных под ваши конкретные потребности с использованием возможностей ИИ v0.",
     "service2Price": "$69.13",
-    "service2LinkText": "Заказать на Contra"
+    "service2LinkText": "Заказать на Contra",
+    service1Link:"https://contra.com/s/lXMUXEXe-move-existing-web-site-to-framer",
+    service2Link:"https://contra.com/s/RggeLso3-create-landing-paywall-membership-e-market-sites-and-more",
+  
   },
   "benefits": {
     "title": "Почему стоит выбрать v0?",

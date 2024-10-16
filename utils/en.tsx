@@ -53,7 +53,9 @@ export const en: LanguageDictionary = {
     "service2Title": "Create custom v0 projects",
     "service2Description": "Custom website creation tailored to your specific needs using v0's AI capabilities.",
     "service2Price": "$69.13",
-    "service2LinkText": "Hire on Contra"
+    "service2LinkText": "Hire on Contra",
+    service1Link:"https://contra.com/s/lXMUXEXe-move-existing-web-site-to-framer",
+    service2Link:"https://contra.com/s/RggeLso3-create-landing-paywall-membership-e-market-sites-and-more",
   },
   "benefits": {
     "title": "Why Choose v0?",

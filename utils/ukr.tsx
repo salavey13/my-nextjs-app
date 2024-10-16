@@ -81,7 +81,10 @@ export const ukr: LanguageDictionary = {
     "service2Title": "Створення індивідуальних проектів на v0",
     "service2Description": "Створення кастомних веб-сайтів, адаптованих під ваші конкретні потреби за допомогою можливостей ІІ v0.",
     "service2Price": "$69.13",
-    "service2LinkText": "Замовити на Contra"
+    "service2LinkText": "Замовити на Contra",
+    service1Link:"https://contra.com/s/lXMUXEXe-move-existing-web-site-to-framer",
+    service2Link:"https://contra.com/s/RggeLso3-create-landing-paywall-membership-e-market-sites-and-more",
+  
   },
   "benefits": {
     "title": "Чому обрати v0?",
