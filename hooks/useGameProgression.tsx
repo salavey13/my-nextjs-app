@@ -62,7 +62,7 @@ export const useGameProgression = () => {
             title: t('componentUnlocked'),
             description: t(`${component}Unlocked`),
             stage: updatedGameState.stage,
-            lang: state.user.lang,
+            lang: state.user?.lang,
           });
         }
       });
@@ -85,7 +85,7 @@ export const useGameProgression = () => {
 
     const onCrashComplete = () => {
       document.body.removeChild(root);
-      progressStage(5, 'versimcel');
+      progressStage(5, ['versimcel']);
     };
 
     ReactDOM.render(<CrashSimulation onCrashComplete={onCrashComplete} />, root);

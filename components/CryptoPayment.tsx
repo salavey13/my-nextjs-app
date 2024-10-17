@@ -9,8 +9,11 @@ import QRCode from "react-qr-code";
 import PaymentNotification from './PaymentNotification';
 import { supabase } from "@/lib/supabaseClient";
 import { useGameProgression } from '@/hooks/useGameProgression';
+import UnlockChoice from './UnlockChoice'; // Import the UnlockChoice component
+import { toast } from '@/hooks/use-toast'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 
-import { toast } from '@/hooks/use-toast';
 export const CryptoPayment: React.FC<{ creatorTelegramId: string }> = ({ creatorTelegramId }) => {
     const { t, state, dispatch } = useAppContext();
     const [amount, setAmount] = useState<number | string>('');
@@ -18,7 +21,54 @@ export const CryptoPayment: React.FC<{ creatorTelegramId: string }> = ({ creator
     const [loading, setLoading] = useState<boolean>(false);
     const [qrCodeUrl, setQrCodeUrl] = useState<string | null>(null);
     const [targetWallet, setTargetWallet] = useState<string | null>(null);
+    const [showUnlockChoice, setShowUnlockChoice] = useState(false); // Added state
     const { progressStage } = useGameProgression();
+    const [sideHustles, setSideHustles] = useState<any[]>([]);
+    const [showSideHustleModal, setShowSideHustleModal] = useState(false);
+  
+    const triggerSideHustleChoice = async () => {
+      const currentStage = state.user?.game_state?.stage || 0;
+      const { data, error } = await supabase
+        .from('story_stages')
+        .select('*')
+        .eq('stage', currentStage)
+        .neq('parentid', null);
+  
+      if (error) {
+        console.error('Error fetching side hustles:', error);
+      } else {
+        setSideHustles(data || []);
+        setShowSideHustleModal(true);
+      }
+    };
+  
+    const handleSideHustleChoice = async (sideHustle: any) => {
+      setShowSideHustleModal(false);
+      
+      const updatedGameState = {
+        ...state.user?.game_state,
+        currentSideHustle: sideHustle.id,
+      };
+  
+      dispatch({
+        type: 'UPDATE_GAME_STATE',
+        payload: updatedGameState,
+      });
+  
+      const { error } = await supabase
+        .from('users')
+        .update({ game_state: updatedGameState })
+        .eq('id', state.user?.id);
+  
+      if (error) {
+        console.error('Error updating user game state:', error);
+      } else {
+        toast({
+          title: t('sideHustleUnlocked'),
+          description: sideHustle.storycontent,
+        });
+      }
+    };
 
     useEffect(() => {
         const fetchWallet = async () => {
@@ -57,8 +107,13 @@ export const CryptoPayment: React.FC<{ creatorTelegramId: string }> = ({ creator
             setPaymentLink(link);
 
             const currentStage = state.user.game_state?.stage ?? 0;
-            if (currentStage < 4) {
-                await progressStage(4);
+            if (currentStage === 3) {
+                await progressStage(4, ["createEvent"]);
+                dispatch({
+                    type: 'UPDATE_GAME_STATE',
+                    payload: { stage: 4, unlockedComponents: [...(state.user?.game_state?.unlockedComponents || []), 'createEvent'] }
+                });
+                setShowUnlockChoice(true);
             }
         } catch (error) {
             console.error('Error generating payment link:', error);
@@ -71,6 +126,7 @@ export const CryptoPayment: React.FC<{ creatorTelegramId: string }> = ({ creator
             setLoading(false);
         }
     };
+
 
     return (
         <div className="p-6 bg-gray-800 rounded-lg shadow-lg">
@@ -115,6 +171,31 @@ export const CryptoPayment: React.FC<{ creatorTelegramId: string }> = ({ creator
                     <PaymentNotification link={paymentLink} />
                 </div>
             )}
+            {showUnlockChoice && <UnlockChoice />} {/* Added UnlockChoice component */}
+            <Dialog open={showSideHustleModal} onOpenChange={setShowSideHustleModal}>
+                <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>{t('chooseSideHustle')}</DialogTitle>
+                    <DialogDescription>{t('sideHustleDescription')}</DialogDescription>
+                </DialogHeader>
+                <div className="grid gap-4">
+                    {sideHustles.map((sideHustle) => (
+                    <Card key={sideHustle.id}>
+                        <CardHeader>
+                        <CardTitle>{sideHustle.activecomponent}</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                        <p>{sideHustle.storycontent}</p>
+                        <p className="font-bold mt-2">{t('achievement')}: {sideHustle.achievement}</p>
+                        <Button onClick={() => handleSideHustleChoice(sideHustle)}>
+                            {t('choose')}
+                        </Button>
+                    </CardContent>
+                    </Card>
+                    ))}
+                </div>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 };

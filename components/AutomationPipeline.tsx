@@ -193,7 +193,7 @@ export default function AutomationPipeline() {
       title: t("error"),
       description: message,
     });
-  }, [t]);
+  }, [t, addLog]);
 
   const handleSuccess = useCallback((message: string) => {
     addLog(message, 'success');
@@ -201,9 +201,9 @@ export default function AutomationPipeline() {
       title: t("success"),
       description: message,
     });
-  }, [t]);
+  }, [t, addLog]);
 
-  const collectData = async (): Promise<AutomaData> => {
+  const collectData = useCallback(async (): Promise<AutomaData> => {
     try {
       addLog('Starting data collection...');
       setProgress(10);
@@ -220,9 +220,9 @@ export default function AutomationPipeline() {
     return { vercelLogs: "",
       repoStructure: [],
       buildErrors: []}as AutomaData
-  };
+  }, [addLog, handleError]);
 
-  const enhanceCodeWithV0 = async (parsedData: AutomaData):Promise<V0Response> => {
+  const enhanceCodeWithV0 = useCallback(async (parsedData: AutomaData):Promise<V0Response> => {
     try {
       addLog('Starting code enhancement with v0...');
       setProgress(40);
@@ -252,7 +252,7 @@ export default function AutomationPipeline() {
       handleError(`Failed to enhance code: ${(err as Error).message}`);
     }
     return {code: "", files:[]} as V0Response
-  };
+  }, [ addLog, handleError]);
 
   const reviewEnhancements = useCallback(async () => {
     try {
@@ -266,9 +266,9 @@ export default function AutomationPipeline() {
     } catch (err) {
       handleError(`Failed to review enhancements: ${(err as Error).message}`);
     }
-  }, [handleError, handleSuccess]);
+  }, [handleError, handleSuccess, addLog]);
 
-  const pushFilesToGitHub = async () => {
+  const pushFilesToGitHub = useCallback(async () => {
     try {
       addLog('Pushing files to GitHub...');
       setProgress(80);
@@ -282,7 +282,9 @@ export default function AutomationPipeline() {
     } catch (err) {
       handleError(`Failed to push files to GitHub: ${(err as Error).message}`);
     }
-  };
+  }, [addLog, handleError, handleSuccess, v0Response?.files ]);
+
+
  // Step 1: Collect Data
  useEffect(() => {
   const collect = async () => {
@@ -297,7 +299,7 @@ export default function AutomationPipeline() {
     }
   };
   collect();
-}, [currentStep]);
+}, [currentStep, collectData]);
 
 // Step 2: Generate / Enhance Code with V0
 useEffect(() => {
@@ -313,7 +315,7 @@ useEffect(() => {
     }
   };
   generate();
-}, [automaParsedData, currentStep]);
+}, [automaParsedData, currentStep, enhanceCodeWithV0]);
 
 // Step 3: Review Enhancements (Simulated - you can add real logic here)
 useEffect(() => {
@@ -345,7 +347,7 @@ useEffect(() => {
     }
   };
   pushToGitHub();
-}, [v0Response, currentStep]);
+}, [v0Response, currentStep, pushFilesToGitHub]);
 
   const handleFileContentChange = (filePath: string, content: string) => {
     setFileContents(prev => ({ ...prev, [filePath]: content }));

@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { useAppContext } from "../context/AppContext";
 import { useGameProgression } from "@/hooks/useGameProgression";
+import UnlockChoice from "@/components/UnlockChoice"; // Import the UnlockChoice component
+import { toast } from '@/hooks/use-toast'
 
 export default function CreateEvent() {
   const { state, dispatch, t } = useAppContext();
@@ -19,6 +21,9 @@ export default function CreateEvent() {
   const [educationalVideoUrl, setEducationalVideoUrl] = useState<string>('');
   const [expirationDate, setExpirationDate] = useState<string | null>(null);
   const [showConfirmation, setShowConfirmation] = useState<boolean>(false);
+  const [showUnlockChoice, setShowUnlockChoice] = useState(false); // Added state for UnlockChoice
+  const [sideHustles, setSideHustles] = useState<any[]>([]);
+  const [showSideHustleModal, setShowSideHustleModal] = useState(false);
 
   const handleCreateEvent = async () => {
     if (title && description && titleRu && descriptionRu) {
@@ -42,16 +47,14 @@ export default function CreateEvent() {
         setShowConfirmation(true);
         resetForm();
 
-        // Check if the user's stage should be progressed
         const currentStage = state.user?.game_state?.stage || 0;
         if (currentStage === 4) {
-          await progressStage(5, ['events']);
+          await progressStage(5, ['bets']);
           dispatch({
             type: 'UPDATE_GAME_STATE',
-            payload: { stage: 5, unlockedComponents: [...(state.user?.game_state?.unlockedComponents || []), 'events'] }
+            payload: { stage: 5, unlockedComponents: [...(state.user?.game_state?.unlockedComponents || []), 'bets'] }
           });
-          // Trigger side hustle choice
-          triggerSideHustleChoice();
+          setShowUnlockChoice(true);
         }
       } catch (error) {
         console.error("Error creating event:", error);
@@ -68,11 +71,49 @@ export default function CreateEvent() {
     setExpirationDate(null);
   };
 
-  const triggerSideHustleChoice = () => {
-    // Implement side hustle choice logic here
-    // For example, you could show a modal with different options
-    // This is a placeholder function
-    console.log("Triggering side hustle choice");
+
+  const triggerSideHustleChoice = async () => {
+    const currentStage = state.user?.game_state?.stage || 0;
+    const { data, error } = await supabase
+      .from('story_stages')
+      .select('*')
+      .eq('stage', currentStage)
+      .neq('parentid', null);
+
+    if (error) {
+      console.error('Error fetching side hustles:', error);
+    } else {
+      setSideHustles(data || []);
+      setShowSideHustleModal(true);
+    }
+  };
+
+  const handleSideHustleChoice = async (sideHustle: any) => {
+    setShowSideHustleModal(false);
+    
+    const updatedGameState = {
+      ...state.user?.game_state,
+      currentSideHustle: sideHustle.id,
+    };
+
+    dispatch({
+      type: 'UPDATE_GAME_STATE',
+      payload: updatedGameState,
+    });
+
+    const { error } = await supabase
+      .from('users')
+      .update({ game_state: updatedGameState })
+      .eq('id', state.user?.id);
+
+    if (error) {
+      console.error('Error updating user game state:', error);
+    } else {
+      toast({
+        title: t('sideHustleUnlocked'),
+        description: sideHustle.storycontent,
+      });
+    }
   };
 
   return (
@@ -144,6 +185,31 @@ export default function CreateEvent() {
           </DialogContent>
         </Dialog>
       )}
+      {showUnlockChoice && <UnlockChoice />} {/* Added UnlockChoice component */}
+      <Dialog open={showSideHustleModal} onOpenChange={setShowSideHustleModal}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t('chooseSideHustle')}</DialogTitle>
+            <DialogDescription>{t('sideHustleDescription')}</DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4">
+            {sideHustles.map((sideHustle) => (
+              <Card key={sideHustle.id}>
+                <CardHeader>
+                  <CardTitle>{sideHustle.activecomponent}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p>{sideHustle.storycontent}</p>
+                  <p className="font-bold mt-2">{t('achievement')}: {sideHustle.achievement}</p>
+                  <Button onClick={() => handleSideHustleChoice(sideHustle)}>
+                    {t('choose')}
+                  </Button>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

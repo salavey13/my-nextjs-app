@@ -66,7 +66,7 @@ export default function DevKit() {
         variant: "destructive",
       })
     }
-  }, [])
+  }, [t])
 
   const fetchStageStats = useCallback(async () => {
     try {

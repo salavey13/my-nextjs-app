@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { useRouter } from "next/navigation"; // Adjust import if not using Next.js
+import { useRouter } from "next/navigation";
 import { supabase } from "../lib/supabaseClient";
 import { Card, CardHeader, CardTitle, CardContent } from "../components/ui/card";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
@@ -9,118 +9,176 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { useAppContext } from "../context/AppContext";
+import { useGameProgression } from "@/hooks/useGameProgression";
 import DebugInfo from "../components/DebugInfo";
 import DynamicItemForm from "@/components/DynamicItemForm";
 import DynamicItemDetails from "@/components/DynamicItemDetails";
 import PaymentComponent from "@/components/PaymentComponent";
-import { faPlus, faMinus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import useTelegram from '../hooks/useTelegram';
+import { faPlus, faMinus } from '@fortawesome/free-solid-svg-icons';
 import { Textarea } from "./ui/textarea";
-import  MainSection  from "@/components/MainSection"
+import MainSection from "@/components/MainSection";
+import UnlockChoice from '@/components/UnlockChoice';
+import { toast } from '@/hooks/use-toast'
 
 interface Item {
-  id: number
-  title: string
-  creator_ref_code: string
-  item_type: string
+  id: number;
+  title: string;
+  creator_ref_code: string;
+  item_type: string;
   details: {
     ad_info: {
-      title: string
-      description: string
-    }
+      title: string;
+      description: string;
+    };
     general_info: {
-      make: string
-       year: string
-       model: string
-       price: string // Changed from number to string
-       mileage?: string
-       color?: string
-     }
-     photo_upload: {
-       photo: string
-     }
-   }
- }
+      make: string;
+      year: string;
+      model: string;
+      price: string;
+      mileage?: string;
+      color?: string;
+    };
+    photo_upload: {
+      photo: string;
+    };
+  };
+}
+
+interface Rent {
+  id: number;
+  user_id: number;
+  item_id: number;
+  rent_start: string;
+  rent_end: string;
+  status: string;
+}
+
+interface User {
+  id: number;
+  ref_code: string;
+  site?: string;
+}
+
 export default function Rents() {
   const [rents, setRents] = useState<Rent[]>([]);
   const [items, setItems] = useState<Item[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [newItemModalOpen, setNewItemModalOpen] = useState(false);
-  const [itemType, setItemType] = useState<string>("evo"); // Default to "evo" type
-  const [topEmbedUrl, setTopEmbedUrl] = useState(""); // Default URL
+  const [itemType, setItemType] = useState<string>("evo");
+  const [topEmbedUrl, setTopEmbedUrl] = useState("");
   const [selectedItem, setSelectedItem] = useState<Item | null>(null);
   const [itemDetailsModalOpen, setItemDetailsModalOpen] = useState(false);
-  const { state, dispatch, t } = useAppContext()
-  const user = state.user
-  const [itemDetails, setItemDetails] = useState<any>(null); // Adjust type if needed
-  const [itemTypes, setItemTypes] = useState<ItemType[]>([]);
-  const router = useRouter(); // Initialize the router here
+  const { state, dispatch, t } = useAppContext();
+  const { progressStage } = useGameProgression();
+  const user = state.user;
+  const [itemDetails, setItemDetails] = useState<any>(null);
+  const [itemTypes, setItemTypes] = useState<any[]>([]);
+  const router = useRouter();
   const [showForm, setShowForm] = useState(false);
-    const [typeName, setTypeName] = useState('');
-    const [jsonInput, setJsonInput] = useState('');
-    const [jsonError, setJsonError] = useState('');
-    const [typeNameError, setTypeNameError] = useState('');
-    const [hasTriedToSave, setHasTriedToSave] = useState(false); // Track save attempts
+  const [typeName, setTypeName] = useState('');
+  const [jsonInput, setJsonInput] = useState('');
+  const [jsonError, setJsonError] = useState('');
+  const [typeNameError, setTypeNameError] = useState('');
+  const [hasTriedToSave, setHasTriedToSave] = useState(false);
+  const [showUnlockChoice, setShowUnlockChoice] = useState(false);
+  const [sideHustles, setSideHustles] = useState<any[]>([]);
+  const [showSideHustleModal, setShowSideHustleModal] = useState(false);
 
-    const fetchItems = useCallback(async () => {
-      const { data, error } = await supabase
-        .from("items")
-        .select("*");
-  
-      if (error) {
-        console.error("Error fetching items:", error);
-      } else {
-        setItems(data || []);
-      }
-    }, []);
-  
-    const fetchItemTypes = useCallback(async () => {
-      const { data, error } = await supabase.from("item_types").select("*");
-  
-      if (error) {
-        console.error("Error fetching item types:", error);
-      } else {
-        setItemTypes(data || []);
-      }
-    }, []);
-  
-    const fetchRents = useCallback(async () => {
-      if (!user) return;
-      const { data, error } = await supabase
-        .from("rents")
-        .select("*")
-        .eq("user_id", user.telegram_id);
-  
-      if (error) {
-        console.error("Error fetching rents:", error);
-      } else {
-        setRents(data || []);
-      }
-    }, [user]);
-  
-    const fetchUsers = useCallback(async () => {
-      const { data, error } = await supabase
-        .from("users")
-        .select("*");
-  
-      if (error) {
-        console.error("Error fetching users:", error);
-      } else {
-        setUsers(data || []);
-      }
-    }, []);
-  
-    useEffect(() => {
-      fetchItemTypes();
-    }, [fetchItemTypes]);
-  
-    useEffect(() => {
-      if (!user) return;
-      fetchRents();
-      fetchItems();
-      fetchUsers();
-    }, [user, fetchRents, fetchItems, fetchUsers]);
+  const triggerSideHustleChoice = async () => {
+    const currentStage = state.user?.game_state?.stage || 0;
+    const { data, error } = await supabase
+      .from('story_stages')
+      .select('*')
+      .eq('stage', currentStage)
+      .neq('parentid', null);
+
+    if (error) {
+      console.error('Error fetching side hustles:', error);
+    } else {
+      setSideHustles(data || []);
+      setShowSideHustleModal(true);
+    }
+  };
+
+  const handleSideHustleChoice = async (sideHustle: any) => {
+    setShowSideHustleModal(false);
+    
+    const updatedGameState = {
+      ...state.user?.game_state,
+      currentSideHustle: sideHustle.id,
+    };
+
+    dispatch({
+      type: 'UPDATE_GAME_STATE',
+      payload: updatedGameState,
+    });
+
+    const { error } = await supabase
+      .from('users')
+      .update({ game_state: updatedGameState })
+      .eq('id', state.user?.id);
+
+    if (error) {
+      console.error('Error updating user game state:', error);
+    } else {
+      toast({
+        title: t('sideHustleUnlocked'),
+        description: sideHustle.storycontent,
+      });
+    }
+  };
+
+  const fetchItems = useCallback(async () => {
+    const { data, error } = await supabase.from("items").select("*");
+    if (error) {
+      console.error("Error fetching items:", error);
+    } else {
+      setItems(data || []);
+    }
+  }, []);
+
+  const fetchItemTypes = useCallback(async () => {
+    const { data, error } = await supabase.from("item_types").select("*");
+    if (error) {
+      console.error("Error fetching item types:", error);
+    } else {
+      setItemTypes(data || []);
+    }
+  }, []);
+
+  const fetchRents = useCallback(async () => {
+    if (!user) return;
+    const { data, error } = await supabase
+      .from("rents")
+      .select("*")
+      .eq("user_id", user.telegram_id);
+    if (error) {
+      console.error("Error fetching rents:", error);
+    } else {
+      setRents(data || []);
+    }
+  }, [user]);
+
+  const fetchUsers = useCallback(async () => {
+    const { data, error } = await supabase.from("users").select("*");
+    if (error) {
+      console.error("Error fetching users:", error);
+    } else {
+      setUsers(data || []);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchItemTypes();
+  }, [fetchItemTypes]);
+
+  useEffect(() => {
+    if (!user) return;
+    fetchRents();
+    fetchItems();
+    fetchUsers();
+  }, [user, fetchRents, fetchItems, fetchUsers]);
 
   useEffect(() => {
     if (!router) return;
@@ -158,7 +216,7 @@ export default function Rents() {
             setItemDetails({
               startDate: rent.rent_start,
               endDate: rent.rent_end,
-              greyedOut: true // Flag to indicate greyed-out dates
+              greyedOut: true
             });
             setItemDetailsModalOpen(true);
           }
@@ -180,7 +238,7 @@ export default function Rents() {
 
   const handleCloseNewItemModal = () => {
     setNewItemModalOpen(false);
-    setItemType("evo"); // Reset item type when closing modal
+    setItemType("evo");
     fetchItems();
   };
 
@@ -189,119 +247,95 @@ export default function Rents() {
   };
 
   const handleRowClick = async (item: Item) => {
-    // Send notification to the item creator
     const matchingUser = users.find(user => user.ref_code === item.creator_ref_code);
     if (matchingUser && matchingUser.site) {
       setTopEmbedUrl(matchingUser.site);
     } else {
-      setTopEmbedUrl("https://soft-goals-411926.framer.app"); // Fallback to default if no matching user
+      setTopEmbedUrl("https://soft-goals-411926.framer.app");
     }
 
     try {
-        // Fetch item type schema from Supabase
-        const { data: itemTypeSchema, error } = await supabase
-          .from('item_types')
-          .select('fields')
-          .eq('type', item.item_type)
-          .single();
-    
-        if (error) {
-          throw error;
-        }
-    
-        // Check if itemTypeSchema is not null and has fields
-        if (itemTypeSchema) {
-            setItemDetails(itemTypeSchema);
-          }
-      } catch (error) {
-        console.error('Error fetching item type schema:', error);
+      const { data: itemTypeSchema, error } = await supabase
+        .from('item_types')
+        .select('fields')
+        .eq('type', item.item_type)
+        .single();
+
+      if (error) {
+        throw error;
       }
-    
-    // Set selected item and open details modal
+
+      if (itemTypeSchema) {
+        setItemDetails(itemTypeSchema);
+      }
+    } catch (error) {
+      console.error('Error fetching item type schema:', error);
+    }
+
     setSelectedItem(item);
     setItemDetailsModalOpen(true);
+
+    // Check if this is the user's first interaction with an item
+    if (user && user.game_state.stage === 5) {
+      await progressStage(6, ['rents']);
+      dispatch({
+        type: 'UPDATE_GAME_STATE',
+        payload: { stage: 6, unlockedComponents: [...(user.game_state.unlockedComponents || []), 'rents'] }
+      });
+      setShowUnlockChoice(true);
+    }
   };
 
-    const handleCloseItemDetailsModal = () => {
-        setItemDetailsModalOpen(false);
-        setSelectedItem(null);
-    };
+  const handleCloseItemDetailsModal = () => {
+    setItemDetailsModalOpen(false);
+    setSelectedItem(null);
+  };
 
-    // Validate JSON on input change
-    useEffect(() => {
-        try {
-            if (jsonInput.trim()) {
-                const parsedJson = JSON.parse(jsonInput);
-                if (typeof parsedJson === 'object') {
-                    setJsonError(''); // JSON is valid
-                } else {
-                    setJsonError(t('gpt')); // JSON structure is invalid
-                }
-            } else {
-                setJsonError(t('gpt')); // JSON is empty or invalid
-            }
-        } catch (error) {
-            setJsonError(t('gpt')); // JSON parsing failed
-        }
-    }, [jsonInput, t]);
+  const handleAddNewItemType = async () => {
+    setHasTriedToSave(true);
+    if (jsonError || typeNameError) {
+      return;
+    }
 
-    // Validate typeName on input change
-    useEffect(() => {
-        // Derive existing item names from itemTypes array
-        const existingItemNames = itemTypes.map((item) => item.type);
-        if (typeName.trim()) {
-            if (existingItemNames.includes(typeName.trim())) {
-                setTypeNameError(t('gptTypeName')); // Handle name collision
-            } else {
-                setTypeNameError(''); // Name is valid
-            }
-        } else {
-            setTypeNameError(t('emptyTypeName')); // Name is empty
-        }
-    }, [typeName, t, itemTypes]);
+    try {
+      const jsonObject = JSON.parse(jsonInput);
 
-    const handleAddNewItemType = async () => {
-        setHasTriedToSave(true); // Mark that the user tried to save
-        if (jsonError || typeNameError) {
-            // Prevent saving if there's an error
-            return;
-        }
+      const { data, error } = await supabase
+        .from('item_types')
+        .insert([{ type: typeName, fields: jsonObject }]);
 
-        try {
-            // Parse the JSON input
-            const jsonObject = JSON.parse(jsonInput);
+      if (error) {
+        console.error('Error inserting new item type:', error);
+        return;
+      }
 
-            // Insert the new item type into Supabase
-            const { data, error } = await supabase
-                .from('item_types')
-                .insert([{ type: typeName, fields: jsonObject }]);
+      const { data: newTypes, error: fetchError } = await supabase
+        .from('item_types')
+        .select('*');
 
-            if (error) {
-                console.error('Error inserting new item type:', error);
-                return;
-            }
+      if (fetchError) {
+        console.error('Error fetching item types:', fetchError);
+      } else {
+        setItemTypes(newTypes || []);
+      }
 
-            // Reload item types after successful insertion
-            const { data: newTypes, error: fetchError } = await supabase
-                .from('item_types')
-                .select('*');
+      setTypeName('');
+      setJsonInput('');
+      setShowForm(false);
 
-            if (fetchError) {
-                console.error('Error fetching item types:', fetchError);
-            } else {
-                setItemTypes(newTypes || []);
-            }
-
-            // Clear the form inputs after successful submission
-            setTypeName('');
-            setJsonInput('');
-            setShowForm(false);
-        } catch (error) {
-            console.error('Error processing new item type:', error);
-        }
-    };
-
-  
+      // Check if this is the user's first time adding a new item type
+      if (user && user.game_state.stage === 6) {
+        await progressStage(7, ['versimcel']);
+        dispatch({
+          type: 'UPDATE_GAME_STATE',
+          payload: { stage: 7, unlockedComponents: [...(user.game_state.unlockedComponents || []), 'versimcel'] }
+        });
+        triggerSideHustleChoice();
+      }
+    } catch (error) {
+      console.error('Error processing new item type:', error);
+    }
+  };
 
   const handleActiveRentClick = async (rent: Rent) => {
     const item = items.find(i => i.id === rent.item_id);
@@ -312,7 +346,7 @@ export default function Rents() {
         ...itemDetails, 
         startDate: rent.rent_start,
         endDate: rent.rent_end,
-        greyedOut: true // Flag to indicate greyed-out dates
+        greyedOut: true
       });
       setItemDetailsModalOpen(true);
     }
@@ -320,8 +354,7 @@ export default function Rents() {
 
   return (
     <div className="relative w-full h-[calc(200vh-128px)] bg-muted/40">
-      {/* The iframe fills the whole 200vh */}
-      {topEmbedUrl != "" && (
+      {topEmbedUrl !== "" && (
         <div className="absolute top-0 left-0 w-full h-[calc(200vh-128px)] z-0">
           <iframe
             width="100%"
@@ -330,12 +363,12 @@ export default function Rents() {
             title="Top Embed"
             frameBorder="0"
             allowFullScreen
-            style={{ height: '100%' }} // 100% of the container's height (200vh)h-[200vh]
+            style={{ height: '100%' }}
           ></iframe>
         </div>
       )}
 
-      {topEmbedUrl == "" && (
+      {topEmbedUrl === "" && (
         <div className="absolute top-0 left-0 w-full h-[calc(200vh-128px)] z-0">
           <MainSection
             setItemDetailsModalOpen={setItemDetailsModalOpen}
@@ -345,7 +378,6 @@ export default function Rents() {
         </div>
       )}
 
-      {/* Content positioned 64px from the bottom, occupying the bottom 100vh overflow-auto*/}
       <div className="absolute bottom-0 left-0 scrollbars-hide w-full z-10 max-h-[calc(100vh-128px)] backdrop-blur-lg rounded-t-2xl">
         <div className="p-4">
           <div className="relative flex justify-between items-center mb-4 h-[100px]">
@@ -356,126 +388,120 @@ export default function Rents() {
           </div>
           <div className="relative w-full z-10 overflow-scroll  max-h-[calc(100vh-228px)]">
             <Card>
-                <CardHeader>
+              <CardHeader>
                 <CardTitle>{t("activeRentals")}</CardTitle>
-                </CardHeader>
-                <CardContent>
+              </CardHeader>
+              <CardContent>
                 <Table>
-                    <TableHeader>
+                  <TableHeader>
                     <TableRow>
-                        <TableHead>{t("itemTitle")}</TableHead>
-                        <TableHead>{t("rentStart")}</TableHead>
-                        <TableHead>{t("rentEnd")}</TableHead>
-                        <TableHead>{t("status")}</TableHead>
+                      <TableHead>{t("itemTitle")}</TableHead>
+                      <TableHead>{t("rentStart")}</TableHead>
+                      <TableHead>{t("rentEnd")}</TableHead>
+                      <TableHead>{t("status")}</TableHead>
                     </TableRow>
-                    </TableHeader>
-                    <TableBody>
+                  </TableHeader>
+                  <TableBody>
                     {rents.map((rent) => (
-                        <TableRow key={rent.id} onClick={() => handleActiveRentClick(rent)} className="cursor-pointer">
+                      <TableRow key={rent.id} onClick={() => handleActiveRentClick(rent)} className="cursor-pointer">
                         <TableCell>{getItemDetailsById(rent.item_id)}</TableCell>
                         <TableCell>{new Date(rent.rent_start).toLocaleDateString()}</TableCell>
                         <TableCell>{new Date(rent.rent_end).toLocaleDateString()}</TableCell>
                         <TableCell>{t(rent.status)}</TableCell>
-                        </TableRow>
+                      </TableRow>
                     ))}
-                    </TableBody>
+                  </TableBody>
                 </Table>
-                </CardContent>
+              </CardContent>
             </Card>
 
             <Card className="mt-4">
-                <CardHeader>
+              <CardHeader>
                 <CardTitle>{t("newItems")}</CardTitle>
-                </CardHeader>
-                <CardContent>
+              </CardHeader>
+              <CardContent>
                 <Table>
-                    <TableHeader>
+                  <TableHeader>
                     <TableRow>
-                        <TableHead>{t("itemTitle")}</TableHead>
-                        <TableHead>{t("creatorShop")}</TableHead>
+                      <TableHead>{t("itemTitle")}</TableHead>
+                      <TableHead>{t("creatorShop")}</TableHead>
                     </TableRow>
-                    </TableHeader>
-                    <TableBody>
+                  </TableHeader>
+                  <TableBody>
                     {items.map((item) => (
-                        <TableRow key={item.id} onClick={() => handleRowClick(item)} className="cursor-pointer">
+                      <TableRow key={item.id} onClick={() => handleRowClick(item)} className="cursor-pointer">
                         <TableCell>{item.title}</TableCell>
                         <TableCell>{item.creator_ref_code}</TableCell>
-                        </TableRow>
+                      </TableRow>
                     ))}
-                    </TableBody>
+                  </TableBody>
                 </Table>
-                </CardContent>
+              </CardContent>
             </Card>
             <div className="h-[calc(64px)]"></div>
-            </div>
+          </div>
         </div>
-        
       </div>
 
       <Dialog open={newItemModalOpen} onOpenChange={handleCloseNewItemModal}>
-        <DialogContent
-            className="max-h-[calc(100vh-113px)] overflow-y-auto flex-grow min-h-[calc(100vh-128px)] overflow-y-auto backdrop-blur-lg bg-white bg-opacity-80"
-        >
-            <DialogHeader>
+        <DialogContent className="max-h-[calc(100vh-113px)] overflow-y-auto flex-grow min-h-[calc(100vh-128px)] ">
+          <DialogHeader>
             <DialogTitle>{t("addNewItemTitle")}</DialogTitle>
             <DialogDescription>{t("addNewItemDescription")}</DialogDescription>
-            </DialogHeader>
-            <div className="grid grid-cols-2 gap-4 mb-4">
+          </DialogHeader>
+          <div className="grid grid-cols-2 gap-4 mb-4">
             {itemTypes.map((type) => (
-                <Button
+              <Button
                 key={type.id}
                 onClick={() => handleButtonClick(type.type)}
                 className="bg-blue-500 text-white p-2 rounded"
-                >
+              >
                 {t(`formTypes.${type.type}`)}
-                </Button>
+              </Button>
             ))}
-            {/* Add new type button */}
             <Button
-                onClick={() => setShowForm(!showForm)}
-                className="bg-green-500 text-white p-2 rounded"
+              onClick={() => setShowForm(!showForm)}
+              className="bg-green-500 text-white p-2 rounded"
             >
-                <FontAwesomeIcon icon={showForm ? faMinus : faPlus} size="lg" />
+              <FontAwesomeIcon icon={showForm ? faMinus : faPlus} size="lg" />
             </Button>
+          </div>
+          {showForm && (
+            <div className="mt-4">
+              <Input
+                type="text"
+                value={typeName}
+                onChange={(e) => setTypeName(e.target.value)}
+                placeholder={t('enterTitleKey')}
+                className="p-2 border rounded mb-2 w-full"
+              />
+              {hasTriedToSave && typeNameError && (
+                <p className="text-red-500 text-sm mb-2">{typeNameError}</p>
+              )}
+              <Textarea
+                value={jsonInput}
+                onChange={(e) => setJsonInput(e.target.value)}
+                placeholder={t('enterJsonData')}
+                rows={4}
+              />
+              {hasTriedToSave && jsonError && (
+                <p className="text-red-500 text-sm mb-2">{jsonError}</p>
+              )}
+              <Button
+                onClick={handleAddNewItemType}
+                className="bg-blue-500 text-white p-2 rounded"
+                disabled={!!jsonError || !!typeNameError || !jsonInput || !typeName}
+              >
+                {t('save')}
+              </Button>
             </div>
-                {/* Conditionally render the form */}
-                {showForm && (
-                    <div className="mt-4">
-                        <Input
-                            type="text"
-                            value={typeName}
-                            onChange={(e) => setTypeName(e.target.value)}
-                            placeholder={t('enterTitleKey')}
-                            className="p-2 border rounded mb-2 w-full"
-                        />
-                        {hasTriedToSave && typeNameError && (
-                            <p className="text-red-500 text-sm mb-2">{typeNameError}</p>
-                        )}
-                        <Textarea
-                            value={jsonInput}
-                            onChange={(e) => setJsonInput(e.target.value)}
-                            placeholder={t('enterJsonData')}
-                            rows={4}
-                        />
-                        {hasTriedToSave && jsonError && (
-                            <p className="text-red-500 text-sm mb-2">{jsonError}</p>
-                        )}
-                        <Button
-                            onClick={handleAddNewItemType}
-                            className="bg-blue-500 text-white p-2 rounded"
-                            disabled={!!jsonError || !!typeNameError || !jsonInput || !typeName}
-                        >
-                            {t('save')}
-                        </Button>
-                    </div>
-                )}
-            <DynamicItemForm itemType={itemType} />
+          )}
+          <DynamicItemForm itemType={itemType} />
         </DialogContent>
-        </Dialog>
+      </Dialog>
 
-      {/* Modal for showing item details and payment */}
       <Dialog open={itemDetailsModalOpen} onOpenChange={handleCloseItemDetailsModal}>
-        <DialogContent className="max-h-[calc(100vh-113px)] overflow-y-auto flex-grow min-h-[calc(100vh-128px)] overflow-y-auto backdrop-blur-lg bg-white bg-opacity-80">
+        <DialogContent className="max-h-[calc(100vh-113px)] overflow-y-auto flex-grow min-h-[calc(100vh-128px)]">
           <DialogHeader>
             <DialogTitle>{t("itemDetailsTitle")}</DialogTitle>
             <DialogDescription>{t("itemDetailsDescription")}</DialogDescription>
@@ -483,12 +509,9 @@ export default function Rents() {
 
           {selectedItem && (
             <div>
-              {/* Dynamic item details */}
-                {itemDetails && (
-                    <DynamicItemDetails itemType={selectedItem.item_type} itemDetails={selectedItem.details} />
-                )}
-
-              {/* Payment component */}
+              {itemDetails && (
+                <DynamicItemDetails itemType={selectedItem.item_type} itemDetails={selectedItem.details} />
+              )}
               <PaymentComponent item={selectedItem} />
             </div>
           )}
@@ -500,8 +523,31 @@ export default function Rents() {
           </div>
         </DialogContent>
       </Dialog>
-  
-      {/*<DebugInfo />*/}
+      {showUnlockChoice && <UnlockChoice />}
+      <Dialog open={showSideHustleModal} onOpenChange={setShowSideHustleModal}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t('chooseSideHustle')}</DialogTitle>
+            <DialogDescription>{t('sideHustleDescription')}</DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4">
+            {sideHustles.map((sideHustle) => (
+              <Card key={sideHustle.id}>
+                <CardHeader>
+                  <CardTitle>{sideHustle.activecomponent}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p>{sideHustle.storycontent}</p>
+                  <p className="font-bold mt-2">{t('achievement')}: {sideHustle.achievement}</p>
+                  <Button onClick={() => handleSideHustleChoice(sideHustle)}>
+                    {t('choose')}
+                  </Button>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
