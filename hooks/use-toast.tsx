@@ -129,7 +129,7 @@ export const GlitchyToastProvider = () => {
       position="top-center"
       toastOptions={{
         style: {
-          background: 'transparent',
+          // background: 'transparent',
           boxShadow: 'none',
         },
       }}
