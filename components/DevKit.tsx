@@ -166,10 +166,10 @@ export default function DevKit() {
     const link = navigationLinks.find(link => link.component === component)
     if (!link) return false
     return (link.stageMask & (1 << (stage - 1))) !== 0
-  }, [navigationLinks])
+  }
 
-  const handleApplyChanges = useCallback(async () => {
-  const handleApplyChanges = useCallback(async () => {
+
+const handleApplyChanges = useCallback(async () => {
   if (!state.user) return;
 
   try {
@@ -217,26 +217,7 @@ export default function DevKit() {
   }
 }, [state.user, selectedStage, bottomShelfComponents, isComponentUnlockable, coins, crypto, dispatch, progressStage, t]);
 
-    // Then update the database (ensure progressStage works correctly)
-    await progressStage(newStage, undefined, true);
-
-    toast({
-      title: t("devKit.success"),
-      description: t("devKit.gameStateUpdated"),
-      variant: "success",
-      stage: updatedGameState.stage,
-    });
-
-  } catch (error) {
-    console.error('Error updating game state:', error);
-    toast({
-      title: t("devKit.error"),
-      description: t("devKit.failedToUpdateGameState"),
-      variant: "destructive",
-    });
-  }
-}, [state.user, selectedStage, bottomShelfComponents, isComponentUnlockable, coins, crypto, dispatch, progressStage, t]);
-
+                                            
   const handleSimulateCrash = useCallback(async () => {
     try {
       await simulateCrash()
