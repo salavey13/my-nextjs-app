@@ -169,58 +169,61 @@ export default function DevKit() {
   }, [navigationLinks])
 
   const handleApplyChanges = useCallback(async () => {
-    if (!state.user) return
+  if (!state.user) return;
 
-    try {
-      const newStage = parseInt(selectedStage)
-      let unlockedComponents = Object.entries(bottomShelfComponents)
-        .filter(([component, isChecked]) => isChecked && isComponentUnlockable(component, newStage))
-        .map(([component]) => component)
+  try {
+    const newStage = parseInt(selectedStage);
+    
+    // Determine which components are unlockable based on the stage
+    let unlockedComponents = Object.entries(bottomShelfComponents)
+      .filter(([component, isChecked]) => isChecked && isComponentUnlockable(component, newStage))
+      .map(([component]) => component);
 
-        const updatedGameState = {
-          ...state.user.game_state,
-          stage: newStage,
-          coins: coins,
-          crypto: crypto,
-          unlockedComponents: [
-            ...(state.user.game_state.unlockedComponents || []),
-            ...(Array.isArray(unlockedComponents) ? unlockedComponents : [unlockedComponents])
-          ].filter(Boolean), // Remove falsy values like undefined
-        };
-        
-        // Remove duplicates
-        updatedGameState.unlockedComponents = Array.from(new Set(updatedGameState.unlockedComponents));
-        
-        // Update local state first
-        dispatch({ type: 'UPDATE_GAME_STATE', payload: updatedGameState });
+    const updatedGameState = {
+      ...state.user.game_state,
+      stage: newStage,
+      coins: coins,
+      crypto: crypto,
+      unlockedComponents: [
+        ...(state.user.game_state.unlockedComponents || []),
+        ...(Array.isArray(unlockedComponents) ? unlockedComponents : [unlockedComponents])
+      ].filter(Boolean), // Remove falsy values like undefined
+    };
 
-      // Then update the database
-      await progressStage(newStage, undefined, true)
+    // Remove duplicates
+    updatedGameState.unlockedComponents = Array.from(new Set(updatedGameState.unlockedComponents));
 
-      // Update the bottom shelf components state
-      setBottomShelfComponents(prev => {
-        const updated = { ...prev }
-        Object.keys(updated).forEach(component => {
-          updated[component] = unlockedComponents.includes(component)
-        })
-        return updated
-      })
+    // Update local state first
+    dispatch({ type: 'UPDATE_GAME_STATE', payload: updatedGameState });
 
-      toast({
-        title: t("devKit.success"),
-        description: t("devKit.gameStateUpdated"),
-        variant: "success",
-        stage: updatedGameState.stage
-      })
-    } catch (error) {
-      console.error('Error updating game state:', error)
-      toast({
-        title: t("devKit.error"),
-        description: t("devKit.failedToUpdateGameState"),
-        variant: "destructive",
-      })
-    }
-  }, [state.user, selectedStage, bottomShelfComponents, isComponentUnlockable, coins, crypto, dispatch, progressStage, t])
+    // Update the bottom shelf components immediately
+    setBottomShelfComponents(prev => {
+      const updated = { ...prev };
+      Object.keys(updated).forEach(component => {
+        updated[component] = unlockedComponents.includes(component);
+      });
+      return updated;
+    });
+
+    // Then update the database (ensure progressStage works correctly)
+    await progressStage(newStage, undefined, true);
+
+    toast({
+      title: t("devKit.success"),
+      description: t("devKit.gameStateUpdated"),
+      variant: "success",
+      stage: updatedGameState.stage,
+    });
+
+  } catch (error) {
+    console.error('Error updating game state:', error);
+    toast({
+      title: t("devKit.error"),
+      description: t("devKit.failedToUpdateGameState"),
+      variant: "destructive",
+    });
+  }
+}, [state.user, selectedStage, bottomShelfComponents, isComponentUnlockable, coins, crypto, dispatch, progressStage, t]);
 
   const handleSimulateCrash = useCallback(async () => {
     try {
