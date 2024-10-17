@@ -428,7 +428,6 @@ export default function HackButtonStoryShower() {
           </motion.div>
         </CardContent>
       </Card>
-      {showBottomShelf && <BottomShelf bitmask={currentStage?.bottomshelfbitmask || 0} />}
     </div>
   )
 }
