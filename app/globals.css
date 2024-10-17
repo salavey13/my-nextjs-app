@@ -332,4 +332,35 @@ nav {
 .drop-shadow-custom {
   filter: drop-shadow(0 0 0.75rem rgba(225, 255, 1, 0.5));
 }
+  /* Custom checkbox appearance */
+input[type="checkbox"] {
+  /* Remove default styling */
+  appearance: none;
+  -webkit-appearance: none;
+  display: inline-block;
+  width: 1.5rem;
+  height: 1.5rem;
+  background-color: hsl(var(--background));
+  border: 2px solid hsl(var(--foreground)); /* Border color */
+  border-radius: 0.25rem;
+  transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+  position: relative;
+}
+
+/* Checkmark (visible only when checked) */
+input[type="checkbox"]:checked {
+  background-color: var(--accent-color); /* Background when checked */
+  border-color: var(--accent-color); /* Border when checked */
+}
+
+input[type="checkbox"]:checked::after {
+  content: '✔'; /* Checkmark symbol */
+  color: hsl(var(--background)); /* White checkmark */
+  font-size: 1rem;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
 }
