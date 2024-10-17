@@ -7,9 +7,11 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { useAppContext } from "../context/AppContext";
+import { useGameProgression } from "@/hooks/useGameProgression";
 
 export default function CreateEvent() {
-  const { t } = useAppContext();
+  const { state, dispatch, t } = useAppContext();
+  const { progressStage } = useGameProgression();
   const [title, setTitle] = useState<string>('');
   const [description, setDescription] = useState<string>('');
   const [titleRu, setTitleRu] = useState<string>('');
@@ -20,25 +22,39 @@ export default function CreateEvent() {
 
   const handleCreateEvent = async () => {
     if (title && description && titleRu && descriptionRu) {
-      const { error } = await supabase
-        .from('events')
-        .insert([
-          {
-            title,
-            description,
-            title_ru: titleRu,
-            description_ru: descriptionRu,
-            educational_video_url: educationalVideoUrl,
-            expired: false,
-            expiration_date: expirationDate,
-          },
-        ]);
+      try {
+        const { error } = await supabase
+          .from('events')
+          .insert([
+            {
+              title,
+              description,
+              title_ru: titleRu,
+              description_ru: descriptionRu,
+              educational_video_url: educationalVideoUrl,
+              expired: false,
+              expiration_date: expirationDate,
+            },
+          ]);
 
-      if (error) {
-        console.error("Error creating event:", error);
-      } else {
+        if (error) throw error;
+
         setShowConfirmation(true);
         resetForm();
+
+        // Check if the user's stage should be progressed
+        const currentStage = state.user?.game_state?.stage || 0;
+        if (currentStage === 4) {
+          await progressStage(5, ['events']);
+          dispatch({
+            type: 'UPDATE_GAME_STATE',
+            payload: { stage: 5, unlockedComponents: [...(state.user?.game_state?.unlockedComponents || []), 'events'] }
+          });
+          // Trigger side hustle choice
+          triggerSideHustleChoice();
+        }
+      } catch (error) {
+        console.error("Error creating event:", error);
       }
     }
   };
@@ -50,6 +66,13 @@ export default function CreateEvent() {
     setDescriptionRu('');
     setEducationalVideoUrl('');
     setExpirationDate(null);
+  };
+
+  const triggerSideHustleChoice = () => {
+    // Implement side hustle choice logic here
+    // For example, you could show a modal with different options
+    // This is a placeholder function
+    console.log("Triggering side hustle choice");
   };
 
   return (
