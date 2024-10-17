@@ -166,7 +166,7 @@ export default function DevKit() {
     const link = navigationLinks.find(link => link.component === component)
     if (!link) return false
     return (link.stageMask & (1 << (stage - 1))) !== 0
-  }
+  }, [navigationLinks])
 
 
 const handleApplyChanges = useCallback(async () => {
