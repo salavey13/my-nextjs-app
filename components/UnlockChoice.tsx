@@ -5,7 +5,7 @@ import { useAppContext } from '@/context/AppContext';
 import { useGameProgression } from '@/hooks/useGameProgression';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Zap, Car, Users, Dice } from 'lucide-react';
+import { Zap, Car, Users, Dice1 } from 'lucide-react';
 
 const UnlockChoice: React.FC = () => {
   const { state, t } = useAppContext();
