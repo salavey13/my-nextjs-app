@@ -169,6 +169,7 @@ export default function DevKit() {
   }, [navigationLinks])
 
   const handleApplyChanges = useCallback(async () => {
+  const handleApplyChanges = useCallback(async () => {
   if (!state.user) return;
 
   try {
@@ -186,7 +187,7 @@ export default function DevKit() {
       crypto: crypto,
       unlockedComponents: [
         ...(state.user.game_state.unlockedComponents || []),
-        ...(Array.isArray(unlockedComponents) ? unlockedComponents : [unlockedComponents])
+        ...unlockedComponents,
       ].filter(Boolean), // Remove falsy values like undefined
     };
 
@@ -196,14 +197,25 @@ export default function DevKit() {
     // Update local state first
     dispatch({ type: 'UPDATE_GAME_STATE', payload: updatedGameState });
 
-    // Update the bottom shelf components immediately
-    setBottomShelfComponents(prev => {
-      const updated = { ...prev };
-      Object.keys(updated).forEach(component => {
-        updated[component] = unlockedComponents.includes(component);
-      });
-      return updated;
+    // Update the Supabase database to save the new unlocked components
+    await progressStage(newStage, unlockedComponents, true);
+
+    toast({
+      title: t("devKit.success"),
+      description: t("devKit.gameStateUpdated"),
+      variant: "success",
+      stage: updatedGameState.stage,
     });
+
+  } catch (error) {
+    console.error('Error updating game state:', error);
+    toast({
+      title: t("devKit.error"),
+      description: t("devKit.failedToUpdateGameState"),
+      variant: "destructive",
+    });
+  }
+}, [state.user, selectedStage, bottomShelfComponents, isComponentUnlockable, coins, crypto, dispatch, progressStage, t]);
 
     // Then update the database (ensure progressStage works correctly)
     await progressStage(newStage, undefined, true);
