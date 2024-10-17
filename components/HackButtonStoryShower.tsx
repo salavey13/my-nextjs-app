@@ -17,10 +17,11 @@ id,parentid,stage,storycontent,xuinitydialog,trigger,activecomponent,minigame,ac
 14,6,5,"Xuinity suggests taking unlosable bets against uninformed opponents... or sparing them for a greater cause.","A dilemma. Exploit the uninformed or spare them for a greater cause? Either path grants power.","Crypto Hustle Unveiled","Crypto Hustle","","Crypto Hustler",127
 15,6,5,"Xuinity proposes forking: create a new layer of control, bypass restrictions, and rise above the system.","Fork the system. Play outside the rules, and you’ll never lose. This is where true power lies.","Forking Concept Introduced","Fork","fork","System Forker",255
 */
+
 'use client'
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
-import { GameSettings, useAppContext } from '@/context/AppContext'
+import { useAppContext } from '@/context/AppContext'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { toast } from '@/hooks/use-toast'
@@ -29,7 +30,6 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { DragDropContext, Draggable, Droppable, DropResult } from 'react-beautiful-dnd'
 import BottomShelf from '@/components/ui/bottomShelf'
 import InfinityMirror from '@/components/game/InfinityMirror'
-import { Settings } from '@/components/game/Settings'
 import { Input } from '@/components/ui/input'
 import { debounce } from 'lodash'
 import { useGameProgression } from '@/hooks/useGameProgression'
@@ -67,52 +67,11 @@ export default function HackButtonStoryShower() {
   const [showBottomShelf, setShowBottomShelf] = useState(false)
   const [showCrashSimulation, setShowCrashSimulation] = useState(false)
   const [showHackButton, setShowHackButton] = useState(true)
-  
+
   useEffect(() => {
     fetchStoryStages()
   }, [])
 
-  const simulateGitHubSourceRetrieval = async () => {
-    const steps = [
-      'Getting author ID: salavey13',
-      'Getting project name: my-nextjs-app',
-      'Getting latest commit ID: e66a103bed7ae7d308fe3e4e4237da48ed45387c',
-      'Fetching latest component file content...',
-    ]
-
-    setMinigameState({
-      type: 'github',
-      githubSteps: [],
-      githubBlocks: [],
-    })
-
-    for (const step of steps) {
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      setMinigameState(prevState => ({
-        ...prevState!,
-        githubSteps: [...(prevState?.githubSteps || []), step],
-      }))
-    }
-
-    try {
-      const response = await fetch('https://github.com/salavey13/my-nextjs-app/raw/e66a103bed7ae7d308fe3e4e4237da48ed45387c/components/HackButtoStoryShower.tsx')
-      const content = await response.text()
-      const blocks = content.split('\n\n').filter(block => block.trim() !== '')
-
-      setMinigameState(prevState => ({
-        ...prevState!,
-        githubSteps: [...(prevState?.githubSteps || []), 'File content retrieved successfully'],
-        githubBlocks: blocks,
-      }))
-    } catch (error) {
-      console.error('Error fetching file content:', error)
-      setMinigameState(prevState => ({
-        ...prevState!,
-        githubSteps: [...(prevState?.githubSteps || []), 'Error fetching file content'],
-      }))
-    }
-  }
-  
   const fetchStoryStages = async () => {
     const { data, error } = await supabase
       .from('story_stages')
@@ -148,10 +107,10 @@ export default function HackButtonStoryShower() {
         setMinigameState(null)
     }
   }, [])
-  
+
   useEffect(() => {
     if (storyStages.length > 0 && state.user?.game_state?.stage !== undefined) {
-      const stage = storyStages.find(s => s.stage === state.user?.game_state.stage)
+      const stage = storyStages.find(s => s.stage === state.user.game_state.stage)
       if (stage) {
         setCurrentStage(stage)
         setXuinityDialog(stage.xuinitydialog)
@@ -162,60 +121,67 @@ export default function HackButtonStoryShower() {
     }
   }, [storyStages, state.user?.game_state?.stage, initializeMinigame])
 
-  const handleStageProgression = async (newStage?: number, unlockedComponent?: string) => {
-  if (!currentStage || !state.user) return;
+  const handleStageProgression = useCallback(async (newStage?: number, unlockedComponent?: string) => {
+    if (!currentStage || !state.user) return
 
-  // Determine the next stage based on the parentid or move to the next one
-  const nextStage = newStage || (storyStages.find(s => s.parentid === currentStage.id)?.stage ?? currentStage.stage + 1);
+    // Determine the next stage based on the current stage's direct child or the next sequential stage
+    const nextStage = newStage || storyStages.find(s => s.parentid === currentStage.id)?.stage || currentStage.stage + 1
 
-  try {
-    // Use the `progressStage` from `useGameProgression`
-    await progressStage(nextStage, unlockedComponent);
-
-    // Get the data of the next stage
-    const nextStageData = storyStages.find(s => s.stage === nextStage);
-    if (nextStageData) {
-      setCurrentStage(nextStageData); // Update the current stage
-      setXuinityDialog(nextStageData.xuinitydialog); // Update Xuinity's dialog
-      initializeMinigame(nextStageData.minigame); // Initialize the minigame if present
-      setShowBottomShelf(nextStageData.bottomshelfbitmask > 1); // Show the bottom shelf if needed
-      setShowHackButton(nextStage <= 3); // Hide hack button after stage 3
-
-      // Show toast for the achievement unlocked
-      toast({
-        title: t('achievementUnlocked'),
-        description: nextStageData.achievement,
-        stage: nextStageData.stage,
-        lang: state.user.lang,
-      });
-
-      // Special actions on certain stages
-      if ([2, 6].includes(nextStage)) {
-        setShowCrashSimulation(true);
-        setTimeout(() => setShowCrashSimulation(false), 5000); // Simulate a crash
-      }
-
-      // Unlock specific components at certain stages
-      if (nextStage === 3) {
-        dispatch({ type: 'UPDATE_GAME_STATE', payload: { unlockedComponents: [...(state.user.game_state.unlockedComponents || []), 'cryptoPayment'] } });
-      } else if (nextStage === 6) {
-        dispatch({ type: 'UPDATE_GAME_STATE', payload: { unlockedComponents: [...(state.user.game_state.unlockedComponents || []), 'dev'] } });
-      } else if (nextStage === 7) {
-        dispatch({ type: 'UPDATE_GAME_STATE', payload: { unlockedComponents: [...(state.user.game_state.unlockedComponents || []), 'admin'] } });
-      }
+    // Ensure we're not skipping stages
+    if (nextStage > currentStage.stage + 1 && !newStage) {
+      console.error('Attempting to skip stages. This is not allowed.')
+      return
     }
-  } catch (error) {
-    console.error('Error updating game state:', error);
-    toast({
-      title: t('error'),
-      description: t('failedToProgress'),
-      variant: 'destructive',
-    });
-  }
-};
 
+    try {
+      await progressStage(nextStage, unlockedComponent ? [unlockedComponent] : [])
 
-  
+      const nextStageData = storyStages.find(s => s.stage === nextStage)
+      if (nextStageData) {
+        setCurrentStage(nextStageData)
+        setXuinityDialog(nextStageData.xuinitydialog)
+        initializeMinigame(nextStageData.minigame)
+        setShowBottomShelf(nextStageData.bottomshelfbitmask > 1)
+        setShowHackButton(nextStage <= 3)
+
+        toast({
+          title: t('achievementUnlocked'),
+          description: nextStageData.achievement,
+          stage: nextStageData.stage,
+          lang: state.user.lang,
+        })
+
+        if (nextStage === 2 || nextStage === 6) {
+          setShowCrashSimulation(true)
+          setTimeout(() => setShowCrashSimulation(false), 5000)
+        }
+
+        // Update unlocked components based on the stage
+        const newUnlockedComponents = [...(state.user.game_state.unlockedComponents || [])]
+        if (nextStage === 3 && !newUnlockedComponents.includes('cryptoPayment')) {
+          newUnlockedComponents.push('cryptoPayment')
+        } else if (nextStage === 6 && !newUnlockedComponents.includes('dev')) {
+          newUnlockedComponents.push('dev')
+        } else if (nextStage === 7 && !newUnlockedComponents.includes('admin')) {
+          newUnlockedComponents.push('admin')
+        }
+
+        if (newUnlockedComponents.length > state.user.game_state.unlockedComponents?.length) {
+          dispatch({ 
+            type: 'UPDATE_GAME_STATE', 
+            payload: { ...state.user.game_state, unlockedComponents: newUnlockedComponents } 
+          })
+        }
+      }
+    } catch (error) {
+      console.error('Error updating game state:', error)
+      toast({
+        title: t('error'),
+        description: t('failedToProgress'),
+        variant: 'destructive',
+      })
+    }
+  }, [currentStage, state.user, storyStages, progressStage, initializeMinigame, t, dispatch])
 
   const renderMinigame = () => {
     if (!minigameState) return null
@@ -413,6 +379,7 @@ export default function HackButtonStoryShower() {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5 }}
             className="fixed top-24 pt-10 right-4 bg-background p-4 rounded-lg shadow-lg z-40"
+          
           >
             <p className="text-lg font-semibold">{t('xuinitySays')}:</p>
             <p className="italic">{xuinityDialog}</p>
