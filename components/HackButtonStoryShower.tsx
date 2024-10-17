@@ -67,7 +67,7 @@ export default function HackButtonStoryShower() {
   const [showBottomShelf, setShowBottomShelf] = useState(false)
   const [showCrashSimulation, setShowCrashSimulation] = useState(false)
   const [showHackButton, setShowHackButton] = useState(true)
-
+  
   useEffect(() => {
     fetchStoryStages()
   }, [])
@@ -163,50 +163,57 @@ export default function HackButtonStoryShower() {
   }, [storyStages, state.user?.game_state?.stage, initializeMinigame])
 
   const handleStageProgression = async (newStage?: number, unlockedComponent?: string) => {
-    if (!currentStage || !state.user) return
+  if (!currentStage || !state.user) return;
 
-    const nextStage = newStage || (storyStages.find(s => s.parentid === currentStage.id)?.stage ?? currentStage.stage + 1)
+  // Determine the next stage based on the parentid or move to the next one
+  const nextStage = newStage || (storyStages.find(s => s.parentid === currentStage.id)?.stage ?? currentStage.stage + 1);
 
-    try {
-      await progressStage(nextStage, unlockedComponent)
+  try {
+    // Use the `progressStage` from `useGameProgression`
+    await progressStage(nextStage, unlockedComponent);
 
-      const nextStageData = storyStages.find(s => s.stage === nextStage)
-      if (nextStageData) {
-        setCurrentStage(nextStageData)
-        setXuinityDialog(nextStageData.xuinitydialog)
-        initializeMinigame(nextStageData.minigame)
-        setShowBottomShelf(nextStageData.bottomshelfbitmask > 1)
-        setShowHackButton(nextStage <= 3)
+    // Get the data of the next stage
+    const nextStageData = storyStages.find(s => s.stage === nextStage);
+    if (nextStageData) {
+      setCurrentStage(nextStageData); // Update the current stage
+      setXuinityDialog(nextStageData.xuinitydialog); // Update Xuinity's dialog
+      initializeMinigame(nextStageData.minigame); // Initialize the minigame if present
+      setShowBottomShelf(nextStageData.bottomshelfbitmask > 1); // Show the bottom shelf if needed
+      setShowHackButton(nextStage <= 3); // Hide hack button after stage 3
 
-        toast({
-          title: t('achievementUnlocked'),
-          description: nextStageData.achievement,
-          stage: nextStageData.stage,
-          lang: state.user.lang,
-        })
-
-        if (nextStage === 2 || nextStage === 6) {
-          setShowCrashSimulation(true)
-          setTimeout(() => setShowCrashSimulation(false), 5000)
-        }
-
-        if (nextStage === 3) {
-          dispatch({ type: 'UPDATE_GAME_STATE', payload: { unlockedComponents: [...(state.user.game_state.unlockedComponents || []), 'cryptoPayment'] } })
-        } else if (nextStage === 6) {
-          dispatch({ type: 'UPDATE_GAME_STATE', payload: { unlockedComponents: [...(state.user.game_state.unlockedComponents || []), 'dev'] } })
-        } else if (nextStage === 7) {
-          dispatch({ type: 'UPDATE_GAME_STATE', payload: { unlockedComponents: [...(state.user.game_state.unlockedComponents || []), 'admin'] } })
-        }
-      }
-    } catch (error) {
-      console.error('Error updating game state:', error)
+      // Show toast for the achievement unlocked
       toast({
-        title: t('error'),
-        description: t('failedToProgress'),
-        variant: "destructive",
-      })
+        title: t('achievementUnlocked'),
+        description: nextStageData.achievement,
+        stage: nextStageData.stage,
+        lang: state.user.lang,
+      });
+
+      // Special actions on certain stages
+      if ([2, 6].includes(nextStage)) {
+        setShowCrashSimulation(true);
+        setTimeout(() => setShowCrashSimulation(false), 5000); // Simulate a crash
+      }
+
+      // Unlock specific components at certain stages
+      if (nextStage === 3) {
+        dispatch({ type: 'UPDATE_GAME_STATE', payload: { unlockedComponents: [...(state.user.game_state.unlockedComponents || []), 'cryptoPayment'] } });
+      } else if (nextStage === 6) {
+        dispatch({ type: 'UPDATE_GAME_STATE', payload: { unlockedComponents: [...(state.user.game_state.unlockedComponents || []), 'dev'] } });
+      } else if (nextStage === 7) {
+        dispatch({ type: 'UPDATE_GAME_STATE', payload: { unlockedComponents: [...(state.user.game_state.unlockedComponents || []), 'admin'] } });
+      }
     }
+  } catch (error) {
+    console.error('Error updating game state:', error);
+    toast({
+      title: t('error'),
+      description: t('failedToProgress'),
+      variant: 'destructive',
+    });
   }
+};
+
 
   
 
