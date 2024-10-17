@@ -7,7 +7,6 @@ import ReactDOM from 'react-dom';
 export const useGameProgression = () => {
   const { state, dispatch, t } = useAppContext();
 
-  const progressStage = useCallback(async (newStage: number, unlockedComponent?: string, skipToast: boolean = false) => {
   const progressStage = useCallback(async (newStage: number, unlockedComponents: string[] = [], skipToast: boolean = false) => {
   if (!state.user?.id) return;
   try {
