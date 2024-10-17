@@ -72,6 +72,43 @@ export default function HackButtonStoryShower() {
     fetchStoryStages()
   }, [])
 
+  const simulateGitHubSourceRetrieval = async () => {
+    const steps = [
+      'Getting author ID: salavey13',
+      'Getting project name: my-nextjs-app',
+      'Getting latest commit ID: e66a103bed7ae7d308fe3e4e4237da48ed45387c',
+      'Fetching latest component file content...',
+    ]
+    setMinigameState({
+      type: 'github',
+      githubSteps: [],
+      githubBlocks: [],
+    })
+    for (const step of steps) {
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      setMinigameState(prevState => ({
+        ...prevState!,
+        githubSteps: [...(prevState?.githubSteps || []), step],
+      }))
+    }
+    try {
+      const response = await fetch('https://github.com/salavey13/my-nextjs-app/raw/e66a103bed7ae7d308fe3e4e4237da48ed45387c/components/HackButtoStoryShower.tsx')
+      const content = await response.text()
+      const blocks = content.split('\n\n').filter(block => block.trim() !== '')
+      setMinigameState(prevState => ({
+        ...prevState!,
+        githubSteps: [...(prevState?.githubSteps || []), 'File content retrieved successfully'],
+        githubBlocks: blocks,
+      }))
+    } catch (error) {
+      console.error('Error fetching file content:', error)
+      setMinigameState(prevState => ({
+        ...prevState!,
+        githubSteps: [...(prevState?.githubSteps || []), 'Error fetching file content'],
+      }))
+    }
+  }
+
   const fetchStoryStages = async () => {
     const { data, error } = await supabase
       .from('story_stages')
@@ -110,7 +147,7 @@ export default function HackButtonStoryShower() {
 
   useEffect(() => {
     if (storyStages.length > 0 && state.user?.game_state?.stage !== undefined) {
-      const stage = storyStages.find(s => s.stage === state.user.game_state.stage)
+      const stage = storyStages.find(s => s.stage === state.user?.game_state.stage)
       if (stage) {
         setCurrentStage(stage)
         setXuinityDialog(stage.xuinitydialog)
@@ -157,7 +194,7 @@ export default function HackButtonStoryShower() {
         }
 
         // Update unlocked components based on the stage
-        const newUnlockedComponents = [...(state.user.game_state.unlockedComponents || [])]
+        const newUnlockedComponents = [...(state.user?.game_state.unlockedComponents || [])]
         if (nextStage === 3 && !newUnlockedComponents.includes('cryptoPayment')) {
           newUnlockedComponents.push('cryptoPayment')
         } else if (nextStage === 6 && !newUnlockedComponents.includes('dev')) {
