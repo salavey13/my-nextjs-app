@@ -79,7 +79,7 @@ export const toast = ({ title, description, variant = "info", stage, lang = 'en'
       fontFamily: 'monospace',
       letterSpacing: '1px',
       animation: 'glitchyFadeIn 0.5s ease-in-out forwards',
-      background: 'rgba(0, 0, 0, 0.8)',
+      // background: 'rgba(0, 0, 0, 0.8)',
       color: '#0f0',
       border: '1px solid #0f0',
       textShadow: '0 0 5px #0f0',

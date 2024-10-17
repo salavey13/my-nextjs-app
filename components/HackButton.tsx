@@ -8,12 +8,16 @@ import GameBoard from './game/GameBoard';
 import DiceGame from './game/DiceGame';
 import { toast } from '@/hooks/use-toast';
 import { useTelegram } from '@/hooks/useTelegram';
+import { useGameProgression } from '@/hooks/useGameProgression';
+import UnlockChoice from '@/components/UnlockChoice';
 
 const HackButton: React.FC = () => {
   const { state, dispatch, t } = useAppContext();
   const user = state.user;
   const [selectedGame, setSelectedGame] = useState<'cards' | 'dice' | null>(null);
   const [gamesVisited, setGamesVisited] = useState({ cards: false, dice: false });
+  const [showUnlockChoice, setShowUnlockChoice] = useState(false);
+  const { progressStage } = useGameProgression();
   
   const { showBackButton } = useTelegram({
     onBackButtonPressed: () => {
@@ -27,36 +31,10 @@ const HackButton: React.FC = () => {
     showBackButton();
   }, [selectedGame, showBackButton]);
 
-  const progressStage = useCallback(async (newStage: number) => {
-    if (!user?.id) return;
-    try {
-      const { error } = await supabase
-        .from('users')
-        .update({ game_state: { stage: newStage } })
-        .eq('id', user.id);
-
-      if (error) throw error;
-
-      dispatch({
-        type: 'UPDATE_GAME_STATE',
-        payload: { ...(user.game_state || {}), stage: newStage },
-      });
-
-      toast({
-        title: t('stageProgression'),
-        description: t(`stage${newStage}Unlocked`),
-        stage: newStage,
-        lang: user.lang,
-      });
-    } catch (error) {
-      console.error('Error updating game stage:', error);
-    }
-  }, [user, dispatch, t]);
-
   useEffect(() => {
     const currentStage = user?.game_state?.stage ?? 0;
     if (gamesVisited.cards && gamesVisited.dice && currentStage === 0) {
-      progressStage(1);
+      progressStage(1, ['hack_button']);
     }
   }, [gamesVisited, user?.game_state?.stage, progressStage]);
   
@@ -108,7 +86,8 @@ const HackButton: React.FC = () => {
       });
 
       if (newStage === 2) {
-        progressStage(2);
+        await progressStage(2, []);
+        setShowUnlockChoice(true);
       }
     } catch (error) {
       console.error('Error updating balance:', error);
@@ -159,6 +138,7 @@ const HackButton: React.FC = () => {
       )}
       {selectedGame === 'cards' && <GameBoard goBack={goBack} />}
       {selectedGame === 'dice' && <DiceGame goBack={goBack} />}
+      {showUnlockChoice && <UnlockChoice />}
     </div>
   );
 };

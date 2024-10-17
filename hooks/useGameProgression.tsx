@@ -1,3 +1,4 @@
+//hooks\useGameProgression.tsx
 import { useCallback } from 'react';
 import { useAppContext } from '@/context/AppContext';
 import { supabase } from "@/lib/supabaseClient";

@@ -10,7 +10,7 @@ import { motion } from 'framer-motion';
 import { toast } from '@/hooks/use-toast';
 import Image from 'next/image';
 import { useGameProgression } from '@/hooks/useGameProgression';
-import { ImageProps } from 'next/image';
+import UnlockChoice from '@/components/UnlockChoice';
 
 interface Skin {
   id: string;
@@ -26,6 +26,7 @@ const SkinShop = () => {
   const [otherPlayerSkins, setOtherPlayerSkins] = useState<Skin[]>([]);
   const [loading, setLoading] = useState(true);
   const { progressStage } = useGameProgression();
+  const [showUnlockChoice, setShowUnlockChoice] = useState(false);
 
   useEffect(() => {
     const fetchOtherPlayerSkins = async () => {
@@ -121,7 +122,8 @@ const SkinShop = () => {
       });
 
       if (newStage > currentStage) {
-        progressStage(newStage);
+        await progressStage(newStage);
+        setShowUnlockChoice(true);
       }
     } catch (error) {
       console.error('Error buying skin:', error);
@@ -218,6 +220,8 @@ const SkinShop = () => {
             {!customizationUnlocked && (
               <p className="text-center mt-4">{t('keepPlayingToUnlock')}</p>
             )}
+
+            {showUnlockChoice && <UnlockChoice />}
           </>
         )}
       </CardContent>

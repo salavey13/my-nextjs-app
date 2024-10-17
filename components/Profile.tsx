@@ -15,6 +15,8 @@ import { Crown, Loader2, Zap, Coins, Star, Users, Shield, Sparkles, Trophy, Targ
 import { toast } from '@/hooks/use-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 
+import { useGameProgression } from '@/hooks/useGameProgression';
+import UnlockChoice from '@/components/UnlockChoice';
 interface GameState {
   stage: number;
   coins: number;
@@ -60,6 +62,8 @@ const Profile: React.FC = () => {
   const [avatarUrl, setAvatarUrl] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('profile');
+  const [showUnlockChoice, setShowUnlockChoice] = useState(false);
+  const { progressStage } = useGameProgression();
 
   useEffect(() => {
     if (user) {
@@ -113,10 +117,8 @@ const Profile: React.FC = () => {
       });
 
       if (newStage === 3 && currentStage === 2) {
-        toast({
-          title: t('stageProgression'),
-          description: t('unlockedCryptoPrices'),
-        });
+        await progressStage(3, ['crypto']);
+        setShowUnlockChoice(true);
       }
     } catch (error) {
       console.error('Error updating profile:', error);
@@ -271,6 +273,8 @@ const Profile: React.FC = () => {
             </Card>
           </CardContent>
         </Card>
+        
+        {showUnlockChoice && <UnlockChoice />}
       </motion.div>
     </AnimatePresence>
   );

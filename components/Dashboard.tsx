@@ -1,4 +1,3 @@
-// components/Dashboard.tsx
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
@@ -9,13 +8,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { useAppContext } from "../context/AppContext";
+import { useGameProgression } from "@/hooks/useGameProgression";
 import DebugInfo from "../components/DebugInfo";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTachometerAlt } from '@fortawesome/free-solid-svg-icons';
-import { fetchTargetWallet, CryptoPayment}  from "@/components/CryptoPayment";
+import { CryptoPayment } from "@/components/CryptoPayment";
 import CryptoWithdrawal from "@/components/CryptoWithdrawal";
 
-// Define the shape of the bet data
 interface Bet {
   id: number;
   user_id: number;
@@ -25,7 +24,6 @@ interface Bet {
   status: string;
 }
 
-// Define the shape of the event data
 interface Event {
   id: number;
   title: string;
@@ -45,8 +43,9 @@ export default function Dashboard() {
   const [allEvents, setAllEvents] = useState<Event[]>([]);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [betAmount, setBetAmount] = useState<string>('');
-  const { state, dispatch, t } = useAppContext()
-  const user = state.user
+  const { state, dispatch, t } = useAppContext();
+  const { progressStage } = useGameProgression();
+  const user = state.user;
 
   useEffect(() => {
     if (!user) return;
@@ -64,19 +63,6 @@ export default function Dashboard() {
       }
     };
 
- 
-    const fetchEvents = async () => {
-      const { data, error } = await supabase
-        .from('events')
-        .select('*')
-        .not('id', 'in', `(${bets.map(bet => bet.event_id).join(',')})`);
-  
-      if (error) {
-        console.error("Error fetching events:", error);
-      } else {
-        setEvents(data || []);
-      }
-    };
     const fetchAllEvents = async () => {
       const { data, error } = await supabase
         .from('events')
@@ -91,7 +77,7 @@ export default function Dashboard() {
 
     fetchBets();  
     fetchAllEvents();  
-  }, [bets, user]);
+  }, [user]);
 
   useEffect(() => {
     if (!user) return;
@@ -110,7 +96,7 @@ export default function Dashboard() {
     };
 
     fetchEvents();
-  }, [user, bets]);// Only refetch events when bets change
+  }, [user, bets]);
 
   const getEventDetailsById = useCallback((eventId: number) => {
     const event = allEvents.find(e => e.id === eventId);
@@ -152,7 +138,6 @@ export default function Dashboard() {
         setSelectedEvent(null);
         setBetAmount('');
   
-         // Manually update bets after placing a bet                                           
         const { data: betsData, error: fetchError } = await supabase
           .from('bets')
           .select('*')
@@ -164,7 +149,6 @@ export default function Dashboard() {
           setBets(betsData || []);
         }
   
-        // Update the user's rank                         
         const updatedRank = (parseInt(user.rank, 10) || 0) + 1;
         const { error: rankError } = await supabase
           .from('users')
@@ -174,11 +158,27 @@ export default function Dashboard() {
         if (rankError) {
           console.error("Error updating user rank:", rankError);
         }
+
+        // Check if this is the user's first bet and progress the stage if necessary
+        if (betsData && betsData.length === 1 && user.game_state.stage === 4) {
+          await progressStage(5, ['bets']);
+          dispatch({
+            type: 'UPDATE_GAME_STATE',
+            payload: { stage: 5, unlockedComponents: [...(user.game_state.unlockedComponents || []), 'bets'] }
+          });
+          triggerSideHustleChoice();
+        }
   
       } catch (error) {
         console.error("An unexpected error occurred:", error);
       }
     }
+  };
+
+  const triggerSideHustleChoice = () => {
+    // Implement side hustle choice logic here
+    // For example, you could show a modal with different options
+    console.log("Triggering side hustle choice");
   };
 
   return (
@@ -190,7 +190,7 @@ export default function Dashboard() {
         </h1>
       </div>
 
-      {/* Crypto Section }
+{/* Crypto Section }
       <Card className="mb-4">
         <CardHeader>
           <CardTitle>{t("cryptoManagement")}</CardTitle>
@@ -208,8 +208,6 @@ export default function Dashboard() {
           </div>
         </CardContent>
       </Card>*/}
-      
-
       <Card>
         <CardHeader>
           <CardTitle>{t("activeBets")}</CardTitle>
@@ -235,12 +233,8 @@ export default function Dashboard() {
                     <TableCell>
                       {bet.status === 'active' ? (
                         <CryptoPayment creatorTelegramId={bet?.user_id.toString()}/>
-                        /*{<Button variant="ghost" size="sm">
-                          {t("active")}
-                        </Button>}*/
                       ) : (
-                        <Button variant="destructive" size="sm" 
-                        disabled={true}>
+                        <Button variant="destructive" size="sm" disabled={true}>
                           {bet.status}
                         </Button>
                       )}
