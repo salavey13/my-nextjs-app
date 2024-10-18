@@ -1,5 +1,12 @@
 import { LanguageDictionary } from "../utils/TranslationUtils";
 export const ukr: LanguageDictionary = {
+  "steps": {
+    "collect": "Зібрати",
+    "generate": "Згенерувати",
+    "enhance": "Покращити",
+    "review": "Переглянути",
+    "push": "Відправити"
+  },
   "bottomShelf": {
     customComponent1: "Custom 1",
       customComponent2: "Custom 2",
