@@ -112,17 +112,16 @@ export default function MainSection({ setItemDetailsModalOpen, setSelectedItem, 
         </Button>
       </CardContent>
     </Card>
-    <div className="w-full min-h-[calc(100vh-64px)]"/>
-  </div>
+   </div>
 )
 
 
   return (
-    <div className="w-full min-h-[calc(100vh-128px)] h-full overflow-y-scroll">
+    <>
+     <div className="w-full min-h-[calc(100vh-128px)] h-full overflow-y-scroll">
       {showOnboarding ? (
         <OnboardingSection />
     ) : !selectedCreator ? (
-      <>
         <div className="grid gap-4 p-4 md:grid-cols-2 lg:grid-cols-3">
           {creators.map((creator) => (
             <Button
@@ -142,8 +141,6 @@ export default function MainSection({ setItemDetailsModalOpen, setSelectedItem, 
             </Button>
           ))}
         </div>
-        <div className="w-full min-h-[calc(100vh-64px)]"/>
-      </>
     ) : (
         <>
           <div className="fixed top-20 left-0 w-full flex justify-center z-20">
@@ -182,9 +179,10 @@ export default function MainSection({ setItemDetailsModalOpen, setSelectedItem, 
               </div>
             ))}
           </main>
-          <div className="w-full min-h-[calc(100vh-64px)]"/>
         </>
       )}
     </div>
+     <div className="w-full min-h-[calc(100vh-64px)]"/>
+    </> 
   )
 }
