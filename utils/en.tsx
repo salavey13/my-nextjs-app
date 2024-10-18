@@ -131,7 +131,8 @@ export const en: LanguageDictionary = {
           "Check out our simple guide on how to maximize the potential of your AI-powered website templates.",
         viewInstructions: "View Instructions",
       },
-      mobileShop: {
+      "mobileShop": {
+  "description": "Explore Mobile Shop: Unleash your creativity with our extensive collection of Mobile Shop templates, meticulously curated to cater to diverse tastes and requirements. And the best part? We handle everything for you! From crafting the perfect logo and palette to optimizing SEO-rich content for every section of your website, even handling payments seamlessly. Simply sit back, relax, and watch your dream website come to life.",
         heading: "Mobile Shop",
         title: "Mobile Shop Interface",
       },
