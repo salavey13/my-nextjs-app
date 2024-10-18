@@ -343,10 +343,9 @@ export default function LandingPage() {
           </p>
           <div className="flex justify-center">
             <iframe
-              src="https://oneSitePls.framer.ai/shop"
-              width="375"
-              height="667"
-              className="border-4 border-[#e1ff01] rounded-3xl shadow-2xl"
+              src="https://oneSitePls.framer.ai/web13-2"
+              title={t('mobileShop.title')}
+              className="w-full max-w-sm h-[600px] border-0 rounded-lg shadow-lg"
             ></iframe>
           </div>
         </section>
