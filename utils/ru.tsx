@@ -1,5 +1,12 @@
 import { LanguageDictionary } from "../utils/TranslationUtils";
 export const ru: LanguageDictionary = {
+  "steps": {
+    "collect": "Собрать",
+    "generate": "Создать",
+    "enhance": "Улучшить",
+    "review": "Проверить",
+    "push": "Отправить"
+  },
   "bottomShelf": {
     customComponent1: "Custom 1",
       customComponent2: "Custom 2",
