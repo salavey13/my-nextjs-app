@@ -752,4 +752,23 @@ createTask: "Створити завдання",
   "yourSkins": "Ваші скіни",
 "keepPlayingToUnlock": "Продовжуйте грати, щоб розблокувати більше функцій!",
   "buySkin": "Купити шкіру",
+  "automation": {
+    "heading": "Конвеєр автоматизації",
+    "description": "Спостерігайте за роботою нашого конвеєра автоматизації на базі ШІ, який створює та інтегрує нові компоненти.",
+    "watch": "Дивіться, як відбувається магія",
+    "startingCreation": "Починаємо створення компонента {componentName}...",
+    "dataCollected": "Зібрано дані для компонента {componentName}",
+    "codeGenerated": "Згенеровано код для {componentName}.tsx",
+    "codeEnhanced": "Покращено код компонента {componentName}",
+    "componentReviewed": "Компонент {componentName} перевірено та схвалено",
+    "componentPushed": "Компонент {componentName} успішно додано до репозиторію",
+    "creationSuccess": "Компонент {componentName} успішно створено та інтегровано",
+    "creationError": "Помилка при створенні компонента {componentName}: {errorMessage}",
+    "automationInProgress": "Автоматизація в процесі",
+    "automationComplete": "Автоматизацію завершено",
+    "visitV0": "Відвідати v0.dev",
+    "viewGitHubRepo": "Переглянути GitHub репозиторій",
+    "checkVercelDeployments": "Перевірити розгортання Vercel"
+},
+
 }
