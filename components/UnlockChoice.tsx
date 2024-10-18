@@ -1,4 +1,3 @@
-//components\UnlockChoice.tsx
 'use client'
 
 import React, { useState, useEffect } from 'react';
@@ -9,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Zap, Car, Users, Dice1, Coins, CreditCard, Shield } from 'lucide-react';
 import { supabase } from '@/lib/supabaseClient';
+import AutomationPipeline from '@/components/AutomationPipeline';
 
 interface StoryStage {
   id: number;
@@ -30,6 +30,8 @@ const UnlockChoice: React.FC = () => {
   const [storyStages, setStoryStages] = useState<StoryStage[]>([]);
   const [currentUnlockOptions, setCurrentUnlockOptions] = useState<StoryStage[]>([]);
   const [sideHustles, setSideHustles] = useState<StoryStage[]>([]);
+  const [showAutomationPipeline, setShowAutomationPipeline] = useState(false);
+  const [currentComponent, setCurrentComponent] = useState<string>('');
 
   useEffect(() => {
     const fetchStoryStages = async () => {
@@ -58,6 +60,12 @@ const UnlockChoice: React.FC = () => {
   }, [storyStages, state.user?.game_state?.stage]);
 
   const handleUnlock = async (component: string, nextStage: number) => {
+    setCurrentComponent(component);
+    setShowAutomationPipeline(true);
+
+    // Wait for the automation pipeline to complete
+    await new Promise(resolve => setTimeout(resolve, 12000)); // Adjust this time based on your simulation duration
+
     await progressStage(nextStage, [component]);
     dispatch({
       type: 'UPDATE_GAME_STATE',
@@ -68,6 +76,7 @@ const UnlockChoice: React.FC = () => {
     });
     simulateCrash();
     triggerSideHustleChoice();
+    setShowAutomationPipeline(false);
   };
 
   const triggerSideHustleChoice = () => {
@@ -120,6 +129,7 @@ const UnlockChoice: React.FC = () => {
       <h2 className="text-2xl font-bold mb-6">{t('chooseUnlock')}</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-4xl">
         {currentUnlockOptions.map((option) => {
+          
           const IconComponent = getIconComponent(option.activecomponent);
           return (
             <Card key={option.id} className="bg-gray-800 border-gray-700">
@@ -167,6 +177,17 @@ const UnlockChoice: React.FC = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      {showAutomationPipeline && (
+        <Dialog open={showAutomationPipeline} onOpenChange={setShowAutomationPipeline}>
+          <DialogContent className="max-w-4xl">
+            <DialogHeader>
+              <DialogTitle>{t('creatingComponent', { component: currentComponent })}</DialogTitle>
+            </DialogHeader>
+            <AutomationPipeline componentName={currentComponent} />
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 };
