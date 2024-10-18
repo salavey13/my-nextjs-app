@@ -34,6 +34,9 @@ export const en: LanguageDictionary = {
   viewGitHubRepo: "View GitHub Repo",
   checkVercelDeployments: "Check Vercel Deployments",
     contact: {
+     
+    "heading": "Get in Touch",
+
       title: "Get Started Today!",
       description: "Experience the future of web development with v0. Let our AI bring your vision to life effortlessly.",
       playGameButton: "Play Game",
@@ -62,6 +65,7 @@ export const en: LanguageDictionary = {
     "benefit3Description": "Seamlessly work with your team on web projects."
   },
   "footer": {
+    "socialTitle": "Connect With Us",
     "aboutTitle": "About v0",
     "aboutDescription": "Empowering developers and businesses with AI-enhanced tools for effortless web creation.",
     "quickLinksTitle": "Quick Links",
@@ -125,6 +129,18 @@ export const en: LanguageDictionary = {
         title: "Mobile Shop Interface",
       },
       faq: {
+        {
+  "faq": {
+    "question1": "What are the stages of the AutomationPipeline?",
+    "answer1": "The AutomationPipeline consists of five main stages: 1) Collect - gathering necessary data, 2) Generate - creating initial code, 3) Enhance - improving and optimizing the code, 4) Review - checking for quality and consistency, and 5) Push - integrating the component into the project repository.",
+    "question2": "How does the game progression work?",
+    "answer2": "The game progression is divided into stages. Players start at stage 0 and advance by completing tasks, unlocking new features, and making choices. Each stage introduces new components and challenges, allowing players to build and expand their virtual business.",
+    "question3": "What happens when I unlock a new component?",
+    "answer3": "When you unlock a new component, the AutomationPipeline simulates its creation and integration into your project. You'll see the process unfold in real-time, from data collection to code generation and final deployment. This new component will then become available for use in your game.",
+    "question4": "Can I influence the direction of my game progression?",
+    "answer4": "Yes! At certain stages, you'll be presented with choices that affect your game's direction. These could be selecting different types of businesses to pursue, choosing between various upgrades, or deciding on different strategies. Your choices will shape your unique game experience.",
+    "question5": "How do side hustles work in the game?",
+    "answer5": "Side hustles are additional activities or mini-games that you can engage in alongside your main business. They offer opportunities to earn extra in-game currency, unlock special achievements, or gain advantages in your primary business. You'll encounter options for side hustles as you progress through the game stages.",
         heading: "Frequently Asked Questions",
         whatIsV0: "What is v0?",
         whatIsV0Answer:
