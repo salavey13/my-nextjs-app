@@ -1,6 +1,13 @@
 import { LanguageDictionary } from "../utils/TranslationUtils";
 export const en: LanguageDictionary = {
   // ... (existing translations)
+  "steps": {
+    "collect": "Collect",
+    "generate": "Generate",
+    "enhance": "Enhance",
+    "review": "Review",
+    "push": "Push"
+  },
   bottomShelf: {
       paymentNotification: "Payment",
       dynamicItemForm: "Items",
