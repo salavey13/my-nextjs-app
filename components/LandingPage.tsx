@@ -1,4 +1,4 @@
-"use client";
+p"use client";
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Button } from "@/components/ui/button";
@@ -9,7 +9,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { ChevronRight, Code, Menu, Palette, X, Zap, Globe, Lock, Users, ArrowRight } from "lucide-react";
+import { ChevronRight, Code, Menu, Palette, X, Zap, Globe, Lock, Users, ArrowRight, CheckCircle } from "lucide-react";
 import { motion, AnimatePresence, useScroll, useMotionValueEvent } from "framer-motion";
 import Image from "next/image";
 import { toast } from "@/hooks/use-toast";
@@ -254,15 +254,13 @@ export default function LandingPage() {
                         </li>
                       ))}
                     </ul>
-                  </CardContent>
-                  <CardFooter>
-                    <Button
+                  <Button
                       onClick={() => openLink(plan.link)}
                       className="w-full bg-[#e1ff01] text-gray-900 hover:bg-opacity-90 transition-colors"
                     >
                       {t('pricing.choosePlan')}
                     </Button>
-                  </CardFooter>
+                  </CardContent>
                 </Card>
               </motion.div>
             ))}
