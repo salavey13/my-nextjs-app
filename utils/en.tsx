@@ -863,4 +863,22 @@ createTask: "Create Task",
   },
   stats: "Stats",
   wallet: "Wallet",
+  "automation": {
+    "heading": "Automation Pipeline",
+    "description": "Watch our AI-powered automation pipeline in action as it creates and integrates new components.",
+    "watch": "Watch the magic happen",
+    "startingCreation": "Starting creation of component {componentName}...",
+    "dataCollected": "Data collected for component {componentName}",
+    "codeGenerated": "Code generated for {componentName}.tsx",
+    "codeEnhanced": "Enhanced code for component {componentName}",
+    "componentReviewed": "Reviewed and approved component {componentName}",
+    "componentPushed": "Component {componentName} successfully added to the repository",
+    "creationSuccess": "Component {componentName} successfully created and integrated",
+    "creationError": "Error creating component {componentName}: {errorMessage}",
+    "automationInProgress": "Automation in progress",
+    "automationComplete": "Automation complete",
+    "visitV0": "Visit v0.dev",
+    "viewGitHubRepo": "View GitHub Repo",
+    "checkVercelDeployments": "Check Vercel Deployments"
+  }
 }
