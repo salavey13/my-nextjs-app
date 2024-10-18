@@ -82,39 +82,40 @@ export default function MainSection({ setItemDetailsModalOpen, setSelectedItem, 
   }
 
   const OnboardingSection = () => (
-    <div className="w-full min-h-screen flex-col items-center justify-center bg-gradient-to-br from-gray-900 to-black text-white p-4">
-      <Card className="w-full max-w-4xl bg-gray-800 text-white">
-        <CardHeader>
-          <CardTitle className="text-3xl font-bold mb-4">Welcome to Hack the System</CardTitle>
-          <CardDescription className="text-xl mb-6">Break the rules. Rewire reality. Redefine control.</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <p className="text-lg">
-            In <em>Hack the System</em>, you&apos;re about to enter a world where power isn&apos;t given, it&apos;s taken. Guided by Xuinity, your AI mentor, you&apos;ll learn to exploit the cracks in the system, hack the boundaries of control, and unlock hidden potential that most can&apos;t even see.
-          </p>
-          <h2 className="text-2xl font-semibold">Key Features:</h2>
-          <ul className="list-disc list-inside space-y-2">
-            <li><strong>Deceptive Simplicity:</strong> Start with seemingly basic games that hide a deeper reality.</li>
-            <li><strong>The Crash:</strong> Discover the hidden &quot;Hack the System&quot; button and witness a simulated system crash that reveals the true nature of the game.</li>
-            <li><strong>Visual Programming:</strong> Learn coding concepts through an intuitive, visual interface.</li>
-            <li><strong>The Bit Matrix:</strong> Manipulate the very fabric of the game world, and by extension, reality itself.</li>
-            <li><strong>Ethical Dilemmas:</strong> Face moral choices that impact the game world and challenge your perception of right and wrong.</li>
-            <li><strong>Blurred Reality:</strong> Experience a game that constantly questions the boundaries between the virtual and the real.</li>
-          </ul>
-          <p className="text-lg font-semibold mt-6">
-            This isn&apos;t just a game. It&apos;s a rebellion against limitations, a journey into the heart of technology&apos;s potential, and a stark warning about the power we wield in the digital age. Are you ready to hack the system, or will the system hack you?
-          </p>
-          <Button 
-            onClick={() => setShowOnboarding(false)} 
-            className="w-full mt-6 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition-colors duration-200"
-          >
-            Enter the System
-          </Button>
-        </CardContent>
-      </Card>
-      <div className="w-full min-h-[calc(100vh-64px)]"/>
-    </div>
-  )
+  <div className="w-full min-h-screen flex-col items-center justify-center bg-gradient-to-br from-gray-900 to-black text-white p-4">
+    <Card className="w-full max-w-4xl bg-gray-800 text-white">
+      <CardHeader>
+        <CardTitle className="text-3xl font-bold mb-4">{t('onboarding.welcome')}</CardTitle>
+        <CardDescription className="text-xl mb-6">{t('onboarding.description')}</CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        <p className="text-lg">
+          {t('onboarding.intro')}
+        </p>
+        <h2 className="text-2xl font-semibold">{t('onboarding.keyFeatures')}</h2>
+        <ul className="list-disc list-inside space-y-2">
+          <li><strong>{t('onboarding.features.deceptiveSimplicityTitle')}:</strong> {t('onboarding.features.deceptiveSimplicityDesc')}</li>
+          <li><strong>{t('onboarding.features.crashTitle')}:</strong> {t('onboarding.features.crashDesc')}</li>
+          <li><strong>{t('onboarding.features.visualProgrammingTitle')}:</strong> {t('onboarding.features.visualProgrammingDesc')}</li>
+          <li><strong>{t('onboarding.features.bitMatrixTitle')}:</strong> {t('onboarding.features.bitMatrixDesc')}</li>
+          <li><strong>{t('onboarding.features.ethicalDilemmasTitle')}:</strong> {t('onboarding.features.ethicalDilemmasDesc')}</li>
+          <li><strong>{t('onboarding.features.blurredRealityTitle')}:</strong> {t('onboarding.features.blurredRealityDesc')}</li>
+        </ul>
+        <p className="text-lg font-semibold mt-6">
+          {t('onboarding.conclusion')}
+        </p>
+        <Button 
+          onClick={() => setShowOnboarding(false)} 
+          className="w-full mt-6 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition-colors duration-200"
+        >
+          {t('onboarding.enterButton')}
+        </Button>
+      </CardContent>
+    </Card>
+    <div className="w-full min-h-[calc(100vh-64px)]"/>
+  </div>
+)
+
 
   return (
     <div className="w-full min-h-[calc(100vh-128px)] h-full overflow-y-scroll">
