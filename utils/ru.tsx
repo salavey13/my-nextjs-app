@@ -32,12 +32,7 @@ export const ru: LanguageDictionary = {
   visitV0: "Посетить v0.dev",
     viewGitHubRepo: "Просмотреть репозиторий GitHub",
     checkVercelDeployments: "Проверить развертывания Vercel",
-  'automation': {
-    'heading': 'Автоматизация сегодня!',
-    'description': "Ощутите будущее",
-    copyLink:"Копировать ссылку на автомат",
-    watch:"Смотрите, как ваш код танцует в цикле разработки!",
-  },
+  
   "header": {
     "title": "v0 AI Dev"
   },
