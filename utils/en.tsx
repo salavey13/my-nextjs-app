@@ -1,6 +1,28 @@
 import { LanguageDictionary } from "../utils/TranslationUtils";
 export const en: LanguageDictionary = {
   // ... (existing translations)
+  "onboarding": {
+    "welcome": "Welcome to Hack the System 🔧",
+    "description": "Break the rules. Rewire reality. Redefine control. 🧠💥",
+    "intro": "In Hack the System, you're about to enter a world where power isn't given, it's taken. Guided by Xuinity, your AI mentor, you'll learn to exploit the cracks in the system, hack the boundaries of control, and unlock hidden potential that most can’t even see.",
+    "keyFeatures": "Key Features 😏:",
+    "features": {
+      "deceptiveSimplicityTitle": "Deceptive Simplicity",
+      "deceptiveSimplicityDesc": "Start with seemingly basic games that hide a deeper reality. 🎮",
+      "crashTitle": "The Crash",
+      "crashDesc": "Discover the hidden 'Hack the System' button and witness a simulated system crash that reveals the true nature of the game. 💻",
+      "visualProgrammingTitle": "Visual Programming",
+      "visualProgrammingDesc": "Learn coding concepts through an intuitive, visual interface. 🤖",
+      "bitMatrixTitle": "The Bit Matrix",
+      "bitMatrixDesc": "Manipulate the very fabric of the game world, and by extension, reality itself. 💡",
+      "ethicalDilemmasTitle": "Ethical Dilemmas",
+      "ethicalDilemmasDesc": "Face moral choices that impact the game world and challenge your perception of right and wrong. ⚖️",
+      "blurredRealityTitle": "Blurred Reality",
+      "blurredRealityDesc": "Experience a game that constantly questions the boundaries between the virtual and the real. 🌐"
+    },
+    "conclusion": "This isn't just a game. It's a rebellion against limitations, a journey into the heart of technology's potential, and a stark warning about the power we wield in the digital age. Ready to hack the system, or will the system hack you? 😈",
+    "enterButton": "Enter the System 🚀"
+  },
   "steps": {
     "collect": "Collect",
     "generate": "Generate",
