@@ -1,15 +1,13 @@
 "use client";
 
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Button } from "@/components/ui/button";
 import { toast } from '@/hooks/use-toast';
-import { supabase } from '@/lib/supabaseClient';
 import { useAppContext } from '@/context/AppContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useInView } from '@/hooks/useInView';
 import { AlertCircle, CheckCircle, GitBranch, GitCommit, Loader2 } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from './ui/card';
-import { Textarea } from './ui/textarea';
 import Link from 'next/link';
 import Image from 'next/image'
 
@@ -27,40 +25,6 @@ const componentList = [
   "bets", "createEvent", "conflictAwareness", "dev"
 ];
 
-const LogContainer = ({ logs }: { logs: Log[] }) => {
-  const logsEndRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (logsEndRef.current) {
-      logsEndRef.current.scrollIntoView({ behavior: "smooth" });
-    }
-  }, [logs]);
-
-  const getLogColor = (type: LogType): string => {
-    switch (type) {
-      case 'success':
-        return 'text-green-400';
-      case 'warning':
-        return 'text-yellow-400';
-      case 'error':
-        return 'text-red-400';
-      default:
-        return 'text-gray-300';
-    }
-  };
-
-  return (
-    <div className="bg-gray-700 p-4 rounded-md h-40 overflow-y-auto font-mono text-sm">
-      {logs.map((log, index) => (
-        <div key={index} className={`mb-1 ${getLogColor(log.type)}`}>
-          {log.message}
-        </div>
-      ))}
-      <div ref={logsEndRef} />
-    </div>
-  );
-};
-
 interface AutomationPipelineProps {
   componentName?: string;
 }
@@ -71,12 +35,10 @@ export default function AutomationPipeline({ componentName = "chess" }: Automati
   const [logs, setLogs] = useState<Log[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [progress, setProgress] = useState<number>(0);
-  const [idea, setIdea] = useState<string>('');
+  const [showImageGrid, setShowImageGrid] = useState(false);
 
   const addLog = useCallback((message: string, type: LogType = 'info') => {
-    const shortDate = new Date().toISOString().split('T')[1];
-    const formattedMessage = `[${shortDate}] ${message}`;
-    setLogs(prevLogs => [...prevLogs, { type, message: formattedMessage }]);
+    setLogs(prevLogs => [...prevLogs, { type, message }]);
   }, []);
 
   const handleError = useCallback((message: string) => {
@@ -133,6 +95,7 @@ export default function AutomationPipeline({ componentName = "chess" }: Automati
       setCurrentStep('complete');
 
       handleSuccess(`Компонент ${componentName} успешно создан и интегрирован`);
+      setShowImageGrid(true);
     } catch (err) {
       handleError(`Ошибка при создании компонента ${componentName}: ${(err as Error).message}`);
     }
@@ -148,15 +111,8 @@ export default function AutomationPipeline({ componentName = "chess" }: Automati
     return 'bg-green-500';
   };
 
-  interface ItemProps {
-    href: string;
-    imageSrc: string;
-    alt: string;
-    label: string;
-  }
-  
   const ImageGrid = () => {
-    const items: ItemProps[] = [
+    const items = [
       {
         href: 'https://v0.dev',
         imageSrc: '/v0-screenshot.png',
@@ -186,21 +142,17 @@ export default function AutomationPipeline({ componentName = "chess" }: Automati
     );
   };
   
-  interface ItemCardProps {
-    item: ItemProps;
-  }
-  
-  const ItemCard = ({ item }: ItemCardProps) => {
+  const ItemCard = ({ item }: { item: { href: string; imageSrc: string; alt: string; label: string } }) => {
     const { ref, isInView } = useInView({ threshold: 0.2 });
   
     return (
       <Link
         ref={ref}
         href={item.href}
-        className={`relative group overflow-hidden rounded-lg drop-shadow-custom  transition-all duration-500 transform 
+        className={`relative group overflow-hidden rounded-lg drop-shadow-custom transition-all duration-500 transform 
         ${isInView ? 'scale-100 opacity-100' : 'opacity-0 scale-95'}`}
       >
-        <div className="relative w-full h-0 pb-[57%]"> {/* 16:9 Aspect Ratio */}
+        <div className="relative w-full h-0 pb-[57%]">
           <Image
             src={item.imageSrc}
             alt={item.alt}
@@ -214,7 +166,7 @@ export default function AutomationPipeline({ componentName = "chess" }: Automati
             isInView ? 'opacity-100' : 'opacity-0'
           }`}
         >
-          <span className="text-white text-lg font-bold drop-shadow-custom ">
+          <span className="text-white text-lg font-bold drop-shadow-custom">
             {item.label}
           </span>
         </div>
@@ -228,7 +180,7 @@ export default function AutomationPipeline({ componentName = "chess" }: Automati
         <Card className="bg-gray-800 text-white">
           <CardHeader>
             <CardTitle className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl w-full break-words leading-tight text-center">
-              🪄
+              🪄 VerSimcel
             </CardTitle>
             <CardDescription className="text-gray-400">{t("automation.watch")}</CardDescription>
           </CardHeader>
@@ -261,7 +213,13 @@ export default function AutomationPipeline({ componentName = "chess" }: Automati
                 ))}
               </AnimatePresence>
             </div>        
-            <LogContainer logs={logs} />
+            <div className="bg-gray-700 p-4 rounded-md h-60 overflow-y-auto font-mono text-sm">
+              {logs.map((log, index) => (
+                <div key={index} className={`mb-1 ${log.type === 'error' ? 'text-red-400' : log.type === 'success' ? 'text-green-400' : 'text-gray-300'}`}>
+                  {log.message}
+                </div>
+              ))}
+            </div>
           </CardContent>
           <CardFooter className="flex flex-col md:flex-row justify-between space-y-4 md:space-y-0 md:items-center">
             <div className="flex items-center space-x-2">
@@ -278,7 +236,7 @@ export default function AutomationPipeline({ componentName = "chess" }: Automati
             </div>
           </CardFooter>
         </Card>
-        <ImageGrid/>
+        {showImageGrid && <ImageGrid />}
       </div>
     </div>
   );
