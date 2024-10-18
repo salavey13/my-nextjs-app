@@ -756,4 +756,22 @@ createTask: "Создать задачу",
   "yourSkins": "Ваши скины",
 "keepPlayingToUnlock": "Продолжайте играть, чтобы разблокировать больше функций!",
   "buySkin": "Купить скин",
+  "automation": {
+    "heading": "Конвейер автоматизации",
+    "description": "Наблюдайте за работой нашего конвейера автоматизации на базе ИИ, который создает и интегрирует новые компоненты.",
+    "watch": "Смотрите, как происходит магия",
+    "startingCreation": "Начинаем создание компонента {componentName}...",
+    "dataCollected": "Собраны данные для компонента {componentName}",
+    "codeGenerated": "Сгенерирован код для {componentName}.tsx",
+    "codeEnhanced": "Улучшен код компонента {componentName}",
+    "componentReviewed": "Проверен и одобрен компонент {componentName}",
+    "componentPushed": "Компонент {componentName} успешно добавлен в репозиторий",
+    "creationSuccess": "Компонент {componentName} успешно создан и интегрирован",
+    "creationError": "Ошибка при создании компонента {componentName}: {errorMessage}",
+    "automationInProgress": "Автоматизация в процессе",
+    "automationComplete": "Автоматизация завершена",
+    "visitV0": "Посетить v0.dev",
+    "viewGitHubRepo": "Просмотреть GitHub репозиторий",
+    "checkVercelDeployments": "Проверить развертывания Vercel"
+  }
 }
