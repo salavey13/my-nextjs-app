@@ -129,8 +129,6 @@ export const en: LanguageDictionary = {
         title: "Mobile Shop Interface",
       },
       faq: {
-        {
-  "faq": {
     "question1": "What are the stages of the AutomationPipeline?",
     "answer1": "The AutomationPipeline consists of five main stages: 1) Collect - gathering necessary data, 2) Generate - creating initial code, 3) Enhance - improving and optimizing the code, 4) Review - checking for quality and consistency, and 5) Push - integrating the component into the project repository.",
     "question2": "How does the game progression work?",
