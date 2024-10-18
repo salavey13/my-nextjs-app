@@ -33,12 +33,6 @@ export const en: LanguageDictionary = {
   visitV0: "Visit v0.dev",
   viewGitHubRepo: "View GitHub Repo",
   checkVercelDeployments: "Check Vercel Deployments",
-  'automation': {
-    'heading': 'Automation Today!',
-    'description': "Experience the future",
-    copyLink:"Copy Automa Link",
-    watch:"Watch as your code dances through the development cycle!",
-  },
     contact: {
       title: "Get Started Today!",
       description: "Experience the future of web development with v0. Let our AI bring your vision to life effortlessly.",
