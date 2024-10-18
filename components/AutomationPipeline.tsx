@@ -196,23 +196,26 @@ export default function AutomationPipeline({ componentName = "chess" }: Automati
             </div>
 
             <div className="space-y-4">
-              <AnimatePresence>
-                {['collect', 'generate', 'enhance', 'review', 'push'].map((step, index) => (
-                  <motion.div
-                    key={step}
-                    initial={{ opacity: 0, y: 50 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -50 }}
-                    transition={{ duration: 0.5, delay: index * 0.1 }}
-                    className={`flex items-center space-x-2 automa-step-${step}`}
-                  >
-                    <CheckCircle className={`h-5 w-5 ${currentStep === step ? 'text-green-500' : 'text-gray-500'}`} />
-                    <span>{step.charAt(0).toUpperCase() + step.slice(1)}</span>
-                    {currentStep === step && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}
-                  </motion.div>
-                ))}
-              </AnimatePresence>
-            </div>        
+  <AnimatePresence>
+    {['collect', 'generate', 'enhance', 'review', 'push'].map((step, index) => (
+      <motion.div
+        key={step}
+        initial={{ opacity: 0, y: 50 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -50 }}
+        transition={{ duration: 0.5, delay: index * 0.1 }}
+        className={`flex items-center space-x-2 automa-step-${step}`}
+      >
+        <CheckCircle
+          className={`h-5 w-5 ${currentStep === step ? 'text-green-500' : 'text-gray-500'}`}
+        />
+        <span>{t(`steps.${step}`, { defaultValue: step.charAt(0).toUpperCase() + step.slice(1) })}</span>
+        {currentStep === step && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}
+      </motion.div>
+    ))}
+  </AnimatePresence>
+</div>
+        
             <div className="bg-gray-700 p-4 rounded-md h-60 overflow-y-auto font-mono text-sm">
               {logs.map((log, index) => (
                 <div key={index} className={`mb-1 ${log.type === 'error' ? 'text-red-400' : log.type === 'success' ? 'text-green-400' : 'text-gray-300'}`}>
