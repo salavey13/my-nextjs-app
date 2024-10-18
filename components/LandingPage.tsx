@@ -117,7 +117,7 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-gray-950 text-gray-100">
       <motion.header 
-        className="fixed top-0 left-0 right-0 bg-gray-900 shadow-md z-50"
+        className="fixed top-16 left-0 right-0 bg-gray-900 shadow-md z-50"
         initial={{ y: 0 }}
         animate={{ y: isNavbarVisible ? 0 : -80 }}
         transition={{ type: "spring", stiffness: 300, damping: 30 }}
@@ -169,33 +169,59 @@ export default function LandingPage() {
       <main className="container mx-auto px-4 pt-20 pb-12">
         <section id="home" className="text-center mb-16 pt-24">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-          >
-            <h2 className="text-5xl font-bold text-[#e1ff01] mb-6">{t("home.heading")}</h2>
-            <p className="text-xl text-gray-300 max-w-2xl mx-auto mb-8">{t('home.description')}</p>
-            <Button
+  initial={{ opacity: 0, scale: 0.8 }}
+  animate={{ opacity: 1, scale: 1 }}
+  transition={{ duration: 0.8, delay: 0.3 }}
+  className="mt-12 relative"
+>
+  <svg
+    className="absolute inset-0 w-full h-full object-cover drop-shadow-custom"
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 800 450"
+    preserveAspectRatio="none"
+  >
+    <defs>
+      <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" style={{ stopColor: "#e1ff01", stopOpacity: 1 }} />
+        <stop offset="100%" style={{ stopColor: "#4a00e0", stopOpacity: 1 }} />
+      </linearGradient>
+    </defs>
+    <path
+      fill="url(#grad1)"
+      d="M0,320L80,330C160,340,320,360,480,358.7C640,357,800,343,960,330C1120,317,1280,303,1440,282.7L1600,262.7L1600,450L1440,450C1280,450,1120,450,960,450C800,450,640,450,480,450C320,450,160,450,80,450L0,450Z"
+      transform="translate(0, 0)"
+      opacity="0.5"
+    >
+      <animate
+        repeatCount="indefinite"
+        attributeName="d"
+        dur="10s"
+        values="
+        M0,320L80,330C160,340,320,360,480,358.7C640,357,800,343,960,330C1120,317,1280,303,1440,282.7L1600,262.7L1600,450L1440,450C1280,450,1120,450,960,450C800,450,640,450,480,450C320,450,160,450,80,450L0,450Z;
+        M0,280L120,290C240,300,480,320,720,340C960,360,1200,380,1440,392C1600,403,1760,420,1920,440L2080,450L2080,450L1440,450C1280,450,1120,450,960,450C800,450,640,450,480,450C320,450,160,450,80,450L0,450Z;
+        M0,320L80,330C160,340,320,360,480,358.7C640,357,800,343,960,330C1120,317,1280,303,1440,282.7L1600,262.7L1600,450L1440,450C1280,450,1120,450,960,450C800,450,640,450,480,450C320,450,160,450,80,450L0,450Z
+        "
+      />
+    </path>
+  </svg>
+
+  {/* Optional content on top of the SVG background */}
+  <div className="relative z-10">
+    <h2 className="text-center text-4xl font-bold text-white">
+      {t('home.heading')}
+    </h2>
+    <p className="text-center text-lg text-gray-300 max-w-xl mx-auto">
+      {t('home.description')}
+    </p>
+    <Button
               onClick={() => openLink("https://youtube.com/salavey13")}
-              className="bg-[#e1ff01] text-gray-900 px-8 py-3 rounded-full text-lg font-semibold hover:bg-opacity-90 transition-colors"
+              className="bg-[#e1ff01] text-gray-100 px-8 py-3 rounded-full text-lg font-semibold hover:bg-opacity-90 transition-colors"
             >
               {t('home.watchVideos')} <ArrowRight className="inline-block ml-2" />
             </Button>
-          </motion.div>
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8, delay: 0.3 }}
-            className="mt-12 relative"
-          >
-            <Image
-              src="/hero-image.png"
-              alt={t('home.imageAlt')}
-              width={800}
-              height={450}
-              className="rounded-lg mx-auto shadow-2xl"
-            />
-          </motion.div>
+  </div>
+</motion.div>
+
         </section>
 
         <section id="features" className="mb-24">
