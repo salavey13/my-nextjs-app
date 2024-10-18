@@ -117,7 +117,7 @@ export default function MainSection({ setItemDetailsModalOpen, setSelectedItem, 
 
 
   return (
-    <>
+    
      <div className="w-full min-h-[calc(100vh-128px)] h-full overflow-y-scroll">
       {showOnboarding ? (
         <OnboardingSection />
@@ -181,8 +181,7 @@ export default function MainSection({ setItemDetailsModalOpen, setSelectedItem, 
           </main>
         </>
       )}
-    </div>
      <div className="w-full min-h-[calc(100vh-64px)]"/>
-    </> 
+    </div>
   )
 }
