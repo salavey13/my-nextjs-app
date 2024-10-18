@@ -287,14 +287,14 @@ nav {
     }
   }
 
-  /* Example CSS for animations */
+  /* Example CSS forheight: calc(100vh); animations */
 .game-board {
   min-height: calc(100vh);
     padding-top: 64px;
     padding-bottom: 64px;
   position: relative;
   width: 100vw;
-  height: calc(100vh);
+  
   overflow: hidden;
 }
 
