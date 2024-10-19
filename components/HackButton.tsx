@@ -89,7 +89,7 @@ const HackButton: React.FC = () => {
 
       if (newHackCount === 13) {
         await simulateCrash(); // Added function call
-        await progressStage(3, ['crypto', 'createEvent']);
+        await progressStage(3, ['cryptoPayment', 'createEvent']);
         setShowUnlockChoice(true);
       }
     } catch (error) {
