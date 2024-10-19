@@ -489,7 +489,7 @@ export default function HackButtonStoryShower() {
         await simulateCrash();
         setTimeout(async () => {
           setShowCrashSimulation(false);
-          await progressStage(3, ['crypto', 'createEvent']);
+          await progressStage(3, ['cryptoPayment', 'createEvent']);
           setShowUnlockChoice(true);
         }, 5000);
       }
