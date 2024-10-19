@@ -158,64 +158,67 @@ export default function DevKit() {
     setCrypto(parseInt(e.target.value) || 0)
   }, [])
 
+
   const handleBottomShelfComponentChange = useCallback((component: string, checked: boolean) => {
-    setBottomShelfComponents(prev => ({ ...prev, [component]: checked }))
-  }, [])
+    setBottomShelfComponents(prev => ({ ...prev, [component]: checked }));
+  }, []);
+
+  const handleApplyChanges = useCallback(async () => {
+    if (!state.user) return;
+
+    try {
+      const newStage = parseInt(selectedStage);
+      
+      // Determine which components should be unlocked based on the checkboxes
+      let unlockedComponents = Object.entries(bottomShelfComponents)
+        .filter(([component, isChecked]) => isChecked)
+        .map(([component]) => component);
+
+      const updatedGameState = {
+        ...state.user.game_state,
+        stage: newStage,
+        coins: coins,
+        crypto: crypto,
+        unlockedComponents: unlockedComponents,
+      };
+
+      // Update local state first
+      dispatch({ type: 'UPDATE_GAME_STATE', payload: updatedGameState });
+
+      // Update the Supabase database
+      const { error } = await supabase
+        .from('users')
+        .update({ game_state: updatedGameState })
+        .eq('id', state.user.id);
+
+      if (error) throw error;
+
+      toast({
+        title: t("devKit.success"),
+        description: t("devKit.gameStateUpdated"),
+        variant: "success",
+        stage: updatedGameState.stage,
+      });
+
+    } catch (error) {
+      console.error('Error updating game state:', error);
+      toast({
+        title: t("devKit.error"),
+        description: t("devKit.failedToUpdateGameState"),
+        variant: "destructive",
+      });
+    }
+  }, [state.user, selectedStage, bottomShelfComponents, coins, crypto, dispatch, t]);
 
   const isComponentUnlockable = useCallback((component: string, stage: number) => {
-    const link = navigationLinks.find(link => link.component === component)
-    if (!link) return false
-    return (link.stageMask & (1 << (stage - 1))) !== 0
-  }, [navigationLinks])
+    const link = navigationLinks.find(link => link.component === component);
+    if (!link) return false;
+    if (component === 'admin') {
+      return stage >= 7;
+    }
+    return (link.stageMask & (1 << (stage - 1))) !== 0;
+  }, [navigationLinks]);
 
-
-const handleApplyChanges = useCallback(async () => {
-  if (!state.user) return;
-
-  try {
-    const newStage = parseInt(selectedStage);
-    
-    // Determine which components are unlockable based on the stage
-    let unlockedComponents = Object.entries(bottomShelfComponents)
-      .filter(([component, isChecked]) => isChecked && isComponentUnlockable(component, newStage))
-      .map(([component]) => component);
-
-    const updatedGameState = {
-      ...state.user.game_state,
-      stage: newStage,
-      coins: coins,
-      crypto: crypto,
-      unlockedComponents: [
-        ...(state.user.game_state.unlockedComponents || []),
-        ...unlockedComponents,
-      ].filter(Boolean), // Remove falsy values like undefined
-    };
-
-    // Remove duplicates
-    updatedGameState.unlockedComponents = Array.from(new Set(updatedGameState.unlockedComponents));
-
-    // Update local state first
-    dispatch({ type: 'UPDATE_GAME_STATE', payload: updatedGameState });
-
-    // Update the Supabase database to save the new unlocked components
-    await progressStage(newStage, unlockedComponents, true);
-
-    toast({
-      title: t("devKit.success"),
-      description: t("devKit.gameStateUpdated"),
-      variant: "success",
-      stage: updatedGameState.stage,
-    });
-
-  } catch (error) {
-    console.error('Error updating game state:', error);
-    toast({
-      title: t("devKit.error"),
-      description: t("devKit.failedToUpdateGameState"),
-      variant: "destructive",
-    });
-  }
-}, [state.user, selectedStage, bottomShelfComponents, isComponentUnlockable, coins, crypto, dispatch, progressStage, t]);
 
                                             
   const handleSimulateCrash = useCallback(async () => {

@@ -18,8 +18,10 @@ id,parentid,stage,storycontent,xuinitydialog,trigger,activecomponent,minigame,ac
 15,6,5,"Xuinity proposes forking: create a new layer of control, bypass restrictions, and rise above the system.","Fork the system. Play outside the rules, and you’ll never lose. This is where true power lies.","Forking Concept Introduced","Fork","fork","System Forker",255
 */
 
-'use client'
 
+'use client'
+// swapped to 
+import storyStages from '@/lib/storyStages'
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import { useAppContext } from '@/context/AppContext'
 import { Button } from '@/components/ui/button'
@@ -29,11 +31,20 @@ import { supabase } from '@/lib/supabaseClient'
 import { motion, AnimatePresence } from 'framer-motion'
 import { DragDropContext, Draggable, Droppable, DropResult } from 'react-beautiful-dnd'
 import BottomShelf from '@/components/ui/bottomShelf'
+import { useGameProgression } from '@/hooks/useGameProgression'
 import InfinityMirror from '@/components/game/InfinityMirror'
 import { Input } from '@/components/ui/input'
 import { debounce } from 'lodash'
-import { useGameProgression } from '@/hooks/useGameProgression'
 import HackButton from '@/components/HackButton'
+import CrashSimulation from '@/components/CrashSimulation'
+import UnlockChoice from '@/components/UnlockChoice';
+
+import QRCodeGenerator from '@/components/minigames/QRCodeGenerator'
+import FormBuilder from '@/components/minigames/FormBuilder'
+import PaymentSimulator from '@/components/minigames/PaymentSimulator'
+import ConflictSimulator from '@/components/minigames/ConflictSimulator'
+import VersimcelCreator from '@/components/minigames/VersimcelCreator'
+
 
 interface StoryStage {
   id: string;
@@ -55,6 +66,8 @@ interface MinigameState {
   attempts?: number;
   githubSteps?: string[];
   githubBlocks?: string[];
+  steps?: string[];
+  currentStep?: number|0;
 }
 
 export default function HackButtonStoryShower() {
@@ -67,10 +80,19 @@ export default function HackButtonStoryShower() {
   const [showBottomShelf, setShowBottomShelf] = useState(false)
   const [showCrashSimulation, setShowCrashSimulation] = useState(false)
   const [showHackButton, setShowHackButton] = useState(true)
+  const [hackCount, setHackCount] = useState(0)
+  const [showUnlockChoice, setShowUnlockChoice] = useState(false);
+  
 
+
+  
+  const fetchStoryStages = async () => {
+    setStoryStages(storyStages)
+  }
+  
   useEffect(() => {
     fetchStoryStages()
-  }, [])
+  }, [fetchStoryStages])
 
   const simulateGitHubSourceRetrieval = async () => {
     const steps = [
@@ -109,17 +131,28 @@ export default function HackButtonStoryShower() {
     }
   }
 
-  const fetchStoryStages = async () => {
-    const { data, error } = await supabase
-      .from('story_stages')
-      .select('*')
-      .order('stage', { ascending: true })
+  // const fetchStoryStages = async () => {
+  //   const { data, error } = await supabase
+  //     .from('story_stages')
+  //     .select('*')
+  //     .order('stage', { ascending: true })
 
-    if (error) {
-      console.error('Error fetching story stages:', error)
-    } else {
-      setStoryStages(data || [])
+  //   if (error) {
+  //     console.error('Error fetching story stages:', error)
+  //   } else {
+  //     setStoryStages(data || [])
+  //   }
+  // }
+
+  const simulateVersimcelProcess = async () => {
+    for (let i = 0; i < 3; i++) {
+      await new Promise(resolve => setTimeout(resolve, 2000))
+      setMinigameState(prevState => ({
+        ...prevState!,
+        currentStep: (prevState?.currentStep || 0) + 1,
+      }))
     }
+    handleStageProgression()
   }
 
   const initializeMinigame = useCallback((minigame: string) => {
@@ -140,10 +173,32 @@ export default function HackButtonStoryShower() {
       case 'github':
         simulateGitHubSourceRetrieval()
         break
+      case 'qrCodeGenerator':
+        setMinigameState({ type: 'qrCodeGenerator' })
+        break
+      case 'formBuilder':
+        setMinigameState({ type: 'formBuilder' })
+        break
+      case 'paymentSimulator':
+        setMinigameState({ type: 'paymentSimulator' })
+        break
+      case 'conflictSimulator':
+        setMinigameState({ type: 'conflictSimulator' })
+        break
+      case 'versimcel':
+        setMinigameState({
+          type: 'versimcel',
+          steps: ['Initializing Versimcel...', 'Connecting to GitHub...', 'Fetching component data...'],
+          currentStep: 0,
+        })
+        simulateVersimcelProcess()
+        break
       default:
         setMinigameState(null)
     }
-  }, [])
+  }, [simulateVersimcelProcess])
+
+  
 
   useEffect(() => {
     if (storyStages.length > 0 && state.user?.game_state?.stage !== undefined) {
@@ -302,11 +357,37 @@ export default function HackButtonStoryShower() {
             )}
           </div>
         )
+        case 'qrCodeGenerator':
+          return <QRCodeGenerator onComplete={handleMinigameComplete} />
+        case 'formBuilder':
+          return <FormBuilder onComplete={handleMinigameComplete} />
+        case 'paymentSimulator':
+          return <PaymentSimulator onComplete={handleMinigameComplete} />
+        case 'conflictSimulator':
+          return <ConflictSimulator onComplete={handleMinigameComplete} />
+         case 'versimcel':
+           return <VersimcelCreator onComplete={handleMinigameComplete} />
+      // case 'versimcel':
+      //   return (
+      //     <div className="space-y-4">
+      //       <h3 className="text-lg font-semibold">Versimcel Process</h3>
+      //       {minigameState.steps?.map((step, index) => (
+      //         <div key={index} className={`p-2 rounded ${index <= minigameState.currentStep! ? 'bg-green-100' : 'bg-gray-100'}`}>
+      //           {step}
+      //         </div>
+      //       ))}
+      //     </div>
+      //   )
       default:
         return null
     }
   }
 
+  const handleMinigameComplete = useCallback(() => {
+    // Progress to the next stage or trigger side hustle choice
+    handleStageProgression()
+  }, [handleStageProgression])
+  
   const handleDragEnd = (result: DropResult) => {
     if (!result.destination || !minigameState || !minigameState.errors) return
 
@@ -355,6 +436,73 @@ export default function HackButtonStoryShower() {
     return true
   }
 
+  const handleHackButtonClick = useCallback(async () => {
+    if (!state.user?.id) {
+      toast({
+        title: t('error'),
+        description: t('userNotFound'),
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const { data: userData, error: fetchError } = await supabase
+        .from('users')
+        .select('coins, game_state')
+        .eq('id', state.user.id)
+        .single();
+
+      if (fetchError) throw fetchError;
+
+      const newCoinsValue = (userData?.coins || 0) + 13000;
+      const currentStage = userData?.game_state?.stage ?? 0;
+      const newHackCount = hackCount + 1;
+      setHackCount(newHackCount);
+
+      const { error } = await supabase
+        .from('users')
+        .update({ 
+          coins: newCoinsValue, 
+          game_state: { ...userData.game_state, hackCount: newHackCount }
+        })
+        .eq('id', state.user.id);
+
+      if (error) throw error;
+
+      dispatch({
+        type: 'UPDATE_USER',
+        payload: { 
+          coins: newCoinsValue, 
+          game_state: { ...(userData?.game_state || {}), hackCount: newHackCount } 
+        },
+      });
+
+      toast({
+        title: t('success'),
+        description: t('congratulationsMessage'),
+        stage: currentStage,
+      });
+
+      if (newHackCount === 13) {
+        setShowCrashSimulation(true);
+        await simulateCrash();
+        setTimeout(async () => {
+          setShowCrashSimulation(false);
+          await progressStage(3, ['crypto', 'createEvent']);
+          setShowUnlockChoice(true);
+        }, 5000);
+      }
+    } catch (error) {
+      console.error('Error updating balance:', error);
+      toast({
+        title: t('error'),
+        description: t('generalError'),
+        variant: "destructive",
+      });
+    }
+  }, [state.user, hackCount, dispatch, progressStage, simulateCrash, t]);
+
   const handleHackGuess = useCallback((guess: number) => {
     if (!minigameState || minigameState.type !== 'hack') return
 
@@ -400,32 +548,40 @@ export default function HackButtonStoryShower() {
   return (
     <div className="game-board min-h-[calc(100vh-128px)] pt-24 justify-start items-start relative">
       {showCrashSimulation && (
-        <div className="fixed inset-0 z-50">
-          <InfinityMirror layers={13} baseColor="#000000" accentColor="#ff0000" />
-        </div>
+        <CrashSimulation onCrashComplete={() => setShowCrashSimulation(false)} />
       )}
       <Card>
         <CardHeader>
           <CardTitle>Stage {currentStage?.stage}: {currentStage?.storycontent}</CardTitle>
         </CardHeader>
         <CardContent>
-          {showHackButton && <HackButton />}
+        {showHackButton && (
+            <Button
+              onClick={handleHackButtonClick}
+              className="bg-yellow-500 text-xl px-6 py-3 rounded-lg hover:bg-yellow-600 transition-all drop-shadow-custom"
+            >
+              {t('hackButton')}
+            </Button>
+          )}
           {renderMinigame()}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5 }}
-            className="fixed top-24 pt-10 right-4 bg-background p-4 rounded-lg shadow-lg z-40"
-          
-          >
-            <p className="text-lg font-semibold">{t('xuinitySays')}:</p>
-            <p className="italic">{xuinityDialog}</p>
-            {currentStage?.trigger === 'User Input Required' && (
-              <Button onClick={() => handleStageProgression()} className="mt-2">
-                {t('continue')}
-              </Button>
-            )}
-          </motion.div>
+          <AnimatePresence>
+            <motion.div
+              key={xuinityDialog}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.5 }}
+              className="fixed top-24 pt-10 right-4 bg-background p-4 rounded-lg shadow-lg z-40 max-w-md"
+            >
+              <p className="text-lg font-semibold">{t('xuinitySays')}:</p>
+              <p className="italic">{xuinityDialog}</p>
+              {currentStage?.trigger === 'User Input Required' && (
+                <Button onClick={() => handleStageProgression()} className="mt-2">
+                  {t('continue')}
+                </Button>
+              )}
+            </motion.div>
+          </AnimatePresence>
         </CardContent>
       </Card>
     </div>

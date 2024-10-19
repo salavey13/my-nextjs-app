@@ -14,9 +14,9 @@ import QRCode from 'react-qr-code';
 import { Crown, Loader2, Zap, Coins, Star, Users, Shield, Sparkles, Trophy, Target } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { motion, AnimatePresence } from 'framer-motion';
-
 import { useGameProgression } from '@/hooks/useGameProgression';
 import UnlockChoice from '@/components/UnlockChoice';
+
 interface GameState {
   stage: number;
   coins: number;

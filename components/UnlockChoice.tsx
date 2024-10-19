@@ -8,7 +8,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Zap, Car, Users, Dice1, Coins, CreditCard, Shield } from 'lucide-react';
 import { supabase } from '@/lib/supabaseClient';
-import AutomationPipeline from '@/components/AutomationPipeline';
 
 interface StoryStage {
   id: number;
@@ -31,7 +30,8 @@ const UnlockChoice: React.FC = () => {
   const [currentUnlockOptions, setCurrentUnlockOptions] = useState<StoryStage[]>([]);
   const [sideHustles, setSideHustles] = useState<StoryStage[]>([]);
   const [showAutomationPipeline, setShowAutomationPipeline] = useState(false);
-  const [currentComponent, setCurrentComponent] = useState<string>('');
+  const [currentComponent, setCurrentComponent] = useState('');
+
 
   useEffect(() => {
     const fetchStoryStages = async () => {
@@ -125,70 +125,37 @@ const UnlockChoice: React.FC = () => {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-white p-4">
-      <h2 className="text-2xl font-bold mb-6">{t('chooseUnlock')}</h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-4xl">
-        {currentUnlockOptions.map((option) => {
-          
-          const IconComponent = getIconComponent(option.activecomponent);
-          return (
-            <Card key={option.id} className="bg-gray-800 border-gray-700">
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <IconComponent className="mr-2" />
-                  {t(option.activecomponent)}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="mb-4">{option.storycontent}</p>
-                <Button 
-                  onClick={() => handleUnlock(option.activecomponent, option.stage + 1)}
-                  className="w-full"
-                >
-                  {t(`unlock${option.activecomponent.charAt(0).toUpperCase() + option.activecomponent.slice(1)}`)}
-                </Button>
-              </CardContent>
-            </Card>
-          );
-        })}
-      </div>
-
-      <Dialog open={showSideHustleModal} onOpenChange={setShowSideHustleModal}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>{t('chooseSideHustle')}</DialogTitle>
-            <DialogDescription>{t('sideHustleDescription')}</DialogDescription>
-          </DialogHeader>
-          <div className="grid gap-4">
-            {sideHustles.map((sideHustle) => (
-              <Card key={sideHustle.id}>
+    <Dialog open={true} onOpenChange={() => {}}>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>{t('chooseUnlock')}</DialogTitle>
+        </DialogHeader>
+        <div className="grid gap-4">
+          {currentUnlockOptions.map((option) => {
+            const IconComponent = getIconComponent(option.activecomponent);
+            return (
+              <Card key={option.id} className="bg-card">
                 <CardHeader>
-                  <CardTitle>{sideHustle.activecomponent}</CardTitle>
+                  <CardTitle className="flex items-center">
+                    <IconComponent className="mr-2" />
+                    {t(option.activecomponent)}
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p>{sideHustle.storycontent}</p>
-                  <p className="font-bold mt-2">{t('achievement')}: {sideHustle.achievement}</p>
-                  <Button onClick={() => handleSideHustleChoice(sideHustle)}>
-                    {t('choose')}
+                  <p className="mb-4">{option.storycontent}</p>
+                  <Button 
+                    onClick={() => handleUnlock(option.activecomponent, option.stage + 1)}
+                    className="w-full"
+                  >
+                    {t(`unlock${option.activecomponent.charAt(0).toUpperCase() + option.activecomponent.slice(1)}`)}
                   </Button>
                 </CardContent>
               </Card>
-            ))}
-          </div>
-        </DialogContent>
-      </Dialog>
-
-      {showAutomationPipeline && (
-        <Dialog open={showAutomationPipeline} onOpenChange={setShowAutomationPipeline}>
-          <DialogContent className="max-w-4xl">
-            <DialogHeader>
-              <DialogTitle>{t('creatingComponent', { component: currentComponent })}</DialogTitle>
-            </DialogHeader>
-            <AutomationPipeline componentName={currentComponent} />
-          </DialogContent>
-        </Dialog>
-      )}
-    </div>
+            );
+          })}
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 };
 

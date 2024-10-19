@@ -17,7 +17,8 @@ const HackButton: React.FC = () => {
   const [selectedGame, setSelectedGame] = useState<'cards' | 'dice' | null>(null);
   const [gamesVisited, setGamesVisited] = useState({ cards: false, dice: false });
   const [showUnlockChoice, setShowUnlockChoice] = useState(false);
-  const { progressStage } = useGameProgression();
+  const [hackCount, setHackCount] = useState(0); // Added state for hack count
+  const { simulateCrash, progressStage } = useGameProgression();
   
   const { showBackButton } = useTelegram({
     onBackButtonPressed: () => {
@@ -59,13 +60,14 @@ const HackButton: React.FC = () => {
 
       const newCoinsValue = (userData?.coins || 0) + 13000;
       const currentStage = userData?.game_state?.stage ?? 0;
-      const newStage = currentStage === 1 ? 2 : currentStage;
+      const newHackCount = hackCount + 1;
+      setHackCount(newHackCount);
 
       const { error } = await supabase
         .from('users')
         .update({ 
           coins: newCoinsValue, 
-          game_state: { ...userData.game_state, stage: newStage }
+          game_state: { ...userData.game_state, hackCount: newHackCount }
         })
         .eq('id', user.id);
 
@@ -75,18 +77,19 @@ const HackButton: React.FC = () => {
         type: 'UPDATE_USER',
         payload: { 
           coins: newCoinsValue, 
-          game_state: { ...(userData?.game_state || {}), stage: newStage } 
+          game_state: { ...(userData?.game_state || {}), hackCount: newHackCount } 
         },
       });
 
       toast({
         title: t('success'),
         description: t('congratulationsMessage'),
-        stage: newStage,
+        stage: currentStage,
       });
 
-      if (newStage === 2) {
-        await progressStage(2, []);
+      if (newHackCount === 13) {
+        await simulateCrash(); // Added function call
+        await progressStage(3, ['crypto', 'createEvent']);
         setShowUnlockChoice(true);
       }
     } catch (error) {
@@ -108,7 +111,7 @@ const HackButton: React.FC = () => {
     setSelectedGame(null);
   };
 
-  const currentStage = user?.game_state?.stage ?? 0;
+  const currentStage = user?.game_state?.stage ?? 0;;
 
   return (
     <div className="flex flex-col justify-center items-center min-h-full w-full py-4">
