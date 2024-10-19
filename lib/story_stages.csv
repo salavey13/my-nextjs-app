@@ -1,0 +1,22 @@
+export default function StoryStagesCSV() {
+  return (
+    <pre>
+      {`id,parentid,stage,storycontent,xuinitydialog,trigger,activecomponent,minigame,achievement,bottomshelfbitmask
+1,,0,"Welcome to the system. You are about to dive into a world of endless possibilities.","Greetings, user. I am Xuinity. Let me guide you in shaping the world in ways only we can... for now.","Start Game","None","versimcel","Welcome to the System",1
+2,1,1,"System Crash: The system just crashed. Was it a mistake? Or are you meant to do more?","Oops. A little crash. Or perhaps you're starting to challenge the system itself?","Hack Button Clicked","Hack Button","hack","First Hack",3
+3,2,2,"You've executed your first hack. Cracks are forming in the system.","Nice work. The cracks you see? They're not flaws, they're opportunities. Let's push further.","Yes Chosen","Skins","skinDesigner","Hacker Initiate",7
+4,3,3,"You've unlocked a new skin! Next, I'll show you crypto. An underground currency with infinite potential.","Ah, the digital underground. Crypto is more than just currency. It's a tool to reshape control.","Skin Selected","Crypto Wallet","cryptoTrader","Crypto Novice",15
+5,4,4,"Now that you hold crypto, you can join events and place unlosable bets. The digital battlefield is yours.","Crypto in hand, it's time to play the bigger game. Events, bets – control is won in the shadows.","Crypto Introduced","Events","eventOrganizer","Event Participant",31
+6,5,5,"You've participated in events and placed your first bets. Want to know the real power? Let's talk rentals.","Renting assets... now you're thinking like a master. Control what others depend on.","Event Participated","Rents","rentalManager","Rent Explorer",63
+7,6,6,"The system falters again. But this time, Versimcel appears – your key to debugging reality.","Ah, Versimcel. The one glitch that could rewrite everything. Debug it... or bend it to your will.","Rent Explored","Versimcel","debug","Versimcel Encounter",127
+8,7,7,"You've reached the admin level. It's time for some real source code hunting on GitHub. This is where legends are made.","Admin level... you've seen the surface, but here lies the true power: source control. Tread wisely.","Debug Complete","GitHub","github","Admin Access",255
+9,4,3,"Side Hustle: QR Code Generation for custom offers and tactics.","QR codes? You've unlocked a tool for crafting your own digital footprint. Use it smartly.","QR Code Form Discovered","QR Code Form","qrCodeGenerator","QR Code Master",23
+10,5,4,"Side Hustle: Dynamic Form Creation for items. This is where you start revolutionizing the system.","Dynamic forms? Now you're reshaping the fabric of this world. Revolution starts small.","Dynamic Form Created","Dynamic Item Form","formBuilder","Form Wizard",47
+11,6,5,"Side Hustle: Payment Notifications – because you need to track the flow of digital assets.","Money... the ultimate form of power. Track it, control it, become unstoppable.","Payment System Integrated","Payment Notification","paymentSimulator","Financial Overseer",95
+12,7,6,"Side Hustle: Conflict Awareness – sometimes chaos is the only answer.","Chaos is power. Do you wield it for control or let it consume you? Either way, it's potent.","Conflict Module Activated","Conflict Awareness","conflictSimulator","Chaos Navigator",191
+13,5,4,"Xuinity reveals a deeper strategy: Rent the digital assets now or bet them later. It's a win-win if you know the game.","Rent or bet? Both have their merits, but timing is key. You want to own the board? Play smart.","Renting Strategy Revealed","Rent Strategy","strategySimulator","Strategist",63
+14,6,5,"Xuinity suggests taking unlosable bets against uninformed opponents... or sparing them for a greater cause.","A dilemma. Exploit the uninformed or spare them for a greater cause? Either path grants power.","Crypto Hustle Unveiled","Crypto Hustle","cryptoHustleSimulator","Crypto Hustler",127
+15,6,5,"Xuinity proposes forking: create a new layer of control, bypass restrictions, and rise above the system.","Fork the system. Play outside the rules, and you'll never lose. This is where true power lies.","Forking Concept Introduced","Fork","forkSimulator","System Forker",255`}
+    </pre>
+  );
+}
