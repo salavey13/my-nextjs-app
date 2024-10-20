@@ -276,11 +276,11 @@ export default function Rents() {
     setItemDetailsModalOpen(true);
 
     // Check if this is the user's first interaction with an item
-    if (user && user.game_state.stage === 5) {
-      await progressStage(6, ['rents']);
+    if (user && user.game_state.stage === 6) {
+      await progressStage(7, ['admin']);
       dispatch({
         type: 'UPDATE_GAME_STATE',
-        payload: { stage: 6, unlockedComponents: [...(user.game_state.unlockedComponents || []), 'rents'] }
+        payload: { stage: 7, unlockedComponents: [...(user.game_state.unlockedComponents || []), 'admin'] }
       });
       setShowUnlockChoice(true);
     }
@@ -325,10 +325,10 @@ export default function Rents() {
 
       // Check if this is the user's first time adding a new item type
       if (user && user.game_state.stage === 6) {
-        await progressStage(7, ['versimcel']);
+        await progressStage(7, [ 'admin']);
         dispatch({
           type: 'UPDATE_GAME_STATE',
-          payload: { stage: 7, unlockedComponents: [...(user.game_state.unlockedComponents || []), 'versimcel'] }
+          payload: { stage: 7, unlockedComponents: [...(user.game_state.unlockedComponents || []), 'admin'] }
         });
         triggerSideHustleChoice();
       }

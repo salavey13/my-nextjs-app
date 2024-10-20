@@ -52,7 +52,7 @@ export default function CreateEvent() {
           await progressStage(5, ['bets']);
           dispatch({
             type: 'UPDATE_GAME_STATE',
-            payload: { stage: 5, unlockedComponents: [...(state.user?.game_state?.unlockedComponents || []), 'bets'] }
+            payload: { stage: 5, unlockedComponents: [...(state?.user?.game_state.unlockedComponents || []), 'bets'] }
           });
           setShowUnlockChoice(true);
         }

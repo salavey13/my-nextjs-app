@@ -21,7 +21,7 @@ id,parentid,stage,storycontent,xuinitydialog,trigger,activecomponent,minigame,ac
 
 'use client'
 // swapped to 
-import storyStages from '@/lib/storyStages'
+import storyStages  from '@/lib/storyStages'
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import { useAppContext } from '@/context/AppContext'
 import { Button } from '@/components/ui/button'
@@ -45,10 +45,10 @@ import PaymentSimulator from '@/components/minigames/PaymentSimulator'
 import ConflictSimulator from '@/components/minigames/ConflictSimulator'
 import VersimcelCreator from '@/components/minigames/VersimcelCreator'
 
-
+const storiRealStages:StoryStage[] = storyStages
 interface StoryStage {
-  id: string;
-  parentid: string | null;
+  id: number;
+  parentid: number | null;
   stage: number;
   storycontent: string;
   xuinitydialog: string;
@@ -87,7 +87,7 @@ export default function HackButtonStoryShower() {
 
   
   const fetchStoryStages = async () => {
-    setStoryStages(storyStages)
+    setStoryStages(storiRealStages)
   }
   
   useEffect(() => {
@@ -387,7 +387,7 @@ export default function HackButtonStoryShower() {
     // Progress to the next stage or trigger side hustle choice
     handleStageProgression()
   }, [handleStageProgression])
-  
+
   const handleDragEnd = (result: DropResult) => {
     if (!result.destination || !minigameState || !minigameState.errors) return
 
