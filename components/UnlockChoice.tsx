@@ -8,7 +8,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Zap, Car, Users, Dice1, Coins, CreditCard, Shield } from 'lucide-react';
 import { supabase } from '@/lib/supabaseClient';
-
+import storyStages  from '@/lib/storyStages'
+const storiRealStages:StoryStage[] = storyStages
 interface StoryStage {
   id: number;
   parentid: number | null;
@@ -33,23 +34,29 @@ const UnlockChoice: React.FC = () => {
   const [currentComponent, setCurrentComponent] = useState('');
 
 
+//   useEffect(() => {
+//     const fetchStoryStages = async () => {
+//       const { data, error } = await supabase
+//         .from('story_stages')
+//         .select('*')
+//         .order('stage', { ascending: true });
+
+//       if (error) {
+//         console.error('Error fetching story stages:', error);
+//       } else {
+//         setStoryStages(data || []);
+//       }
+//     };
+
+//     fetchStoryStages();
+//   }, []);
+const fetchStoryStages = async () => {
+    setStoryStages(storiRealStages)
+  }
+  
   useEffect(() => {
-    const fetchStoryStages = async () => {
-      const { data, error } = await supabase
-        .from('story_stages')
-        .select('*')
-        .order('stage', { ascending: true });
-
-      if (error) {
-        console.error('Error fetching story stages:', error);
-      } else {
-        setStoryStages(data || []);
-      }
-    };
-
-    fetchStoryStages();
-  }, []);
-
+    fetchStoryStages()
+  }, [fetchStoryStages])
   useEffect(() => {
     const currentStage = state.user?.game_state?.stage || 0;
     const unlockOptions = storyStages.filter(stage => stage.stage === currentStage && stage.parentid === null);

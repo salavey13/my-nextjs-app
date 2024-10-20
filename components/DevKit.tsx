@@ -15,10 +15,10 @@ import { StoryEdit } from './StoryEdit'
 import { useGameProgression } from '@/hooks/useGameProgression'
 import { getNavigationLinks, NavigationLink } from '@/lib/navigationLinks'
 import { dynamicComponents, DynamicComponent } from '@/lib/dynamicComponents'
-
+import storyStages  from '@/lib/storyStages'
 interface StoryStage {
-  id: string;
-  parentid: string | null;
+  id: number;
+  parentid: number | null;
   stage: number;
   storycontent: string;
   xuinitydialog: string;
@@ -32,6 +32,8 @@ interface StoryStage {
 interface StageStats {
   [key: string]: number;
 }
+
+const storiRealStages:StoryStage[] = storyStages
 
 export default function DevKit() {
   const { state, dispatch, t } = useAppContext()
@@ -49,24 +51,32 @@ export default function DevKit() {
 
   const navigationLinks = useMemo(() => getNavigationLinks(t), [t])
 
-  const fetchStoryStages = useCallback(async () => {
-    try {
-      const { data, error } = await supabase
-        .from('story_stages')
-        .select('*')
-        .order('stage', { ascending: true })
+  // const fetchStoryStages = useCallback(async () => {
+  //   try {
+  //     const { data, error } = await supabase
+  //       .from('story_stages')
+  //       .select('*')
+  //       .order('stage', { ascending: true })
 
-      if (error) throw error
-      setStoryStages(data || [])
-    } catch (error) {
-      console.error('Error fetching story stages:', error)
-      toast({
-        title: t("devKit.error"),
-        description: t("devKit.failedToFetchStoryStages"),
-        variant: "destructive",
-      })
-    }
-  }, [t])
+  //     if (error) throw error
+  //     setStoryStages(data || [])
+  //   } catch (error) {
+  //     console.error('Error fetching story stages:', error)
+  //     toast({
+  //       title: t("devKit.error"),
+  //       description: t("devKit.failedToFetchStoryStages"),
+  //       variant: "destructive",
+  //     })
+  //   }
+  // }, [t])
+  
+  const fetchStoryStages = async () => {
+    setStoryStages(storiRealStages)
+  }
+  
+  useEffect(() => {
+    fetchStoryStages()
+  }, [fetchStoryStages])
 
   const fetchStageStats = useCallback(async () => {
     try {
@@ -263,7 +273,7 @@ export default function DevKit() {
             (bottomShelfBitmask: {stage.bottomshelfbitmask || 'N/A'})
           </div>
         </SelectItem>
-        {renderStageTree(stages, stage.id, depth + 1)}
+        {renderStageTree(stages, stage.id.toString(), depth + 1)}
       </React.Fragment>
     ))
   }, [t])

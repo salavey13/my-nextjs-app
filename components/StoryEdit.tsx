@@ -12,18 +12,21 @@ import { toast } from '@/hooks/use-toast'
 import { supabase } from '@/lib/supabaseClient'
 import { Loader2 } from 'lucide-react'
 
+import storyStages  from '@/lib/storyStages'
 interface StoryStage {
-  id: string;
-  parentId: string | null;
+  id: number;
+  parentid: number | null;
   stage: number;
-  storyContent: string;
-  xuinityDialog: string;
+  storycontent: string;
+  xuinitydialog: string;
   trigger: string;
-  activeComponent: string;
+  activecomponent: string;
   minigame: string;
   achievement: string;
-  bottomShelfBitmask: number;
+  bottomshelfbitmask: number;
 }
+
+const storiRealStages:StoryStage[] = storyStages
 
 export function StoryEdit() {
   const { state, dispatch, t } = useAppContext()
@@ -32,24 +35,28 @@ export function StoryEdit() {
   const [editedStage, setEditedStage] = useState<StoryStage | null>(null)
   const [isLoading, setIsLoading] = useState(false)
 
-  const fetchStoryStages = useCallback(async () => {
-    setIsLoading(true);
-    const { data, error } = await supabase
-      .from('story_stages')
-      .select('*')
-      .order('stage', { ascending: true });
+  // const fetchStoryStages = useCallback(async () => {
+  //   setIsLoading(true);
+  //   const { data, error } = await supabase
+  //     .from('story_stages')
+  //     .select('*')
+  //     .order('stage', { ascending: true });
 
-    if (error) {
-      toast({
-        title: t('error'),
-        description: t('failedToFetchStoryStages'),
-        variant: 'destructive',
-      });
-    } else {
-      setStoryStages(data || []);
-    }
-    setIsLoading(false);
-  }, [t]);
+  //   if (error) {
+  //     toast({
+  //       title: t('error'),
+  //       description: t('failedToFetchStoryStages'),
+  //       variant: 'destructive',
+  //     });
+  //   } else {
+  //     setStoryStages(data || []);
+  //   }
+  //   setIsLoading(false);
+  // }, [t]);
+  
+  const fetchStoryStages = async () => {
+    setStoryStages(storiRealStages)
+  }
 
   useEffect(() => {
     fetchStoryStages();
@@ -57,7 +64,7 @@ export function StoryEdit() {
 
   const handleStageSelect = (stageId: string) => {
     setSelectedStage(stageId)
-    setEditedStage(storyStages.find(s => s.id === stageId) || null)
+    setEditedStage(storyStages.find(s => s.id.toString() === stageId ) || null)
   }
 
   const handleStageEdit = (field: keyof StoryStage, value: string | number) => {
@@ -94,16 +101,16 @@ export function StoryEdit() {
   const handleAddStage = async () => {
     setIsLoading(true)
     const newStage: StoryStage = {
-      id: Date.now().toString(),
-      parentId: null,
+      id: Date.now(),
+      parentid: null,
       stage: storyStages.length,
-      storyContent: '',
-      xuinityDialog: '',
+      storycontent: '',
+      xuinitydialog: '',
       trigger: '',
-      activeComponent: 'None',
+      activecomponent: 'None',
       minigame: '',
       achievement: '',
-      bottomShelfBitmask: 1,
+      bottomshelfbitmask: 1,
     }
 
     const { data, error } = await supabase
@@ -123,7 +130,7 @@ export function StoryEdit() {
         description: t('newStoryStageAdded'),
       })
       fetchStoryStages()
-      setSelectedStage(newStage.id)
+      setSelectedStage(newStage.id.toString())
       setEditedStage(newStage)
     }
     setIsLoading(false)
@@ -169,13 +176,13 @@ export function StoryEdit() {
           </TabsList>
           <TabsContent value="edit">
             <div className="space-y-4">
-              <Select onValueChange={handleStageSelect} value={selectedStage || undefined}>
+              <Select onValueChange={handleStageSelect} value={selectedStage?.toString() || undefined}>
                 <SelectTrigger>
                   <SelectValue placeholder={t('selectAStage')} />
                 </SelectTrigger>
                 <SelectContent>
                   {storyStages.map((stage) => (
-                    <SelectItem key={stage.id} value={stage.id}>
+                    <SelectItem key={stage.id} value={stage.id.toString()}>
                       {t('stage')} {stage.stage} (ID: {stage.id})
                     </SelectItem>
                   ))}
@@ -191,8 +198,8 @@ export function StoryEdit() {
                     onChange={(e) => handleStageEdit('stage', Number(e.target.value))}
                   />
                   <Select
-                    value={editedStage.parentId || 'none'}
-                    onValueChange={(value) => handleStageEdit('parentId', value === 'none' ? 0 : value)}
+                    value={editedStage.parentid?.toString()}
+                    onValueChange={(value) => handleStageEdit('parentid', value === 'none' ? 0 : value)}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder={t('selectParentStage')} />
@@ -200,7 +207,7 @@ export function StoryEdit() {
                     <SelectContent>
                       <SelectItem value="none">{t('noParent')}</SelectItem>
                       {storyStages.map((stage) => (
-                        <SelectItem key={stage.id} value={stage.id}>
+                        <SelectItem key={stage.id} value={stage.id.toString()}>
                           {t('stage')} {stage.stage} (ID: {stage.id})
                         </SelectItem>
                       ))}
@@ -208,13 +215,13 @@ export function StoryEdit() {
                   </Select>
                   <Textarea
                     placeholder={t('storyContent')}
-                    value={editedStage.storyContent}
-                    onChange={(e) => handleStageEdit('storyContent', e.target.value)}
+                    value={editedStage.storycontent}
+                    onChange={(e) => handleStageEdit('storycontent', e.target.value)}
                   />
                   <Textarea
                     placeholder={t('xuinityDialog')}
-                    value={editedStage.xuinityDialog}
-                    onChange={(e) => handleStageEdit('xuinityDialog', e.target.value)}
+                    value={editedStage.xuinitydialog}
+                    onChange={(e) => handleStageEdit('xuinitydialog', e.target.value)}
                   />
                   <Input
                     placeholder={t('trigger')}
@@ -222,8 +229,8 @@ export function StoryEdit() {
                     onChange={(e) => handleStageEdit('trigger', e.target.value)}
                   />
                   <Select
-                    value={editedStage.activeComponent}
-                    onValueChange={(value) => handleStageEdit('activeComponent', value)}
+                    value={editedStage.activecomponent}
+                    onValueChange={(value) => handleStageEdit('activecomponent', value)}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder={t('selectActiveComponent')} />
@@ -252,8 +259,8 @@ export function StoryEdit() {
                   <Input
                     placeholder={t('bottomShelfBitmask')}
                     type="number"
-                    value={editedStage.bottomShelfBitmask}
-                    onChange={(e) => handleStageEdit('bottomShelfBitmask', Number(e.target.value))}
+                    value={editedStage.bottomshelfbitmask}
+                    onChange={(e) => handleStageEdit('bottomshelfbitmask', Number(e.target.value))}
                   />
                   <div className="flex space-x-2">
                     <Button onClick={handleSaveStage} disabled={isLoading}>
