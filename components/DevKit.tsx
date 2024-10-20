@@ -160,6 +160,12 @@ export default function DevKit() {
     setSelectedStage(value)
   }, [])
 
+  useEffect(() => {
+    if (state.user?.game_state?.stage !== undefined) {
+      setSelectedStage(state.user.game_state.stage.toString());
+    }
+  }, [state.user?.game_state?.stage]);
+
   const handleCoinsChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setCoins(parseInt(e.target.value) || 0)
   }, [])
