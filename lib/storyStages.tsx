@@ -1,4 +1,4 @@
-export const storyStages = [
+export const storiRealStages = [
     {
       id: 1,
       parentid: null,
@@ -181,4 +181,4 @@ export const storyStages = [
       }
   ];
   
-  export default storyStages;
+  export default storiRealStages;

@@ -15,7 +15,7 @@ import { StoryEdit } from './StoryEdit'
 import { useGameProgression } from '@/hooks/useGameProgression'
 import { getNavigationLinks, NavigationLink } from '@/lib/navigationLinks'
 import { dynamicComponents, DynamicComponent } from '@/lib/dynamicComponents'
-import storyStages  from '@/lib/storyStages'
+import storiRealStages  from '@/lib/storyStages'
 interface StoryStage {
   id: number;
   parentid: number | null;
@@ -33,7 +33,7 @@ interface StageStats {
   [key: string]: number;
 }
 
-const storiRealStages:StoryStage[] = storyStages
+//const storiRealStages:StoryStage[] = storyStages
 
 export default function DevKit() {
   const { state, dispatch, t } = useAppContext()
@@ -70,9 +70,9 @@ export default function DevKit() {
   //   }
   // }, [t])
   
-  const fetchStoryStages = async () => {
+  const fetchStoryStages = useCallback(() => {
     setStoryStages(storiRealStages)
-  }
+  }, [])
   
   useEffect(() => {
     fetchStoryStages()

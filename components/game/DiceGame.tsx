@@ -16,6 +16,7 @@ import { Physics, useBox, usePlane } from '@react-three/cannon'
 import { Mesh, Vector3, Quaternion, Euler } from 'three'
 import LoadingSpinner from '../ui/LoadingSpinner'
 import * as THREE from 'three';
+import { useTheme } from '@/hooks/useTheme'
 
 interface Player {
   id: string
@@ -60,6 +61,7 @@ function Dice({ position, onRollComplete, customTextures, gyro, isRolling, initi
   const velocityRef = useRef<Vector3>(new Vector3())
   const angularVelocityRef = useRef<Vector3>(new Vector3())
   const stableFrames = useRef(0)
+  const { theme } = useTheme()
 
   useFrame(() => {
     // Update velocity and angular velocity references
@@ -198,10 +200,12 @@ function Wall({ position, rotation, texture }: { position: [number, number, numb
 
 function Floor() {
   const [ref] = usePlane<Mesh>(() => ({ rotation: [-Math.PI / 2, 0, 0] }))
+  
+  const { theme } = useTheme()
   return (
     <mesh ref={ref} receiveShadow>
       <planeGeometry args={[10, 10]} />
-      <meshStandardMaterial color="#282c33" />
+      <meshStandardMaterial color={theme.colors.background} />
     </mesh>
   )
 }
@@ -214,6 +218,7 @@ function Scene({ gameState, onRollComplete, wallTexture }: { gameState: GameStat
   const initialCameraPosition = useRef(new Vector3(10, 10, 10))
   const finalCameraPosition = useRef(new Vector3(5, 5, 5))
 
+  const { theme } = useTheme()
   useFrame((state) => {
     const midPoint = new Vector3().addVectors(dicePositions.current[0], dicePositions.current[1]).multiplyScalar(0.5)
     
@@ -296,7 +301,7 @@ function Scene({ gameState, onRollComplete, wallTexture }: { gameState: GameStat
       <Text
         position={[0, 6, 0]}
         fontSize={0.5}
-        color="#e1ff01"
+        color={theme.colors.background}
         anchorX="center"
         anchorY="middle"
         rotation={[0, Math.PI / 4, 0]} 

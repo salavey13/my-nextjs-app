@@ -7,7 +7,8 @@ import { usePathname, useSearchParams } from 'next/navigation';
 import { updateUserReferral, increaseReferrerX, addReferralEntry } from '../services/ReferralService';
 import useTelegram from '../hooks/useTelegram';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
-
+import { ThemeProvider } from '@/context/ThemeContext'
+import { useTheme } from '@/hooks/useTheme'
 interface GameState {
   stage: number;
   coins: number;
@@ -272,6 +273,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   } = useTelegram();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  
+  const { theme } = useTheme()
 
   const fetchPlayer = async (tg_id: number, username: string, lang: string) => {
     try {
@@ -406,13 +409,13 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       tg.ready();
       setTheme(state.user?.dark_theme ? "dark" : "light");
       if (state.user && !state.user.dark_theme) {
-        setHeaderColor("#282c33");
-        setBackgroundColor("#282c33");
-        setBottomBarColor("#282c33");
+        setHeaderColor("#020728");
+        setBackgroundColor("#020728");
+        setBottomBarColor("#020728");
       } else {
-        setHeaderColor("#282c33");
-        setBackgroundColor("#282c33");
-        setBottomBarColor("#282c33");
+        setHeaderColor("#020728");
+        setBackgroundColor("#020728");
+        setBottomBarColor("#020728");
       }
       disableVerticalSwipes();
 
@@ -468,7 +471,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
   return (
     <Suspense fallback={<LoadingSpinner />}>
-      <AppContext.Provider value={{
+      <ThemeProvider>
+        <AppContext.Provider value={{
         state,
         dispatch,
         fetchPlayer,
@@ -487,8 +491,11 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         isGitHubUnlocked,
         getSideHustleTrigger
       }}>
+        
         {children}
+        
       </AppContext.Provider>
+      </ThemeProvider>
     </Suspense>
   );
 };

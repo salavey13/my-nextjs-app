@@ -2,10 +2,11 @@ import React from "react";
 import Footer from "../components/ui/footer";
 import "../app/globals.css";
 import { AppProvider, useAppContext } from "../context/AppContext";
-
+import { ThemeProvider } from '@/context/ThemeContext'
 const PrivacyPolicy = () => {
   return (
     <AppProvider>
+      <ThemeProvider>
       <div className="container mx-auto p-6 bg-gray-200 text-white rounded-lg shadow-lg">
         <h1 className="text-4xl font-extrabold mb-6 text-teal-400">Политика конфиденциальности</h1>
         <p className="text-sm text-gray-400"><strong>Дата вступления в силу: </strong>4 августа 2024 г.</p>
@@ -48,6 +49,7 @@ const PrivacyPolicy = () => {
         </p>
         <Footer />
       </div>
+      </ThemeProvider>
     </AppProvider>
   );
 };

@@ -1,12 +1,12 @@
 import React, { useCallback, useEffect } from 'react';
 import useTelegram from '../../hooks/useTelegram';
 import { Button } from './button';
+import { useTheme } from '@/hooks/useTheme'
 
 const EnhancedChatButton = () => {
   const {
     tg,
     user,
-    theme,
     openLink,
     showMainButton,
     hideMainButton,
@@ -16,6 +16,8 @@ const EnhancedChatButton = () => {
     setHeaderColor,
     setBackgroundColor
   } = useTelegram();
+  
+  const { theme } = useTheme()
 
   const handleOpenChatGPT = useCallback(() => {
     openLink('https://chatgpt.com/');
@@ -41,15 +43,15 @@ const EnhancedChatButton = () => {
     if (tg) {
       showMainButton('v0.dev');
       tg.MainButton?.onClick(handleOpenChatGPT);
-      tg.MainButton?.setParams({color: "#e1ff01", text_color: "#000000"});
-      setBottomBarColor("#282c33");
-      setHeaderColor("#282c33");
-      setBackgroundColor("#282c33");
+      tg.MainButton?.setParams({color: "#020728", text_color: "#000000"});
+      setBottomBarColor("#020728");
+      setHeaderColor("#020728");
+      setBackgroundColor("#020728");
     }
-  }, [tg, showMainButton, setBottomBarColor, setHeaderColor, setBackgroundColor, handleOpenChatGPT]);
+  }, [ tg, showMainButton, setBottomBarColor, setHeaderColor, setBackgroundColor, handleOpenChatGPT]);
   
   return (
-    <div className={`flex items-center justify-center ${theme === 'dark' ? 'bg-black' : 'bg-white'} p-2 gap-2`}>
+    <div className={`flex items-center justify-center bg-background p-2 gap-2`}>
       <Button
         onClick={handleOpenVPN}
         className="group flex flex-col items-center justify-center text-gray-400 w-36 h-18 gap-2 hover:text-blue-500 transition-all duration-300 rounded-lg transform hover:scale-110"

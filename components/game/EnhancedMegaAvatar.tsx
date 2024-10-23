@@ -6,6 +6,7 @@ import ShineBorder from '@/components/ui/ShineBorder';
 import { Mic, MicOff } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
+import { useTheme } from '@/hooks/useTheme'
 
 interface SpeechRecognition extends EventTarget {
   continuous: boolean;
@@ -108,7 +109,7 @@ const EnhancedMegaAvatar: React.FC<EnhancedMegaAvatarProps> = React.memo(({
   const recognitionRef = useRef<SpeechRecognition | null>(null);
   const interimTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [permissionGranted, setPermissionGranted] = useState(false);
-
+  const { theme } = useTheme()
   const [{ x, y }, api] = useSpring(() => ({
     x: initialPosition.x * window.innerWidth,
     y: initialPosition.y * window.innerHeight,
@@ -303,7 +304,7 @@ const EnhancedMegaAvatar: React.FC<EnhancedMegaAvatarProps> = React.memo(({
         alignItems: 'center',
       }}
     >
-      <ShineBorder borderWidth={2} duration={10} color="#E1FF01">
+      <ShineBorder borderWidth={2} duration={10} color={theme.colors.secondary}>
         <div
           style={{
             width: '128px',
@@ -321,7 +322,7 @@ const EnhancedMegaAvatar: React.FC<EnhancedMegaAvatarProps> = React.memo(({
               width: '64px',
               height: '64px',
               borderRadius: '50%',
-              backgroundColor: '#E1FF01',
+              backgroundColor: 'hsl(var(--secondary))',
               display: 'flex',
               justifyContent: 'center',
               alignItems: 'center',
@@ -349,7 +350,7 @@ const EnhancedMegaAvatar: React.FC<EnhancedMegaAvatarProps> = React.memo(({
           style={{
             marginTop: '8px',
             backgroundColor: 'rgba(0, 0, 0, 0.13)',
-            color: '#E1FF01',
+            color: 'hsl(var(--secondary))',
             padding: '2px 8px',
             borderRadius: '10px',
             fontSize: '0.75rem',
@@ -374,7 +375,7 @@ const EnhancedMegaAvatar: React.FC<EnhancedMegaAvatarProps> = React.memo(({
             style={{
               ...style,
               backgroundColor: 'rgba(0, 0, 0, 0.13)',
-              color: '#E1FF01',
+              color: 'hsl(var(--secondary))',
               padding: '2px 6px',
               borderRadius: '10px',
               fontSize: '0.75rem',

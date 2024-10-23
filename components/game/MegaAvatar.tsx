@@ -3,6 +3,7 @@ import { useSpring, animated, to } from 'react-spring';
 import { useGesture } from '@use-gesture/react';
 import { useAppContext } from '@/context/AppContext';
 import ShineBorder from '@/components/ui/ShineBorder';
+import { useTheme } from '@/hooks/useTheme'
 
 interface Player {
   id: string;
@@ -25,7 +26,7 @@ interface MegaAvatarProps {
 const MegaAvatar: React.FC<MegaAvatarProps> = React.memo(({ gameState, playerId, initialPosition, onPositionChange }) => {
   const { state } = useAppContext();
   const player = gameState.players.find(p => p.id === playerId);
-
+  const { theme } = useTheme()
   const [{ x, y }, api] = useSpring(() => ({
     x: initialPosition.x * window.innerWidth,
     y: initialPosition.y * window.innerHeight,
@@ -66,7 +67,7 @@ const MegaAvatar: React.FC<MegaAvatarProps> = React.memo(({ gameState, playerId,
         alignItems: 'center',
       }}
     >
-      <ShineBorder borderWidth={2} duration={10} color="#E1FF01">
+      <ShineBorder borderWidth={2} duration={10} color={theme.colors.secondary}>
         <div
           style={{
             width: '128px',
@@ -83,7 +84,7 @@ const MegaAvatar: React.FC<MegaAvatarProps> = React.memo(({ gameState, playerId,
               width: '64px',
               height: '64px',
               borderRadius: '50%',
-              backgroundColor: '#E1FF01',
+              backgroundColor: 'hsl(var(--secondary))',
               display: 'flex',
               justifyContent: 'center',
               alignItems: 'center',
@@ -101,7 +102,7 @@ const MegaAvatar: React.FC<MegaAvatarProps> = React.memo(({ gameState, playerId,
           style={{
             marginTop: '5px',
             backgroundColor: 'rgba(0, 0, 0, 0.13)',
-            color: '#E1FF01',
+            color: 'hsl(var(--secondary))',
             padding: '2px 6px',
             borderRadius: '10px',
             fontSize: '0.75rem',

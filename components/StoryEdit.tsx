@@ -12,7 +12,7 @@ import { toast } from '@/hooks/use-toast'
 import { supabase } from '@/lib/supabaseClient'
 import { Loader2 } from 'lucide-react'
 
-import storyStages  from '@/lib/storyStages'
+import storiRealStages  from '@/lib/storyStages'
 interface StoryStage {
   id: number;
   parentid: number | null;
@@ -26,7 +26,7 @@ interface StoryStage {
   bottomshelfbitmask: number;
 }
 
-const storiRealStages:StoryStage[] = storyStages
+//const storiRealStages:StoryStage[] = storyStages
 
 export function StoryEdit() {
   const { state, dispatch, t } = useAppContext()
@@ -54,13 +54,13 @@ export function StoryEdit() {
   //   setIsLoading(false);
   // }, [t]);
   
-  const fetchStoryStages = async () => {
+  const fetchStoryStages = useCallback(() => {
     setStoryStages(storiRealStages)
-  }
+  }, [])
 
   useEffect(() => {
-    fetchStoryStages();
-  }, [fetchStoryStages]);
+    fetchStoryStages()
+  }, [fetchStoryStages])
 
   const handleStageSelect = (stageId: string) => {
     setSelectedStage(stageId)

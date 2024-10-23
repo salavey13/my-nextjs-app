@@ -5,30 +5,29 @@
 @layer base {
   /* Light and Dark Theme Variables */
   :root {
-    --background: 0 0% 100%;
-    --foreground: 0 0% 0%;
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 0%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 0%;
-    --primary: 220.9 39.3% 11%;
-    --primary-foreground: 210 20% 98%;
-    --secondary: 220 14.3% 95.9%;
-    --secondary-foreground: 0 0% 0%;
-    --muted: 220 14.3% 95.9%;
-    --muted-foreground: 220 8.9% 46.1%;
-    --accent: 220 14.3% 95.9%;
-    --accent-foreground: 220.9 39.3% 11%;
+    --background: 220 100% 8%; /* #020728 */
+    --foreground: 184 89% 48%; /* #11e6d0 */
+    --card: 220 100% 8%; /* #020728 */
+    --card-foreground: 184 89% 48%; /* #11e6d0 */
+    --popover: 220 100% 8%; /* #020728 */
+    --popover-foreground: 184 89% 48%; /* #11e6d0 */
+    --primary: 184 89% 48%; /* #11e6d0 */
+    --primary-foreground: 220 100% 8%; /* #020728 */
+    --secondary: 315 100% 80%; /* #FFA9F3 */
+    --secondary-foreground: 220 100% 8%; /* #020728 */
+    --muted: 220 72% 15%; /* #0b1b40 */
+    --muted-foreground: 184 89% 48%; /* #11e6d0 */
+    --accent: 270 90% 13%; /* #1c063e */
+    --accent-foreground: 184 89% 48%; /* #11e6d0 */
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 20% 98%;
-    --border: 220 13% 91%;
-    --input: 220 13% 91%;
-    --ring: 224 71.4% 4.1%;
+    --border: 220 72% 15%; /* #0b1b40 */
+    --input: 220 72% 15%; /* #0b1b40 */
+    --ring: 184 89% 48%; /* #11e6d0 */
     --radius: 0.5rem;
-    --accent-color: #E1FF01; /* Bright yellow accent */
   }
 
-  @media (prefers-color-scheme: dark) {
+  /* @media (prefers-color-scheme: dark) {
     :root {
       --background: 220 13% 18%;
       --foreground: 210 15% 98%;
@@ -50,8 +49,8 @@
       --input: 220 13% 28%;
       --ring: 220 20% 40%;
       --radius: 0.5rem;
-    }
-  }
+    } 
+  }*/
 
   body {
     @apply bg-background text-foreground;
@@ -80,18 +79,17 @@ h1 {
   font-weight: 700;
 }
 
-/* Fix button text color on active state */
-/* button {*/
-  /* background-color: var(--accent-color); */
-  /*color: black;  Ensure black text on bright yellow */
-/* } */
+/* Fix button text color on active state 
+button {
+  color: black !important;  Ensure black text on all states 
+}*/
 
-button:hover,
+/*button:hover,
 button:focus,
 button:active {
   background-color: var(--accent-color);
-  color: black; /* Keep text black during interaction */
-}
+  color: black !important;  Keep text black during interaction
+} */
 
 
 @keyframes glitchyFadeIn {
@@ -132,6 +130,11 @@ button:active {
 /* Add glitch shadow effect */
 .glitchy-toast {
   filter: drop-shadow(0 0 5px rgba(255, 0, 0, 0.7)) drop-shadow(0 0 10px rgba(255, 255, 255, 0.5));
+}
+/* Make all toasts have an opaque background */
+.Toastify__toast {
+  background-color: hsl(var(--background)) !important;
+  color: hsl(var(--foreground)) !important;
 }
 
 /* Navigation Animations */
@@ -259,9 +262,8 @@ nav {
   }
 
   .button-hover:hover {
-    background-color: var(--accent-color);
-    
-    box-shadow: 0 0 10px var(--accent-color);
+    background-color: hsl(var(--secondary));
+    box-shadow: 0 0 10px hsl(var(--secondary));
   }
 
   .textarea-neumorphism, .dropdown-neumorphism {

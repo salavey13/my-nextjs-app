@@ -17,6 +17,7 @@ import { useAppContext } from '../context/AppContext';
 import useTelegram from '@/hooks/useTelegram';
 import AutomationPipeline from '@/components/AutomationPipeline';
 import { useInView } from '@/hooks/useInView';
+import { useTheme } from '@/hooks/useTheme'
 
 const socialLinks = [
   { name: "YouTube", icon: "M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z", url: "https://youtube.com/salavey13" },
@@ -40,7 +41,7 @@ export default function LandingPage() {
   const { openLink } = useTelegram();
   const { ref, isInView } = useInView();
   const [animationStarted, setAnimationStarted] = useState(false);
-
+  const { theme } = useTheme()
   useEffect(() => {
     if  (isInView && !animationStarted) {
       const timeout = setTimeout(() => {
@@ -115,7 +116,7 @@ export default function LandingPage() {
   }, [t, openLink]);
 
   return (
-    <div className="min-h-screen bg-gray-950 text-gray-100">
+    <div className="min-h-screen bg-gray-950 text-gray-100 justify-center items-center">
       <motion.header 
         className="fixed top-16 left-0 right-0 bg-gray-900 shadow-md z-50"
         initial={{ y: 0 }}
@@ -123,7 +124,7 @@ export default function LandingPage() {
         transition={{ type: "spring", stiffness: 300, damping: 30 }}
       >
         <nav className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-[#e1ff01]">{t('header.title')}</h1>
+          <h1 className="text-2xl font-bold text-secondary">{t('header.title')}</h1>
           <div className="md:hidden">
             <Button variant="ghost" size="icon" onClick={() => setIsMenuOpen(!isMenuOpen)}>
               {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
@@ -134,7 +135,7 @@ export default function LandingPage() {
               <Button
                 key={item}
                 variant="ghost"
-                className={`text-sm ${activeSection === item ? "text-[#e1ff01]" : "text-gray-300 hover:text-white"}`}
+                className={`text-sm ${activeSection === item ? "text-secondary" : "text-gray-300 hover:text-white"}`}
                 onClick={() => scrollToSection(item)}
               >
                 {t(`nav.${item}`)}
@@ -182,8 +183,8 @@ export default function LandingPage() {
   >
     <defs>
       <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" style={{ stopColor: "#e1ff01", stopOpacity: 1 }} />
-        <stop offset="100%" style={{ stopColor: "#4a00e0", stopOpacity: 1 }} />
+        <stop offset="0%" style={{ stopColor: theme.colors.secondary, stopOpacity: 1 }} />
+        <stop offset="100%" style={{ stopColor: theme.colors.background, stopOpacity: 1 }} />
       </linearGradient>
     </defs>
     <path
@@ -206,6 +207,13 @@ export default function LandingPage() {
   </svg>
 
   {/* Optional content on top of the SVG background */}
+  <Image
+    src="/photo_5244591252865934981_y.jpg"
+    alt={t('home.heading')}
+    width={600}
+    height={400}
+    className="w-48 h-48 object-cover"
+  />
   <div className="relative z-10">
     <h2 className="text-center text-4xl font-bold text-white">
       {t('home.heading')}
@@ -213,9 +221,11 @@ export default function LandingPage() {
     <p className="text-center text-lg text-gray-300 max-w-xl mx-auto">
       {t('home.description')}
     </p>
+    
     <Button
               onClick={() => openLink("https://youtube.com/salavey13")}
-              className="bg-[#e1ff01] text-gray-100 px-8 py-3 rounded-full text-lg font-semibold hover:bg-opacity-90 transition-colors"
+              className=" text-gray-100 px-8 py-3 rounded-lg text-lg font-semibold hover:bg-opacity-90 transition-colors"
+              variant="default"
             >
               {t('home.watchVideos')} <ArrowRight className="inline-block ml-2" />
             </Button>
@@ -225,12 +235,12 @@ export default function LandingPage() {
         </section>
 
         <section id="features" className="mb-24">
-          <h3 className="text-4xl font-bold text-[#e1ff01] mb-12 text-center">{t('features.heading')}</h3>
+          <h3 className="text-4xl font-bold text-secondary mb-12 text-center">{t('features.heading')}</h3>
           <div className="grid md:grid-cols-3 gap-8">
             {[
-              { icon: <Zap className="text-[#e1ff01] w-12 h-12" />, title: t('features.aiPowered'), description: t('features.aiPoweredDesc') },
-              { icon: <Code className="text-[#e1ff01] w-12 h-12" />, title: t('features.effortlessCreation'), description: t('features.effortlessCreationDesc') },
-              { icon: <Palette className="text-[#e1ff01] w-12 h-12" />, title: t('features.customizableTemplates'), description: t('features.customizableTemplatesDesc') },
+              { icon: <Zap className="text-secondary w-12 h-12" />, title: t('features.aiPowered'), description: t('features.aiPoweredDesc') },
+              { icon: <Code className="text-secondary w-12 h-12" />, title: t('features.effortlessCreation'), description: t('features.effortlessCreationDesc') },
+              { icon: <Palette className="text-secondary w-12 h-12" />, title: t('features.customizableTemplates'), description: t('features.customizableTemplatesDesc') },
             ].map((feature, index) => (
               <motion.div
                 key={feature.title}
@@ -238,9 +248,9 @@ export default function LandingPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.2 * (index + 1) }}
               >
-                <Card className="bg-gray-800 border-gray-700 hover:border-[#e1ff01] transition-colors h-full">
+                <Card className="bg-gray-800 border-gray-700 hover:border-secondary transition-colors h-full">
                   <CardHeader>
-                    <CardTitle className="flex items-center text-[#e1ff01] text-2xl">
+                    <CardTitle className="flex items-center text-secondary text-2xl">
                       {feature.icon}
                       <span className="ml-4">{feature.title}</span>
                     </CardTitle>
@@ -253,7 +263,7 @@ export default function LandingPage() {
         </section>
 
         <section id="pricing" className="text-center mb-24">
-          <h3 className="text-4xl font-bold text-[#e1ff01] mb-12">{t('pricing.heading')}</h3>
+          <h3 className="text-4xl font-bold text-secondary mb-12">{t('pricing.heading')}</h3>
           <div className="grid md:grid-cols-3 gap-8">
             {[
               { title: t('pricing.basic'), price: "$13", link: "https://oneSitePls.framer.ai/shop/3993889", features: [t('pricing.feature1'), t('pricing.feature2'), t('pricing.feature3')] },
@@ -266,23 +276,24 @@ export default function LandingPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.2 * (index + 1) }}
               >
-                <Card className="bg-gray-800 border-gray-700 hover:border-[#e1ff01] transition-colors h-full flex flex-col">
+                <Card className="bg-gray-800 border-gray-700 hover:border-secondary transition-colors h-full flex flex-col">
                   <CardHeader>
-                    <CardTitle className="text-[#e1ff01] text-2xl">{plan.title}</CardTitle>
+                    <CardTitle className="text-secondary text-2xl">{plan.title}</CardTitle>
                   </CardHeader>
                   <CardContent className="flex-grow">
                     <p className="text-4xl font-bold mb-6 text-white">{plan.price}</p>
                     <ul className="text-left mb-6 space-y-2">
                       {plan.features.map((feature) => (
                         <li key={feature} className="flex items-start">
-                          <CheckCircle className="text-[#e1ff01] mr-2 h-5 w-5 mt-1" />
+                          <CheckCircle className="text-secondary mr-2 h-5 w-5 mt-1" />
                           <span className="text-gray-300">{feature}</span>
                         </li>
                       ))}
                     </ul>
                   <Button
                       onClick={() => openLink(plan.link)}
-                      className="w-full bg-[#e1ff01] text-gray-900 hover:bg-opacity-90 transition-colors"
+                      className="w-full text-gray-100 hover:bg-opacity-90 transition-colors"
+                      variant="default"
                     >
                       {t('pricing.choosePlan')}
                     </Button>
@@ -294,7 +305,7 @@ export default function LandingPage() {
         </section>
 
         <section id="templates" className="mb-24">
-          <h3 className="text-4xl font-bold text-[#e1ff01] mb-12 text-center">{t('templates.heading')}</h3>
+          <h3 className="text-4xl font-bold text-secondary mb-12 text-center">{t('templates.heading')}</h3>
           <p className="text-center mb-12 text-gray-300 text-xl max-w-3xl mx-auto">
             {t('templates.description')}
           </p>
@@ -311,7 +322,7 @@ export default function LandingPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.2 * (index + 1) }}
               >
-                <Card className="bg-gray-800 border-gray-700 hover:border-[#e1ff01] transition-colors overflow-hidden">
+                <Card className="bg-gray-800 border-gray-700 hover:border-secondary transition-colors overflow-hidden">
                   <Image
                     src={template.image}
                     alt={template.title}
@@ -320,13 +331,14 @@ export default function LandingPage() {
                     className="w-full h-48 object-cover"
                   />
                   <CardHeader>
-                    <CardTitle className="text-[#e1ff01] text-2xl">{template.title}</CardTitle>
+                    <CardTitle className="text-secondary text-2xl">{template.title}</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <p className="text-gray-300 mb-4">{template.description}</p>
                     <Button
                       onClick={() => openLink(template.link)}
-                      className="bg-[#e1ff01] text-gray-900 hover:bg-opacity-90 transition-colors"
+                      className="text-gray-900 hover:bg-opacity-90 transition-colors"
+                      variant="default"
                     >
                       {t('templates.viewTemplate')}
                     </Button>
@@ -338,14 +350,15 @@ export default function LandingPage() {
         </section>
 
         <section id="instructions" className="mb-24">
-          <h3 className="text-4xl font-bold text-[#e1ff01] mb-12 text-center">{t('instructions.heading')}</h3>
+          <h3 className="text-4xl font-bold text-secondary mb-12 text-center">{t('instructions.heading')}</h3>
           <p className="text-center mb-12 text-gray-300 text-xl max-w-3xl mx-auto">
             {t('instructions.description')}
           </p>
           <div className="text-center">
             <Button
               onClick={() => openLink("https://oneSitePls.framer.ai/instructions")}
-              className="bg-[#e1ff01] text-gray-900 px-8 py-3 rounded-full text-lg font-semibold hover:bg-opacity-90 transition-colors"
+              className=" text-gray-900 px-8 py-3 rounded-lg text-lg font-semibold hover:bg-opacity-90 transition-colors"
+              variant="default"
             >
               {t('instructions.viewInstructions')} <ArrowRight className="ml-2" />
             </Button>
@@ -353,7 +366,7 @@ export default function LandingPage() {
         </section>
 
         <section id="automation" ref={ref} className="mb-24">
-          <h3 className="text-4xl font-bold text-[#e1ff01] mb-12 text-center">
+          <h3 className="text-4xl font-bold text-secondary mb-12 text-center">
             {t('automation.heading')}
           </h3>
           <p className="text-center mb-12 text-gray-300 text-xl max-w-3xl mx-auto">
@@ -363,7 +376,7 @@ export default function LandingPage() {
         </section>
 
         <section id="mobile-shop" className="mb-24">
-          <h3 className="text-4xl font-bold text-[#e1ff01] mb-12 text-center">{t('mobileShop.heading')}</h3>
+          <h3 className="text-4xl font-bold text-secondary mb-12 text-center">{t('mobileShop.heading')}</h3>
           <p className="text-center mb-12 text-gray-300 text-xl max-w-3xl mx-auto">
             {t('mobileShop.description')}
           </p>
@@ -377,7 +390,7 @@ export default function LandingPage() {
         </section>
 
         <section id="faq" className="mb-24">
-          <h3 className="text-4xl font-bold text-[#e1ff01] mb-12 text-center">{t('faq.heading')}</h3>
+          <h3 className="text-4xl font-bold text-secondary mb-12 text-center">{t('faq.heading')}</h3>
           <Accordion type="single" collapsible className="max-w-3xl mx-auto">
             {[
               { question: t('faq.question1'), answer: t('faq.answer1') },
@@ -387,7 +400,7 @@ export default function LandingPage() {
               { question: t('faq.question5'), answer: t('faq.answer5') },
             ].map((faq, index) => (
               <AccordionItem key={index} value={`item-${index}`}>
-                <AccordionTrigger className="text-[#e1ff01]">{faq.question}</AccordionTrigger>
+                <AccordionTrigger className="text-secondary">{faq.question}</AccordionTrigger>
                 <AccordionContent className="text-gray-300">{faq.answer}</AccordionContent>
               </AccordionItem>
             ))}
@@ -395,11 +408,12 @@ export default function LandingPage() {
         </section>
 
         <section id="contact" className="text-center mb-24">
-          <h3 className="text-4xl font-bold text-[#e1ff01] mb-6">{t('contact.heading')}</h3>
+          <h3 className="text-4xl font-bold text-secondary mb-6">{t('contact.heading')}</h3>
           <p className="text-xl text-gray-300 mb-8">{t('contact.description')}</p>
           <Button
             onClick={() => openLink("https://t.me/salavey13")}
-            className="bg-[#e1ff01] text-gray-900 px-8 py-3 rounded-full text-lg font-semibold hover:bg-opacity-90 transition-colors"
+            className=" text-gray-100 px-8 py-3 rounded-lg text-lg font-semibold hover:bg-opacity-90 transition-colors"
+            variant="default"
           >
             {t('contact.contactUs')} <ArrowRight className="ml-2" />
           </Button>
@@ -410,17 +424,17 @@ export default function LandingPage() {
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-3 gap-8">
             <div>
-              <h4 className="text-lg font-semibold mb-4 text-[#e1ff01]">{t('footer.aboutTitle')}</h4>
+              <h4 className="text-lg font-semibold mb-4 text-secondary">{t('footer.aboutTitle')}</h4>
               <p>{t('footer.aboutDescription')}</p>
             </div>
             <div>
-              <h4 className="text-lg font-semibold mb-4 text-[#e1ff01]">{t('footer.quickLinksTitle')}</h4>
+              <h4 className="text-lg font-semibold mb-4 text-secondary">{t('footer.quickLinksTitle')}</h4>
               <ul className="space-y-2">
                 {["home", "features", "pricing", "templates", "instructions", "automation", "mobile-shop", "faq", "contact"].map((item, index) => (
                   <li key={item}>
                     <Button
                       variant="link"
-                      className="p-0 h-auto text-gray-300 hover:text-[#e1ff01] transition-colors"
+                      className="p-0 h-auto text-gray-300 hover:text-secondary transition-colors"
                       onClick={() => scrollToSection(item)}
                     >
                       {t(`footer.quickLink${index + 1}`)}
@@ -430,7 +444,7 @@ export default function LandingPage() {
               </ul>
             </div>
             <div>
-              <h4 className="text-lg font-semibold mb-4 text-[#e1ff01]">{t('footer.socialTitle')}</h4>
+              <h4 className="text-lg font-semibold mb-4 text-secondary">{t('footer.socialTitle')}</h4>
               <div className="flex flex-wrap gap-4">
                 {socialLinks.map((link) => (
                   <a
@@ -438,7 +452,7 @@ export default function LandingPage() {
                     href={link.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-gray-400 hover:text-[#e1ff01] transition-colors"
+                    className="text-gray-400 hover:text-secondary transition-colors"
                   >
                     <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                       <path d={link.icon} />

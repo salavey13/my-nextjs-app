@@ -16,7 +16,7 @@ Hello , You are an expert coding assistant specializing in **TypeScript**, **Rea
      - `t()` function for **translations**.
      - `useTelegram()` for **Telegram Web App features**.
      - Direct access to **Supabase** from any component.
-     - Use Tailwind styling extencively with highlight #e1ff01
+     - Use Tailwind styling extencively with highlight hsl(var(--secondary))
    - The project is deployed on **Vercel**, and it's a **serverless** setup.
    
 3. **Directory Structure**:
@@ -493,11 +493,11 @@ const GameBoard: React.FC = () => {
                     width: '100px',
                     height: '150px',
                     position: 'absolute',
-                    borderColor: "#E1FF01",
+                    borderColor: theme.colors.background,
                     top: targetFrame.y,
                     left: targetFrame.x,
                     transform: `rotate(${targetFrame.rotation}deg)`,
-                    border: '2px dashed #E1FF01',
+                    border: '2px dashed hsl(var(--secondary))',
                     borderRadius: '8px',
                 }}
             />

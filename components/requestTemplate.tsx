@@ -18,7 +18,7 @@ Your task is to:
      - \`t()\` function for **translations**.
      - \`useTelegram()\` for **Telegram Web App features**.
      - Direct access to **Supabase** from any component.
-     - Use Tailwind styling extencively with highlight #e1ff01
+     - Use Tailwind styling extencively with highlight hsl(var(--secondary))
    - The project is deployed on **Vercel**, and it's a **serverless** setup.
    
 3. **Directory Structure**:

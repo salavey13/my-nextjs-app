@@ -4,7 +4,7 @@ const DiceFace = ({ dots }: { dots: [number, number][] }) => (
   <svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
     <rect width="128" height="128" fill="black" />
     {dots.map(([cx, cy], i) => (
-      <circle key={i} cx={cx} cy={cy} r="10" fill="#e1ff01" />
+      <circle key={i} cx={cx} cy={cy} r="10" fill="hsl(var(--secondary))" />
     ))}
   </svg>
 )

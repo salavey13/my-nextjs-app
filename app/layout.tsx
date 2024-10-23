@@ -8,7 +8,7 @@ import TopShelf from "@/components/ui/topShelf";
 import PageWrapper from "@/components/PageWrapper";
 import LoadingSpinner from "../components/ui/LoadingSpinner"; 
 import { GlitchyToastProvider } from "@/hooks/use-toast";
-
+import { ThemeProvider } from '@/context/ThemeContext'
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -23,7 +23,9 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${inter.className} flex flex-col min-h-screen`}>
         <Suspense fallback={<LoadingSpinner />}>
+        <ThemeProvider>
           <AppProvider>
+          
             <div className="flex flex-col min-h-screen">
               <TopShelf />
               <main className="flex-grow overflow-y-auto pt-16 pb-16 backdrop-blur-lg bg-gradient-to-b from-black via-gray-900 to-black">
@@ -33,7 +35,8 @@ export default function RootLayout({
               </main>
               <GlitchyToastProvider />
             </div>
-          </AppProvider>
+            
+          </AppProvider></ThemeProvider>
         </Suspense>
       </body>
     </html>

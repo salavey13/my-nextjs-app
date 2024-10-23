@@ -11,6 +11,7 @@ import useTelegram from '@/hooks/useTelegram';
 import LoadingSpinner from "../ui/LoadingSpinner";
 import InfinityMirror from './InfinityMirror';
 import { toast } from "@/hooks/use-toast";
+import { useTheme } from '@/hooks/useTheme'
 
 const CARD_PROXIMITY_THRESHOLD = 13;
 
@@ -64,6 +65,7 @@ const GameBoard: React.FC<{ goBack: () => void }> = ({ goBack }) => {
   const { showMainButton, setHeaderColor, setBottomBarColor, tg } = useTelegram();
   const lastUpdateRef = useRef<{ [key: string]: number }>({});
 
+  const { theme } = useTheme()
 
   const { showBackButton } = useTelegram({
     onBackButtonPressed: () => {
@@ -213,10 +215,10 @@ const GameBoard: React.FC<{ goBack: () => void }> = ({ goBack }) => {
     setTimeout(() => {
       setIsShuffling(false);
       showMainButton(t('shuffle'));
-      setBottomBarColor("#282c33");
-      setHeaderColor("#282c33");
+      setBottomBarColor("#020728");
+      setHeaderColor("#020728");
     }, 1000);
-  }, [updateSupabase, gameState, user?.currentFoolGameId, randomizeTargetFrame, showMainButton, setBottomBarColor, setHeaderColor, t]);
+  }, [ updateSupabase, gameState, user?.currentFoolGameId, randomizeTargetFrame, showMainButton, setBottomBarColor, setHeaderColor, t]);
 
   useEffect(() => {
     const addPlayerIfNeeded = async () => {
@@ -325,10 +327,10 @@ const GameBoard: React.FC<{ goBack: () => void }> = ({ goBack }) => {
   // Show main button and set colors
   useEffect(() => {
     showMainButton(t('shuffle'));
-    tg?.MainButton?.setParams({ color: "#e1ff01", text_color: "#000000" });
-    setBottomBarColor("#282c33");
-    setHeaderColor("#282c33");
-  }, [showMainButton, t, tg, setBottomBarColor, setHeaderColor]);
+    tg?.MainButton?.setParams({ color: "#11E6D0", text_color: "#000000" });
+    setBottomBarColor("#020728");
+    setHeaderColor("#020728");
+  }, [ showMainButton, t, tg, setBottomBarColor, setHeaderColor]);
 
   // Handle main button click
   useEffect(() => {
@@ -360,7 +362,7 @@ const GameBoard: React.FC<{ goBack: () => void }> = ({ goBack }) => {
     <Suspense fallback={<LoadingSpinner />}>
       <div className="game-board h-[calc(100vh)] relative overflow-hidden">
         {/* <div className="absolute inset-0 z-0">
-          <InfinityMirror layers={15} baseColor="#282c33" accentColor="#e1ff01" />
+          <InfinityMirror layers={15} baseColor=hsl(var(--background)) accentColor={theme.colors.secondary} />
         </div> */}
 
         <div className="relative z-10">
@@ -394,11 +396,11 @@ const GameBoard: React.FC<{ goBack: () => void }> = ({ goBack }) => {
               width: '42px',
               height: '63px',
               position: 'absolute',
-              borderColor: "#E1FF01",
+              borderColor: theme.colors.secondary,
               top: targetFrame.y,
               left: targetFrame.x,
               transform: `rotate(${targetFrame.rotation}deg)`,
-              border: '2px dashed #E1FF01',
+              border: '2px dashed hsl(var(--secondary))',
               borderRadius: '5px',
             }}
           />

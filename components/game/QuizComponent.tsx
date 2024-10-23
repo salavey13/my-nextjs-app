@@ -319,7 +319,7 @@ export default function QuizComponent() {
             </div>
             {!isAnswerSubmitted && (
               <Button
-                className="mt-4 bg-[#e1ff01] text-black"
+                className="mt-4 bg-secondary text-black"
                 onClick={handleSubmitAnswer}
                 disabled={!selectedAnswer}
               >
@@ -336,7 +336,7 @@ export default function QuizComponent() {
             <p className="text-gray-300">{t(currentQuestion.explanation)}</p>
             {currentQuestionIndex < quizQuestions.length - 1 ? (
               <Button
-                className="mt-4 bg-[#e1ff01] text-black"
+                className="mt-4 bg-secondary text-black"
                 onClick={handleNextQuestion}
               >
                 {t('Next Question')}

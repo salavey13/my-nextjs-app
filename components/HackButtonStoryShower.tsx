@@ -21,7 +21,7 @@ id,parentid,stage,storycontent,xuinitydialog,trigger,activecomponent,minigame,ac
 
 'use client'
 // swapped to 
-import storyStages  from '@/lib/storyStages'
+import storiRealStages  from '@/lib/storyStages'
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import { useAppContext } from '@/context/AppContext'
 import { Button } from '@/components/ui/button'
@@ -45,7 +45,7 @@ import PaymentSimulator from '@/components/minigames/PaymentSimulator'
 import ConflictSimulator from '@/components/minigames/ConflictSimulator'
 import VersimcelCreator from '@/components/minigames/VersimcelCreator'
 
-const storiRealStages:StoryStage[] = storyStages
+//const storiRealStages:StoryStage[] = storyStages
 interface StoryStage {
   id: number;
   parentid: number | null;
@@ -86,15 +86,15 @@ export default function HackButtonStoryShower() {
 
 
   
-  const fetchStoryStages = async () => {
+  const fetchStoryStages = useCallback(() => {
     setStoryStages(storiRealStages)
-  }
+  }, [])
   
   useEffect(() => {
     fetchStoryStages()
   }, [fetchStoryStages])
 
-  const simulateGitHubSourceRetrieval = async () => {
+  const simulateGitHubSourceRetrieval = useCallback(async () => {
     const steps = [
       'Getting author ID: salavey13',
       'Getting project name: my-nextjs-app',
@@ -129,7 +129,7 @@ export default function HackButtonStoryShower() {
         githubSteps: [...(prevState?.githubSteps || []), 'Error fetching file content'],
       }))
     }
-  }
+  }, [])
 
   // const fetchStoryStages = async () => {
   //   const { data, error } = await supabase
@@ -143,17 +143,9 @@ export default function HackButtonStoryShower() {
   //     setStoryStages(data || [])
   //   }
   // }
+ 
 
-  const simulateVersimcelProcess = async () => {
-    for (let i = 0; i < 3; i++) {
-      await new Promise(resolve => setTimeout(resolve, 2000))
-      setMinigameState(prevState => ({
-        ...prevState!,
-        currentStep: (prevState?.currentStep || 0) + 1,
-      }))
-    }
-    handleStageProgression()
-  }
+  
 
   const initializeMinigame = useCallback((minigame: string) => {
     switch (minigame) {
@@ -191,35 +183,17 @@ export default function HackButtonStoryShower() {
           steps: ['Initializing Versimcel...', 'Connecting to GitHub...', 'Fetching component data...'],
           currentStep: 0,
         })
-        simulateVersimcelProcess()
         break
       default:
         setMinigameState(null)
     }
-  }, [simulateVersimcelProcess])
-
-  
-
-  useEffect(() => {
-    if (storyStages.length > 0 && state.user?.game_state?.stage !== undefined) {
-      const stage = storyStages.find(s => s.stage === state.user?.game_state.stage)
-      if (stage) {
-        setCurrentStage(stage)
-        setXuinityDialog(stage.xuinitydialog)
-        initializeMinigame(stage.minigame)
-        setShowBottomShelf(stage.bottomshelfbitmask > 1)
-        setShowHackButton(stage.stage <= 3)
-      }
-    }
-  }, [storyStages, state.user?.game_state?.stage, initializeMinigame])
+  }, [simulateGitHubSourceRetrieval])
 
   const handleStageProgression = useCallback(async (newStage?: number, unlockedComponent?: string) => {
     if (!currentStage || !state.user) return
 
-    // Determine the next stage based on the current stage's direct child or the next sequential stage
     const nextStage = newStage || storyStages.find(s => s.parentid === currentStage.id)?.stage || currentStage.stage + 1
 
-    // Ensure we're not skipping stages
     if (nextStage > currentStage.stage + 1 && !newStage) {
       console.error('Attempting to skip stages. This is not allowed.')
       return
@@ -248,7 +222,6 @@ export default function HackButtonStoryShower() {
           setTimeout(() => setShowCrashSimulation(false), 5000)
         }
 
-        // Update unlocked components based on the stage
         const newUnlockedComponents = [...(state.user?.game_state.unlockedComponents || [])]
         if (nextStage === 3 && !newUnlockedComponents.includes('cryptoPayment')) {
           newUnlockedComponents.push('cryptoPayment')
@@ -273,7 +246,35 @@ export default function HackButtonStoryShower() {
         variant: 'destructive',
       })
     }
-  }, [currentStage, state.user, storyStages, progressStage, initializeMinigame, t, dispatch])
+  }, [currentStage, state.user, storyStages, progressStage, t, dispatch, initializeMinigame])
+
+  const simulateVersimcelProcess = useCallback(async () => {
+    for (let i = 0; i < 3; i++) {
+      await new Promise(resolve => setTimeout(resolve, 2000))
+      setMinigameState(prevState => ({
+        ...prevState!,
+        currentStep: (prevState?.currentStep || 0) + 1,
+      }))
+    }
+    handleStageProgression()
+  }, [handleStageProgression])
+
+  useEffect(() => {
+    if (storyStages.length > 0 && state.user?.game_state?.stage !== undefined) {
+      const stage = storyStages.find(s => s.stage === state.user?.game_state.stage)
+      if (stage) {
+        setCurrentStage(stage)
+        setXuinityDialog(stage.xuinitydialog)
+        initializeMinigame(stage.minigame)
+        setShowBottomShelf(stage.bottomshelfbitmask > 1)
+        setShowHackButton(stage.stage <= 3)
+      }
+    }
+  }, [storyStages, state.user?.game_state?.stage, initializeMinigame])
+
+  const handleMinigameComplete = useCallback(() => {
+    handleStageProgression()
+  }, [handleStageProgression])
 
   const renderMinigame = () => {
     if (!minigameState) return null
@@ -383,10 +384,6 @@ export default function HackButtonStoryShower() {
     }
   }
 
-  const handleMinigameComplete = useCallback(() => {
-    // Progress to the next stage or trigger side hustle choice
-    handleStageProgression()
-  }, [handleStageProgression])
 
   const handleDragEnd = (result: DropResult) => {
     if (!result.destination || !minigameState || !minigameState.errors) return

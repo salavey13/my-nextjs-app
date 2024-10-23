@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { Toaster, toast as hotToast, ToastOptions } from "react-hot-toast";
 import ShineBorder from "@/components/ui/ShineBorder";
+import { useTheme } from '@/hooks/useTheme'
 
 type ToastParams = {
   title: string;
@@ -23,6 +24,7 @@ const CustomToast: React.FC<ToastParams & { visible: boolean }> = ({ title, desc
   const [distortedTitle, setDistortedTitle] = useState(title);
   const [distortedDescription, setDistortedDescription] = useState(description || '');
   const [isGlitching, setIsGlitching] = useState(false);
+  const { theme } = useTheme()
 
   useEffect(() => {
     const glitchInterval = setInterval(() => {
@@ -56,7 +58,7 @@ const CustomToast: React.FC<ToastParams & { visible: boolean }> = ({ title, desc
       className={`${
         visible ? 'animate-enter' : 'animate-leave'
       } max-w-md w-full top-16 pointer-events-auto flex ring-1 ring-black ring-opacity-5`}
-      color={isGlitching ? "#e1ff01" : "#000000"}
+      color={isGlitching ? theme.colors.secondary : "#000000"}
     >
       <div className="flex-1 w-0 p-4">
         <div className="flex items-start">
