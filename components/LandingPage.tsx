@@ -208,7 +208,7 @@ export default function LandingPage() {
 
   {/* Optional content on top of the SVG background */}
   <Image
-    src="/photo_5244591252865934981_y.jpg"
+    src="/Utool-20241025-205631064.png"
     alt={t('home.heading')}
     width={600}
     height={400}
