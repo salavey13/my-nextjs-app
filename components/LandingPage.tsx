@@ -18,7 +18,6 @@ import useTelegram from '@/hooks/useTelegram';
 import AutomationPipeline from '@/components/AutomationPipeline';
 import { useInView } from '@/hooks/useInView';
 import { useTheme } from '@/hooks/useTheme'
-
 const socialLinks = [
   { name: "YouTube", icon: "M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z", url: "https://youtube.com/salavey13" },
   { name: "Twitter", icon: "M21.543 7.104c.015.211.015.423.015.636 0 6.507-4.954 14.01-14.01 14.01v-.003A13.94 13.94 0 0 1 0 19.539a9.88 9.88 0 0 0 7.287-2.041 4.93 4.93 0 0 1-4.6-3.42 4.916 4.916 0 0 0 2.223-.084A4.926 4.926 0 0 1 .96 9.167v-.062a4.887 4.87 0 0 0 2.235.616A4.928 4.928 0 0 1 1.67 3.148a13.98 13.98 0 0 0 10.15 5.144 4.929 4.929 0 0 1 8.39-4.49 9.868 9.868 0 0 0 3.128-1.196 4.941 4.941 0 0 1-2.165 2.724A9.828 9.828 0 0 0 24 4.555a10.019 10.019 0 0 1-2.457 2.549z", url: "https://twitter.com/salavey13" },
@@ -156,7 +155,7 @@ export default function LandingPage() {
             {["home", "features", "pricing", "templates", "instructions", "automation", "mobile-shop", "faq", "contact"].map((item) => (
               <Button
                 key={item}
-                variant="ghost"
+                variant="neon"
                 className="w-full text-left py-3 px-4 text-gray-300 hover:text-white hover:bg-gray-800"
                 onClick={() => scrollToSection(item)}
               >
@@ -168,71 +167,80 @@ export default function LandingPage() {
       </AnimatePresence>
 
       <main className="container mx-auto px-4 pt-20 pb-12">
-        <section id="home" className="text-center mb-16 pt-24">
-          <motion.div
-  initial={{ opacity: 0, scale: 0.8 }}
-  animate={{ opacity: 1, scale: 1 }}
-  transition={{ duration: 0.8, delay: 0.3 }}
-  className="mt-12 relative"
->
-  <svg
-    className="absolute inset-0 w-full h-full object-cover drop-shadow-custom"
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 800 450"
-    preserveAspectRatio="none"
+<section id="home" className="text-center mb-16 pt-24">
+  <motion.div
+    initial={{ opacity: 0, scale: 0.8 }}
+    animate={{ opacity: 1, scale: 1 }}
+    transition={{ duration: 0.8, delay: 0.3 }}
+    className="relative rounded-lg overflow-hidden"
   >
-    <defs>
-      <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" style={{ stopColor: theme.colors.secondary, stopOpacity: 1 }} />
-        <stop offset="100%" style={{ stopColor: theme.colors.background, stopOpacity: 1 }} />
-      </linearGradient>
-    </defs>
-    <path
-      fill="url(#grad1)"
-      d="M0,320L80,330C160,340,320,360,480,358.7C640,357,800,343,960,330C1120,317,1280,303,1440,282.7L1600,262.7L1600,450L1440,450C1280,450,1120,450,960,450C800,450,640,450,480,450C320,450,160,450,80,450L0,450Z"
-      transform="translate(0, 0)"
-      opacity="0.5"
+    {/* Background SVG with adjusted height */}
+    <svg
+      className="absolute inset-0 w-full h-[150%] object-cover drop-shadow-custom z-[-1]"
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 800 450"
+      preserveAspectRatio="none"
     >
-      <animate
-        repeatCount="indefinite"
-        attributeName="d"
-        dur="10s"
-        values="
-        M0,320L80,330C160,340,320,360,480,358.7C640,357,800,343,960,330C1120,317,1280,303,1440,282.7L1600,262.7L1600,450L1440,450C1280,450,1120,450,960,450C800,450,640,450,480,450C320,450,160,450,80,450L0,450Z;
-        M0,280L120,290C240,300,480,320,720,340C960,360,1200,380,1440,392C1600,403,1760,420,1920,440L2080,450L2080,450L1440,450C1280,450,1120,450,960,450C800,450,640,450,480,450C320,450,160,450,80,450L0,450Z;
-        M0,320L80,330C160,340,320,360,480,358.7C640,357,800,343,960,330C1120,317,1280,303,1440,282.7L1600,262.7L1600,450L1440,450C1280,450,1120,450,960,450C800,450,640,450,480,450C320,450,160,450,80,450L0,450Z
-        "
-      />
-    </path>
-  </svg>
+      <defs>
+        <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop
+            offset="0%"
+            style={{ stopColor: theme.colors.secondary, stopOpacity: 1 }}
+          />
+          <stop
+            offset="100%"
+            style={{ stopColor: theme.colors.background, stopOpacity: 1 }}
+          />
+        </linearGradient>
+      </defs>
+      <path
+        fill="url(#grad1)"
+        d="M0,320L80,330C160,340,320,360,480,358.7C640,357,800,343,960,330C1120,317,1280,303,1440,282.7L1600,262.7L1600,450L1440,450C1280,450,1120,450,960,450C800,450,640,450,480,450C320,450,160,450,80,450L0,450Z"
+        transform="translate(0, 0)"
+        opacity="0.5"
+      >
+        <animate
+          repeatCount="indefinite"
+          attributeName="d"
+          dur="10s"
+          values="
+          M0,320L80,330C160,340,320,360,480,358.7C640,357,800,343,960,330C1120,317,1280,303,1440,282.7L1600,262.7L1600,450L1440,450C1280,450,1120,450,960,450C800,450,640,450,480,450C320,450,160,450,80,450L0,450Z;
+          M0,280L120,290C240,300,480,320,720,340C960,360,1200,380,1440,392C1600,403,1760,420,1920,440L2080,450L2080,450L1440,450C1280,450,1120,450,960,450C800,450,640,450,480,450C320,450,160,450,80,450L0,450Z;
+          M0,320L80,330C160,340,320,360,480,358.7C640,357,800,343,960,330C1120,317,1280,303,1440,282.7L1600,262.7L1600,450L1440,450C1280,450,1120,450,960,450C800,450,640,450,480,450C320,450,160,450,80,450L0,450Z
+          "
+        />
+      </path>
+    </svg>
 
-  {/* Optional content on top of the SVG background */}
-  <Image
-    src="/Utool-20241025-205631064.png"
-    alt={t('home.heading')}
-    width={600}
-    height={400}
-    className="w-48 h-48 object-cover"
-  />
-  <div className="relative z-10">
-    <h2 className="text-center text-4xl font-bold text-white">
-      {t('home.heading')}
-    </h2>
-    <p className="text-center text-lg text-gray-300 max-w-xl mx-auto">
-      {t('home.description')}
-    </p>
+    {/* Optional content on top of the SVG background */}
+    <Image
+      src="/Utool-20241025-205631064.png"
+      alt={t('home.heading')}
+      width={900} // Larger size to fit the new layout
+      height={600}
+      className="rounded-lg object-cover relative z-10 mx-auto"
+    />
     
-    <Button
-              onClick={() => openLink("https://youtube.com/salavey13")}
-              className=" text-gray-100 px-8 py-3 rounded-lg text-lg font-semibold hover:bg-opacity-90 transition-colors"
-              variant="default"
-            >
-              {t('home.watchVideos')} <ArrowRight className="inline-block ml-2" />
-            </Button>
-  </div>
-</motion.div>
+    {/* Heading and content */}
+    <div className="relative z-10 mt-8">
+      <h2 className="text-center text-4xl font-bold text-white">
+        {t('home.heading')}
+      </h2>
+      <p className="text-center text-lg text-gray-300 max-w-xl mx-auto mt-4">
+        {t('home.description')}
+      </p>
+      
+      <Button
+        onClick={() => openLink("https://youtube.com/salavey13")}
+        className="text-gray-100 px-8 py-3 rounded-lg text-lg font-semibold mt-8 hover:bg-opacity-90 transition-colors"
+        variant="neon"
+      >
+        {t('home.watchVideos')} <ArrowRight className="inline-block ml-2" />
+      </Button>
+    </div>
+  </motion.div>
+</section>
 
-        </section>
 
         <section id="features" className="mb-24">
           <h3 className="text-4xl font-bold text-secondary mb-12 text-center">{t('features.heading')}</h3>
@@ -293,7 +301,7 @@ export default function LandingPage() {
                   <Button
                       onClick={() => openLink(plan.link)}
                       className="w-full text-gray-100 hover:bg-opacity-90 transition-colors"
-                      variant="default"
+                      variant="neon"
                     >
                       {t('pricing.choosePlan')}
                     </Button>
@@ -305,49 +313,57 @@ export default function LandingPage() {
         </section>
 
         <section id="templates" className="mb-24">
-          <h3 className="text-4xl font-bold text-secondary mb-12 text-center">{t('templates.heading')}</h3>
-          <p className="text-center mb-12 text-gray-300 text-xl max-w-3xl mx-auto">
-            {t('templates.description')}
-          </p>
-          <div className="grid md:grid-cols-2 gap-8">
-            {[
-              { title: t('templates.unhuilome'), description: t('templates.unhuilomeDesc'), link: "https://oneSitePls.framer.ai/shop/unhuilome", image: "/template-unhuilome.png" },
-              { title: t('templates.ezShop'), description: t('templates.ezShopDesc'), link: "https://oneSitePls.framer.ai/shop/ezshop", image: "/template-ezshop.png" },
-              { title: t('templates.promo'), description: t('templates.promoDesc'), link: "https://oneSitePls.framer.ai/shop/promo", image: "/template-promo.png" },
-              { title: t('templates.domiki'), description: t('templates.domikiDesc'), link: "https://oneSitePls.framer.ai/shop/domiki", image: "/template-domiki.png" },
-            ].map((template, index) => (
-              <motion.div
-                key={template.title}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.2 * (index + 1) }}
+  <h3 className="text-4xl font-bold text-secondary mb-12 text-center">{t('templates.heading')}</h3>
+  <p className="text-center mb-12 text-gray-300 text-xl max-w-3xl mx-auto">
+    {t('templates.description')}
+  </p>
+  <div className="grid md:grid-cols-2 gap-8">
+    {[
+      { title: t('templates.unhuilome'), description: t('templates.unhuilomeDesc'), link: "https://oneSitePls.framer.ai/shop/unhuilome", image: "/template-unhuilome.png" },
+      { title: t('templates.ezShop'), description: t('templates.ezShopDesc'), link: "https://oneSitePls.framer.ai/shop/ezshop", image: "/template-ezshop.png" },
+      { title: t('templates.promo'), description: t('templates.promoDesc'), link: "https://oneSitePls.framer.ai/shop/promo", image: "/template-promo.png" },
+      { title: t('templates.domiki'), description: t('templates.domikiDesc'), link: "https://oneSitePls.framer.ai/shop/domiki", image: "/template-domiki.png" },
+    ].map((template, index) => (
+      <motion.div
+        key={template.title}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.2 * (index + 1) }}
+      >
+        <Card className="relative bg-gray-800 border-gray-700 hover:border-secondary transition-colors overflow-hidden">
+          {/* Background Image */}
+          <Image
+            src={template.image}
+            alt={template.title}
+            layout="fill"
+            objectFit="cover"
+            className="absolute inset-0 w-full h-full z-[-1]"
+          />
+
+          {/* Spacer for maintaining card size */}
+          <div className="w-full h-48" />
+
+          <div className="relative p-6">
+            <CardHeader>
+              <CardTitle className="text-secondary text-2xl">{template.title}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-gray-300 mb-4">{template.description}</p>
+              <Button
+                onClick={() => openLink(template.link)}
+                className="text-gray-900 hover:bg-opacity-90 transition-colors"
+                variant="neon"
               >
-                <Card className="bg-gray-800 border-gray-700 hover:border-secondary transition-colors overflow-hidden">
-                  <Image
-                    src={template.image}
-                    alt={template.title}
-                    width={600}
-                    height={400}
-                    className="w-full h-48 object-cover"
-                  />
-                  <CardHeader>
-                    <CardTitle className="text-secondary text-2xl">{template.title}</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-gray-300 mb-4">{template.description}</p>
-                    <Button
-                      onClick={() => openLink(template.link)}
-                      className="text-gray-900 hover:bg-opacity-90 transition-colors"
-                      variant="default"
-                    >
-                      {t('templates.viewTemplate')}
-                    </Button>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
+                {t('templates.viewTemplate')}
+              </Button>
+            </CardContent>
           </div>
-        </section>
+        </Card>
+      </motion.div>
+    ))}
+  </div>
+</section>
+
 
         <section id="instructions" className="mb-24">
           <h3 className="text-4xl font-bold text-secondary mb-12 text-center">{t('instructions.heading')}</h3>
