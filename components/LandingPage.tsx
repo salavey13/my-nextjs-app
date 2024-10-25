@@ -129,7 +129,7 @@ export default function LandingPage() {
               {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </Button>
           </div>
-          <div className="hidden md:flex space-x-4">
+          <div className="hidden md:flex space-x-4 sm:backdrop-blur-lg">
             {["home", "features", "pricing", "templates", "instructions", "automation", "mobile-shop", "faq", "contact"].map((item) => (
               <Button
                 key={item}
@@ -167,16 +167,16 @@ export default function LandingPage() {
       </AnimatePresence>
 
       <main className="container mx-auto px-4 pt-20 pb-12">
-<section id="home" className="text-center mb-16 pt-24">
+<section id="home" className="text-center mb-16 pt-24 rounded-lg overflow-hidden ">
   <motion.div
     initial={{ opacity: 0, scale: 0.8 }}
     animate={{ opacity: 1, scale: 1 }}
     transition={{ duration: 0.8, delay: 0.3 }}
-    className="relative rounded-lg overflow-hidden"
+    className="relative   justify-center"
   >
     {/* Background SVG with adjusted height */}
     <svg
-      className="absolute inset-0 w-full h-[150%] object-cover drop-shadow-custom z-[-1]"
+      className="absolute inset-0  w-[100%] h-[100%] object-cover drop-shadow-custom z-[-1]"
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 800 450"
       preserveAspectRatio="none"
@@ -185,11 +185,11 @@ export default function LandingPage() {
         <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
           <stop
             offset="0%"
-            style={{ stopColor: theme.colors.secondary, stopOpacity: 1 }}
+            style={{ stopColor: theme.colors.primary, stopOpacity: 1 }}
           />
           <stop
             offset="100%"
-            style={{ stopColor: theme.colors.background, stopOpacity: 1 }}
+            style={{ stopColor: theme.colors.accent, stopOpacity: 1 }}
           />
         </linearGradient>
       </defs>
@@ -214,11 +214,11 @@ export default function LandingPage() {
 
     {/* Optional content on top of the SVG background */}
     <Image
-      src="/Utool-20241025-205631064.png"
+      src="/her01.png"
       alt={t('home.heading')}
       width={900} // Larger size to fit the new layout
       height={600}
-      className="rounded-lg object-cover relative z-10 mx-auto"
+      className=" object-cover relative z-10 mx-auto"
     />
     
     {/* Heading and content */}
@@ -232,7 +232,7 @@ export default function LandingPage() {
       
       <Button
         onClick={() => openLink("https://youtube.com/salavey13")}
-        className="text-gray-100 px-8 py-3 rounded-lg text-lg font-semibold mt-8 hover:bg-opacity-90 transition-colors"
+        className="text-gray-100 px-8 py-3 rounded-lg mb-8 text-lg font-semibold mt-8 hover:bg-opacity-90 transition-colors"
         variant="neon"
       >
         {t('home.watchVideos')} <ArrowRight className="inline-block ml-2" />
@@ -242,7 +242,7 @@ export default function LandingPage() {
 </section>
 
 
-        <section id="features" className="mb-24">
+        <section id="features" className="mb-24 ">
           <h3 className="text-4xl font-bold text-secondary mb-12 text-center">{t('features.heading')}</h3>
           <div className="grid md:grid-cols-3 gap-8">
             {[
@@ -300,8 +300,8 @@ export default function LandingPage() {
                     </ul>
                   <Button
                       onClick={() => openLink(plan.link)}
-                      className="w-full text-gray-100 hover:bg-opacity-90 transition-colors"
-                      variant="neon"
+                      className="w-full ro8unded-lg text-gray-100 hover:bg-opacity-90 transition-colors"
+                      variant="default"
                     >
                       {t('pricing.choosePlan')}
                     </Button>
@@ -352,7 +352,7 @@ export default function LandingPage() {
               <Button
                 onClick={() => openLink(template.link)}
                 className="text-gray-900 hover:bg-opacity-90 transition-colors"
-                variant="neon"
+                variant="default"
               >
                 {t('templates.viewTemplate')}
               </Button>
@@ -429,7 +429,7 @@ export default function LandingPage() {
           <Button
             onClick={() => openLink("https://t.me/salavey13")}
             className=" text-gray-100 px-8 py-3 rounded-lg text-lg font-semibold hover:bg-opacity-90 transition-colors"
-            variant="default"
+            variant="neon"
           >
             {t('contact.contactUs')} <ArrowRight className="ml-2" />
           </Button>

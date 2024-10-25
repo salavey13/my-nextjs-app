@@ -309,13 +309,14 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
           telegram_id: tg_id,
           telegram_username: username,
           lang: lang,
+          role: 1,
           game_state: {
             stage: 0,
             coins: 1000,
             crypto: 0,
             rank: "13",
             cheersCount: 1,
-            progress: "0%",
+            progress: "13%",
             unlockedComponents: []
           }
         }])

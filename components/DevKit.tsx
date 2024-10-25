@@ -72,7 +72,7 @@ export default function DevKit() {
   
   const fetchStoryStages = useCallback(() => {
     setStoryStages(storiRealStages)
-  }, [])
+  }, [t])
   
   useEffect(() => {
     fetchStoryStages()
