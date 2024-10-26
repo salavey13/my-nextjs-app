@@ -126,7 +126,13 @@ const EdgeHighlight: React.FC<{ imageUrl: string }> = ({ imageUrl }) => {
   )
 }
 
-export default function GlitchyHero() {
+interface GlitchyHeroProps = {
+  imageUrl: string
+}
+
+export default function GlitchyHero({ imageUrl, width, height }: GlitchyHeroProps = {
+  imageUrl: '/her01.png'
+}) {
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 })
   const [gyro, setGyro] = useState({ x: 0, y: 0 })
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 })
@@ -261,7 +267,7 @@ export default function GlitchyHero() {
           className="relative"
         >
           <motion.img
-            src="/her01.png"
+            src=imageUrl
             alt="Hero"
             className="w-full max-w-2xl mb-8"
             style={{ width: '95%' }}
@@ -274,7 +280,7 @@ export default function GlitchyHero() {
               }
             }}
           />
-          <EdgeHighlight imageUrl="/her01.png" />
+          <EdgeHighlight imageUrl=imageUrl />
         </motion.div>
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -289,7 +295,7 @@ export default function GlitchyHero() {
           </p>
           <Button
             onClick={() => openLink("https://youtube.com/salavey13")}
-            className="text-gray-100 px-8 py-3 rounded-lg text-lg mb-8 w-full font-semibold hover:bg-opacity-90 transition-colors"
+            className="text-gray-100 px-8 py-3 rounded-lg text-lg mb-8 mr-2 ml-2 w-full font-semibold hover:bg-opacity-90 transition-colors"
             variant="neon"
           >
             {t('home.watchVideos')} <ArrowRight className="inline-block ml-2" />
