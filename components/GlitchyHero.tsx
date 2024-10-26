@@ -256,7 +256,7 @@ const GlitchyHero: React.FC<GlitchyHeroProps> = ({ imageUrls }) => {
     if (imageUrls.length > 1) {
       const intervalId = setInterval(() => {
         setCurrentImageIndex((prevIndex) => (prevIndex + 1) % imageUrls.length)
-      }, 3000) // Change image every 3 seconds, adjust as needed
+      }, 13000) // Change image every 13 seconds, adjust as needed
 
       return () => clearInterval(intervalId)
     }
@@ -298,7 +298,7 @@ const GlitchyHero: React.FC<GlitchyHeroProps> = ({ imageUrls }) => {
               }
             }}
         exit={{ opacity: 0 }}
-        transition={{ duration: 1 }}
+        transition={{ duration: 13 }}
         alt={`Slide ${currentImageIndex}`}
         className="w-full max-w-2xl mb-8"
       />
