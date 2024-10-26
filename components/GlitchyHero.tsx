@@ -238,7 +238,7 @@ export default function GlitchyHero() {
   }, [dimensions])
 
   return (
-    <div className="relative w-full h-screen overflow-visible" style={{ backgroundColor: themeColors.secondary }}>
+    <div className="relative w-full h-screen overflow-visible justify-center" style={{ backgroundColor: themeColors.secondary }}>
       <VignetteOverlay />
       <motion.div
         className="absolute inset-0"
@@ -272,7 +272,7 @@ export default function GlitchyHero() {
               }
             }}
           />
-          <EdgeHighlight imageUrl="her01.png" />
+          <EdgeHighlight imageUrl="/her01.png" />
         </motion.div>
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -287,7 +287,7 @@ export default function GlitchyHero() {
           </p>
           <Button
             onClick={() => openLink("https://youtube.com/salavey13")}
-            className="text-gray-100 px-8 py-3 rounded-lg text-lg mb-8 font-semibold hover:bg-opacity-90 transition-colors"
+            className="text-gray-100 px-8 py-3 rounded-lg text-lg mb-13 font-semibold hover:bg-opacity-90 transition-colors"
             variant="neon"
           >
             {t('home.watchVideos')} <ArrowRight className="inline-block ml-2" />
