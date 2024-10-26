@@ -67,7 +67,7 @@
     height: 100%;
   }
 
-  /* Fixed h1 to remove stroke and add a clean gradient effect */
+  /* Fixed h1 to remove stroke and add a clean gradient effect 
 h1 {
   background: linear-gradient(45deg, #8e2de2, #4a00e0, #9c27b0);
   -webkit-background-clip: text;
@@ -75,9 +75,9 @@ h1 {
   background-clip: text;
   text-fill-color: transparent;
   animation: slide-in-left 1s ease-out;
-  /* Removed the stroke */
+   
   font-weight: 700;
-}
+}*/
 
 /* Fix button text color on active state 
 button {
@@ -91,6 +91,47 @@ button:active {
   color: black !important;  Keep text black during interaction
 } */
 
+ h1 {
+  /* Theme-based gradient */
+  background: linear-gradient(45deg, #11e6d0, #FFA9F3, #1c063e); /* Using theme colors */
+  background-size: 200% 200%; /* Creates a nice gradient flow */
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-fill-color: transparent;
+  
+  /* Font and animation settings */
+  font-weight: 700;
+  animation: slide-in-left 1s ease-out, glitch-stroke 3s infinite; /* Add glitch stroke animation */
+
+  /* Stroke styles */
+  position: relative;
+}
+
+/* Keyframes for Glitch Stroke Animation */
+@keyframes glitch-stroke {
+  0%, 100% {
+    text-shadow: none;
+  }
+  5%, 10%, 30%, 35%, 50%, 55%, 80%, 85% {
+    text-shadow:
+      -2px 0 #11e6d0, 2px 0 #FFA9F3, /* Left & right strokes */
+      0 -2px #1c063e, 0 2px #1c063e; /* Top & bottom strokes */
+  }
+}
+
+/* Optional slide-in effect */
+@keyframes slide-in-left {
+  0% {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+ 
 
 @keyframes glitchyFadeIn {
   0% {
@@ -143,16 +184,7 @@ nav {
 }
 
 
-  @keyframes slide-in-left {
-    from {
-      transform: translateX(-69%);
-      opacity: 0;
-    }
-    to {
-      transform: translateX(0);
-      opacity: 1;
-    }
-  }
+  
 
   .gradient-text {
     background: linear-gradient(45deg, #ff6f61, #d4a5a5);
