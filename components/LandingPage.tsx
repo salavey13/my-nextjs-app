@@ -247,7 +247,7 @@ export default function LandingPage() {
         <h3 className="text-center text-4xl font-bold text-white">
         after:
       </h3>
-<GlitchyHero imageUrls={["/her01.png", "/Utool-20241025-205631064.png", "/Utool-20241025-213450920.png", "/template-unhuilome", "/Utool-20241025-215318432.png"]} />
+<GlitchyHero imageUrls={["/her01.png", "/Utool-20241025-205631064.png", "/Utool-20241025-213450920.png", "/template-unhuilome.png", "/Utool-20241025-215318432.png"]} />
 
         <section id="features" className="mb-24 ">
           <h3 className="text-4xl font-bold text-secondary mb-12 text-center">{t('features.heading')}</h3>
