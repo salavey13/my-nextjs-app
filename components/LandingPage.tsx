@@ -133,7 +133,7 @@ export default function LandingPage() {
               {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </Button>
           </div>
-          <div className="hidden md:flex space-x-4 sm:backdrop-blur-lg">
+          <div className="hidden md:flex space-x-4 backdrop-blur-xl">
             {["home", "features", "pricing", "templates", "instructions", "automation", "mobile-shop", "faq", "contact"].map((item) => (
               <Button
                 key={item}
