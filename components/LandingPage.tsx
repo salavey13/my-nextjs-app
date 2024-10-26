@@ -171,14 +171,13 @@ export default function LandingPage() {
       </AnimatePresence>
 
       <main className="container mx-auto px-4 pt-20 pb-12">
-<section id="home" className="text-center mb-16 pt-24 rounded-lg overflow-hidden ">
+        {/*<section id="home" className="text-center mb-16 pt-24 rounded-lg overflow-hidden ">
   <motion.div
     initial={{ opacity: 0, scale: 0.8 }}
     animate={{ opacity: 1, scale: 1 }}
     transition={{ duration: 0.8, delay: 0.3 }}
     className="relative   justify-center"
   >
-    {/* Background SVG with adjusted height */}
     <svg
       className="absolute inset-0  w-[100%] h-[100%] object-cover drop-shadow-custom z-[-1]"
       xmlns="http://www.w3.org/2000/svg"
@@ -216,7 +215,6 @@ export default function LandingPage() {
       </path>
     </svg>
 
-    {/* Optional content on top of the SVG background */}
     <Image
       src="/her01.png"
       alt={t('home.heading')}
@@ -225,8 +223,7 @@ export default function LandingPage() {
       className=" object-cover relative z-10 mx-auto"
     />
     
-    {/* Heading and content */}
-    <div className="relative z-10 mt-8">
+        <div className="relative z-10 mt-8">
       <h2 className="text-center text-4xl font-bold text-white">
         {t('home.heading')}
       </h2>
@@ -243,8 +240,8 @@ export default function LandingPage() {
       </Button>
     </div>
   </motion.div>
-</section>
-<GlitchyHero />
+</section>*/}
+<GlitchyHero imageUrl="/her01.png" />
 
         <section id="features" className="mb-24 ">
           <h3 className="text-4xl font-bold text-secondary mb-12 text-center">{t('features.heading')}</h3>
