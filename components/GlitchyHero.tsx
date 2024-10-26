@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button"
 import { useAppContext } from '../context/AppContext';
 import { ArrowRight } from "lucide-react"
 import useTelegram from '@/hooks/useTelegram';
+import { useTheme } from '@/hooks/useTheme';
+
 
 const themeColors = {
   secondary: '#020728',
@@ -110,7 +112,7 @@ const EdgeHighlight: React.FC<{ imageUrl: string }> = ({ imageUrl }) => {
       ref={canvasRef}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      transition={{ delay: 1, duration: 1 }}
+      transition={{ delay: 1, duration: 4 }}
       style={{
         position: 'absolute',
         top: '50%',
@@ -133,7 +135,7 @@ export default function GlitchyHero() {
   const [glitchLines, setGlitchLines] = useState<React.ReactNode[]>([])
   const { t } = useAppContext();
   const { openLink } = useTelegram();
-  
+  const { theme } = useTheme()
   useEffect(() => {
     const updateDimensions = () => {
       setDimensions({
@@ -238,8 +240,8 @@ export default function GlitchyHero() {
   }, [dimensions])
 
   return (
-    <div className="relative w-full h-screen overflow-visible justify-center" style={{ backgroundColor: themeColors.secondary }}>
-      <VignetteOverlay />
+    <div className="relative w-full h-[113%] mb-16 overflow-visible justify-center" style={{ backgroundColor: themeColors.secondary }}>
+      {/*<VignetteOverlay />*/}
       <motion.div
         className="absolute inset-0"
         animate={{
@@ -287,7 +289,7 @@ export default function GlitchyHero() {
           </p>
           <Button
             onClick={() => openLink("https://youtube.com/salavey13")}
-            className="text-gray-100 px-8 py-3 rounded-lg text-lg mb-13 font-semibold hover:bg-opacity-90 transition-colors"
+            className="text-gray-100 px-8 py-3 rounded-lg text-lg mb-16 font-semibold hover:bg-opacity-90 transition-colors"
             variant="neon"
           >
             {t('home.watchVideos')} <ArrowRight className="inline-block ml-2" />
