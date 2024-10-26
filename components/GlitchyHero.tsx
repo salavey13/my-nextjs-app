@@ -287,12 +287,20 @@ const GlitchyHero: React.FC<GlitchyHeroProps> = ({ imageUrls }) => {
         key={currentImageIndex} // Key is important to trigger animation on change
         src={imageUrls[currentImageIndex]}
         initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
+             style={{ width: '95%' }}
+            animate={{
+              opacity: 1,
+              y: [0, -5, 0],
+              transition: {
+                duration: 7,
+                repeat: Infinity,
+                ease: "easeInOut"
+              }
+            }}
         exit={{ opacity: 0 }}
         transition={{ duration: 1 }}
         alt={`Slide ${currentImageIndex}`}
         className="w-full max-w-2xl mb-8"
-        style={{ width: '100%', height: '100%', objectFit: 'cover', position: 'absolute' }}
       />
       <EdgeHighlight imageUrl={imageUrls[currentImageIndex]} />
         </motion.div>
