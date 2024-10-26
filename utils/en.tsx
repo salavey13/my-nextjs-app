@@ -1,6 +1,8 @@
 import { LanguageDictionary } from "../utils/TranslationUtils";
 export const en: LanguageDictionary = {
   // ... (existing translations)
+ "before:": "Before:",
+  "after:": "After:",
   "onboarding": {
     "welcome": "Welcome to Hack the System 🔧",
     "description": "Break the rules. Rewire reality. Redefine control. 🧠💥",
