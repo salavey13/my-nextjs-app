@@ -1,6 +1,7 @@
 import { LanguageDictionary } from "../utils/TranslationUtils";
 export const ru: LanguageDictionary = {
- 
+  "before:": "До:",
+  "after:": "После:",
   "onboarding": {
     "welcome": "Добро пожаловать в Hack the System 🔧",
     "description": "Нарушай правила. Перепиши реальность. Перепиши контроль. 🧠💥",
