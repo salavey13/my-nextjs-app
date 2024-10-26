@@ -23,7 +23,7 @@ const VignetteOverlay: React.FC = () => (
     style={{
       position: 'absolute',
       inset: 0,
-      background: 'radial-gradient(circle at center 69%, transparent 0%, rgba(2, 7, 40, 0.9) 70%, rgba(2, 7, 40, 1) 100%)',
+      background: 'radial-gradient(circle at center 69%, transparent 0%, rgba(0, 14, 41, 0.9) 70%, rgba(0, 14, 41, 1) 100%)',
       pointerEvents: 'none',
       zIndex: 5,
     }}
