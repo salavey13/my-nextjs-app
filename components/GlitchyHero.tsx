@@ -129,7 +129,11 @@ const EdgeHighlight: React.FC<{ imageUrl: string }> = ({ imageUrl }) => {
 /*interface GlitchyHeroProps {
   imageUrl: string
 }*/
-export default function GlitchyHero: React.FC<{ imageUrls: string[] }> = ({ imageUrls }) => {
+interface GlitchyHeroProps {
+  imageUrls: string[];
+}
+
+const GlitchyHero: React.FC<GlitchyHeroProps> = ({ imageUrls }) => {
   
 /*export default function GlitchyHero({ imageUrl }: GlitchyHeroProps = {
   imageUrl: '/her01.png'
@@ -315,3 +319,5 @@ export default function GlitchyHero: React.FC<{ imageUrls: string[] }> = ({ imag
     </div>
   )
 }
+
+export default GlitchyHero;
