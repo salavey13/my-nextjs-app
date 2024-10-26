@@ -5,6 +5,7 @@ import { motion, useAnimation } from 'framer-motion'
 import { Button } from "@/components/ui/button"
 import { useAppContext } from '../context/AppContext';
 import { ArrowRight } from "lucide-react"
+import useTelegram from '@/hooks/useTelegram';
 
 const themeColors = {
   secondary: '#020728',
@@ -131,6 +132,7 @@ export default function GlitchyHero() {
   const previousTimeRef = useRef<number>()
   const [glitchLines, setGlitchLines] = useState<React.ReactNode[]>([])
   const { t } = useAppContext();
+  const { openLink } = useTelegram();
   
   useEffect(() => {
     const updateDimensions = () => {
@@ -284,9 +286,9 @@ export default function GlitchyHero() {
              {t('home.description')}
           </p>
           <Button
-            onClick={() => console.log("Watch videos clicked")}
-            className="text-gray-100 px-8 py-3 rounded-lg text-lg font-semibold hover:bg-opacity-90 transition-colors"
-            variant="default"
+            onClick={() => openLink("https://youtube.com/salavey13")}
+            className="text-gray-100 px-8 py-3 rounded-lg text-lg mb-8 font-semibold hover:bg-opacity-90 transition-colors"
+            variant="neon"
           >
             {t('home.watchVideos')} <ArrowRight className="inline-block ml-2" />
           </Button>
