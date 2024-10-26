@@ -118,7 +118,7 @@ const EdgeHighlight: React.FC<{ imageUrl: string }> = ({ imageUrl }) => {
         top: '50%',
         left: '50%',
         transform: 'translate(-50%, -50%)',
-        width: '95%',
+        width: '100%',
         height: 'auto',
         mixBlendMode: 'screen',
       }}
@@ -240,8 +240,8 @@ export default function GlitchyHero() {
   }, [dimensions])
 
   return (
-    <div className="relative w-full h-[113%] mb-16 overflow-visible justify-center" style={{ backgroundColor: themeColors.secondary }}>
-      {/*<VignetteOverlay />*/}
+    <div className="relative w-full h-[113%] mb-8 overflow-hidden justify-center" style={{ backgroundColor: themeColors.secondary }}>
+      <VignetteOverlay />
       <motion.div
         className="absolute inset-0"
         animate={{
@@ -289,7 +289,7 @@ export default function GlitchyHero() {
           </p>
           <Button
             onClick={() => openLink("https://youtube.com/salavey13")}
-            className="text-gray-100 px-8 py-3 rounded-lg text-lg mb-16 font-semibold hover:bg-opacity-90 transition-colors"
+            className="text-gray-100 px-8 py-3 rounded-lg text-lg mb-8 w-full font-semibold hover:bg-opacity-90 transition-colors"
             variant="neon"
           >
             {t('home.watchVideos')} <ArrowRight className="inline-block ml-2" />
