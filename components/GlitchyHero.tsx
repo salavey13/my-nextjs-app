@@ -317,7 +317,7 @@ const GlitchyHero: React.FC<GlitchyHeroProps> = ({ imageUrls }) => {
           </p>
           <Button
             onClick={() => openLink("https://youtube.com/salavey13")}
-            className="text-gray-100 px-8 py-3 rounded-lg text-lg mb-8 mr-2 ml-2 w-full font-semibold hover:bg-opacity-90 transition-colors"
+            className="text-gray-100 px-8 py-3 rounded-lg text-lg mb-8 mr-2 ml-2 w-[80%] font-semibold hover:bg-opacity-90 transition-colors"
             variant="neon"
           >
             {t('home.watchVideos')} <ArrowRight className="inline-block ml-2" />
