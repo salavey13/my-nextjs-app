@@ -126,13 +126,15 @@ const EdgeHighlight: React.FC<{ imageUrl: string }> = ({ imageUrl }) => {
   )
 }
 
-interface GlitchyHeroProps = {
+interface GlitchyHeroProps {
   imageUrl: string
 }
-
-export default function GlitchyHero({ imageUrl, width, height }: GlitchyHeroProps = {
+export default function GlitchyHero: React.FC<{ imageUrls: string[] }> = ({ imageUrls }) => {
+  
+/*export default function GlitchyHero({ imageUrl }: GlitchyHeroProps = {
   imageUrl: '/her01.png'
-}) {
+}) {*/
+  const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 })
   const [gyro, setGyro] = useState({ x: 0, y: 0 })
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 })
@@ -245,6 +247,17 @@ export default function GlitchyHero({ imageUrl, width, height }: GlitchyHeroProp
     generateGlitchLines()
   }, [dimensions])
 
+  // Loop through images at a set interval
+  useEffect(() => {
+    if (imageUrls.length > 1) {
+      const intervalId = setInterval(() => {
+        setCurrentImageIndex((prevIndex) => (prevIndex + 1) % imageUrls.length)
+      }, 3000) // Change image every 3 seconds, adjust as needed
+
+      return () => clearInterval(intervalId)
+    }
+  }, [imageUrls])
+
   return (
     <div className="relative w-full h-[113%] mb-8 overflow-hidden justify-center" style={{ backgroundColor: themeColors.secondary }}>
       <VignetteOverlay />
@@ -266,21 +279,18 @@ export default function GlitchyHero({ imageUrl, width, height }: GlitchyHeroProp
           transition={{ duration: 1, delay: 1 }}
           className="relative"
         >
-          <motion.img
-            src=imageUrl
-            alt="Hero"
-            className="w-full max-w-2xl mb-8"
-            style={{ width: '95%' }}
-            animate={{
-              y: [0, -5, 0],
-              transition: {
-                duration: 7,
-                repeat: Infinity,
-                ease: "easeInOut"
-              }
-            }}
-          />
-          <EdgeHighlight imageUrl=imageUrl />
+           <motion.img
+        key={currentImageIndex} // Key is important to trigger animation on change
+        src={imageUrls[currentImageIndex]}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 1 }}
+        alt={`Slide ${currentImageIndex}`}
+        className="w-full max-w-2xl mb-8"
+        style={{ width: '100%', height: '100%', objectFit: 'cover', position: 'absolute' }}
+      />
+      <EdgeHighlight imageUrl={imageUrls[currentImageIndex]} />
         </motion.div>
         <motion.div
           initial={{ opacity: 0, y: 20 }}
