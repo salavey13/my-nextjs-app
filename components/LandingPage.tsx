@@ -171,9 +171,9 @@ export default function LandingPage() {
       </AnimatePresence>
 
       <main className="container mx-auto px-4 pt-20 pb-12">
-        <h3 className="text-center text-4xl font-bold text-white">
-        before:
-      </h3>
+        <h5 className="text-center text-4xl font-bold text-white">
+          {t("before:")}
+      </h5>
         <section id="home" className="text-center mb-16 pt-24 rounded-lg overflow-hidden ">
   <motion.div
     initial={{ opacity: 0, scale: 0.8 }}
@@ -244,9 +244,9 @@ export default function LandingPage() {
     </div>
   </motion.div>
 </section>
-        <h3 className="text-center text-4xl font-bold text-white">
-        after:
-      </h3>
+        <h5 className="text-center text-4xl font-bold text-white">
+        {t("after:")}
+      </h5>
 <GlitchyHero imageUrls={["/her01.png", "/Utool-20241025-205631064.png", "/Utool-20241025-213450920.png", "/template-unhuilome.png", "/Utool-20241025-215318432.png"]} />
 
         <section id="features" className="mb-24 ">
