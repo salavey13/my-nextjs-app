@@ -871,6 +871,7 @@ createTask: "Create Task",
   projectSection: "Project Mission Control 🎛️",
   achievementsSection: "Trophy Cabinet 🏆",
   notifySection: "Bat-Signal for Salavey13 🦇",
+  SubmitAnswer: "Submit Answer",
   "devKit": {
     "stageNumber": "Stage Number",
 "notSet": "Not Set",

@@ -734,6 +734,7 @@ createTask: "Створити завдання",
   projectSection: "Проект Mission Control 🎛️",
   achievementsSection: "Шафа трофеїв🏆",
   notifySection: "Bat-Signal для Salavey13 🦇",
+  SubmitAnswer: "Відправити відповідь",
   devKit: {
     stageNumber: "Номер етапу",
 

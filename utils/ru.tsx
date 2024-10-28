@@ -738,6 +738,7 @@ createTask: "Создать задачу",
   projectSection: "Проект Управление полетами 🎛️",
   achievementsSection: "Кабинет трофеев 🏆",
   notifySection: "Bat-Signal для Salavey13 🦇",
+  SubmitAnswer: "Отправить ответ",
   devKit: {
     stageNumber: "# Сцены",
 

@@ -323,7 +323,7 @@ export default function QuizComponent() {
                 onClick={handleSubmitAnswer}
                 disabled={!selectedAnswer}
               >
-                {t('Submit Answer')}
+                {t('SubmitAnswer')}
               </Button>
             )}
           </div>
