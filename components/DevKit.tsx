@@ -335,6 +335,14 @@ export default function DevKit() {
               </TabsList>
               <TabsContent value="gameState">
                 <div className="space-y-4">
+                  <Select onValueChange={handleStageChange} value={selectedStage}>
+                    <SelectTrigger>
+                      <SelectValue placeholder={t("devKit.selectStage")} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {renderStageTree(storyStages)}
+                    </SelectContent>
+                  </Select>
                   <Button onClick={handleShowUnlockChoice} className="w-full">
                     {t("devKit.showUnlockChoice")}
                   </Button>
@@ -409,6 +417,7 @@ export default function DevKit() {
                     }
                     placeholder={t("devKit.newComponentStageMask")}
                   />
+                  {renderStageMask(parseInt(newComponentStageMask))}
                   <Button onClick={handleAddNewComponent} className="w-full">
                     {t("devKit.addNewComponent")}
                   </Button>

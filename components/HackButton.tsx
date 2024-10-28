@@ -30,7 +30,9 @@ const HackButton: React.FC = () => {
   });
 
   useEffect(() => {
-    showBackButton();
+    if(selectedGame) {
+      showBackButton();
+    }
   }, [selectedGame, showBackButton]);
 
   useEffect(() => {
