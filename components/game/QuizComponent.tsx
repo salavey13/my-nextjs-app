@@ -255,7 +255,7 @@ export default function QuizComponent() {
     openLink,
   } = useTelegram();
   const questions = getQuizQuestions(state?.user?.lang || "en");
-  const currentQuestion = quizQuestions[currentQuestionIndex];
+  const currentQuestion = questions[currentQuestionIndex];
 
   const handleAnswerSelect = (answer: string) => {
     setSelectedAnswer(answer);
