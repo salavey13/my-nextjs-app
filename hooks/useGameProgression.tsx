@@ -85,7 +85,7 @@ export const useGameProgression = () => {
     document.body.appendChild(root);
 
     const onCrashComplete = () => {
-      document.body.removeChild(root);
+      //document.body.removeChild(root);
       progressStage(5, ['versimcel']);
     };
 
