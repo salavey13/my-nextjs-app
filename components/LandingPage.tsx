@@ -342,9 +342,9 @@ export default function LandingPage() {
           <Image
             src={template.image}
             alt={template.title}
-            layout="fill"
-            objectFit="cover"
-            className="absolute inset-0 w-full h-full z-[-1]"
+            width={900} // Larger size to fit the new layout
+            height={600}
+            className="absolute inset-0 object-cover w-full h-full z-[-1]"
           />
 
           {/* Spacer for maintaining card size */}
