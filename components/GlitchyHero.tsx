@@ -3,11 +3,10 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react'
 import { motion, useAnimation } from 'framer-motion'
 import { Button } from "@/components/ui/button"
-import { useAppContext } from '../context/AppContext';
+import { useAppContext } from '../context/AppContext'
 import { ArrowRight } from "lucide-react"
-import useTelegram from '@/hooks/useTelegram';
-import { useTheme } from '@/hooks/useTheme';
-
+import useTelegram from '@/hooks/useTelegram'
+import { useTheme } from '@/hooks/useTheme'
 
 const themeColors = {
   secondary: '#020728',
@@ -49,8 +48,8 @@ const GlitchyLine: React.FC<{ x1: number; y1: number; x2: number; y2: number; co
       initial={{ opacity: 0, pathLength: 0 }}
       animate={{ opacity: [0, 1, 0.5], pathLength: 1 }}
       transition={{ 
-        opacity: { delay, duration: 2, times: [0, 0.1, 1] },
-        pathLength: { delay, duration: 2, ease: "easeOut" }
+        opacity: { delay, duration: 1, times: [0, 0.1, 1] },
+        pathLength: { delay, duration: 1, ease: "easeOut" }
       }}
     >
       <line x1={x1} y1={y1} x2={x2} y2={y2} />
@@ -63,7 +62,7 @@ const EdgeHighlight: React.FC<{ imageUrl: string }> = ({ imageUrl }) => {
 
   useEffect(() => {
     const canvas = canvasRef.current
-    const ctx = canvas?.getContext('2d')
+    const ctx = canvas?.getContext('2d', { willReadFrequently: true })
     if (!canvas || !ctx) return
 
     const img = new Image()
@@ -126,18 +125,11 @@ const EdgeHighlight: React.FC<{ imageUrl: string }> = ({ imageUrl }) => {
   )
 }
 
-/*interface GlitchyHeroProps {
-  imageUrl: string
-}*/
 interface GlitchyHeroProps {
   imageUrls: string[];
 }
 
 const GlitchyHero: React.FC<GlitchyHeroProps> = ({ imageUrls }) => {
-  
-/*export default function GlitchyHero({ imageUrl }: GlitchyHeroProps = {
-  imageUrl: '/her01.png'
-}) {*/
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 })
   const [gyro, setGyro] = useState({ x: 0, y: 0 })
@@ -145,9 +137,11 @@ const GlitchyHero: React.FC<GlitchyHeroProps> = ({ imageUrls }) => {
   const requestRef = useRef<number>()
   const previousTimeRef = useRef<number>()
   const [glitchLines, setGlitchLines] = useState<React.ReactNode[]>([])
-  const { t } = useAppContext();
-  const { openLink } = useTelegram();
+  const { t } = useAppContext()
+  const { openLink } = useTelegram()
   const { theme } = useTheme()
+  const [easterEggTriggered, setEasterEggTriggered] = useState(false)
+
   useEffect(() => {
     const updateDimensions = () => {
       setDimensions({
@@ -220,7 +214,6 @@ const GlitchyHero: React.FC<GlitchyHeroProps> = ({ imageUrls }) => {
         const x1 = centerX + Math.cos(angle) * radius
         const y1 = centerY + Math.sin(angle) * radius
         
-        // Randomly flip the angle by 90 degrees
         const flipAngle = Math.random() < 0.5 ? Math.PI / 2 : 0
         const endAngle = Math.round(angle / (Math.PI / 2)) * (Math.PI / 2) + flipAngle
         const length = Math.random() * 100 + 50
@@ -229,7 +222,7 @@ const GlitchyHero: React.FC<GlitchyHeroProps> = ({ imageUrls }) => {
 
         const color = Math.random() > 0.5 ? themeColors.foreground : themeColors.background
         const thickness = Math.random() * 3 + 1
-        const delay = Math.pow(i / numLines, 3) * 2 // Exponential delay
+        const delay = Math.pow(i / numLines, 3) * 2 // Quadratic delay for faster animation
 
         lines.push(
           <GlitchyLine
@@ -251,19 +244,33 @@ const GlitchyHero: React.FC<GlitchyHeroProps> = ({ imageUrls }) => {
     generateGlitchLines()
   }, [dimensions])
 
-  // Loop through images at a set interval
   useEffect(() => {
     if (imageUrls.length > 1) {
       const intervalId = setInterval(() => {
         setCurrentImageIndex((prevIndex) => (prevIndex + 1) % imageUrls.length)
-      }, 13000) // Change image every 13 seconds, adjust as needed
+      }, 13000)
 
       return () => clearInterval(intervalId)
     }
   }, [imageUrls])
 
+  const handleTap = () => {
+    setEasterEggTriggered(true)
+    setTimeout(() => setEasterEggTriggered(false), 3000) // Reset after 3 seconds
+  }
+
+  const imageHeight = dimensions.width * 2//  * 0.5625 16:9 aspect ratio
+
   return (
-    <div className="relative w-full h-[113%] mb-8 overflow-hidden justify-center" style={{ backgroundColor: themeColors.secondary }}>
+    <div 
+      className="relative w-full overflow-hidden justify-center" 
+      style={{ 
+        backgroundColor: themeColors.secondary,
+        
+        maxHeight: '80vh'
+      }}
+      onClick={handleTap}
+    >
       <VignetteOverlay />
       <motion.div
         className="absolute inset-0"
@@ -276,18 +283,18 @@ const GlitchyHero: React.FC<GlitchyHeroProps> = ({ imageUrls }) => {
       >
         {glitchLines}
       </motion.div>
-      <div className="relative z-10 flex flex-col items-center justify-center h-full text-white">
+      <div className="relative flex flex-col items-center justify-center h-full text-white">
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1, delay: 1 }}
           className="relative"
         >
-           <motion.img
-        key={currentImageIndex} // Key is important to trigger animation on change
-        src={imageUrls[currentImageIndex]}
-        initial={{ opacity: 0 }}
-             style={{ width: '95%' }}
+          <motion.img
+            key={currentImageIndex}
+            src={imageUrls[currentImageIndex]}
+            initial={{ opacity: 0 }}
+            style={{ width: '95%' }}
             animate={{
               opacity: 1,
               y: [0, -5, 0],
@@ -297,12 +304,13 @@ const GlitchyHero: React.FC<GlitchyHeroProps> = ({ imageUrls }) => {
                 ease: "easeInOut"
               }
             }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 13 }}
-        alt={`Slide ${currentImageIndex}`}
-        className="w-full max-w-2xl mb-8"
-      />
-      <EdgeHighlight imageUrl={imageUrls[currentImageIndex]} />
+            exit={{ opacity: 0 }}
+            transition={{ duration: 13 }}
+            alt={`Slide ${currentImageIndex}`}
+            className="w-full max-w-2xl mb-8"
+
+          />
+          <EdgeHighlight imageUrl={imageUrls[currentImageIndex]} />
         </motion.div>
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -313,7 +321,7 @@ const GlitchyHero: React.FC<GlitchyHeroProps> = ({ imageUrls }) => {
             {t('home.heading')}
           </h1>
           <p className="text-xl md:text-2xl mb-8 text-center max-w-2xl">
-             {t('home.description')}
+            {t('home.description')}
           </p>
           <Button
             onClick={() => openLink("https://youtube.com/salavey13")}
@@ -324,8 +332,19 @@ const GlitchyHero: React.FC<GlitchyHeroProps> = ({ imageUrls }) => {
           </Button>
         </motion.div>
       </div>
+      {easterEggTriggered && (
+        <motion.div
+          initial={{ opacity: 0, scale: 0 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0 }}
+          transition={{ duration: 0.5 }}
+          className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center"
+        >
+          <div className="text-white text-4xl font-bold">Easter Egg Found!</div>
+        </motion.div>
+      )}
     </div>
   )
 }
 
-export default GlitchyHero;
+export default GlitchyHero

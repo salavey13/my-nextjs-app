@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 // Define types for new functionalities
 interface User {
@@ -20,28 +20,37 @@ export const useTelegram = (props: UseTelegramProps = {}) => {
   const [tg, setTg] = useState<TelegramWebApp | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
+  const [webAppVersion, setWebAppVersion] = useState<number>(0);
+
+  const handleBackButton = useCallback(() => {
+    if (onBackButtonPressed) {
+      onBackButtonPressed();
+    } else if (tg && webAppVersion >= 6.1) {
+      tg.close();
+    }
+  }, [onBackButtonPressed, tg, webAppVersion]);
 
   useEffect(() => {
     if (typeof window !== 'undefined' && window.Telegram?.WebApp) {
       const telegram = window.Telegram.WebApp;
+      setTg(telegram);
+      const version = parseFloat(telegram.version);
+      setWebAppVersion(version);
 
-      // Show the back button only when needed
-      if (onBackButtonPressed) {
-        telegram.BackButton?.show();
-        telegram.BackButton?.onClick(onBackButtonPressed);
-      } else {
-        telegram.BackButton?.hide(); // Hide if not needed
+      if (version >= 6.1) {
+        telegram?.BackButton?.onClick(handleBackButton);
       }
 
       // Clean up when unmounted
       return () => {
-        telegram.BackButton?.hide();
+        if (version >= 6.1) {
+          telegram?.BackButton?.hide();
+        }
       };
     }
-  }, [onBackButtonPressed]);
+  }, [handleBackButton]);
   
   useEffect(() => {
-    // Ensure we're on the client side before interacting with the DOM
     if (typeof window !== 'undefined') {
       const initTelegramWebApp = () => {
         const script = document.createElement('script');
@@ -54,6 +63,7 @@ export const useTelegram = (props: UseTelegramProps = {}) => {
             const tgWebApp = window.Telegram.WebApp as TelegramWebApp;
             tgWebApp.ready();
             setTg(tgWebApp);
+            setWebAppVersion(parseFloat(tgWebApp.version));
 
             const user = tgWebApp.initDataUnsafe?.user;
             if (user) setUser(user);
@@ -62,7 +72,6 @@ export const useTelegram = (props: UseTelegramProps = {}) => {
           }
         };
 
-        // Cleanup the script tag on unmount
         return () => {
           document.head.removeChild(script);
         };
@@ -89,85 +98,91 @@ export const useTelegram = (props: UseTelegramProps = {}) => {
     }
   };
 
-  const showBackButton = () => {
-    if (tg?.BackButton && String(window.Telegram?.WebView?.initParams.tgWebVersion) > "6") {
+  const showBackButton = useCallback(() => {
+    if (tg?.BackButton && webAppVersion >= 6.1) {
       tg.BackButton.show();
     }
-  };
+  }, [tg, webAppVersion]);
+
+  const hideBackButton = useCallback(() => {
+    if (tg?.BackButton && webAppVersion >= 6.1) {
+      tg.BackButton.hide();
+    }
+  }, [tg, webAppVersion]);
 
   const closeWebApp = () => {
-    if (tg) {
+    if (tg && webAppVersion >= 6.1) {
       tg.close();
     }
   };
   const showCloseButton = () => {
-    if (tg) {
+    if (tg && webAppVersion >= 6.1) {
       tg.close();
     }
   };
 
   const showPopup = (params: PopupParams, callback?: (buttonId: string) => void) => {
-    if (tg) {
+    if (tg && webAppVersion >= 6.1) {
       tg.showPopup(params, callback);
     }
   };
 
   const showAlert = (message: string, callback?: () => void) => {
-    if (tg) {
+    if (tg && webAppVersion >= 6.1) {
       tg.showAlert(message, callback);
     }
   };
 
   const showConfirm = (message: string, callback?: (confirmed: boolean) => void) => {
-    if (tg) {
+    if (tg && webAppVersion >= 6.1) {
       tg.showConfirm(message, callback);
     }
   };
 
   const showScanQrPopup = (params: ScanQrPopupParams, callback?: (text: string) => void) => {
-    if (tg) {
+    if (tg && webAppVersion >= 6.1) {
       tg.showScanQrPopup(params, callback);
     }
   };
 
   const closeScanQrPopup = () => {
-    if (tg) {
+    if (tg && webAppVersion >= 6.1) {
       tg.closeScanQrPopup();
     }
   };
 
   const readTextFromClipboard = (callback?: (text: string) => void) => {
-    if (tg) {
+    if (tg && webAppVersion >= 6.1) {
       tg.readTextFromClipboard(callback);
     }
   };
 
   const enableVerticalSwipes = () => {
-    if (tg) {
+    if (tg && webAppVersion >= 6.1) {
       tg.enableVerticalSwipes();
     }
   };
 
   const disableVerticalSwipes = () => {
-    if (tg) {
+    if (tg && webAppVersion >= 6.1) {
       tg.disableVerticalSwipes();
     }
   };
 
   const setHeaderColor = (color: string) => {
-    if (tg) {
+    if (tg && webAppVersion >= 6.1) {
       tg.setHeaderColor(color);
     }
   };
 
   const setBottomBarColor = (color: string) => {
-    if (tg) {
+    if (tg && webAppVersion >= 6.1) {
       tg.setBottomBarColor(color);
     }
   };
 
   const setBackgroundColor = (color: string) => {
-    if (tg) {
+    if (tg && webAppVersion >= 6.1) {
       tg.setBackgroundColor(color);
     }
   };
@@ -191,11 +206,13 @@ export const useTelegram = (props: UseTelegramProps = {}) => {
     tg,
     user,
     theme,
+    webAppVersion,
     setTheme,
     openLink,
     showMainButton,
     hideMainButton,
     showBackButton,
+    hideBackButton,
     showCloseButton,
     closeWebApp,
     showPopup,

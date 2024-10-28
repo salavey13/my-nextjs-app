@@ -20,6 +20,7 @@ interface TelegramThemeParams {
   }
   
   interface TelegramWebApp {
+    version: string;
     expand(): void;
     initData: string;
     initDataUnsafe: {

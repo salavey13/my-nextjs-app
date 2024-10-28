@@ -292,6 +292,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     setBackgroundColor,
     setBottomBarColor,
     disableVerticalSwipes,
+    webAppVersion
   } = useTelegram();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -299,9 +300,9 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   
   const { theme } = useTheme()
 
-  // useEffect(() => {
-  //   setStoryStages(storiRealStages)
-  // }, [])
+  useEffect(() => {
+    setStoryStages(storiRealStages)
+  }, [])
 
 
 
@@ -437,25 +438,33 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
   useEffect(() => {
     if (tg) {
-      tg.ready();
-      setTheme(state.user?.dark_theme ? "dark" : "light");
-      if (state.user && !state.user.dark_theme) {
-        setHeaderColor(theme.colors.secondary);
-        setBackgroundColor(theme.colors.secondary);
-        setBottomBarColor(theme.colors.secondary);
-      } else {
-        setHeaderColor(theme.colors.secondary);
-        setBackgroundColor(theme.colors.secondary);
-        setBottomBarColor(theme.colors.secondary);
+      tg.ready()
+      setTheme(state.user?.dark_theme ? "dark" : "light")
+      
+      // Only set colors if the Web App version supports it
+      if (webAppVersion >= 6.1) {
+        if (state.user && !state.user.dark_theme) {
+          setHeaderColor(theme.colors.secondary)
+          setBackgroundColor(theme.colors.secondary)
+          setBottomBarColor(theme.colors.secondary)
+        } else {
+          setHeaderColor(theme.colors.secondary)
+          setBackgroundColor(theme.colors.secondary)
+          setBottomBarColor(theme.colors.secondary)
+        }
       }
-      disableVerticalSwipes();
 
-      const tgUser = tg.initDataUnsafe?.user;
+      // Only disable vertical swipes if the Web App version supports it
+      if (webAppVersion >= 6.1) {
+        disableVerticalSwipes()
+      }
+
+      const tgUser = tg.initDataUnsafe?.user
       if (tgUser) {
-        fetchPlayer(tgUser.id, tgUser.username, tgUser.language_code);
+        fetchPlayer(tgUser.id, tgUser.username, tgUser.language_code)
       }
     }
-  }, [tg]);
+  }, [tg, theme.colors.secondary, state.user, setTheme, setHeaderColor, setBackgroundColor, setBottomBarColor, disableVerticalSwipes, webAppVersion])
 
   useEffect(() => {
     const channel = supabase
@@ -586,7 +595,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     } catch (error) {
       console.error('Error fetching story stages:', error)
     }
-  }, [t])
+  }, [])
 
   const updateStoryStage = useCallback(async (updatedStage: any) => {
     try {
@@ -602,7 +611,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     } catch (error) {
       console.error('Error updating story stage:', error)
     }
-  }, [fetchStoryStages, t])
+  }, [fetchStoryStages])
 
   useEffect(() => {
     fetchStoryStages()
