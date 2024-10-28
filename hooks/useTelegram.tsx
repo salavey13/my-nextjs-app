@@ -90,7 +90,7 @@ export const useTelegram = (props: UseTelegramProps = {}) => {
   };
 
   const showBackButton = () => {
-    if (tg?.BackButton) {
+    if (tg?.BackButton && String(window.Telegram?.WebView?.initParams.tgWebVersion) > "6") {
       tg.BackButton.show();
     }
   };

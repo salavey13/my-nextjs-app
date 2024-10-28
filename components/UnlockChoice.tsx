@@ -46,7 +46,7 @@ interface Skill {
   prerequisites: number[]
 }
 
-const UnlockChoice: React.FC<UnlockChoiceProps> = ({ onClose, currentStage }) => {
+const UnlockChoice: React.FC<UnlockChoiceProps> = ({ onClose, currentStage, isDevMode }) => {
   const { state, dispatch, t, storyStages } = useAppContext();
   const { progressStage, simulateCrash } = useGameProgression();
   const [showSideHustleModal, setShowSideHustleModal] = useState(false);

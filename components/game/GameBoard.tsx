@@ -215,8 +215,6 @@ const GameBoard: React.FC<{ goBack: () => void }> = ({ goBack }) => {
     setTimeout(() => {
       setIsShuffling(false);
       showMainButton(t('shuffle'));
-      setBottomBarColor("#020728");
-      setHeaderColor("#020728");
     }, 1000);
   }, [ updateSupabase, gameState, user?.currentFoolGameId, randomizeTargetFrame, showMainButton, setBottomBarColor, setHeaderColor, t]);
 
@@ -328,9 +326,7 @@ const GameBoard: React.FC<{ goBack: () => void }> = ({ goBack }) => {
   useEffect(() => {
     showMainButton(t('shuffle'));
     tg?.MainButton?.setParams({ color: "#11E6D0", text_color: "#000000" });
-    setBottomBarColor("#020728");
-    setHeaderColor("#020728");
-  }, [ showMainButton, t, tg, setBottomBarColor, setHeaderColor]);
+  }, [ showMainButton, t, tg]);
 
   // Handle main button click
   useEffect(() => {

@@ -44,11 +44,9 @@ const EnhancedChatButton = () => {
       showMainButton('v0.dev');
       tg.MainButton?.onClick(handleOpenChatGPT);
       tg.MainButton?.setParams({color: "#020728", text_color: "#000000"});
-      setBottomBarColor("#020728");
-      setHeaderColor("#020728");
-      setBackgroundColor("#020728");
+
     }
-  }, [ tg, showMainButton, setBottomBarColor, setHeaderColor, setBackgroundColor, handleOpenChatGPT]);
+  }, [ tg, showMainButton, handleOpenChatGPT]);
   
   return (
     <div className={`flex items-center justify-center bg-background p-2 gap-2`}>

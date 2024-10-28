@@ -123,7 +123,7 @@ const toCamelCase = (str:string) => {
                 alt={t(toCamelCase('photo_upload.photo_alt'))} 
                 width={500} 
                 height={300} 
-                layout="responsive"
+                className=" object-cover"
               />
             </div>
           ) : (

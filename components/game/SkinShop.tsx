@@ -161,8 +161,8 @@ const SkinShop = () => {
           src={skin.shirtImgUrl} 
           alt="Shirt skin" 
           width={48}
-          height={48}
-          className="absolute bottom-0 right-0 w-12 h-12 object-cover"
+          height={64}
+          className="absolute bottom-0 right-0 w-12 h-16 object-cover"
         />
       </div>
       <div className="p-2">

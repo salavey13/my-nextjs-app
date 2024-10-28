@@ -141,10 +141,16 @@ interface TelegramWebApp {
     colorScheme: 'light' | 'dark'; // Define the color scheme that can be light or dark
 }
 
+interface TelegramWebView {
+    initParams: {
+        tgWebVersion: string;
+    };
+}
 // Extend the global Window interface to include the Telegram WebApp
 interface Window {
     Telegram?: {
         WebApp?: TelegramWebApp;
+        WebView?: TelegramWebView;
     };
 }
 
