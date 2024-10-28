@@ -872,6 +872,7 @@ createTask: "Create Task",
   achievementsSection: "Trophy Cabinet 🏆",
   notifySection: "Bat-Signal for Salavey13 🦇",
   SubmitAnswer: "Submit Answer",
+  unlock: "Unlock",
   "devKit": {
     "stageNumber": "Stage Number",
 "notSet": "Not Set",

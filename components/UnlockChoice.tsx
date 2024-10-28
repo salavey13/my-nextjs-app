@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Zap, Car, Users, Dice1, Coins, CreditCard, Shield, GitBranch } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+import { useTheme } from '@/hooks/useTheme'
 
 interface UnlockChoiceProps {
   onClose: () => void
@@ -49,6 +50,7 @@ const UnlockChoice: React.FC<UnlockChoiceProps> = ({ onClose, currentStage, isDe
   const { progressStage } = useGameProgression()
   const [skills, setSkills] = useState<Skill[]>([])
   const [columns, setColumns] = useState(3)
+  const { theme } = useTheme()
 
   useEffect(() => {
     const handleResize = () => {
@@ -154,7 +156,7 @@ const UnlockChoice: React.FC<UnlockChoiceProps> = ({ onClose, currentStage, isDe
                                 disabled={!isSkillUnlockable(skill)}
                                 size="sm"
                               >
-                                {t(`unlock${skill.activecomponent.charAt(0).toUpperCase() + skill.activecomponent.slice(1)}`)}
+                                {t(`unlock`)}
                               </Button>
                             </div>
                           </CardContent>
@@ -174,6 +176,47 @@ const UnlockChoice: React.FC<UnlockChoiceProps> = ({ onClose, currentStage, isDe
                 </motion.div>
               )
             })}
+            {/* Prerequisite arrows */}
+          {/* <svg className="absolute top-0 left-0 w-full h-full pointer-events-none">
+            <defs>
+              <marker
+                id="arrowhead"
+                markerWidth="10"
+                markerHeight="7"
+                refX="0"
+                refY="3.5"
+                orient="auto"
+              >
+                <polygon points="0 0, 10 3.5, 0 7" fill={theme.colors.primary.hex} />
+              </marker>
+            </defs>
+            {skills.map(skill => 
+              skill.prerequisites.map(prereqId => {
+                const prereq = skills.find(s => s.id === prereqId)
+                if (prereq) {
+                  const startX = (skills.indexOf(prereq) % columns) * (100 / columns) + (100 / columns / 2)
+                  const startY = Math.floor(skills.indexOf(prereq) / columns) * 200 + 150
+                  const endX = (skills.indexOf(skill) % columns) * (100 / columns) + (100 / columns / 2)
+                  const endY = Math.floor(skills.indexOf(skill) / columns) * 200 + 50
+                  return (
+                    <line 
+                      key={`${skill.id}-${prereqId}`}
+                      x1={`${startX}%`} 
+                      y1={startY} 
+                      x2={`${endX}%`} 
+                      y2={endY} 
+                      stroke={theme.colors.primary.hex}
+                      strokeWidth="2"
+                      strokeDasharray="5,5"
+                      opacity="0.42"
+                      markerEnd="url(#arrowhead)"
+                    />
+                  )
+                }
+                return null
+              })
+            )}
+          </svg> */}
           </AnimatePresence>
         </div>
       </DialogContent>

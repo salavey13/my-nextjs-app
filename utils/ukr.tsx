@@ -735,6 +735,7 @@ createTask: "Створити завдання",
   achievementsSection: "Шафа трофеїв🏆",
   notifySection: "Bat-Signal для Salavey13 🦇",
   SubmitAnswer: "Відправити відповідь",
+  unlock: "Розблокувати",
   devKit: {
     stageNumber: "Номер етапу",
 
