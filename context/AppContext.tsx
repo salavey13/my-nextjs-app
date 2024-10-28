@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useReducer, useEffect, ReactNode, Suspense } from 'react';
+import React, { createContext, useContext, useReducer, useState, useEffect, ReactNode, Suspense, useCallback } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { LanguageDictionary, translations } from "../utils/TranslationUtils";
 import { usePathname, useSearchParams } from 'next/navigation';
@@ -9,6 +9,7 @@ import useTelegram from '../hooks/useTelegram';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import { ThemeProvider } from '@/context/ThemeContext'
 import { useTheme } from '@/hooks/useTheme'
+import storiRealStages  from '@/lib/storyStages'
 interface GameState {
   stage: number;
   coins: number;
@@ -69,14 +70,29 @@ export interface UserData {
 
 interface AppState {
   user: UserData | null;
+  storyStages: any[]
   debugLogs: string[];
   formState: any;
+}
+
+export interface StoryStage {
+  id: number
+  parentid: number | null
+  stage: number
+  storycontent: string
+  xuinitydialog: string
+  trigger: string
+  activecomponent: string
+  minigame: string
+  achievement: string
+  bottomshelfbitmask: number
 }
 
 type Action =
   | { type: 'SET_USER'; payload: UserData }
   | { type: 'UPDATE_USER'; payload: Partial<UserData> }
   | { type: 'UPDATE_GAME_STATE'; payload: Partial<GameState> }
+  | { type: 'SET_STORY_STAGES'; payload: any[] }
   | { type: 'ADD_DEBUG_LOG'; payload: string }
   | { type: 'SET_FORM_STATE'; payload: any }
   | { type: 'RESET_USER' };
@@ -179,6 +195,9 @@ interface AppContextType {
   isVersimcelUnlocked: (playerStage: number) => boolean;
   isGitHubUnlocked: (playerStage: number) => boolean;
   getSideHustleTrigger: (hustleId: number) => SideHustle;
+  storyStages: StoryStage[];
+  fetchStoryStages: () => Promise<void>;
+  updateStoryStage: (updatedStage: any) => Promise<void>;
 }
 
 const initialState: AppState = {
@@ -230,6 +249,7 @@ const initialState: AppState = {
       }
     }
   },
+  storyStages: [],
   debugLogs: [],
   formState: {},
 };
@@ -248,6 +268,8 @@ function appReducer(state: AppState, action: Action): AppState {
           game_state: { ...state.user.game_state, ...action.payload }
         }
       } : state;
+    case 'SET_STORY_STAGES':
+      return { ...state, storyStages: action.payload }
     case 'ADD_DEBUG_LOG':
       return { ...state, debugLogs: [...state.debugLogs, action.payload] };
     case 'SET_FORM_STATE':
@@ -273,8 +295,16 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   } = useTelegram();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const [storyStages, setStoryStages] = useState<StoryStage[]>([])
   
   const { theme } = useTheme()
+
+  // useEffect(() => {
+  //   setStoryStages(storiRealStages)
+  // }, [])
+
+
+
 
   const fetchPlayer = async (tg_id: number, username: string, lang: string) => {
     try {
@@ -410,13 +440,13 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       tg.ready();
       setTheme(state.user?.dark_theme ? "dark" : "light");
       if (state.user && !state.user.dark_theme) {
-        setHeaderColor("#020728");
-        setBackgroundColor("#020728");
-        setBottomBarColor("#020728");
+        setHeaderColor(theme.colors.secondary);
+        setBackgroundColor(theme.colors.secondary);
+        setBottomBarColor(theme.colors.secondary);
       } else {
-        setHeaderColor("#020728");
-        setBackgroundColor("#020728");
-        setBottomBarColor("#020728");
+        setHeaderColor(theme.colors.secondary);
+        setBackgroundColor(theme.colors.secondary);
+        setBottomBarColor(theme.colors.secondary);
       }
       disableVerticalSwipes();
 
@@ -470,6 +500,114 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     localStorage.setItem('formState', JSON.stringify(state.formState));
   };
 
+  // const progressStage = useCallback(async (newStage: number, unlockedComponents: string[] = [], skipToast: boolean = false) => {
+  //   if (!state.user?.id) return
+  //   try {
+  //     const { data: latestUserData, error: fetchError } = await supabase
+  //       .from('users')
+  //       .select('game_state')
+  //       .eq('id', state.user.id)
+  //       .single()
+
+  //     if (fetchError) throw fetchError
+
+  //     const latestGameState = latestUserData.game_state
+
+  //     const updatedGameState = {
+  //       ...latestGameState,
+  //       stage: Math.max(latestGameState.stage, newStage),
+  //       unlockedComponents: Array.from(new Set([
+  //         ...(latestGameState.unlockedComponents || []),
+  //         ...unlockedComponents
+  //       ])),
+  //     }
+
+  //     const { error: updateError } = await supabase
+  //       .from('users')
+  //       .update({ game_state: updatedGameState })
+  //       .eq('id', state.user.id)
+
+  //     if (updateError) throw updateError
+
+  //     dispatch({
+  //       type: 'UPDATE_GAME_STATE',
+  //       payload: updatedGameState,
+  //     })
+
+  //     if (!skipToast) {
+  //       if (updatedGameState.stage > latestGameState.stage) {
+  //         toast({
+  //           title: t('stageProgression'),
+  //           description: t(`stage${updatedGameState.stage}Unlocked`),
+  //         })
+  //       }
+
+  //       unlockedComponents.forEach(component => {
+  //         if (!latestGameState.unlockedComponents?.includes(component)) {
+  //           toast({
+  //             title: t('componentUnlocked'),
+  //             description: t(`${component}Unlocked`),
+  //           })
+  //         }
+  //       })
+  //     }
+  //   } catch (error) {
+  //     console.error('Error updating game stage:', error)
+  //     toast({
+  //       title: t('error'),
+  //       description: t('errorUpdatingGameState'),
+  //       variant: 'destructive',
+  //     })
+  //   }
+  // }, [state.user, t])
+
+  // const simulateCrash = useCallback(async () => {
+  //   const CrashSimulation = (await import('@/components/CrashSimulation')).default
+  //   const root = document.createElement('div')
+  //   document.body.appendChild(root)
+
+  //   const onCrashComplete = () => {
+  //     document.body.removeChild(root)
+  //     progressStage(5, ['versimcel'])
+  //   }
+
+  //   ReactDOM.render(<CrashSimulation onCrashComplete={onCrashComplete} />, root)
+  // }, [progressStage])
+
+  const fetchStoryStages = useCallback(async () => {
+    try {
+      const { data, error } = await supabase
+        .from('story_stages')
+        .select('*')
+        .order('stage', { ascending: true })
+
+      if (error) throw error
+      dispatch({ type: 'SET_STORY_STAGES', payload: data || [] })
+    } catch (error) {
+      console.error('Error fetching story stages:', error)
+    }
+  }, [t])
+
+  const updateStoryStage = useCallback(async (updatedStage: any) => {
+    try {
+      const { error } = await supabase
+        .from('story_stages')
+        .update(updatedStage)
+        .eq('id', updatedStage.id)
+
+      if (error) throw error
+
+
+      fetchStoryStages()
+    } catch (error) {
+      console.error('Error updating story stage:', error)
+    }
+  }, [fetchStoryStages, t])
+
+  useEffect(() => {
+    fetchStoryStages()
+  }, [fetchStoryStages])
+
   return (
     <Suspense fallback={<LoadingSpinner />}>
       <ThemeProvider>
@@ -490,7 +628,10 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         areRentsUnlocked,
         isVersimcelUnlocked,
         isGitHubUnlocked,
-        getSideHustleTrigger
+        getSideHustleTrigger,
+        storyStages,
+        fetchStoryStages,
+        updateStoryStage,
       }}>
         
         {children}

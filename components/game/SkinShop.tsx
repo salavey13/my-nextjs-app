@@ -220,8 +220,7 @@ const SkinShop = () => {
             {!customizationUnlocked && (
               <p className="text-center mt-4">{t('keepPlayingToUnlock')}</p>
             )}
-
-            {showUnlockChoice && <UnlockChoice />}
+            {showUnlockChoice && <UnlockChoice onClose={() => setShowUnlockChoice(false)} currentStage={state.user?.game_state?.stage} isDevMode={false} />}
           </>
         )}
       </CardContent>

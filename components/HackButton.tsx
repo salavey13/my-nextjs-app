@@ -19,6 +19,7 @@ const HackButton: React.FC = () => {
   const [showUnlockChoice, setShowUnlockChoice] = useState(false);
   const [hackCount, setHackCount] = useState(0); // Added state for hack count
   const { simulateCrash, progressStage } = useGameProgression();
+  const [selectedStage, setSelectedStage] = useState(state.user?.game_state?.stage?.toString() || "0")
   
   const { showBackButton } = useTelegram({
     onBackButtonPressed: () => {
@@ -141,7 +142,12 @@ const HackButton: React.FC = () => {
       )}
       {selectedGame === 'cards' && <GameBoard goBack={goBack} />}
       {selectedGame === 'dice' && <DiceGame goBack={goBack} />}
-      {showUnlockChoice && <UnlockChoice />}
+      {showUnlockChoice && 
+      <UnlockChoice
+          onClose={() => setShowUnlockChoice(false)}
+          currentStage={parseInt(selectedStage)}
+        />
+      }
     </div>
   );
 };

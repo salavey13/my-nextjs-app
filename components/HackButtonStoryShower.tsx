@@ -581,6 +581,11 @@ export default function HackButtonStoryShower() {
           </AnimatePresence>
         </CardContent>
       </Card>
+        
+        {showUnlockChoice && <UnlockChoice  
+          onClose={() => setShowUnlockChoice(false)}
+          currentStage={state.user?.game_state?.stage || 1}/>
+        }
     </div>
   )
 }

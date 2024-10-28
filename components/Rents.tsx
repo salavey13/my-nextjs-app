@@ -523,7 +523,9 @@ export default function Rents() {
           </div>
         </DialogContent>
       </Dialog>
-      {showUnlockChoice && <UnlockChoice />}
+      {showUnlockChoice && <UnlockChoice 
+          onClose={() => setShowUnlockChoice(false)}
+          currentStage={user?.game_state?.stage || 1}/>}
       <Dialog open={showSideHustleModal} onOpenChange={setShowSideHustleModal}>
         <DialogContent>
           <DialogHeader>

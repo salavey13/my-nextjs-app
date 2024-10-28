@@ -274,7 +274,10 @@ const Profile: React.FC = () => {
           </CardContent>
         </Card>
         
-        {showUnlockChoice && <UnlockChoice />}
+        {showUnlockChoice && <UnlockChoice  
+          onClose={() => setShowUnlockChoice(false)}
+          currentStage={user?.game_state?.stage || 1}/>
+        }
       </motion.div>
     </AnimatePresence>
   );

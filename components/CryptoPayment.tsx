@@ -171,7 +171,10 @@ export const CryptoPayment: React.FC<{ creatorTelegramId: string }> = ({ creator
                     <PaymentNotification link={paymentLink} />
                 </div>
             )}
-            {showUnlockChoice && <UnlockChoice />} {/* Added UnlockChoice component */}
+            {showUnlockChoice && <UnlockChoice 
+          onClose={() => setShowUnlockChoice(false)}
+          currentStage={state.user?.game_state?.stage || 1}/>
+      } {/* Added UnlockChoice component */}
             <Dialog open={showSideHustleModal} onOpenChange={setShowSideHustleModal}>
                 <DialogContent>
                 <DialogHeader>
