@@ -871,7 +871,29 @@ createTask: "Create Task",
   projectSection: "Project Mission Control 🎛️",
   achievementsSection: "Trophy Cabinet 🏆",
   notifySection: "Bat-Signal for Salavey13 🦇",
-  devKit: {
+  "devKit": {
+    "stageNumber": "Stage Number",
+
+storyContent: "Content",
+xuinityDialog: "Dialog",
+
+trigger: "Trigger",
+
+activeComponent: "Active Component",
+
+minigame: "Minigame",
+
+achievement: "Achievement",
+
+
+bottomShelfBitmask: "Bottom Shelf Bitmask",
+
+parentStage: "Parent Stage",
+
+editStage: "Edit Stage",
+addNewStage: "Add New Stage",
+
+xuinitySays: "XUINITY Says",
     showUnlockChoice: "Show Unlock Choice",
     failedToFetchStoryStages: "Failed to Fetch Story Stages",
     crashSimulated: "Oops! It Crashed!",

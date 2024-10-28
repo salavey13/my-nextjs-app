@@ -739,6 +739,28 @@ createTask: "Создать задачу",
   achievementsSection: "Кабинет трофеев 🏆",
   notifySection: "Bat-Signal для Salavey13 🦇",
   devKit: {
+    stageNumber: "# Сцены",
+
+storyContent: "Контент",
+xuinityDialog: "Диалог",
+
+trigger: "Триггер",
+
+activeComponent: "Активный компонент",
+
+minigame: "Мини-игра",
+
+achievement: "Ачивка",
+
+
+bottomShelfBitmask: "Битмаска",
+
+parentStage: "Стадия родителя",
+
+editStage: "Редактировать сцену",
+addNewStage: "Добавить новую сцену",
+
+xuinitySays: "XUINITY:",
     showUnlockChoice: "Показать выбор разблокировки",
     failToFetchStoryStages: "Не удалось получить этапы истории",
     crashSimulated: "Уронено",

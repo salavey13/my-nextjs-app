@@ -263,15 +263,12 @@ const GlitchyHero: React.FC<GlitchyHeroProps> = ({ imageUrls }) => {
 
   return (
     <div 
-      className="relative w-full overflow-hidden justify-center" 
-      style={{ 
-        backgroundColor: themeColors.secondary,
-        
-        maxHeight: '80vh'
-      }}
+      className="relative w-full h-[113%] mb-8 overflow-visible justify-center"
+ 
+      
       onClick={handleTap}
     >
-      <VignetteOverlay />
+      {/* <VignetteOverlay /> */}
       <motion.div
         className="absolute inset-0"
         animate={{
@@ -326,7 +323,7 @@ const GlitchyHero: React.FC<GlitchyHeroProps> = ({ imageUrls }) => {
           </p>
           <Button
             onClick={() => openLink("https://youtube.com/salavey13")}
-            className="text-gray-100 px-8 py-3 rounded-lg text-lg mb-8 mr-2 ml-2 font-semibold hover:bg-opacity-90 transition-colors"
+            className="text-gray-100 px-8 py-3 rounded-lg text-lg mb-8 mr-2 ml-2 font-semibold hover:bg-opacity-90 hover:text-grey-100 transition-colors"
             variant="neon"
           >
             {t('home.watchVideos')} <ArrowRight className="inline-block ml-2" />
@@ -341,7 +338,7 @@ const GlitchyHero: React.FC<GlitchyHeroProps> = ({ imageUrls }) => {
           transition={{ duration: 0.5 }}
           className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center"
         >
-          <div className="text-white text-4xl font-bold">Easter Egg Found!</div>
+          <div className="text-white text-4xl font-bold">SALAVEY13</div>
         </motion.div>
       )}
     </div>

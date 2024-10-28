@@ -735,6 +735,27 @@ createTask: "Створити завдання",
   achievementsSection: "Шафа трофеїв🏆",
   notifySection: "Bat-Signal для Salavey13 🦇",
   devKit: {
+    stageNumber: "Номер етапу",
+
+storyContent: "Контент",
+xuinityDialog: "Діалог",
+
+trigger: "Триггер",
+
+activeComponent: "Активний компонент",
+
+minigame: "Мини-игра",
+
+achievements: "Ачивка",
+
+
+bottomShelfBitmask: "Бітмаска",
+
+parentStage: "Стадия родителя",
+
+editStage: "Редактувати сцену",
+addNewStage: "Додати нову сцену",
+xuinitySays: "XUINITY:",
     showUnlockChoice: "Показати вибір розблокування",
     failedToFetchStoryStages: "Не вдалося отримати етапи історії",
     crashSimulated: "Уронено",

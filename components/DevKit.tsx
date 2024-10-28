@@ -11,11 +11,9 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import { Checkbox } from '@/components/ui/checkbox'
 import { toast } from '@/hooks/use-toast'
 import { supabase } from '@/lib/supabaseClient'
-//import { StoryEdit } from './StoryEdit'
 import { useGameProgression } from '@/hooks/useGameProgression'
 import { getNavigationLinks, NavigationLink } from '@/lib/navigationLinks'
 import { dynamicComponents, DynamicComponent } from '@/lib/dynamicComponents'
-import storiRealStages  from '@/lib/storyStages'
 import UnlockChoice from './UnlockChoice'
 import { Textarea } from './ui/textarea'
 
@@ -36,11 +34,8 @@ interface StageStats {
   [key: string]: number;
 }
 
-//const storiRealStages:StoryStage[] = storyStages
-
 export default function DevKit() {
   const { state, dispatch, t, storyStages } = useAppContext()
-  //const [storyStages, setStoryStages] = useState<StoryStage[]>([])
   const [selectedStage, setSelectedStage] = useState(state.user?.game_state?.stage?.toString() || "0")
   const [coins, setCoins] = useState(state.user?.game_state?.coins || 0)
   const [crypto, setCrypto] = useState(state.user?.game_state?.crypto || 0)
@@ -117,10 +112,10 @@ export default function DevKit() {
   }, [navigationLinks, state.user?.game_state?.unlockedComponents])
 
   useEffect(() => {
-    //etchStoryStages()
+    //fetchStoryStages()
     fetchStageStats()
     initializeBottomShelfComponents()
-  }, [ fetchStageStats, initializeBottomShelfComponents])
+  }, [fetchStageStats, initializeBottomShelfComponents])
 
   const handleAddNewComponent = useCallback(() => {
     if (!newComponentName || !newComponentIcon) {
@@ -177,7 +172,6 @@ export default function DevKit() {
     setCrypto(parseInt(e.target.value) || 0)
   }, [])
 
-
   const handleBottomShelfComponentChange = useCallback((component: string, checked: boolean) => {
     setBottomShelfComponents(prev => ({ ...prev, [component]: checked }));
   }, []);
@@ -216,7 +210,6 @@ export default function DevKit() {
         title: t("devKit.success"),
         description: t("devKit.gameStateUpdated"),
         variant: "success",
-        stage: updatedGameState.stage,
       });
 
     } catch (error) {
@@ -229,17 +222,6 @@ export default function DevKit() {
     }
   }, [state.user, selectedStage, bottomShelfComponents, coins, crypto, dispatch, t]);
 
-  const isComponentUnlockable = useCallback((component: string, stage: number) => {
-    const link = navigationLinks.find(link => link.component === component);
-    if (!link) return false;
-    if (component === 'admin') {
-      return stage >= 7;
-    }
-    return (link.stageMask & (1 << (stage - 1))) !== 0;
-  }, [navigationLinks]);
-
-
-                                            
   const handleSimulateCrash = useCallback(async () => {
     try {
       await simulateCrash()
@@ -262,31 +244,18 @@ export default function DevKit() {
     setShowUnlockChoice(true)
   }, [])
 
-  const renderStageTree = useCallback((stages: StoryStage[], parentId: string | null = null, depth = 0) => {
+  const renderStageTree = useCallback((stages: StoryStage[], parentId: number | null = null, depth = 0) => {
     const childStages = stages.filter(stage => stage.parentid === parentId)
     
     return childStages.map(stage => (
       <React.Fragment key={stage.id}>
         <SelectItem value={stage.stage.toString()} className="text-xs">
           <div style={{ marginLeft: `${depth * 20}px` }}>
-            (ID: {stage.id}) (parentId: {stage.parentid}) {t("devKit.stage")} {stage.stage} 
-            <br />
-            (xuinityDialog: {stage.xuinitydialog?.substring(0, 30) || 'N/A'}...) 
-            <br />
-            (storyContent: {stage.storycontent?.substring(0, 30) || 'N/A'}...) 
-            <br />
-            (achievement: {stage.achievement || 'N/A'}) 
-            <br />
-            (activeComponent: {stage.activecomponent || 'N/A'}) 
-            <br />
-            (minigame: {stage.minigame || 'N/A'}) 
-            <br />
-            (trigger: {stage.trigger || 'N/A'})
-            <br />
-            (bottomShelfBitmask: {stage.bottomshelfbitmask || 'N/A'})
+            {t("devKit.stage")} {stage.stage} (ID: {stage.id})
+            {stage.storycontent && ` - ${stage.storycontent.substring(0, 30)}...`}
           </div>
         </SelectItem>
-        {renderStageTree(stages, stage.id.toString(), depth + 1)}
+        {renderStageTree(stages, stage.id, depth + 1)}
       </React.Fragment>
     ))
   }, [t])
@@ -413,7 +382,7 @@ export default function DevKit() {
                     type="text"
                     value={newComponentStageMask}
                     onChange={(e) => 
-                      setNewComponentStageMask(e.target.value.startsWith('0b') ? e.target.value : `0b${e.target.value}`)
+                      setNewComponentStageMask(e.target.value.startsWith('0b') ? e.target.value :   `0b${e.target.value}`)
                     }
                     placeholder={t("devKit.newComponentStageMask")}
                   />
@@ -438,15 +407,15 @@ export default function DevKit() {
   )
 }
 
-function StoryEdit({ storyStages }: { storyStages: any[] }) {
+function StoryEdit({ storyStages }: { storyStages: StoryStage[] }) {
   const { t } = useAppContext()
-  const [editingStage, setEditingStage] = useState<any | null>(null)
+  const [editingStage, setEditingStage] = useState<StoryStage | null>(null)
 
-  const handleEditStage = (stage: any) => {
+  const handleEditStage = (stage: StoryStage) => {
     setEditingStage(stage)
   }
 
-  const handleSaveStage = async (updatedStage: any) => {
+  const handleSaveStage = async (updatedStage: StoryStage) => {
     try {
       const { error } = await supabase
         .from('story_stages')
