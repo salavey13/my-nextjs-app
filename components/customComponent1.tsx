@@ -31,11 +31,11 @@ const SectionCard: React.FC<SectionCardProps> = React.memo(({ section, index }) 
       <CardHeader className="flex flex-row items-center gap-2">
         <span className="sr-only">{`${section.title} 아이콘`}</span>
         {section.icon}
-        <CardTitle className="text-xl font-bold">{section.title}</CardTitle>
+        <CardTitle className="text-xl font-bold ">{section.title}</CardTitle>
       </CardHeader>
       <CardContent className="p-4">
         <Badge variant="outline" className="mb-2">섹션 {index + 1}</Badge>
-        <p className="text-sm leading-relaxed">
+        <p className="text-sm leading-relaxed text-secondary">
           {section.content.split(' ').map((word, i) => 
             i % 5 === 0 ? <strong key={i}>{word} </strong> : `${word} `
           )}
