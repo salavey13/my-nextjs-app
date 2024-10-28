@@ -316,6 +316,7 @@ const GlitchyHero: React.FC<GlitchyHeroProps> = ({ imageUrls }) => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1.5, duration: 0.8 }}
+          className="relative flex flex-col items-center justify-center"
         >
           <h1 className="text-4xl md:text-6xl font-bold mb-4 text-center">
             {t('home.heading')}
@@ -325,7 +326,7 @@ const GlitchyHero: React.FC<GlitchyHeroProps> = ({ imageUrls }) => {
           </p>
           <Button
             onClick={() => openLink("https://youtube.com/salavey13")}
-            className="text-gray-100 px-8 py-3 rounded-lg text-lg mb-8 mr-2 ml-2 w-[80%] font-semibold hover:bg-opacity-90 transition-colors"
+            className="text-gray-100 px-8 py-3 rounded-lg text-lg mb-8 mr-2 ml-2 font-semibold hover:bg-opacity-90 transition-colors"
             variant="neon"
           >
             {t('home.watchVideos')} <ArrowRight className="inline-block ml-2" />
