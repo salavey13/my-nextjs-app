@@ -739,8 +739,8 @@ createTask: "Створити завдання",
 
 storyContent: "Контент",
 xuinityDialog: "Діалог",
-notSet: "Нет",
-noParent: "Нет родителя",
+"notSet": "Нет",
+"noParentStage": "Нет родителя",
 trigger: "Триггер",
 
 activeComponent: "Активний компонент",

@@ -873,7 +873,8 @@ createTask: "Create Task",
   notifySection: "Bat-Signal for Salavey13 🦇",
   "devKit": {
     "stageNumber": "Stage Number",
-
+"notSet": "Not Set",
+noParentStage: "No Parent Stage",
 storyContent: "Content",
 xuinityDialog: "Dialog",
 
