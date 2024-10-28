@@ -739,6 +739,7 @@ createTask: "Создать задачу",
   achievementsSection: "Кабинет трофеев 🏆",
   notifySection: "Bat-Signal для Salavey13 🦇",
   devKit: {
+    showUnlockChoice: "Показать выбор разблокировки",
     failToFetchStoryStages: "Не удалось получить этапы истории",
     crashSimulated: "Уронено",
     simulateCrash: "Уронить",

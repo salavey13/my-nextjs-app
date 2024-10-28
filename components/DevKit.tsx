@@ -262,52 +262,52 @@ export default function DevKit() {
     setShowUnlockChoice(true)
   }, [])
 
-  // const renderStageTree = useCallback((stages: StoryStage[], parentId: string | null = null, depth = 0) => {
-  //   const childStages = stages.filter(stage => stage.parentid === parentId)
+  const renderStageTree = useCallback((stages: StoryStage[], parentId: string | null = null, depth = 0) => {
+    const childStages = stages.filter(stage => stage.parentid === parentId)
     
-  //   return childStages.map(stage => (
-  //     <React.Fragment key={stage.id}>
-  //       <SelectItem value={stage.stage.toString()} className="text-xs">
-  //         <div style={{ marginLeft: `${depth * 20}px` }}>
-  //           (ID: {stage.id}) (parentId: {stage.parentid}) {t("devKit.stage")} {stage.stage} 
-  //           <br />
-  //           (xuinityDialog: {stage.xuinitydialog?.substring(0, 30) || 'N/A'}...) 
-  //           <br />
-  //           (storyContent: {stage.storycontent?.substring(0, 30) || 'N/A'}...) 
-  //           <br />
-  //           (achievement: {stage.achievement || 'N/A'}) 
-  //           <br />
-  //           (activeComponent: {stage.activecomponent || 'N/A'}) 
-  //           <br />
-  //           (minigame: {stage.minigame || 'N/A'}) 
-  //           <br />
-  //           (trigger: {stage.trigger || 'N/A'})
-  //           <br />
-  //           (bottomShelfBitmask: {stage.bottomshelfbitmask || 'N/A'})
-  //         </div>
-  //       </SelectItem>
-  //       {renderStageTree(stages, stage.id.toString(), depth + 1)}
-  //     </React.Fragment>
-  //   ))
-  // }, [t])
+    return childStages.map(stage => (
+      <React.Fragment key={stage.id}>
+        <SelectItem value={stage.stage.toString()} className="text-xs">
+          <div style={{ marginLeft: `${depth * 20}px` }}>
+            (ID: {stage.id}) (parentId: {stage.parentid}) {t("devKit.stage")} {stage.stage} 
+            <br />
+            (xuinityDialog: {stage.xuinitydialog?.substring(0, 30) || 'N/A'}...) 
+            <br />
+            (storyContent: {stage.storycontent?.substring(0, 30) || 'N/A'}...) 
+            <br />
+            (achievement: {stage.achievement || 'N/A'}) 
+            <br />
+            (activeComponent: {stage.activecomponent || 'N/A'}) 
+            <br />
+            (minigame: {stage.minigame || 'N/A'}) 
+            <br />
+            (trigger: {stage.trigger || 'N/A'})
+            <br />
+            (bottomShelfBitmask: {stage.bottomshelfbitmask || 'N/A'})
+          </div>
+        </SelectItem>
+        {renderStageTree(stages, stage.id.toString(), depth + 1)}
+      </React.Fragment>
+    ))
+  }, [t])
 
-  // const renderStageMask = useCallback((stageMask: number) => {
-  //   const bits = stageMask.toString(2).padStart(8, '0').split('').reverse()
-  //   return (
-  //     <div className="grid grid-cols-8 gap-1 mt-2">
-  //       {bits.map((bit, index) => (
-  //         <div
-  //           key={index}
-  //           className={`w-6 h-6 flex items-center justify-center text-xs font-mono ${
-  //             bit === '1' ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-700'
-  //           }`}
-  //         >
-  //           {bit}
-  //         </div>
-  //       ))}
-  //     </div>
-  //   )
-  // }, [])
+  const renderStageMask = useCallback((stageMask: number) => {
+    const bits = stageMask.toString(2).padStart(8, '0').split('').reverse()
+    return (
+      <div className="grid grid-cols-8 gap-1 mt-2">
+        {bits.map((bit, index) => (
+          <div
+            key={index}
+            className={`w-6 h-6 flex items-center justify-center text-xs font-mono ${
+              bit === '1' ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-700'
+            }`}
+          >
+            {bit}
+          </div>
+        ))}
+      </div>
+    )
+  }, [])
 
   if (state.user?.role !== 1) {
     return null

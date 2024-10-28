@@ -872,6 +872,7 @@ createTask: "Create Task",
   achievementsSection: "Trophy Cabinet 🏆",
   notifySection: "Bat-Signal for Salavey13 🦇",
   devKit: {
+    showUnlockChoice: "Show Unlock Choice",
     failedToFetchStoryStages: "Failed to Fetch Story Stages",
     crashSimulated: "Oops! It Crashed!",
     simulateCrash: "Crash it",

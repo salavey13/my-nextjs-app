@@ -735,6 +735,7 @@ createTask: "Створити завдання",
   achievementsSection: "Шафа трофеїв🏆",
   notifySection: "Bat-Signal для Salavey13 🦇",
   devKit: {
+    showUnlockChoice: "Показати вибір розблокування",
     failedToFetchStoryStages: "Не вдалося отримати етапи історії",
     crashSimulated: "Уронено",
     simulateCrash: "Уронить",
