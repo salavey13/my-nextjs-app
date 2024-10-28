@@ -392,7 +392,7 @@ const GameBoard: React.FC<{ goBack: () => void }> = ({ goBack }) => {
               width: '42px',
               height: '63px',
               position: 'absolute',
-              borderColor: theme.colors.secondary,
+              borderColor: theme.colors.secondary.hex,
               top: targetFrame.y,
               left: targetFrame.x,
               transform: `rotate(${targetFrame.rotation}deg)`,

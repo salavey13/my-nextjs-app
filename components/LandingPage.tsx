@@ -191,11 +191,11 @@ export default function LandingPage() {
         <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
           <stop
             offset="0%"
-            style={{ stopColor: theme.colors.primary, stopOpacity: 1 }}
+            style={{ stopColor: theme.colors.primary.hex, stopOpacity: 1 }}
           />
           <stop
             offset="100%"
-            style={{ stopColor: theme.colors.accent, stopOpacity: 1 }}
+            style={{ stopColor: theme.colors.accent.hex, stopOpacity: 1 }}
           />
         </linearGradient>
       </defs>

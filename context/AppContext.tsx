@@ -441,21 +441,16 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       tg.ready()
       setTheme(state.user?.dark_theme ? "dark" : "light")
       
-      // Only set colors if the Web App version supports it
       if (webAppVersion >= 6.1) {
         if (state.user && !state.user.dark_theme) {
-          setHeaderColor(theme.colors.secondary)
-          setBackgroundColor(theme.colors.secondary)
-          setBottomBarColor(theme.colors.secondary)
+          setHeaderColor(theme.colors.secondary.hex)
+          setBackgroundColor(theme.colors.secondary.hex)
+          setBottomBarColor(theme.colors.secondary.hex)
         } else {
-          setHeaderColor(theme.colors.secondary)
-          setBackgroundColor(theme.colors.secondary)
-          setBottomBarColor(theme.colors.secondary)
+          setHeaderColor(theme.colors.secondary.hex)
+          setBackgroundColor(theme.colors.secondary.hex)
+          setBottomBarColor(theme.colors.secondary.hex)
         }
-      }
-
-      // Only disable vertical swipes if the Web App version supports it
-      if (webAppVersion >= 6.1) {
         disableVerticalSwipes()
       }
 
@@ -464,7 +459,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         fetchPlayer(tgUser.id, tgUser.username, tgUser.language_code)
       }
     }
-  }, [tg, theme.colors.secondary, state.user, setTheme, setHeaderColor, setBackgroundColor, setBottomBarColor, disableVerticalSwipes, webAppVersion])
+  }, [tg, theme.colors.secondary.hex, state.user, setTheme, setHeaderColor, setBackgroundColor, setBottomBarColor, disableVerticalSwipes, webAppVersion])
 
   useEffect(() => {
     const channel = supabase

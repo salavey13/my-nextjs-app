@@ -58,7 +58,7 @@ const CustomToast: React.FC<ToastParams & { visible: boolean }> = ({ title, desc
       className={`${
         visible ? 'animate-enter' : 'animate-leave'
       } max-w-md w-full top-16 pointer-events-auto flex ring-1 ring-black ring-opacity-5`}
-      color={isGlitching ? theme.colors.secondary : "#000000"}
+      color={isGlitching ? theme.colors.secondary.hex : "#000000"}
     >
       <div className="flex-1 w-0 p-4">
         <div className="flex items-start">
@@ -131,7 +131,7 @@ export const GlitchyToastProvider = () => {
       position="top-center"
       toastOptions={{
         style: {
-          // background: 'transparent',
+          background: 'transparent',
           boxShadow: 'none',
         },
       }}

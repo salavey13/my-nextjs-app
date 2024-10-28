@@ -170,7 +170,7 @@ export const useTelegram = (props: UseTelegramProps = {}) => {
   };
 
   const setHeaderColor = (color: string) => {
-    if (tg && webAppVersion >= 6.1) {
+    if (tg && webAppVersion >= 7.0) {
       tg.setHeaderColor(color);
     }
   };

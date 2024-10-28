@@ -205,7 +205,7 @@ function Floor() {
   return (
     <mesh ref={ref} receiveShadow>
       <planeGeometry args={[10, 10]} />
-      <meshStandardMaterial color={theme.colors.background} />
+      <meshStandardMaterial color={theme.colors.background.hex} />
     </mesh>
   )
 }
@@ -301,7 +301,7 @@ function Scene({ gameState, onRollComplete, wallTexture }: { gameState: GameStat
       <Text
         position={[0, 6, 0]}
         fontSize={0.5}
-        color={theme.colors.background}
+        color={theme.colors.background.hex}
         anchorX="center"
         anchorY="middle"
         rotation={[0, Math.PI / 4, 0]} 

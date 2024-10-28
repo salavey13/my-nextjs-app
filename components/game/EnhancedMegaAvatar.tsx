@@ -304,7 +304,7 @@ const EnhancedMegaAvatar: React.FC<EnhancedMegaAvatarProps> = React.memo(({
         alignItems: 'center',
       }}
     >
-      <ShineBorder borderWidth={2} duration={10} color={theme.colors.secondary}>
+      <ShineBorder borderWidth={2} duration={10} color={theme.colors.secondary.hex}>
         <div
           style={{
             width: '128px',

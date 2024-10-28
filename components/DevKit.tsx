@@ -222,6 +222,17 @@ export default function DevKit() {
     }
   }, [state.user, selectedStage, bottomShelfComponents, coins, crypto, dispatch, t]);
 
+  const isComponentUnlockable = useCallback((component: string, stage: number) => {
+    const link = navigationLinks.find(link => link.component === component);
+    if (!link) return false;
+    if (component === 'admin') {
+      return stage >= 7;
+    }
+    return (link.stageMask & (1 << (stage - 1))) !== 0;
+  }, [navigationLinks]);
+
+
+
   const handleSimulateCrash = useCallback(async () => {
     try {
       await simulateCrash()
