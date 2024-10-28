@@ -422,6 +422,7 @@ export default function DevKit() {
         <UnlockChoice
           onClose={() => setShowUnlockChoice(false)}
           currentStage={state.user?.game_state?.stage || 0}
+          isDevMode={true}
         />
       )}
     </Collapsible>
