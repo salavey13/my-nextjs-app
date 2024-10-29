@@ -58,7 +58,81 @@ export const en: LanguageDictionary = {
       feature2: "Responsive layouts for mobile and desktop",
       feature3: "Basic SEO optimization",
       feature4: "100% stress-free process"
-    }
+    },
+      customBot: {
+    title: "Custom Telegram Bot Development",
+    subtitle: "Automated Bots with Smart User Interaction & Data Handling",
+    description: "Develop a tailored Telegram bot that meets your unique requirements, from data collection to smart user interactions.",
+    feature1: "Interactive workflows & commands",
+    feature2: "Data handling & storage",
+    feature3: "Custom API integrations",
+    feature4: "Real-time notifications",
+    feature5: "Role-based access & user management"
+  },
+  
+  analyticsSetup: {
+    title: "Advanced Analytics Dashboard Setup",
+    description: "Create a powerful analytics dashboard with data insights tailored for your platform’s performance and user engagement.",
+    feature1: "Custom KPIs & metrics",
+    feature2: "Real-time user tracking",
+    feature3: "Event-based data collection",
+    feature4: "Data visualization & reporting tools"
+  },
+  
+  ecommerceIntegration: {
+    title: "E-commerce Platform Integration",
+    description: "Integrate e-commerce capabilities into your Telegram app, enabling a seamless buying experience for your users.",
+    feature1: "Product catalog & search",
+    feature2: "Secure payment processing",
+    feature3: "Order tracking & notifications",
+    feature4: "Automated inventory updates"
+  },
+  
+  cmsAutomation: {
+    title: "CMS Automation & Content Management",
+    description: "Automate your content management with AI, perfect for blogs, product updates, or multi-platform posting.",
+    feature1: "Automated content scheduling",
+    feature2: "Multi-channel publishing",
+    feature3: "Version control & history",
+    feature4: "SEO-optimized formatting"
+  },
+  
+  customerSupportBot: {
+    title: "Customer Support Bot Setup",
+    subtitle: "24/7 Support Bot for Enhanced Customer Engagement",
+    description: "Provide continuous support to your users with a Telegram bot that handles FAQs, inquiries, and personalized responses.",
+    feature1: "Automated responses for FAQs",
+    feature2: "Customizable support flows",
+    feature3: "Integration with live support",
+    feature4: "Detailed user interaction analytics"
+  },
+  
+  aiSEOOptimizer: {
+    title: "AI-Powered SEO Optimizer",
+    description: "Boost your website’s ranking with AI-driven SEO recommendations and automated keyword integration.",
+    feature1: "Automated keyword suggestions",
+    feature2: "Content optimization insights",
+    feature3: "Competitor analysis",
+    feature4: "Ongoing SEO performance tracking"
+  },
+  
+  userRetentionSystem: {
+    title: "User Retention System Setup",
+    description: "Enhance your app’s user retention with personalized notifications, gamification, and incentive programs.",
+    feature1: "In-app rewards & incentives",
+    feature2: "Custom retention workflows",
+    feature3: "User segmentation & targeting",
+    feature4: "Detailed retention analytics"
+  },
+  
+  aiUXOptimization: {
+    title: "AI-Driven UX Optimization",
+    description: "Improve user experience with AI recommendations tailored to user behavior and interaction data.",
+    feature1: "UX analysis & insights",
+    feature2: "Personalized user journey maps",
+    feature3: "Behavior-based design tweaks",
+    feature4: "Ongoing A/B testing support"
+  }
     },
  "before:": "Before:",
   "after:": "After:",
