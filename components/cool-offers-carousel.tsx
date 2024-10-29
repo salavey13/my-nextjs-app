@@ -28,6 +28,8 @@ interface CoolOffers {
   [key: string]: string | Offer;
 }
 
+type OfferEntry = [string, Offer]
+
 export default function CoolOffersCarousel() {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [touchStart, setTouchStart] = useState(0)
@@ -50,9 +52,15 @@ export default function CoolOffersCarousel() {
            'description' in value
   }
 
+  // Helper function to type guard the entry as an OfferEntry
+  const isOfferEntry = (entry: [string, string | Offer]): entry is OfferEntry => {
+    const [key, value] = entry
+    return isOfferKey(key) && isOffer(value)
+  }
+
   // Dynamically generate offers from translation dictionary
   const offers = Object.entries(t('coolOffers') as unknown as CoolOffers)
-    .filter(([key, value]) => isOfferKey(key) && isOffer(value))
+    .filter(isOfferEntry)
     .map(([key, value]) => ({
       type: key.includes('Package') ? 'plan' : 'gig',
       title: value.title,
@@ -67,6 +75,7 @@ export default function CoolOffersCarousel() {
                      key.includes('basic') ? 7 : 6
     }))
     .sort((a, b) => b.coolnessFactor - a.coolnessFactor)
+
 
   const handleTouchStart = (e: React.TouchEvent) => {
     setTouchStart(e.targetTouches[0].clientX)
