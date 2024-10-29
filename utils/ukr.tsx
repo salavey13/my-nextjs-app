@@ -3,6 +3,10 @@ export const ukr: LanguageDictionary = {
   
   coolOffers: {
     heading: "kwork",
+  learnMore: "Дізнатися більше",
+  watchTutorials: "Переглянути навчальні матеріали",
+  viewOnKwork: "Переглянути на Kwork",
+
   vipPackage: {
     title: "VIP Пакет",
     subtitle: "Висококласний Telegram додаток з розумним доступом, кастомною прогресією користувача та AI підтримкою",
