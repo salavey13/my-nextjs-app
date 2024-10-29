@@ -1,6 +1,11 @@
 import { LanguageDictionary } from "../utils/TranslationUtils";
 export const ru: LanguageDictionary = {
   coolOffers: {
+    heading: "кворк",
+    learnMore: "Узнать больше",
+  watchTutorials: "Смотреть учебные материалы",
+  viewOnKwork: "Посмотреть на Kwork",
+
   vipPackage: {
     title: "VIP Пакет",
     subtitle: "Высококлассное Telegram приложение с умным доступом, кастомной прогрессией пользователя и AI поддержкой",
@@ -53,7 +58,6 @@ export const ru: LanguageDictionary = {
     feature3: "Базовая SEO оптимизация",
     feature4: "100% безстрессовый процесс"
   },
-    heading: "кворк",
   },
   "before:": "До:",
   "after:": "После:",
