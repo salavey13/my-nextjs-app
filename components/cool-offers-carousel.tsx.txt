@@ -1,0 +1,170 @@
+import React, { useState, useEffect } from 'react'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { ChevronLeft, ChevronRight, Zap, Rocket } from 'lucide-react'
+import { useAppContext } from '../context/AppContext'
+
+export default function CoolOffersCarousel() {
+  const [currentIndex, setCurrentIndex] = useState(0)
+  const { t } = useAppContext()
+
+  const offers = [
+    {
+      type: 'plan',
+      title: t('coolOffers.vipPackage.title'),
+      subtitle: t('coolOffers.vipPackage.subtitle'),
+      description: t('coolOffers.vipPackage.description'),
+      features: [
+        t('coolOffers.vipPackage.feature1'),
+        t('coolOffers.vipPackage.feature2'),
+        t('coolOffers.vipPackage.feature3'),
+        t('coolOffers.vipPackage.feature4'),
+        t('coolOffers.vipPackage.feature5')
+      ],
+      coolnessFactor: 10
+    },
+    {
+      type: 'gig',
+      title: t('coolOffers.aiAutomation.title'),
+      description: t('coolOffers.aiAutomation.description'),
+      features: [
+        t('coolOffers.aiAutomation.feature1'),
+        t('coolOffers.aiAutomation.feature2'),
+        t('coolOffers.aiAutomation.feature3'),
+        t('coolOffers.aiAutomation.feature4')
+      ],
+      coolnessFactor: 9
+    },
+    {
+      type: 'plan',
+      title: t('coolOffers.standardPackage.title'),
+      subtitle: t('coolOffers.standardPackage.subtitle'),
+      description: t('coolOffers.standardPackage.description'),
+      features: [
+        t('coolOffers.standardPackage.feature1'),
+        t('coolOffers.standardPackage.feature2'),
+        t('coolOffers.standardPackage.feature3'),
+        t('coolOffers.standardPackage.feature4')
+      ],
+      coolnessFactor: 8
+    },
+    {
+      type: 'gig',
+      title: t('coolOffers.aiComponents.title'),
+      description: t('coolOffers.aiComponents.description'),
+      features: [
+        t('coolOffers.aiComponents.feature1'),
+        t('coolOffers.aiComponents.feature2'),
+        t('coolOffers.aiComponents.feature3'),
+        t('coolOffers.aiComponents.feature4')
+      ],
+      coolnessFactor: 7
+    },
+    {
+      type: 'plan',
+      title: t('coolOffers.basicPackage.title'),
+      subtitle: t('coolOffers.basicPackage.subtitle'),
+      description: t('coolOffers.basicPackage.description'),
+      features: [
+        t('coolOffers.basicPackage.feature1'),
+        t('coolOffers.basicPackage.feature2'),
+        t('coolOffers.basicPackage.feature3'),
+        t('coolOffers.basicPackage.feature4')
+      ],
+      coolnessFactor: 6
+    },
+    {
+      type: 'gig',
+      title: t('coolOffers.aiWebsite.title'),
+      description: t('coolOffers.aiWebsite.description'),
+      features: [
+        t('coolOffers.aiWebsite.feature1'),
+        t('coolOffers.aiWebsite.feature2'),
+        t('coolOffers.aiWebsite.feature3'),
+        t('coolOffers.aiWebsite.feature4')
+      ],
+      coolnessFactor: 5
+    },
+  ].sort((a, b) => b.coolnessFactor - a.coolnessFactor)
+
+  const nextSlide = () => {
+    setCurrentIndex((prevIndex) => (prevIndex + 1) % offers.length)
+  }
+
+  const prevSlide = () => {
+    setCurrentIndex((prevIndex) => (prevIndex - 1 + offers.length) % offers.length)
+  }
+
+  return (
+    <div className="w-full bg-gray-900 p-4 sm:p-6 md:p-8">
+      <div className="relative overflow-hidden">
+        <div
+          className="flex transition-transform duration-300 ease-in-out"
+          style={{ transform: `translateX(-${currentIndex * 100}%)` }}
+        >
+          {offers.map((offer, index) => (
+            <div key={index} className="w-full flex-shrink-0 px-2">
+              <Card className={`h-full ${
+                offer.type === 'plan' 
+                  ? 'bg-gray-800 border-2 border-purple-500' 
+                  : 'bg-gray-700 border border-green-400'
+              }`}>
+                <CardHeader>
+                  <CardTitle className={`text-2xl sm:text-3xl font-bold ${
+                    offer.type === 'plan' ? 'text-purple-300' : 'text-green-300'
+                  }`}>
+                    {offer.type === 'plan' ? <Rocket className="inline-block mr-2" /> : <Zap className="inline-block mr-2" />}
+                    {offer.title}
+                  </CardTitle>
+                  {offer.subtitle && (
+                    <CardDescription className="text-gray-400">{offer.subtitle}</CardDescription>
+                  )}
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <p className="text-gray-300">{offer.description}</p>
+                  <ul className="space-y-2">
+                    {offer.features.map((feature, idx) => (
+                      <li key={idx} className="flex items-start text-gray-400">
+                        <span className={`mr-2 text-xl ${
+                          offer.type === 'plan' ? 'text-purple-400' : 'text-green-400'
+                        }`}>•</span>
+                        {feature}
+                      </li>
+                    ))}
+                  </ul>
+                </CardContent>
+              </Card>
+            </div>
+          ))}
+        </div>
+        <Button
+          variant="outline"
+          size="icon"
+          className="absolute left-2 top-1/2 -translate-y-1/2 bg-gray-800 text-gray-300 hover:bg-gray-700"
+          onClick={prevSlide}
+        >
+          <ChevronLeft className="h-4 w-4" />
+        </Button>
+        <Button
+          variant="outline"
+          size="icon"
+          className="absolute right-2 top-1/2 -translate-y-1/2 bg-gray-800 text-gray-300 hover:bg-gray-700"
+          onClick={nextSlide}
+        >
+          <ChevronRight className="h-4 w-4" />
+        </Button>
+      </div>
+      <div className="mt-4 flex justify-center space-x-2">
+        {offers.map((_, index) => (
+          <button
+            key={index}
+            className={`h-2 w-2 rounded-full ${
+              index === currentIndex ? 'bg-purple-500' : 'bg-gray-600'
+            }`}
+            onClick={() => setCurrentIndex(index)}
+          />
+        ))}
+      </div>
+    </div>
+  )
+}
