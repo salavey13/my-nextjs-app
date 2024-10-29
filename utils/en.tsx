@@ -1,6 +1,60 @@
 import { LanguageDictionary } from "../utils/TranslationUtils";
 export const en: LanguageDictionary = {
   // ... (existing translations)
+    coolOffers: {
+    vipPackage: {
+      title: "VIP Package",
+      subtitle: "High-Level Telegram App with Smart Access, Custom User Progression & AI Guidance",
+      description: "Get the ultimate Telegram app, loaded with smart access controls, progressive unlocking, and an AI-powered tab to help users build out new features as they go.",
+      feature1: "Full Custom Interface & UX",
+      feature2: "Supabase with Full RLS & Custom Role Setup",
+      feature3: "AI-Powered Dev Tab for Content Creation",
+      feature4: "Step-by-Step User Learning & Engagement",
+      feature5: "Multi-Stage Role Access"
+    },
+    aiAutomation: {
+      title: "AI Automation Pipeline Setup",
+      description: "Set up an AI-driven automation pipeline tailored to your needs. Perfect for agencies, product sites, or any project that requires a scalable, high-efficiency web automation setup.",
+      feature1: "Custom AI automation pipeline configuration",
+      feature2: "Component integration & automated deployment",
+      feature3: "Advanced control panel for managing updates",
+      feature4: "Instructions and ongoing support"
+    },
+    standardPackage: {
+      title: "Standard Package",
+      subtitle: "Advanced Telegram App with Stepwise Access & Learning System",
+      description: "Get an advanced Telegram mini app with custom role access, data security, and phased feature unlocking.",
+      feature1: "Advanced Interface",
+      feature2: "Enhanced User Data Security with Row Level Security",
+      feature3: "Custom Role & Access Setup",
+      feature4: "Stepwise Feature Unlocking"
+    },
+    aiComponents: {
+      title: "AI-Powered Web Components",
+      description: "Get custom AI-powered web components tailored to your project's needs, ensuring a seamless user experience and compatibility across devices.",
+      feature1: "Custom AI-driven component development",
+      feature2: "Responsive design and cross-platform functionality",
+      feature3: "Full testing and integration support",
+      feature4: "Post-deployment support"
+    },
+    basicPackage: {
+      title: "Basic Package",
+      subtitle: "Essential Telegram Mini App with User Data & Role Access",
+      description: "Get a basic Telegram mini app that handles user data, simple role-based access, and a clean, straightforward interface.",
+      feature1: "Basic Interface",
+      feature2: "Simple User Data Setup",
+      feature3: "Role-Based Access Control",
+      feature4: "Core Tabs Only"
+    },
+    aiWebsite: {
+      title: "AI-Powered Website Creation",
+      description: "Get a professional, responsive website built using advanced AI tools, ensuring it's visually striking and optimized for conversions.",
+      feature1: "AI-based custom design",
+      feature2: "Responsive layouts for mobile and desktop",
+      feature3: "Basic SEO optimization",
+      feature4: "100% stress-free process"
+    }
+    },
  "before:": "Before:",
   "after:": "After:",
   "onboarding": {
