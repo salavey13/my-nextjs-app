@@ -8,6 +8,26 @@ import { useAppContext } from '../context/AppContext'
 import useTelegram from '@/hooks/useTelegram'
 import { useTheme } from '@/hooks/useTheme'
 
+// Define types for our offers structure
+interface OfferFeatures {
+  [key: string]: string;
+}
+
+interface Offer {
+  title: string;
+  subtitle?: string;
+  description: string;
+  [key: string]: any; // for feature1, feature2, etc.
+}
+
+interface CoolOffers {
+  heading: string;
+  learnMore: string;
+  watchTutorials: string;
+  viewOnKwork: string;
+  [key: string]: string | Offer;
+}
+
 export default function CoolOffersCarousel() {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [touchStart, setTouchStart] = useState(0)
@@ -17,9 +37,22 @@ export default function CoolOffersCarousel() {
   const { theme } = useTheme()
   const containerRef = useRef<HTMLDivElement>(null)
 
+  // Helper function to check if a key represents an offer
+  const isOfferKey = (key: string): boolean => {
+    return key.endsWith('Package') || key.startsWith('ai')
+  }
+
+  // Helper function to check if a value is an Offer
+  const isOffer = (value: any): value is Offer => {
+    return typeof value === 'object' && 
+           value !== null && 
+           'title' in value && 
+           'description' in value
+  }
+
   // Dynamically generate offers from translation dictionary
-  const offers = Object.entries(t('coolOffers') as Record<string, any>)
-    .filter(([key]) => key !== 'viewOnKwork' && key !== 'learnMore')
+  const offers = Object.entries(t('coolOffers') as unknown as CoolOffers)
+    .filter(([key, value]) => isOfferKey(key) && isOffer(value))
     .map(([key, value]) => ({
       type: key.includes('Package') ? 'plan' : 'gig',
       title: value.title,
@@ -74,8 +107,16 @@ export default function CoolOffersCarousel() {
     return () => clearInterval(interval)
   }, [])
 
+  if (offers.length === 0) {
+    return null // Or some loading state/fallback
+  }
+
   return (
     <div className="w-full bg-background p-4 sm:p-6 md:p-8" style={{ backgroundColor: theme.colors.background.hex }}>
+      <h2 className="text-2xl font-bold mb-6 text-center" style={{ color: theme.colors.foreground.hex }}>
+        {(t('coolOffers') as unknown as CoolOffers).heading}
+      </h2>
+      
       <div 
         ref={containerRef}
         className="relative overflow-hidden touch-pan-y"
@@ -158,7 +199,7 @@ export default function CoolOffersCarousel() {
                 onClick={() => openLink("https://github.com/salavey13")}
               >
                 <Github className="w-3 h-3 mr-1" />
-                {t('coolOffers.learnMore')}
+                {(t('coolOffers') as unknown as CoolOffers).learnMore}
               </Button>
               <Button
                 variant="ghost"
@@ -167,7 +208,7 @@ export default function CoolOffersCarousel() {
                 onClick={() => openLink("https://youtube.com/salavey13")}
               >
                 <Youtube className="w-3 h-3 mr-1" />
-                {t('coolOffers.watchTutorials')}
+                {(t('coolOffers') as unknown as CoolOffers).watchTutorials}
               </Button>
             </div>
           </div>
@@ -191,7 +232,7 @@ export default function CoolOffersCarousel() {
           }}
         >
           <ExternalLink className="w-4 h-4 mr-2" />
-          {t('coolOffers.viewOnKwork')}
+          {(t('coolOffers') as unknown as CoolOffers).viewOnKwork}
         </Button>
       </div>
 
