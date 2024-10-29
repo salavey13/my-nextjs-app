@@ -1,8 +1,12 @@
 import { LanguageDictionary } from "../utils/TranslationUtils";
 export const en: LanguageDictionary = {
   // ... (existing translations)
+  
     coolOffers: {
       heading: "kwork gigs",
+      learnMore: "Learn More",
+      watchTutorials: "Watch Tutorials",
+      viewOnKwork: "View Service on Kwork",
     vipPackage: {
       title: "VIP Package",
       subtitle: "High-Level Telegram App with Smart Access, Custom User Progression & AI Guidance",
