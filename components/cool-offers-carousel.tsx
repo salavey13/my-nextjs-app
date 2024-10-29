@@ -1,91 +1,65 @@
-import React, { useState, useEffect } from 'react'
+'use client'
+
+import React, { useState, useRef, useEffect } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { ChevronLeft, ChevronRight, Zap, Rocket } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Zap, Rocket, ExternalLink, Github, Youtube } from 'lucide-react'
 import { useAppContext } from '../context/AppContext'
+import useTelegram from '@/hooks/useTelegram'
+import { useTheme } from '@/hooks/useTheme'
 
 export default function CoolOffersCarousel() {
   const [currentIndex, setCurrentIndex] = useState(0)
+  const [touchStart, setTouchStart] = useState(0)
+  const [touchEnd, setTouchEnd] = useState(0)
   const { t } = useAppContext()
+  const { openLink } = useTelegram()
+  const { theme } = useTheme()
+  const containerRef = useRef<HTMLDivElement>(null)
 
-  const offers = [
-    {
-      type: 'plan',
-      title: t('coolOffers.vipPackage.title'),
-      subtitle: t('coolOffers.vipPackage.subtitle'),
-      description: t('coolOffers.vipPackage.description'),
-      features: [
-        t('coolOffers.vipPackage.feature1'),
-        t('coolOffers.vipPackage.feature2'),
-        t('coolOffers.vipPackage.feature3'),
-        t('coolOffers.vipPackage.feature4'),
-        t('coolOffers.vipPackage.feature5')
-      ],
-      coolnessFactor: 10
-    },
-    {
-      type: 'gig',
-      title: t('coolOffers.aiAutomation.title'),
-      description: t('coolOffers.aiAutomation.description'),
-      features: [
-        t('coolOffers.aiAutomation.feature1'),
-        t('coolOffers.aiAutomation.feature2'),
-        t('coolOffers.aiAutomation.feature3'),
-        t('coolOffers.aiAutomation.feature4')
-      ],
-      coolnessFactor: 9
-    },
-    {
-      type: 'plan',
-      title: t('coolOffers.standardPackage.title'),
-      subtitle: t('coolOffers.standardPackage.subtitle'),
-      description: t('coolOffers.standardPackage.description'),
-      features: [
-        t('coolOffers.standardPackage.feature1'),
-        t('coolOffers.standardPackage.feature2'),
-        t('coolOffers.standardPackage.feature3'),
-        t('coolOffers.standardPackage.feature4')
-      ],
-      coolnessFactor: 8
-    },
-    {
-      type: 'gig',
-      title: t('coolOffers.aiComponents.title'),
-      description: t('coolOffers.aiComponents.description'),
-      features: [
-        t('coolOffers.aiComponents.feature1'),
-        t('coolOffers.aiComponents.feature2'),
-        t('coolOffers.aiComponents.feature3'),
-        t('coolOffers.aiComponents.feature4')
-      ],
-      coolnessFactor: 7
-    },
-    {
-      type: 'plan',
-      title: t('coolOffers.basicPackage.title'),
-      subtitle: t('coolOffers.basicPackage.subtitle'),
-      description: t('coolOffers.basicPackage.description'),
-      features: [
-        t('coolOffers.basicPackage.feature1'),
-        t('coolOffers.basicPackage.feature2'),
-        t('coolOffers.basicPackage.feature3'),
-        t('coolOffers.basicPackage.feature4')
-      ],
-      coolnessFactor: 6
-    },
-    {
-      type: 'gig',
-      title: t('coolOffers.aiWebsite.title'),
-      description: t('coolOffers.aiWebsite.description'),
-      features: [
-        t('coolOffers.aiWebsite.feature1'),
-        t('coolOffers.aiWebsite.feature2'),
-        t('coolOffers.aiWebsite.feature3'),
-        t('coolOffers.aiWebsite.feature4')
-      ],
-      coolnessFactor: 5
-    },
-  ].sort((a, b) => b.coolnessFactor - a.coolnessFactor)
+  // Dynamically generate offers from translation dictionary
+  const offers = Object.entries(t('coolOffers') as Record<string, any>)
+    .filter(([key]) => key !== 'viewOnKwork' && key !== 'learnMore')
+    .map(([key, value]) => ({
+      type: key.includes('Package') ? 'plan' : 'gig',
+      title: value.title,
+      subtitle: value.subtitle,
+      description: value.description,
+      features: Object.entries(value)
+        .filter(([k]) => k.startsWith('feature'))
+        .map(([_, v]) => v as string),
+      coolnessFactor: key.includes('vip') ? 10 : 
+                     key.includes('ai') ? 9 : 
+                     key.includes('standard') ? 8 : 
+                     key.includes('basic') ? 7 : 6
+    }))
+    .sort((a, b) => b.coolnessFactor - a.coolnessFactor)
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchStart(e.targetTouches[0].clientX)
+  }
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX)
+  }
+
+  const handleTouchEnd = () => {
+    if (!touchStart || !touchEnd) return
+    
+    const distance = touchStart - touchEnd
+    const minSwipeDistance = 50
+
+    if (Math.abs(distance) < minSwipeDistance) return
+
+    if (distance > 0) {
+      nextSlide()
+    } else {
+      prevSlide()
+    }
+
+    setTouchStart(0)
+    setTouchEnd(0)
+  }
 
   const nextSlide = () => {
     setCurrentIndex((prevIndex) => (prevIndex + 1) % offers.length)
@@ -95,9 +69,20 @@ export default function CoolOffersCarousel() {
     setCurrentIndex((prevIndex) => (prevIndex - 1 + offers.length) % offers.length)
   }
 
+  useEffect(() => {
+    const interval = setInterval(nextSlide, 5000)
+    return () => clearInterval(interval)
+  }, [])
+
   return (
-    <div className="w-full bg-gray-900 p-4 sm:p-6 md:p-8">
-      <div className="relative overflow-hidden">
+    <div className="w-full bg-background p-4 sm:p-6 md:p-8" style={{ backgroundColor: theme.colors.background.hex }}>
+      <div 
+        ref={containerRef}
+        className="relative overflow-hidden touch-pan-y"
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+      >
         <div
           className="flex transition-transform duration-300 ease-in-out"
           style={{ transform: `translateX(-${currentIndex * 100}%)` }}
@@ -106,28 +91,28 @@ export default function CoolOffersCarousel() {
             <div key={index} className="w-full flex-shrink-0 px-2">
               <Card className={`h-full ${
                 offer.type === 'plan' 
-                  ? 'bg-gray-800 border-2 border-purple-500' 
-                  : 'bg-gray-700 border border-green-400'
-              }`}>
+                  ? 'border-2'
+                  : 'border'
+              }`}
+              style={{
+                backgroundColor: theme.colors.muted.hex,
+                borderColor: offer.type === 'plan' ? theme.colors.primary.hex : theme.colors.accent.hex
+              }}>
                 <CardHeader>
-                  <CardTitle className={`text-2xl sm:text-3xl font-bold ${
-                    offer.type === 'plan' ? 'text-purple-300' : 'text-green-300'
-                  }`}>
+                  <CardTitle className="text-2xl sm:text-3xl font-bold" style={{ color: theme.colors.foreground.hex }}>
                     {offer.type === 'plan' ? <Rocket className="inline-block mr-2" /> : <Zap className="inline-block mr-2" />}
                     {offer.title}
                   </CardTitle>
                   {offer.subtitle && (
-                    <CardDescription className="text-gray-400">{offer.subtitle}</CardDescription>
+                    <CardDescription className="text-muted-foreground">{offer.subtitle}</CardDescription>
                   )}
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <p className="text-gray-300">{offer.description}</p>
+                  <p className="text-foreground/80">{offer.description}</p>
                   <ul className="space-y-2">
                     {offer.features.map((feature, idx) => (
-                      <li key={idx} className="flex items-start text-gray-400">
-                        <span className={`mr-2 text-xl ${
-                          offer.type === 'plan' ? 'text-purple-400' : 'text-green-400'
-                        }`}>•</span>
+                      <li key={idx} className="flex items-start text-foreground/60">
+                        <span className="mr-2 text-xl" style={{ color: offer.type === 'plan' ? theme.colors.primary.hex : theme.colors.accent.hex }}>•</span>
                         {feature}
                       </li>
                     ))}
@@ -137,34 +122,81 @@ export default function CoolOffersCarousel() {
             </div>
           ))}
         </div>
+      </div>
+
+      {/* Navigation and social proof */}
+      <div className="fixed bottom-0 left-0 right-0 bg-background/80 backdrop-blur-sm p-4" style={{ backgroundColor: `${theme.colors.background.hex}CC` }}>
+        <div className="flex justify-between items-center max-w-screen-xl mx-auto">
+          <Button
+            variant="outline"
+            size="icon"
+            className="bg-muted hover:bg-muted/80"
+            onClick={prevSlide}
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
+
+          <div className="flex flex-col items-center gap-4">
+            <div className="flex space-x-2">
+              {offers.map((_, index) => (
+                <button
+                  key={index}
+                  className={`h-2 w-2 rounded-full transition-colors`}
+                  style={{ 
+                    backgroundColor: index === currentIndex ? theme.colors.primary.hex : theme.colors.muted.hex 
+                  }}
+                  onClick={() => setCurrentIndex(index)}
+                />
+              ))}
+            </div>
+            
+            <div className="flex gap-2 text-sm text-muted-foreground">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-xs"
+                onClick={() => openLink("https://github.com/salavey13")}
+              >
+                <Github className="w-3 h-3 mr-1" />
+                {t('coolOffers.learnMore')}
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-xs"
+                onClick={() => openLink("https://youtube.com/salavey13")}
+              >
+                <Youtube className="w-3 h-3 mr-1" />
+                {t('coolOffers.watchTutorials')}
+              </Button>
+            </div>
+          </div>
+
+          <Button
+            variant="outline"
+            size="icon"
+            className="bg-muted hover:bg-muted/80"
+            onClick={nextSlide}
+          >
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+        </div>
+
         <Button
-          variant="outline"
-          size="icon"
-          className="absolute left-2 top-1/2 -translate-y-1/2 bg-gray-800 text-gray-300 hover:bg-gray-700"
-          onClick={prevSlide}
+          onClick={() => openLink("https://kwork.ru/website-development/36601783/telegram-mini-prilozhenie-s-bazoy-dannykh-na-supabase")}
+          className="w-full mt-4"
+          style={{ 
+            backgroundColor: theme.colors.primary.hex,
+            color: theme.colors.background.hex
+          }}
         >
-          <ChevronLeft className="h-4 w-4" />
-        </Button>
-        <Button
-          variant="outline"
-          size="icon"
-          className="absolute right-2 top-1/2 -translate-y-1/2 bg-gray-800 text-gray-300 hover:bg-gray-700"
-          onClick={nextSlide}
-        >
-          <ChevronRight className="h-4 w-4" />
+          <ExternalLink className="w-4 h-4 mr-2" />
+          {t('coolOffers.viewOnKwork')}
         </Button>
       </div>
-      <div className="mt-4 flex justify-center space-x-2">
-        {offers.map((_, index) => (
-          <button
-            key={index}
-            className={`h-2 w-2 rounded-full ${
-              index === currentIndex ? 'bg-purple-500' : 'bg-gray-600'
-            }`}
-            onClick={() => setCurrentIndex(index)}
-          />
-        ))}
-      </div>
+
+      {/* Add bottom padding to account for fixed navigation */}
+      <div className="h-32" />
     </div>
   )
 }
