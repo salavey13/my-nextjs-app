@@ -18,7 +18,7 @@ import useTelegram from '@/hooks/useTelegram';
 import AutomationPipeline from '@/components/AutomationPipeline';
 import { useInView } from '@/hooks/useInView';
 import { useTheme } from '@/hooks/useTheme';
-import CoolOffersCarousel from '@/components/CoolOffersCarousel'
+import CoolOffersCarousel from '@/components/cool-offers-carousel'
 
 
 import   GlitchyHero  from '@/components/GlitchyHero';
