@@ -18,6 +18,7 @@ import useTelegram from '@/hooks/useTelegram';
 import AutomationPipeline from '@/components/AutomationPipeline';
 import { useInView } from '@/hooks/useInView';
 import { useTheme } from '@/hooks/useTheme';
+import CoolOffersCarousel from '@/components/CoolOffersCarousel'
 
 
 import   GlitchyHero  from '@/components/GlitchyHero';
@@ -317,6 +318,11 @@ export default function LandingPage() {
               </motion.div>
             ))}
           </div>
+        </section>
+
+        <section id="cool-offers" className="mb-24">
+          <h3 className="text-4xl font-bold text-secondary mb-12 text-center">{t('coolOffers.heading')}</h3>
+          <CoolOffersCarousel />
         </section>
 
         <section id="templates" className="mb-24">
