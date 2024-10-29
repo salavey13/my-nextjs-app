@@ -48,7 +48,7 @@ export default function CoolOffersCarousel() {
     typeof value === 'object' && value !== null && 'title' in value && 'description' in value
 
   // Generate offers dynamically
-  const offers = Object.entries(t('coolOffers') as CoolOffers)
+  const offers = Object.entries(t('coolOffers') as unknown as CoolOffers)
     .filter(([key, value]) => isOfferKey(key) && isOffer(value))
     .map(([key, offer]) => ({
       type: key.includes('Package') ? 'plan' : 'gig',
