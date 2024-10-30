@@ -140,7 +140,7 @@ export default function CoolOffersCarousel() {
           <div 
             ref={containerRef}
             className="relative overflow-hidden rounded-lg"
-            style={{ height: 'calc(100vh - 142px)', minHeight: '600px', maxHeight: '800px' }}
+            style={{ height: 'calc(100vh - 113px)', minHeight: '620px', maxHeight: '800px' }}
             onTouchStart={handleTouchStart}
             onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}
@@ -161,11 +161,11 @@ export default function CoolOffersCarousel() {
                     style={{
                       backgroundColor: theme.colors.background.hex,
                       borderColor: offer.type === 'plan' ? theme.colors.primary.hex : theme.colors.accent.hex,
-                      minHeight: '369px',
-                      maxWidth: '324px'
+                      minHeight: '380px',
+                      maxWidth: '318px'
                     }}
                   >
-                    <CardHeader className="sticky top-0 bg-background/95 border-b backdrop-blur-md rounded">
+                    <CardHeader className="sticky top-0 bg-background/95 border-b backdrop-blur-md rounded-lg">
                       <CardTitle className="text-xl sm:text-2xl md:text-3xl font-bold text-primary">
                         {offer.type === 'plan' ? <Rocket className="inline-block mr-2" /> : <Zap className="inline-block mr-2" />}
                         {offer.title}
