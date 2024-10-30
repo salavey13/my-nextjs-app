@@ -150,11 +150,10 @@ export default function CoolOffersCarousel() {
               style={{ 
                 transform: `translateX(-${currentIndex * 100}%)`,
                 width: `${offers.length * 100}%`,
-                display: 'flex'
               }}
             >
               {offers.map((offer, index) => (
-                <div key={index} className="w-full h-full p-2 md:p-4">
+                <div key={index} className="w-full h-full p-2 md:p-4 flex-shrink-0">
                   <Card 
                     className={`h-full w-full overflow-auto ${
                       offer.type === 'plan' ? 'border-2' : 'border'
@@ -190,7 +189,7 @@ export default function CoolOffersCarousel() {
               ))}
             </div>
           </div>
-
+          
           {/* Controls section - now part of the carousel */}
           <div className="mt-4 bg-background/95 rounded-lg p-4">
             <div className="flex flex-col gap-4">
