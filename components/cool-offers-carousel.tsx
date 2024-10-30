@@ -62,6 +62,15 @@ export default function CoolOffersCarousel() {
     return isOfferKey(key) && isRawOffer(value)
   }
 
+  // Helper to extract features from an offer
+  const extractFeatures = (offer: RawOffer): string[] => {
+    return Object.entries(offer)
+      .filter(([key, value]): value is string => 
+        key.startsWith('feature') && typeof value === 'string'
+      )
+      .map(([_, value]) => value)
+  }
+
   // Process raw offers into final format
   const offers = Object.entries(t('coolOffers') as unknown as CoolOffers)
     .filter(isOfferEntry)
@@ -70,9 +79,7 @@ export default function CoolOffersCarousel() {
       title: offer.title,
       subtitle: offer.subtitle,
       description: offer.description,
-      features: Object.entries(offer)
-        .filter(([k]) => k.startsWith('feature'))
-        .map(([_, v]) => v),
+      features: extractFeatures(offer),
       coolnessFactor: key.includes('vip') ? 10 : 
                      key.includes('ai') ? 9 : 
                      key.includes('standard') ? 8 : 
