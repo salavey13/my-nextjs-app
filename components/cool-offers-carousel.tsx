@@ -156,7 +156,7 @@ export default function CoolOffersCarousel() {
                 <div key={index} className="w-full h-full p-2 md:p-4 flex-shrink-0">
                   <Card 
                     className={`h-full w-full overflow-auto ${
-                      offer.type === 'plan' ? 'border-2' : ''
+                      offer.type === 'plan' ? 'border-2' : 'border-2'
                     }`}
                     style={{
                       backgroundColor: theme.colors.background.hex,
