@@ -139,14 +139,14 @@ export default function CoolOffersCarousel() {
           {/* Carousel container */}
           <div 
             ref={containerRef}
-            className="relative overflow-hidden rounded-lg"
+            className="relative overflow-hidden"
             style={{ height: 'calc(100vh - 113px)', minHeight: '620px', maxHeight: '800px' }}
             onTouchStart={handleTouchStart}
             onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}
           >
             <div 
-              className="flex transition-transform rounded-lg duration-400 ease-in-out absolute top-0 left-0 h-full"
+              className="flex transition-transform duration-1300 ease-in-out absolute top-0 left-0 h-full"
               style={{ 
                 transform: `translateX(-${currentIndex * 100}%)`,
                 width: `${offers.length * 100}%`,
