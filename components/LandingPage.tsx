@@ -321,7 +321,6 @@ export default function LandingPage() {
         </section>
 
         <section id="cool-offers" className="mb-24">
-          <h3 className="text-4xl font-bold text-secondary mb-12 text-center">{t('coolOffers.heading')}</h3>
           <CoolOffersCarousel />
         </section>
 
