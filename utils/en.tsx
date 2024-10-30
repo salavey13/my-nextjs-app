@@ -10,7 +10,7 @@ export const en: LanguageDictionary = {
     vipPackage: {
       title: "VIP Package",
       subtitle: "High-Level Telegram App with Smart Access, Custom User Progression & AI Guidance",
-      description: "Get the ultimate Telegram app, loaded with smart access controls, progressive unlocking, and an AI-powered tab to help users build out new features as they go.",
+      description: "Get the ultimate Telegram app with smart access controls, progressive unlocking to help users build out new features as they go.",
       feature1: "Full Custom Interface & UX",
       feature2: "Supabase with Full RLS & Custom Role Setup",
       feature3: "AI-Powered Dev Tab for Content Creation",
