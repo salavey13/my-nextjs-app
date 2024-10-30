@@ -8,22 +8,85 @@ import { useAppContext } from '../context/AppContext'
 import useTelegram from '@/hooks/useTelegram'
 import { useTheme } from '@/hooks/useTheme'
 
-interface OfferTranslation {
-  title: string
-  subtitle?: string
-  description: string
-  [key: `feature${number}`]: string
-}
-
-interface CoolOffersTranslations {
-  heading: string
-  learnMore: string
-  watchTutorials: string
-  viewOnKwork: string
-  [key: string]: string | OfferTranslation
-}
-
-type OfferEntry = [string, OfferTranslation]
+// Hardcoded offers for reliability
+const DEFAULT_OFFERS = [
+  {
+    type: 'plan',
+    title: "VIP Package",
+    subtitle: "High-Level Telegram App with Smart Access, Custom User Progression & AI Guidance",
+    description: "Get the ultimate Telegram app, loaded with smart access controls, progressive unlocking, and an AI-powered tab to help users build out new features as they go.",
+    features: [
+      "Full Custom Interface & UX",
+      "Supabase with Full RLS & Custom Role Setup",
+      "AI-Powered Dev Tab for Content Creation",
+      "Step-by-Step User Learning & Engagement",
+      "Multi-Stage Role Access"
+    ],
+    coolnessFactor: 10
+  },
+  {
+    type: 'gig',
+    title: "AI Automation Pipeline Setup",
+    description: "Set up an AI-driven automation pipeline tailored to your needs. Perfect for agencies, product sites, or any project that requires a scalable, high-efficiency web automation setup.",
+    features: [
+      "Custom AI automation pipeline configuration",
+      "Component integration & automated deployment",
+      "Advanced control panel for managing updates",
+      "Instructions and ongoing support"
+    ],
+    coolnessFactor: 9
+  },
+  {
+    type: 'plan',
+    title: "Standard Package",
+    subtitle: "Advanced Telegram App with Stepwise Access & Learning System",
+    description: "Get an advanced Telegram mini app with custom role access, data security, and phased feature unlocking.",
+    features: [
+      "Advanced Interface",
+      "Enhanced User Data Security with Row Level Security",
+      "Custom Role & Access Setup",
+      "Stepwise Feature Unlocking"
+    ],
+    coolnessFactor: 8
+  },
+  {
+    type: 'gig',
+    title: "AI-Powered Web Components",
+    description: "Get custom AI-powered web components tailored to your project's needs, ensuring a seamless user experience and compatibility across devices.",
+    features: [
+      "Custom AI-driven component development",
+      "Responsive design and cross-platform functionality",
+      "Full testing and integration support",
+      "Post-deployment support"
+    ],
+    coolnessFactor: 7
+  },
+  {
+    type: 'plan',
+    title: "Basic Package",
+    subtitle: "Essential Telegram Mini App with User Data & Role Access",
+    description: "Get a basic Telegram mini app that handles user data, simple role-based access, and a clean, straightforward interface.",
+    features: [
+      "Basic Interface",
+      "Simple User Data Setup",
+      "Role-Based Access Control",
+      "Core Tabs Only"
+    ],
+    coolnessFactor: 6
+  },
+  {
+    type: 'gig',
+    title: "AI-Powered Website Creation",
+    description: "Get a professional, responsive website built using advanced AI tools, ensuring it's visually striking and optimized for conversions.",
+    features: [
+      "AI-based custom design",
+      "Responsive layouts for mobile and desktop",
+      "Basic SEO optimization",
+      "100% stress-free process"
+    ],
+    coolnessFactor: 5
+  }
+]
 
 export default function CoolOffersCarousel() {
   const [currentIndex, setCurrentIndex] = useState(0)
@@ -34,38 +97,8 @@ export default function CoolOffersCarousel() {
   const { theme } = useTheme()
   const containerRef = useRef<HTMLDivElement>(null)
 
-  // Get all translations for coolOffers
-  const coolOffers = t('coolOffers') as unknown as CoolOffersTranslations
-
-  // Helper function to check if an entry is an offer
-  const isOfferEntry = (entry: [string, string | OfferTranslation]): entry is OfferEntry => {
-    const [key, value] = entry
-    if (typeof value === 'string') return false
-    if (key === 'heading' || key === 'learnMore' || key === 'watchTutorials' || key === 'viewOnKwork') return false
-    return 'title' in value && 'description' in value
-  }
-
-  // Process offers from translations
-  const offers = Object.entries(coolOffers)
-    .filter(isOfferEntry)
-    .map(([key, offer]) => ({
-      type: key.includes('Package') ? 'plan' : 'gig',
-      title: offer.title,
-      subtitle: offer.subtitle,
-      description: offer.description,
-      features: Object.entries(offer)
-        .filter(([key]) => key.startsWith('feature'))
-        .map(([_, value]) => value),
-      coolnessFactor: key.includes('vip') ? 10 : 
-                     key.includes('ai') ? 9 : 
-                     key.includes('standard') ? 8 : 
-                     key.includes('basic') ? 7 : 6
-    }))
-    .sort((a, b) => b.coolnessFactor - a.coolnessFactor)
-
-  // Debug logging
-  console.log('Raw coolOffers:', coolOffers)
-  console.log('Processed offers:', offers)
+  // Always use hardcoded offers for now
+  const offers = DEFAULT_OFFERS
 
   const handleTouchStart = (e: React.TouchEvent) => setTouchStart(e.targetTouches[0].clientX)
   const handleTouchMove = (e: React.TouchEvent) => setTouchEnd(e.targetTouches[0].clientX)
@@ -88,16 +121,11 @@ export default function CoolOffersCarousel() {
     return () => clearInterval(interval)
   }, [])
 
-  if (offers.length === 0) {
-    console.log('No offers found in translations')
-    return null
-  }
-
   return (
     <div className="w-full min-h-screen bg-background" style={{ backgroundColor: theme.colors.background.hex }}>
       <div className="container mx-auto px-4 py-8">
         <h2 className="text-2xl font-bold mb-6 text-center" style={{ color: theme.colors.foreground.hex }}>
-          {coolOffers.heading}
+          Kwork Gigs
         </h2>
         
         <div 
@@ -185,7 +213,7 @@ export default function CoolOffersCarousel() {
                     onClick={() => openLink("https://github.com/salavey13")}
                   >
                     <Github className="w-3 h-3 mr-1" />
-                    {coolOffers.learnMore}
+                    Learn More
                   </Button>
                   <Button
                     variant="ghost"
@@ -194,7 +222,7 @@ export default function CoolOffersCarousel() {
                     onClick={() => openLink("https://youtube.com/salavey13")}
                   >
                     <Youtube className="w-3 h-3 mr-1" />
-                    {coolOffers.watchTutorials}
+                    Watch Tutorials
                   </Button>
                 </div>
               </div>
@@ -218,7 +246,7 @@ export default function CoolOffersCarousel() {
               }}
             >
               <ExternalLink className="w-4 h-4 mr-2" />
-              {coolOffers.viewOnKwork}
+              View Service on Kwork
             </Button>
           </div>
         </div>
