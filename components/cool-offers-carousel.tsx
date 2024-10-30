@@ -8,81 +8,81 @@ import { useAppContext } from '../context/AppContext'
 import useTelegram from '@/hooks/useTelegram'
 import { useTheme } from '@/hooks/useTheme'
 
-// Hardcoded offers for reliability
+// Hardcoded offers structure for reliability, content will be translated
 const DEFAULT_OFFERS = [
   {
     type: 'plan',
-    title: "VIP Package",
-    subtitle: "High-Level Telegram App with Smart Access, Custom User Progression & AI Guidance",
-    description: "Get the ultimate Telegram app, loaded with smart access controls, progressive unlocking, and an AI-powered tab to help users build out new features as they go.",
+    titleKey: 'coolOffers.vipPackage.title',
+    subtitleKey: 'coolOffers.vipPackage.subtitle',
+    descriptionKey: 'coolOffers.vipPackage.description',
     features: [
-      "Full Custom Interface & UX",
-      "Supabase with Full RLS & Custom Role Setup",
-      "AI-Powered Dev Tab for Content Creation",
-      "Step-by-Step User Learning & Engagement",
-      "Multi-Stage Role Access"
+      'coolOffers.vipPackage.feature1',
+      'coolOffers.vipPackage.feature2',
+      'coolOffers.vipPackage.feature3',
+      'coolOffers.vipPackage.feature4',
+      'coolOffers.vipPackage.feature5'
     ],
     coolnessFactor: 10
   },
   {
     type: 'gig',
-    title: "AI Automation Pipeline Setup",
-    description: "Set up an AI-driven automation pipeline tailored to your needs. Perfect for agencies, product sites, or any project that requires a scalable, high-efficiency web automation setup.",
+    titleKey: 'coolOffers.aiAutomation.title',
+    descriptionKey: 'coolOffers.aiAutomation.description',
     features: [
-      "Custom AI automation pipeline configuration",
-      "Component integration & automated deployment",
-      "Advanced control panel for managing updates",
-      "Instructions and ongoing support"
+      'coolOffers.aiAutomation.feature1',
+      'coolOffers.aiAutomation.feature2',
+      'coolOffers.aiAutomation.feature3',
+      'coolOffers.aiAutomation.feature4'
     ],
     coolnessFactor: 9
   },
   {
     type: 'plan',
-    title: "Standard Package",
-    subtitle: "Advanced Telegram App with Stepwise Access & Learning System",
-    description: "Get an advanced Telegram mini app with custom role access, data security, and phased feature unlocking.",
+    titleKey: 'coolOffers.standardPackage.title',
+    subtitleKey: 'coolOffers.standardPackage.subtitle',
+    descriptionKey: 'coolOffers.standardPackage.description',
     features: [
-      "Advanced Interface",
-      "Enhanced User Data Security with Row Level Security",
-      "Custom Role & Access Setup",
-      "Stepwise Feature Unlocking"
+      'coolOffers.standardPackage.feature1',
+      'coolOffers.standardPackage.feature2',
+      'coolOffers.standardPackage.feature3',
+      'coolOffers.standardPackage.feature4'
     ],
     coolnessFactor: 8
   },
   {
     type: 'gig',
-    title: "AI-Powered Web Components",
-    description: "Get custom AI-powered web components tailored to your project's needs, ensuring a seamless user experience and compatibility across devices.",
+    titleKey: 'coolOffers.aiComponents.title',
+    descriptionKey: 'coolOffers.aiComponents.description',
     features: [
-      "Custom AI-driven component development",
-      "Responsive design and cross-platform functionality",
-      "Full testing and integration support",
-      "Post-deployment support"
+      'coolOffers.aiComponents.feature1',
+      'coolOffers.aiComponents.feature2',
+      'coolOffers.aiComponents.feature3',
+      'coolOffers.aiComponents.feature4'
     ],
     coolnessFactor: 7
   },
   {
     type: 'plan',
-    title: "Basic Package",
-    subtitle: "Essential Telegram Mini App with User Data & Role Access",
-    description: "Get a basic Telegram mini app that handles user data, simple role-based access, and a clean, straightforward interface.",
+    titleKey: 'coolOffers.basicPackage.title',
+    subtitleKey: 'coolOffers.basicPackage.subtitle',
+    descriptionKey: 'coolOffers.basicPackage.description',
     features: [
-      "Basic Interface",
-      "Simple User Data Setup",
-      "Role-Based Access Control",
-      "Core Tabs Only"
+      'coolOffers.basicPackage.feature1',
+      'coolOffers.basicPackage.feature2',
+      'coolOffers.basicPackage.feature3',
+      'coolOffers.basicPackage.feature4'
     ],
     coolnessFactor: 6
   },
   {
     type: 'gig',
-    title: "AI-Powered Website Creation",
-    description: "Get a professional, responsive website built using advanced AI tools, ensuring it's visually striking and optimized for conversions.",
+    titleKey: 'coolOffers.aiWebsite.title',
+    descriptionKey: 'coolOffers.aiWebsite.description',
     features: [
-      "AI-based custom design",
-      "Responsive layouts for mobile and desktop",
-      "Basic SEO optimization",
-      "100% stress-free process"
+      'coolOffers.aiWebsite.feature1',
+      'coolOffers.aiWebsite.feature2',
+      'coolOffers.aiWebsite.feature3',
+      'coolOffers.aiWebsite.feature4'
     ],
     coolnessFactor: 5
   }
@@ -97,8 +97,14 @@ export default function CoolOffersCarousel() {
   const { theme } = useTheme()
   const containerRef = useRef<HTMLDivElement>(null)
 
-  // Always use hardcoded offers for now
-  const offers = DEFAULT_OFFERS
+  // Transform offers with translations
+  const offers = DEFAULT_OFFERS.map(offer => ({
+    ...offer,
+    title: t(offer.titleKey),
+    subtitle: offer.subtitleKey ? t(offer.subtitleKey) : undefined,
+    description: t(offer.descriptionKey),
+    features: offer.features.map(fKey => t(fKey))
+  }))
 
   const handleTouchStart = (e: React.TouchEvent) => setTouchStart(e.targetTouches[0].clientX)
   const handleTouchMove = (e: React.TouchEvent) => setTouchEnd(e.targetTouches[0].clientX)
@@ -122,137 +128,138 @@ export default function CoolOffersCarousel() {
   }, [])
 
   return (
-    <div className="w-full min-h-screen bg-background" style={{ backgroundColor: theme.colors.background.hex }}>
+    <div className="w-full bg-background/95">
       <div className="container mx-auto px-4 py-8">
         <h2 className="text-2xl font-bold mb-6 text-center" style={{ color: theme.colors.foreground.hex }}>
-          Kwork Gigs
+          {t('coolOffers.heading')}
         </h2>
         
-        <div 
-          ref={containerRef}
-          className="relative overflow-hidden h-[600px] mb-16"
-          onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
-          onTouchEnd={handleTouchEnd}
-        >
+        {/* Main carousel section */}
+        <div className="relative mb-8">
+          {/* Carousel container */}
           <div 
-            className="flex transition-transform duration-300 ease-in-out absolute top-0 left-0 h-full"
-            style={{ 
-              transform: `translateX(-${currentIndex * 100}%)`,
-              width: `${offers.length * 100}%`
-            }}
+            ref={containerRef}
+            className="relative overflow-hidden rounded-lg"
+            style={{ height: 'calc(100vh - 300px)', minHeight: '500px', maxHeight: '800px' }}
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
           >
-            {offers.map((offer, index) => (
-              <div key={index} className="w-full h-full flex-shrink-0 px-2">
-                <Card 
-                  className={`h-full overflow-auto ${
-                    offer.type === 'plan' ? 'border-2' : 'border'
-                  }`}
-                  style={{
-                    backgroundColor: theme.colors.muted.hex,
-                    borderColor: offer.type === 'plan' ? theme.colors.primary.hex : theme.colors.accent.hex
-                  }}
-                >
-                  <CardHeader className="sticky top-0 bg-inherit z-10">
-                    <CardTitle className="text-2xl sm:text-3xl font-bold" style={{ color: theme.colors.foreground.hex }}>
-                      {offer.type === 'plan' ? <Rocket className="inline-block mr-2" /> : <Zap className="inline-block mr-2" />}
-                      {offer.title}
-                    </CardTitle>
-                    {offer.subtitle && (
-                      <CardDescription className="text-muted-foreground">{offer.subtitle}</CardDescription>
-                    )}
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <p className="text-foreground/80">{offer.description}</p>
-                    <ul className="space-y-2">
-                      {offer.features.map((feature, idx) => (
-                        <li key={idx} className="flex items-start text-foreground/60">
-                          <span className="mr-2 text-xl" style={{ color: offer.type === 'plan' ? theme.colors.primary.hex : theme.colors.accent.hex }}>•</span>
-                          {feature}
-                        </li>
-                      ))}
-                    </ul>
-                  </CardContent>
-                </Card>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Navigation and social links */}
-        <div className="fixed bottom-0 left-0 right-0 bg-background/80 backdrop-blur-sm p-4 border-t" style={{ backgroundColor: `${theme.colors.background.hex}CC` }}>
-          <div className="container mx-auto">
-            <div className="flex justify-between items-center max-w-screen-xl mx-auto">
-              <Button
-                variant="outline"
-                size="icon"
-                className="bg-muted hover:bg-muted/80"
-                onClick={prevSlide}
-              >
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-
-              <div className="flex flex-col items-center gap-4">
-                <div className="flex space-x-2">
-                  {offers.map((_, index) => (
-                    <button
-                      key={index}
-                      className={`h-2 w-2 rounded-full transition-colors`}
-                      style={{ 
-                        backgroundColor: index === currentIndex ? theme.colors.primary.hex : theme.colors.muted.hex 
-                      }}
-                      onClick={() => setCurrentIndex(index)}
-                    />
-                  ))}
-                </div>
-                <div className="flex gap-2 text-sm text-muted-foreground">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-xs"
-                    onClick={() => openLink("https://github.com/salavey13")}
-                  >
-                    <Github className="w-3 h-3 mr-1" />
-                    Learn More
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-xs"
-                    onClick={() => openLink("https://youtube.com/salavey13")}
-                  >
-                    <Youtube className="w-3 h-3 mr-1" />
-                    Watch Tutorials
-                  </Button>
-                </div>
-              </div>
-
-              <Button
-                variant="outline"
-                size="icon"
-                className="bg-muted hover:bg-muted/80"
-                onClick={nextSlide}
-              >
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-            </div>
-
-            <Button
-              onClick={() => openLink("https://kwork.ru/website-development/36601783/telegram-mini-prilozhenie-s-bazoy-dannykh-na-supabase")}
-              className="w-full mt-4"
+            <div 
+              className="flex transition-transform duration-300 ease-in-out absolute top-0 left-0 h-full"
               style={{ 
-                backgroundColor: theme.colors.primary.hex,
-                color: theme.colors.background.hex
+                transform: `translateX(-${currentIndex * 100}%)`,
+                width: `${offers.length * 100}%`
               }}
             >
-              <ExternalLink className="w-4 h-4 mr-2" />
-              View Service on Kwork
-            </Button>
+              {offers.map((offer, index) => (
+                <div key={index} className="w-full h-full p-2 md:p-4">
+                  <Card 
+                    className={`h-full w-full overflow-auto ${
+                      offer.type === 'plan' ? 'border-2' : 'border'
+                    }`}
+                    style={{
+                      backgroundColor: theme.colors.background.hex,
+                      borderColor: offer.type === 'plan' ? theme.colors.primary.hex : theme.colors.accent.hex
+                    }}
+                  >
+                    <CardHeader className="sticky top-0 backdrop-blur-md bg-background/95 border-b">
+                      <CardTitle className="text-xl sm:text-2xl md:text-3xl font-bold text-primary">
+                        {offer.type === 'plan' ? <Rocket className="inline-block mr-2" /> : <Zap className="inline-block mr-2" />}
+                        {offer.title}
+                      </CardTitle>
+                      {offer.subtitle && (
+                        <CardDescription className="text-secondary-foreground/80">{offer.subtitle}</CardDescription>
+                      )}
+                    </CardHeader>
+                    <CardContent className="space-y-6 p-4 md:p-6">
+                      <p className="text-foreground/90 text-base md:text-lg">{offer.description}</p>
+                      <ul className="space-y-3">
+                        {offer.features.map((feature, idx) => (
+                          <li key={idx} className="flex items-start text-foreground/80">
+                            <span className="mr-2 text-xl" style={{ color: offer.type === 'plan' ? theme.colors.primary.hex : theme.colors.accent.hex }}>•</span>
+                            <span className="text-sm md:text-base">{feature}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </CardContent>
+                  </Card>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Controls section - now part of the carousel */}
+          <div className="mt-4 bg-background/95 rounded-lg p-4">
+            <div className="flex flex-col gap-4">
+              {/* Navigation controls */}
+              <div className="flex justify-between items-center">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="bg-background hover:bg-accent hover:text-accent-foreground"
+                  onClick={prevSlide}
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+
+                <div className="flex flex-col items-center gap-4">
+                  <div className="flex space-x-2">
+                    {offers.map((_, index) => (
+                      <button
+                        key={index}
+                        className={`h-2 w-2 rounded-full transition-colors ${
+                          index === currentIndex ? 'bg-primary' : 'bg-muted'
+                        }`}
+                        onClick={() => setCurrentIndex(index)}
+                      />
+                    ))}
+                  </div>
+                </div>
+
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="bg-background hover:bg-accent hover:text-accent-foreground"
+                  onClick={nextSlide}
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
+
+              {/* Action buttons */}
+              <div className="flex flex-col sm:flex-row gap-2 justify-center">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="text-xs bg-background hover:bg-accent hover:text-accent-foreground"
+                  onClick={() => openLink("https://github.com/salavey13")}
+                >
+                  <Github className="w-3 h-3 mr-1" />
+                  {t('coolOffers.learnMore')}
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="text-xs bg-background hover:bg-accent hover:text-accent-foreground"
+                  onClick={() => openLink("https://youtube.com/salavey13")}
+                >
+                  <Youtube className="w-3 h-3 mr-1" />
+                  {t('coolOffers.watchTutorials')}
+                </Button>
+                <Button
+                  variant="default"
+                  size="sm"
+                  className="text-xs"
+                  onClick={() => openLink("https://kwork.ru/website-development/36601783/telegram-mini-prilozhenie-s-bazoy-dannykh-na-supabase")}
+                >
+                  <ExternalLink className="w-3 h-3 mr-1" />
+                  {t('coolOffers.viewOnKwork')}
+                </Button>
+              </div>
+            </div>
           </div>
         </div>
-
-        {/* Padding for fixed navigation */}
-        <div className="h-32" />
       </div>
     </div>
   )
