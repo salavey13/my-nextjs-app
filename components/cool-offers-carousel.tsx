@@ -23,6 +23,8 @@ interface CoolOffersTranslations {
   [key: string]: string | OfferTranslation
 }
 
+type OfferEntry = [string, OfferTranslation]
+
 export default function CoolOffersCarousel() {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [touchStart, setTouchStart] = useState(0)
@@ -35,14 +37,17 @@ export default function CoolOffersCarousel() {
   // Get all translations for coolOffers
   const coolOffers = t('coolOffers') as unknown as CoolOffersTranslations
 
+  // Helper function to check if an entry is an offer
+  const isOfferEntry = (entry: [string, string | OfferTranslation]): entry is OfferEntry => {
+    const [key, value] = entry
+    if (typeof value === 'string') return false
+    if (key === 'heading' || key === 'learnMore' || key === 'watchTutorials' || key === 'viewOnKwork') return false
+    return 'title' in value && 'description' in value
+  }
+
   // Process offers from translations
   const offers = Object.entries(coolOffers)
-    .filter(([key, value]): value is OfferTranslation => {
-      // Filter out non-offer entries
-      if (typeof value === 'string') return false
-      if (key === 'heading' || key === 'learnMore' || key === 'watchTutorials' || key === 'viewOnKwork') return false
-      return 'title' in value && 'description' in value
-    })
+    .filter(isOfferEntry)
     .map(([key, offer]) => ({
       type: key.includes('Package') ? 'plan' : 'gig',
       title: offer.title,
@@ -97,13 +102,13 @@ export default function CoolOffersCarousel() {
         
         <div 
           ref={containerRef}
-          className="relative overflow-hidden h-[600px] mb-16" // Fixed height
+          className="relative overflow-hidden h-[600px] mb-16"
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
         >
           <div 
-            className="flex transition-transform duration-300 ease-in-out absolute top-0 left-0 h-full" 
+            className="flex transition-transform duration-300 ease-in-out absolute top-0 left-0 h-full"
             style={{ 
               transform: `translateX(-${currentIndex * 100}%)`,
               width: `${offers.length * 100}%`
@@ -218,8 +223,8 @@ export default function CoolOffersCarousel() {
           </div>
         </div>
 
-        {/*<div className="h-32" /> Padding for fixed navigation */}
-        
+        {/* Padding for fixed navigation */}
+        <div className="h-32" />
       </div>
     </div>
   )
