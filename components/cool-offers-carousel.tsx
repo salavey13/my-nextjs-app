@@ -135,12 +135,12 @@ export default function CoolOffersCarousel() {
         </h1>
         
         {/* Main carousel section */}
-        <div className="relative mb-8">
+        <div className="relative mb-8 overflow-hidden rounded-lg">
           {/* Carousel container */}
           <div 
             ref={containerRef}
             className="relative overflow-hidden rounded-lg"
-            style={{ height: 'calc(100vh - 169px)', minHeight: '600px', maxHeight: '800px' }}
+            style={{ height: 'calc(100vh - 142px)', minHeight: '600px', maxHeight: '800px' }}
             onTouchStart={handleTouchStart}
             onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}
@@ -161,8 +161,8 @@ export default function CoolOffersCarousel() {
                     style={{
                       backgroundColor: theme.colors.background.hex,
                       borderColor: offer.type === 'plan' ? theme.colors.primary.hex : theme.colors.accent.hex,
-                      minHeight: '342px',
-                      maxWidth: '330px'
+                      minHeight: '369px',
+                      maxWidth: '324px'
                     }}
                   >
                     <CardHeader className="sticky top-0 bg-background/95 border-b backdrop-blur-md rounded">
