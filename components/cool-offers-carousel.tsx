@@ -1,4 +1,3 @@
-
 'use client'
 
 import React, { useState, useRef, useEffect } from 'react'
@@ -9,16 +8,12 @@ import { useAppContext } from '../context/AppContext'
 import useTelegram from '@/hooks/useTelegram'
 import { useTheme } from '@/hooks/useTheme'
 
-// Types for offers structure
-interface OfferFeatures {
-  [key: string]: string;
-}
-
-interface Offer {
+// Types for raw offer data from translations
+interface RawOffer {
   title: string;
   subtitle?: string;
   description: string;
-  [key: string]: any; // for feature1, feature2, etc.
+  [key: string]: string | undefined;
 }
 
 interface CoolOffers {
@@ -26,10 +21,18 @@ interface CoolOffers {
   learnMore: string;
   watchTutorials: string;
   viewOnKwork: string;
-  [key: string]: string | Offer;
+  [key: string]: string | RawOffer;
 }
 
-type OfferEntry = [string, Offer]
+// Type for processed offer data
+interface ProcessedOffer {
+  type: 'plan' | 'gig';
+  title: string;
+  subtitle?: string;
+  description: string;
+  features: string[];
+  coolnessFactor: number;
+}
 
 export default function CoolOffersCarousel() {
   const [currentIndex, setCurrentIndex] = useState(0)
@@ -43,26 +46,33 @@ export default function CoolOffersCarousel() {
   // Check if key in CoolOffers is an offer type
   const isOfferKey = (key: string): boolean => key.endsWith('Package') || key.startsWith('ai')
 
-  // Verify if entry value matches Offer structure
-  const isOffer = (value: any): value is Offer =>
-    typeof value === 'object' && value !== null && 'title' in value && 'description' in value
+  // Verify if value matches RawOffer structure
+  const isRawOffer = (value: unknown): value is RawOffer => {
+    return typeof value === 'object' && 
+           value !== null && 
+           'title' in value && 
+           'description' in value
+  }
 
-  // Generate offers dynamically
- const offers = Object.entries(t('coolOffers') as unknown as CoolOffers)
-  .filter(([key, value]) => isOfferKey(key) && isOffer(value))
-  .map(([key, offer]) => {
-    if (typeof offer === 'string') return null;
-    return {
+  // Process raw offers into final format
+  const offers = Object.entries(t('coolOffers') as unknown as CoolOffers)
+    .filter(([key, value]): value is [string, RawOffer] => 
+      isOfferKey(key) && isRawOffer(value)
+    )
+    .map(([key, offer]): ProcessedOffer => ({
       type: key.includes('Package') ? 'plan' : 'gig',
       title: offer.title,
       subtitle: offer.subtitle,
       description: offer.description,
       features: Object.entries(offer)
-        .filter(([featureKey, featureValue]) => featureKey !== 'title' && featureKey !== 'subtitle' && featureKey !== 'description')
-        .map(([featureKey, featureValue]) => `${featureKey}: ${featureValue}`),
-    };
-  })
-  .filter((offer): offer is Offer => offer !== null); // <-- Filter out null values here
+        .filter(([k]) => k.startsWith('feature'))
+        .map(([_, v]) => v),
+      coolnessFactor: key.includes('vip') ? 10 : 
+                     key.includes('ai') ? 9 : 
+                     key.includes('standard') ? 8 : 
+                     key.includes('basic') ? 7 : 6
+    }))
+    .sort((a, b) => b.coolnessFactor - a.coolnessFactor)
 
   const handleTouchStart = (e: React.TouchEvent) => setTouchStart(e.targetTouches[0].clientX)
   const handleTouchMove = (e: React.TouchEvent) => setTouchEnd(e.targetTouches[0].clientX)
@@ -87,10 +97,12 @@ export default function CoolOffersCarousel() {
 
   if (offers.length === 0) return null
 
+  const coolOffers = t('coolOffers') as unknown as CoolOffers
+
   return (
     <div className="w-full bg-background p-4 sm:p-6 md:p-8" style={{ backgroundColor: theme.colors.background.hex }}>
       <h2 className="text-2xl font-bold mb-6 text-center" style={{ color: theme.colors.foreground.hex }}>
-        {t('coolOffers.heading') as string}
+        {coolOffers.heading}
       </h2>
       
       <div 
@@ -150,11 +162,11 @@ export default function CoolOffersCarousel() {
             <div className="flex gap-2 text-sm text-muted-foreground">
               <Button variant="ghost" size="sm" className="text-xs" onClick={() => openLink("https://github.com/salavey13")}>
                 <Github className="w-3 h-3 mr-1" />
-                {t('coolOffers.learnMore') as string}
+                {coolOffers.learnMore}
               </Button>
               <Button variant="ghost" size="sm" className="text-xs" onClick={() => openLink("https://youtube.com/salavey13")}>
                 <Youtube className="w-3 h-3 mr-1" />
-                {t('coolOffers.watchTutorials') as string}
+                {coolOffers.watchTutorials}
               </Button>
             </div>
           </div>
@@ -166,13 +178,12 @@ export default function CoolOffersCarousel() {
 
         <Button onClick={() => openLink("https://kwork.ru/website-development/36601783/telegram-mini-prilozhenie-s-bazoy-dannykh-na-supabase")} className="w-full mt-4" style={{ backgroundColor: theme.colors.primary.hex, color: theme.colors.background.hex }}>
           <ExternalLink className="w-4 h-4 mr-2" />
-          {t('coolOffers.viewOnKwork') as string}
+          {coolOffers.viewOnKwork}
         </Button>
       </div>
 
-      {/* Padding for fixed navigation <div className="h-32" />*/}
-      
+      {/* Padding for fixed navigation */}
+      <div className="h-32" />
     </div>
   )
 }
-
