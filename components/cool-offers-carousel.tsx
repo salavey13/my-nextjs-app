@@ -49,22 +49,21 @@ export default function CoolOffersCarousel() {
 
   // Generate offers dynamically
   const offers = Object.entries(t('coolOffers') as unknown as CoolOffers)
-    .filter(([key, value]) => isOfferKey(key) && isOffer(value))
-    .map(([key, offer]) => ({
+  .filter(([key, value]) => isOfferKey(key) && isOffer(value))
+  .map(([key, offer]) => {
+    if (typeof offer === 'string') return null; // Skip if offer is a string
+    return {
       type: key.includes('Package') ? 'plan' : 'gig',
       title: offer.title,
       subtitle: offer.subtitle,
       description: offer.description,
       features: Object.entries(offer)
-        .filter(([k]) => k.startsWith('feature'))
-        .map(([_, v]) => v as string),
-      coolnessFactor: key.includes('vip') ? 10 : 
-                     key.includes('ai') ? 9 : 
-                     key.includes('standard') ? 8 : 
-                     key.includes('basic') ? 7 : 6
-    }))
-    .sort((a, b) => b.coolnessFactor - a.coolnessFactor)
-
+        .filter(([featureKey, featureValue]) => featureKey !== 'title' && featureKey !== 'subtitle' && featureKey !== 'description')
+        .map(([featureKey, featureValue]) => `${featureKey}: ${featureValue}`),
+    };
+  })
+  .filter(Boolean); // Remove any null entries
+  
   const handleTouchStart = (e: React.TouchEvent) => setTouchStart(e.targetTouches[0].clientX)
   const handleTouchMove = (e: React.TouchEvent) => setTouchEnd(e.targetTouches[0].clientX)
   const handleTouchEnd = () => {
