@@ -153,9 +153,9 @@ export default function CoolOffersCarousel() {
               }}
             >
               {offers.map((offer, index) => (
-                <div key={index} className="w-full h-full p-2 md:p-4 flex-shrink-0">
+                <div key={index} className="w-[300px] h-full rounded-lg p-2 md:p-4 flex-shrink-0">
                   <Card 
-                    className={`h-full w-full overflow-auto ${
+                    className={`h-full w-full overflow-auto rounded-lg ${
                       offer.type === 'plan' ? 'border-2' : 'border'
                     }`}
                     style={{
@@ -164,7 +164,7 @@ export default function CoolOffersCarousel() {
                       minHeight: '300px'
                     }}
                   >
-                    <CardHeader className="sticky top-0 backdrop-blur-md bg-background/95 border-b">
+                    <CardHeader className="sticky top-0 bg-background/95 border-b">
                       <CardTitle className="text-xl sm:text-2xl md:text-3xl font-bold text-primary">
                         {offer.type === 'plan' ? <Rocket className="inline-block mr-2" /> : <Zap className="inline-block mr-2" />}
                         {offer.title}
@@ -209,7 +209,7 @@ export default function CoolOffersCarousel() {
                     {offers.map((_, index) => (
                       <button
                         key={index}
-                        className={`h-2 w-2 rounded-full transition-colors ${
+                        className={`h-2 w-2 rounded-lg transition-colors ${
                           index === currentIndex ? 'bg-primary' : 'bg-muted'
                         }`}
                         onClick={() => setCurrentIndex(index)}
