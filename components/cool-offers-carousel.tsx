@@ -162,10 +162,10 @@ export default function CoolOffersCarousel() {
                       backgroundColor: theme.colors.background.hex,
                       borderColor: offer.type === 'plan' ? theme.colors.primary.hex : theme.colors.accent.hex,
                       minHeight: '342px',
-                      maxWidth: '342px'
+                      maxWidth: '330px'
                     }}
                   >
-                    <CardHeader className="sticky top-0 bg-background/95 border-b backdrop-blur-md rounded-lg">
+                    <CardHeader className="sticky top-0 bg-background/95 border-b backdrop-blur-md rounded">
                       <CardTitle className="text-xl sm:text-2xl md:text-3xl font-bold text-primary">
                         {offer.type === 'plan' ? <Rocket className="inline-block mr-2" /> : <Zap className="inline-block mr-2" />}
                         {offer.title}
