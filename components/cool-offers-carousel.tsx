@@ -165,7 +165,7 @@ export default function CoolOffersCarousel() {
                       maxWidth: '318px'
                     }}
                   >
-                    <CardHeader className="sticky top-0 bg-background/95 border-b backdrop-blur-md rounded-lg">
+                    <CardHeader className="sticky top-0 bg-background/95 border-b backdrop-blur-md">
                       <CardTitle className="text-xl sm:text-2xl md:text-3xl font-bold text-primary">
                         {offer.type === 'plan' ? <Rocket className="inline-block mr-2" /> : <Zap className="inline-block mr-2" />}
                         {offer.title}
