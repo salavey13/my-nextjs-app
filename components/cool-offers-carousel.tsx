@@ -135,7 +135,7 @@ export default function CoolOffersCarousel() {
         </h1>
         
         {/* Main carousel section */}
-        <div className="relative mb-8 overflow-hidden rounded-lg">
+        <div className="relative mb-8 overflow-hidden">
           {/* Carousel container */}
           <div 
             ref={containerRef}
@@ -153,10 +153,10 @@ export default function CoolOffersCarousel() {
               }}
             >
               {offers.map((offer, index) => (
-                <div key={index} className="w-full h-full rounded-lg p-2 md:p-4 flex-shrink-0">
+                <div key={index} className="w-full h-full p-2 md:p-4 flex-shrink-0">
                   <Card 
-                    className={`h-full w-full overflow-auto rounded-lg ${
-                      offer.type === 'plan' ? 'border-2' : 'border'
+                    className={`h-full w-full overflow-auto ${
+                      offer.type === 'plan' ? 'border-2' : ''
                     }`}
                     style={{
                       backgroundColor: theme.colors.background.hex,
