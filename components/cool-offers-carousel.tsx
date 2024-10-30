@@ -34,6 +34,8 @@ interface ProcessedOffer {
   coolnessFactor: number;
 }
 
+type OfferEntry = [string, RawOffer];
+
 export default function CoolOffersCarousel() {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [touchStart, setTouchStart] = useState(0)
@@ -54,11 +56,15 @@ export default function CoolOffersCarousel() {
            'description' in value
   }
 
+  // Type guard for offer entries
+  const isOfferEntry = (entry: [string, unknown]): entry is OfferEntry => {
+    const [key, value] = entry
+    return isOfferKey(key) && isRawOffer(value)
+  }
+
   // Process raw offers into final format
   const offers = Object.entries(t('coolOffers') as unknown as CoolOffers)
-    .filter(([key, value]): value is [string, RawOffer] => 
-      isOfferKey(key) && isRawOffer(value)
-    )
+    .filter(isOfferEntry)
     .map(([key, offer]): ProcessedOffer => ({
       type: key.includes('Package') ? 'plan' : 'gig',
       title: offer.title,
