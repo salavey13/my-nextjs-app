@@ -13,6 +13,7 @@ interface RawOffer {
   title: string;
   subtitle?: string;
   description: string;
+  [key: `feature${number}`]: string;
   [key: string]: string | undefined;
 }
 
@@ -64,11 +65,10 @@ export default function CoolOffersCarousel() {
 
   // Helper to extract features from an offer
   const extractFeatures = (offer: RawOffer): string[] => {
-    return Object.entries(offer)
-      .filter(([key, value]): value is string => 
-        key.startsWith('feature') && typeof value === 'string'
-      )
-      .map(([_, value]) => value)
+    return Object.keys(offer)
+      .filter(key => key.startsWith('feature'))
+      .map(key => offer[key])
+      .filter((value): value is string => typeof value === 'string')
   }
 
   // Process raw offers into final format
