@@ -169,7 +169,7 @@ export default function CoolOffersCarousel() {
                         {offer.title}
                       </CardTitle>
                       {offer.subtitle && (
-                        <CardDescription className="text-secondary-foreground/80">{offer.subtitle}</CardDescription>
+                        <CardDescription className="text-foreground/90">{offer.subtitle}</CardDescription>
                       )}
                     </CardHeader>
                     <CardContent className="space-y-6 p-4 md:p-6">
@@ -178,7 +178,7 @@ export default function CoolOffersCarousel() {
                         {offer.features.map((feature, idx) => (
                           <li key={idx} className="flex items-start text-foreground/80">
                             <span className="mr-2 text-xl" style={{ color: offer.type === 'plan' ? theme.colors.primary.hex : theme.colors.accent.hex }}>•</span>
-                            <span className="text-foreground/90 text-sm md:text-base">{feature}</span>
+                            <span className="text-secondary-foreground/80 text-sm md:text-base">{feature}</span>
                           </li>
                         ))}
                       </ul>
