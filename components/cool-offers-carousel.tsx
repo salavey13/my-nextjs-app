@@ -48,10 +48,10 @@ export default function CoolOffersCarousel() {
     typeof value === 'object' && value !== null && 'title' in value && 'description' in value
 
   // Generate offers dynamically
-  const offers = Object.entries(t('coolOffers') as unknown as CoolOffers)
+ const offers = Object.entries(t('coolOffers') as unknown as CoolOffers)
   .filter(([key, value]) => isOfferKey(key) && isOffer(value))
   .map(([key, offer]) => {
-    if (typeof offer === 'string') return null; // Skip if offer is a string
+    if (typeof offer === 'string') return null;
     return {
       type: key.includes('Package') ? 'plan' : 'gig',
       title: offer.title,
@@ -62,8 +62,8 @@ export default function CoolOffersCarousel() {
         .map(([featureKey, featureValue]) => `${featureKey}: ${featureValue}`),
     };
   })
-  .filter(Boolean); // Remove any null entries
-  
+  .filter((offer): offer is Offer => offer !== null); // <-- Filter out null values here
+
   const handleTouchStart = (e: React.TouchEvent) => setTouchStart(e.targetTouches[0].clientX)
   const handleTouchMove = (e: React.TouchEvent) => setTouchEnd(e.targetTouches[0].clientX)
   const handleTouchEnd = () => {
