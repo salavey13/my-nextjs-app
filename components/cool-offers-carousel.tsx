@@ -140,13 +140,13 @@ export default function CoolOffersCarousel() {
           <div 
             ref={containerRef}
             className="relative overflow-hidden rounded-lg"
-            style={{ height: 'calc(100vh - 200px)', minHeight: '500px', maxHeight: '800px' }}
+            style={{ height: 'calc(100vh - 169px)', minHeight: '600px', maxHeight: '800px' }}
             onTouchStart={handleTouchStart}
             onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}
           >
             <div 
-              className="flex transition-transform duration-300 ease-in-out absolute top-0 left-0 h-full"
+              className="flex transition-transform rounded-lg duration-400 ease-in-out absolute top-0 left-0 h-full"
               style={{ 
                 transform: `translateX(-${currentIndex * 100}%)`,
                 width: `${offers.length * 100}%`,
@@ -161,11 +161,11 @@ export default function CoolOffersCarousel() {
                     style={{
                       backgroundColor: theme.colors.background.hex,
                       borderColor: offer.type === 'plan' ? theme.colors.primary.hex : theme.colors.accent.hex,
-                      minHeight: '300px',
-                      maxWidth: '300px'
+                      minHeight: '342px',
+                      maxWidth: '342px'
                     }}
                   >
-                    <CardHeader className="sticky top-0 bg-background/95 border-b backdrop-blur-md">
+                    <CardHeader className="sticky top-0 bg-background/95 border-b backdrop-blur-md rounded-lg">
                       <CardTitle className="text-xl sm:text-2xl md:text-3xl font-bold text-primary">
                         {offer.type === 'plan' ? <Rocket className="inline-block mr-2" /> : <Zap className="inline-block mr-2" />}
                         {offer.title}
@@ -174,7 +174,7 @@ export default function CoolOffersCarousel() {
                         <CardDescription className="text-foreground/90">{offer.subtitle}</CardDescription>
                       )}
                     </CardHeader>
-                    <CardContent className="space-y-6 p-4 md:p-6">
+                    <CardContent className="space-y-6 p-4 md:p-6 rounded-lg">
                       <p className="text-background/90 text-base md:text-lg">{offer.description}</p>
                       <ul className="space-y-3">
                         {offer.features.map((feature, idx) => (
