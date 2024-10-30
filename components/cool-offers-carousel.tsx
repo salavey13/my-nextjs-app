@@ -140,7 +140,7 @@ export default function CoolOffersCarousel() {
           <div 
             ref={containerRef}
             className="relative overflow-hidden rounded-lg"
-            style={{ height: 'calc(100vh - 300px)', minHeight: '500px', maxHeight: '800px' }}
+            style={{ height: 'calc(100vh - 200px)', minHeight: '500px', maxHeight: '800px' }}
             onTouchStart={handleTouchStart}
             onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}
@@ -149,7 +149,8 @@ export default function CoolOffersCarousel() {
               className="flex transition-transform duration-300 ease-in-out absolute top-0 left-0 h-full"
               style={{ 
                 transform: `translateX(-${currentIndex * 100}%)`,
-                width: `${offers.length * 100}%`
+                width: `${offers.length * 100}%`,
+                display: 'flex'
               }}
             >
               {offers.map((offer, index) => (
@@ -160,7 +161,8 @@ export default function CoolOffersCarousel() {
                     }`}
                     style={{
                       backgroundColor: theme.colors.background.hex,
-                      borderColor: offer.type === 'plan' ? theme.colors.primary.hex : theme.colors.accent.hex
+                      borderColor: offer.type === 'plan' ? theme.colors.primary.hex : theme.colors.accent.hex,
+                      minHeight: '300px'
                     }}
                   >
                     <CardHeader className="sticky top-0 backdrop-blur-md bg-background/95 border-b">
