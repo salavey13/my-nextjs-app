@@ -153,7 +153,7 @@ export default function CoolOffersCarousel() {
               }}
             >
               {offers.map((offer, index) => (
-                <div key={index} className="w-[300px] h-full rounded-lg p-2 md:p-4 flex-shrink-0">
+                <div key={index} className="w-full h-full rounded-lg p-2 md:p-4 flex-shrink-0">
                   <Card 
                     className={`h-full w-full overflow-auto rounded-lg ${
                       offer.type === 'plan' ? 'border-2' : 'border'
@@ -161,10 +161,11 @@ export default function CoolOffersCarousel() {
                     style={{
                       backgroundColor: theme.colors.background.hex,
                       borderColor: offer.type === 'plan' ? theme.colors.primary.hex : theme.colors.accent.hex,
-                      minHeight: '300px'
+                      minHeight: '300px',
+                      maxWidth: '300px'
                     }}
                   >
-                    <CardHeader className="sticky top-0 bg-background/95 border-b">
+                    <CardHeader className="sticky top-0 bg-background/95 border-b backdrop-blur-md">
                       <CardTitle className="text-xl sm:text-2xl md:text-3xl font-bold text-primary">
                         {offer.type === 'plan' ? <Rocket className="inline-block mr-2" /> : <Zap className="inline-block mr-2" />}
                         {offer.title}
