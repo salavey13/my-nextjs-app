@@ -130,9 +130,9 @@ export default function CoolOffersCarousel() {
   return (
     <div className="w-full bg-background/95">
       <div className="container mx-auto px-4 py-8">
-        <h2 className="text-2xl font-bold mb-6 text-center" style={{ color: theme.colors.foreground.hex }}>
+        <h1 className="text-2xl font-bold mb-6 text-center" style={{ color: theme.colors.foreground.hex }}>
           {t('coolOffers.heading')}
-        </h2>
+        </h1>
         
         {/* Main carousel section */}
         <div className="relative mb-8">
@@ -173,12 +173,12 @@ export default function CoolOffersCarousel() {
                       )}
                     </CardHeader>
                     <CardContent className="space-y-6 p-4 md:p-6">
-                      <p className="text-foreground/90 text-base md:text-lg">{offer.description}</p>
+                      <p className="text-background/90 text-base md:text-lg">{offer.description}</p>
                       <ul className="space-y-3">
                         {offer.features.map((feature, idx) => (
                           <li key={idx} className="flex items-start text-foreground/80">
                             <span className="mr-2 text-xl" style={{ color: offer.type === 'plan' ? theme.colors.primary.hex : theme.colors.accent.hex }}>•</span>
-                            <span className="text-sm md:text-base">{feature}</span>
+                            <span className="text-foreground/90 text-sm md:text-base">{feature}</span>
                           </li>
                         ))}
                       </ul>
