@@ -8,34 +8,20 @@ import { useAppContext } from '../context/AppContext'
 import useTelegram from '@/hooks/useTelegram'
 import { useTheme } from '@/hooks/useTheme'
 
-// Types for raw offer data from translations
-interface RawOffer {
-  title: string;
-  subtitle?: string;
-  description: string;
-  [key: `feature${number}`]: string;
-  [key: string]: string | undefined;
+interface OfferTranslation {
+  title: string
+  subtitle?: string
+  description: string
+  [key: `feature${number}`]: string
 }
 
-interface CoolOffers {
-  heading: string;
-  learnMore: string;
-  watchTutorials: string;
-  viewOnKwork: string;
-  [key: string]: string | RawOffer;
+interface CoolOffersTranslations {
+  heading: string
+  learnMore: string
+  watchTutorials: string
+  viewOnKwork: string
+  [key: string]: string | OfferTranslation
 }
-
-// Type for processed offer data
-interface ProcessedOffer {
-  type: 'plan' | 'gig';
-  title: string;
-  subtitle?: string;
-  description: string;
-  features: string[];
-  coolnessFactor: number;
-}
-
-type OfferEntry = [string, RawOffer];
 
 export default function CoolOffersCarousel() {
   const [currentIndex, setCurrentIndex] = useState(0)
@@ -46,41 +32,25 @@ export default function CoolOffersCarousel() {
   const { theme } = useTheme()
   const containerRef = useRef<HTMLDivElement>(null)
 
-  // Check if key in CoolOffers is an offer type
-  const isOfferKey = (key: string): boolean => key.endsWith('Package') || key.startsWith('ai')
+  // Get all translations for coolOffers
+  const coolOffers = t('coolOffers') as unknown as CoolOffersTranslations
 
-  // Verify if value matches RawOffer structure
-  const isRawOffer = (value: unknown): value is RawOffer => {
-    return typeof value === 'object' && 
-           value !== null && 
-           'title' in value && 
-           'description' in value
-  }
-
-  // Type guard for offer entries
-  const isOfferEntry = (entry: [string, unknown]): entry is OfferEntry => {
-    const [key, value] = entry
-    return isOfferKey(key) && isRawOffer(value)
-  }
-
-  // Helper to extract features from an offer
-  const extractFeatures = (offer: RawOffer): string[] => {
-    return Object.keys(offer)
-      .filter(key => key.startsWith('feature'))
-      .map(key => offer[key])
-      .filter((value): value is string => typeof value === 'string')
-  }
-
-  // Add debug logging
-  console.log('Raw coolOffers:', t('coolOffers'))
-  const processedOffers = Object.entries(t('coolOffers') as unknown as CoolOffers)
-    .filter(isOfferEntry)
-    .map(([key, offer]): ProcessedOffer => ({
+  // Process offers from translations
+  const offers = Object.entries(coolOffers)
+    .filter(([key, value]): value is OfferTranslation => {
+      // Filter out non-offer entries
+      if (typeof value === 'string') return false
+      if (key === 'heading' || key === 'learnMore' || key === 'watchTutorials' || key === 'viewOnKwork') return false
+      return 'title' in value && 'description' in value
+    })
+    .map(([key, offer]) => ({
       type: key.includes('Package') ? 'plan' : 'gig',
       title: offer.title,
       subtitle: offer.subtitle,
       description: offer.description,
-      features: extractFeatures(offer),
+      features: Object.entries(offer)
+        .filter(([key]) => key.startsWith('feature'))
+        .map(([_, value]) => value),
       coolnessFactor: key.includes('vip') ? 10 : 
                      key.includes('ai') ? 9 : 
                      key.includes('standard') ? 8 : 
@@ -88,9 +58,10 @@ export default function CoolOffersCarousel() {
     }))
     .sort((a, b) => b.coolnessFactor - a.coolnessFactor)
 
-  console.log('Processed offers:', processedOffers)
+  // Debug logging
+  console.log('Raw coolOffers:', coolOffers)
+  console.log('Processed offers:', offers)
 
-  const offers = processedOffers
   const handleTouchStart = (e: React.TouchEvent) => setTouchStart(e.targetTouches[0].clientX)
   const handleTouchMove = (e: React.TouchEvent) => setTouchEnd(e.targetTouches[0].clientX)
   const handleTouchEnd = () => {
@@ -113,11 +84,9 @@ export default function CoolOffersCarousel() {
   }, [])
 
   if (offers.length === 0) {
-    console.log('No offers found')
-    return <div className="p-4 text-center">No offers available</div>
+    console.log('No offers found in translations')
+    return null
   }
-
-  const coolOffers = t('coolOffers') as unknown as CoolOffers
 
   return (
     <div className="w-full min-h-screen bg-background" style={{ backgroundColor: theme.colors.background.hex }}>
