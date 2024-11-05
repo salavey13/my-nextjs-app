@@ -66,6 +66,8 @@ export interface UserData {
       }
     }
   };
+  
+  balance?: number | null;
 }
 
 interface AppState {
@@ -95,7 +97,8 @@ type Action =
   | { type: 'SET_STORY_STAGES'; payload: any[] }
   | { type: 'ADD_DEBUG_LOG'; payload: string }
   | { type: 'SET_FORM_STATE'; payload: any }
-  | { type: 'RESET_USER' };
+  | { type: 'RESET_USER' }
+  | { type: 'UPDATE_BALANCE'; payload: number };
 
 interface StageTrigger {
   unlockCustomization: boolean;
@@ -247,7 +250,8 @@ const initialState: AppState = {
           shirt_img_url: "https://thumbs4.imagebam.com/76/dd/61/MEWDIXW_t.png"
         }
       }
-    }
+    },
+    balance: 0,
   },
   storyStages: [],
   debugLogs: [],
@@ -276,6 +280,10 @@ function appReducer(state: AppState, action: Action): AppState {
       return { ...state, formState: action.payload };
     case 'RESET_USER':
       return { ...state, user: null };
+    case 'UPDATE_BALANCE':
+      return state.user
+        ? { ...state, user: { ...state.user, balance: action.payload } }
+        : state;
     default:
       return state;
   }

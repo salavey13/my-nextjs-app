@@ -67,6 +67,59 @@
     height: 100%;
   }
 
+  .tarot-theme {
+    --background: 270 50% 10%;
+    --foreground: 60 100% 50%;
+    --card: 270 50% 15%;
+    --card-foreground: 60 100% 50%;
+    --popover: 270 50% 15%;
+    --popover-foreground: 60 100% 50%;
+    --primary: 60 100% 50%;
+    --primary-foreground: 270 50% 10%;
+    --secondary: 310 50% 50%;
+    --secondary-foreground: 60 100% 50%;
+    --muted: 270 50% 20%;
+    --muted-foreground: 60 100% 70%;
+    --accent: 310 50% 50%;
+    --accent-foreground: 60 100% 50%;
+    --destructive: 0 100% 50%;
+    --destructive-foreground: 60 100% 50%;
+    --border: 270 50% 20%;
+    --input: 270 50% 20%;
+    --ring: 60 100% 50%;
+  }
+  
+  .tarot-theme .btn-tarot {
+    background-color: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+    border: 2px solid hsl(var(--border));
+    padding: 0.5rem 1rem;
+    border-radius: 0.25rem;
+    transition: all 0.3s ease;
+  }
+  
+  .tarot-theme .btn-tarot:hover {
+    background-color: hsl(var(--accent));
+    color: hsl(var(--accent-foreground));
+    border-color: hsl(var(--accent));
+  }
+  
+  .tarot-theme .input-tarot,
+  .tarot-theme .textarea-tarot {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    border: 2px solid hsl(var(--border));
+    padding: 0.5rem;
+    border-radius: 0.25rem;
+  }
+  
+  .tarot-theme .input-tarot:focus,
+  .tarot-theme .textarea-tarot:focus {
+    outline: none;
+    border-color: hsl(var(--ring));
+    box-shadow: 0 0 0 2px hsl(var(--ring) / 0.3);
+  }
+
   /* Fixed h1 to remove stroke and add a clean gradient effect 
 h1 {
   background: linear-gradient(45deg, #8e2de2, #4a00e0, #9c27b0);

@@ -1,5 +1,27 @@
+// utils\en.tsx
 import { LanguageDictionary } from "../utils/TranslationUtils";
 export const en: LanguageDictionary = {
+  // ... (existing translations)tarotReading: "Tarot Reading",
+  tarotWelcome: "Welcome to Tarot Readings",
+  tarotDescription: "Explore your future with our mystical tarot readings.",
+  startReading: "Start New Reading",
+  viewHistory: "View Reading History",
+    tarotReadingDescription: "Enter your question below. Be specific and focus on what you want to know.",
+    enterQuestionPlaceholder: "Enter your question...",
+    cost: "Cost: {cost} coins",
+    balance: "Balance: {balance} coins",
+    generatingReading: "Generating Reading...",
+    getReading: "Get Reading",
+    buyCoins: "Buy Coins",
+    error: "Error",
+    enterQuestion: "Please enter your question",
+    insufficientBalance: "Insufficient Balance",
+    insufficientBalanceMessage: "You need {cost} coins for a reading. Would you like to buy coins?",
+    buyNow: "Buy Now",
+    cancel: "Cancel",
+    paymentError: "Failed to process payment. Please try again.",
+    readingError: "Failed to generate reading. Please try again.",
+    buyCoinsMessage: "You will be redirected to the payment page. After successful payment, your balance will be updated automatically.",
   // ... (existing translations)
   
     coolOffers: {
@@ -525,7 +547,6 @@ export const en: LanguageDictionary = {
     yes: "Yes",
     no: "No",
     ok: "OK",
-    cancel: "Cancel",
     confirm: "Confirm",
     back: "Back",
     next: "Next",
@@ -555,7 +576,6 @@ export const en: LanguageDictionary = {
     sendInvite: "Send Invite",
     inviteSent: "Invite Sent Successfully!",
     alreadyReferred: "This user has already been referred.",
-    error: "An error occurred. Please try again.",
     profile: "Profile",
     createEvent: "Create Event",
     eventTitle: "Event Title",
