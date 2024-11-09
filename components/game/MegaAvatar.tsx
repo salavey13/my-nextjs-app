@@ -97,7 +97,7 @@ const MegaAvatar: React.FC<MegaAvatarProps> = React.memo(({ gameState, playerId,
           </div>
         </div>
       </ShineBorder>
-      {player && (
+      {/* {player && (
         <div
           style={{
             marginTop: '5px',
@@ -114,7 +114,7 @@ const MegaAvatar: React.FC<MegaAvatarProps> = React.memo(({ gameState, playerId,
         >
           {player.username}
         </div>
-      )}
+      )} */}
     </animated.div>
   );
 });
